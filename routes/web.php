@@ -23,8 +23,8 @@
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-/* — Raíz: redirige al login — */
-Route::get('/', fn () => redirect()->route('login'));
+/* — Raíz: muestra la landing (welcome) — */
+Route::get('/', fn () => view('welcome'))->name('home');
 
 /* — Vistas de autenticación — */
 Route::get('/login',    [AuthController::class, 'showLogin'])
