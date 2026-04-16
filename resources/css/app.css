@@ -6,6 +6,118 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============================================================
+   VIBEZ — estilos base
+   Fondo claro con formas decorativas, cabecera morada
+   ============================================================ */
+
+/* --- Base --- */
+body {
+    background-color: #f7f5ff;   /* blanco con toque lavanda muy suave */
+    color: #1e1b4b;              /* morado muy oscuro, casi negro */
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* --- Cabecera morada --- */
+.header-purple {
+    background-color: #7c3aed;
+}
+
+/* --- Texto con degradado morado --- */
+/* Usado en el título principal y palabras clave */
+.text-gradient {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Botón principal (CTA) --- */
+/* Fondo morado sólido, se agranda un poco al pasar el ratón */
+.btn-cta {
+    background-color: #7c3aed;
+    color: white;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn-cta:hover {
+    background-color: #6d28d9;
+    transform: scale(1.03);
+}
+
+/* --- Botón secundario (login) --- */
+/* Solo borde blanco, sin fondo — diseñado para ir sobre cabecera morada */
+.btn-ghost {
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    color: white;
+    transition: background-color 0.2s ease;
+}
+.btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Etiquetas de características (pills) --- */
+/* Fondo lavanda claro con borde morado suave */
+.pill {
+    background-color: #ede9fe;
+    border: 1px solid #c4b5fd;
+    color: #5b21b6;
+}
+
+/* --- Formas decorativas de fondo --- */
+/* Círculos con desenfoque que dan profundidad al fondo sin tapar el contenido */
+.shape {
+    position: absolute;
+    border-radius: 50%;          /* círculo perfecto */
+    opacity: 0.12;               /* muy suaves, casi invisibles */
+    filter: blur(60px);          /* borde difuminado */
+    pointer-events: none;        /* no interfieren con los clics */
+    z-index: 0;                  /* detrás de todo el contenido */
+}
+
+/* Círculo grande arriba a la izquierda */
+.shape-1 {
+    width: 400px;
+    height: 400px;
+    background-color: #7c3aed;
+    top: -80px;
+    left: -120px;
+}
+
+/* Círculo mediano abajo a la derecha */
+.shape-2 {
+    width: 300px;
+    height: 300px;
+    background-color: #a855f7;
+    bottom: 0;
+    right: -80px;
+}
+
+/* Círculo pequeño en el centro */
+.shape-3 {
+    width: 200px;
+    height: 200px;
+    background-color: #6d28d9;
+    top: 45%;
+    left: 50%;
+}
+
+/* --- Animación de entrada del hero --- */
+/* El contenido sube suavemente al cargar la página */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-content {
+    animation: fadeSlideUp 0.7s ease both;
 }
