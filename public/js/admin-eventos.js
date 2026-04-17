@@ -10,6 +10,27 @@ var AdminEventos = {
 
         while (i < formularios.length) {
             formularios[i].onsubmit = function () {
+                var formulario = this;
+
+                if (window.Swal && typeof window.Swal.fire === 'function') {
+                    window.Swal.fire({
+                        title: 'Eliminar evento',
+                        text: 'Esta accion no se puede deshacer.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Si, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d'
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            formulario.submit();
+                        }
+                    });
+
+                    return false;
+                }
+
                 return window.confirm('Estas seguro de eliminar este evento?');
             };
             i = i + 1;
