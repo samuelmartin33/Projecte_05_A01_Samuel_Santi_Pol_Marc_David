@@ -8,13 +8,16 @@
     --border: #c4b5fd;
 }
 
+/* Importar fuente Inter desde Bunny Fonts (sin Google) */
+@import url('https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900');
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
     background: linear-gradient(180deg, #f7f5ff 0%, #f0ecff 30%, #f7f5ff 100%) fixed;
     color: var(--ink);
 }
@@ -31,10 +34,8 @@ body {
 }
 
 .dashboard-sidebar {
-    background:
-        linear-gradient(180deg, rgba(10, 5, 35, 0.98) 0%, rgba(60, 20, 100, 0.95) 100%),
-        radial-gradient(circle at 10% 0%, rgba(124, 58, 237, 0.4), rgba(124, 58, 237, 0));
-    color: #f4f7ff;
+    background-color: #7c3aed;
+    color: #ffffff;
     padding: 0.55rem 1rem;
     display: flex;
     align-items: center;
@@ -49,8 +50,12 @@ body {
 .brand {
     display: flex;
     align-items: center;
-    font-size: 1rem;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: -0.05em;
     white-space: nowrap;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
 }
 
 .menu {

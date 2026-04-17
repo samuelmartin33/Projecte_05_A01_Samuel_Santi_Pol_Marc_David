@@ -10,7 +10,7 @@
 <div class="dashboard-wrap">
     <aside class="dashboard-sidebar" id="sidebar">
         <div class="brand">
-            <strong>Vibez Admin</strong>
+            <span>VIBEZ</span>
         </div>
 
         <nav class="menu">
