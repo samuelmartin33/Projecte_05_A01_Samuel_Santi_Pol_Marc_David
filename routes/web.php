@@ -28,6 +28,14 @@ Route::get('/trabajos/{id}', [EventoController::class, 'detalleOferta'])
 Route::get('/api/filtrar', [EventoController::class, 'filtrar'])
     ->name('api.filtrar');
 
+// --- Página completa de Bolsa de Trabajo ---
+Route::get('/bolsa-de-trabajo', [EventoController::class, 'bolsaTrabajo'])
+    ->name('trabajos.index');
+
+// --- API AJAX: filtrar solo ofertas de trabajo ---
+Route::get('/api/filtrar-trabajos', [EventoController::class, 'filtrarTrabajos'])
+    ->name('api.filtrar-trabajos');
+
 // --- Landing de bienvenida (página estática de marketing) ---
 Route::get('/bienvenida', function () {
     return view('welcome');

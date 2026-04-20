@@ -35,6 +35,14 @@ class BolsaOfertaTrabajo extends Model
     }
 
     /**
+     * Relación: la oferta pertenece a una categoría de trabajo.
+     */
+    public function categoria()
+    {
+        return $this->belongsTo(CategoriaTrabajo::class, 'categoria_trabajo_id');
+    }
+
+    /**
      * Accessor: devuelve el rango salarial formateado.
      * Ejemplo: "€ 1.200 – € 1.800 / mes" o "A negociar"
      */

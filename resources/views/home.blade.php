@@ -5,379 +5,504 @@
 @section('contenido')
 
 {{-- ════════════════════════════════════════════════════
-     BANNER HERO — Título y subtítulo de la sección
+     BANNER HERO — Fondo oscuro con orbs neon animados
 ════════════════════════════════════════════════════ --}}
 <section class="hero-home">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
+
+    {{-- Partículas decorativas (estrellitas de luz) --}}
+    <div class="hero-particula hero-particula-1"></div>
+    <div class="hero-particula hero-particula-2"></div>
+    <div class="hero-particula hero-particula-3"></div>
+    <div class="hero-particula hero-particula-4"></div>
+    <div class="hero-particula hero-particula-5"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10">
+
+        {{-- Badge de bienvenida --}}
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
+             style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#c084fc;letter-spacing:0.06em;text-transform:uppercase;">
+            🔥 La plataforma de la escena joven
+        </div>
+
         <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Descubre tu próximo<br>
-            <span class="text-gradient-claro">evento</span>
+            Tu próxima<br>
+            <span class="text-gradient-claro">aventura empieza aquí</span>
         </h1>
-        <p class="mt-4 text-white/70 text-lg max-w-xl mx-auto">
-            Música, cultura, deporte y oportunidades de trabajo — todo en un solo lugar.
+
+        <p class="mt-5 text-white/60 text-base max-w-lg mx-auto leading-relaxed">
+            Eventos, conciertos, festivales y trabajo — todo lo que vive tu escena, en un solo lugar.
         </p>
+
+        {{-- Pills de categorías interactivas --}}
+        <div class="flex flex-wrap justify-center gap-2 mt-7">
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '1', '🎵 Música', {stopPropagation:function(){}})">🎵 Música</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '3', '⚽ Deporte', {stopPropagation:function(){}})">⚽ Deporte</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '2', '🎭 Cultura', {stopPropagation:function(){}})">🎭 Cultura</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '4', '🍕 Gastro', {stopPropagation:function(){}})">🍕 Gastro</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', 'trabajo', '💼 Trabajo', {stopPropagation:function(){}})">💼 Trabajo</span>
+        </div>
+
     </div>
 </section>
 
 {{-- ════════════════════════════════════════════════════
      BARRA DE FILTROS — sticky bajo el nav
-     onchange llama a aplicarFiltros() que hace fetch AJAX
+     Usa custom selects (sin look nativo del navegador)
 ════════════════════════════════════════════════════ --}}
 <section class="barra-filtros sticky top-16 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-4">
 
-        {{-- Indicador de resultados --}}
-        <p class="text-sm font-medium text-navy/70 mr-auto">
-            <span id="contador-resultados">
-                {{ $eventos->count() + $ofertas->count() }}
-            </span> resultados
+    {{-- Overlay transparente para cerrar dropdowns al pulsar fuera --}}
+    <div id="overlay-dropdowns"
+         style="display:none;position:fixed;inset:0;z-index:200;"
+         onclick="cerrarTodosDropdowns()"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
+
+        {{-- Contador de resultados --}}
+        <p class="text-sm font-semibold mr-auto self-center"
+           style="color:rgba(15,23,42,0.5)">
+            <span id="contador-resultados">{{ $eventos->count() + $ofertas->count() }}</span>
+            <span style="color:var(--morado)"> resultados</span>
         </p>
 
-        {{-- Selector de categoría --}}
-        <div class="filtro-grupo">
-            <label class="filtro-label" for="filtro-categoria">Categoría</label>
-            <select id="filtro-categoria"
-                    class="filtro-select"
-                    onchange="aplicarFiltros()">
-                <option value="">Todas</option>
-                @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
-                @endforeach
-                {{-- Opción especial para mostrar solo ofertas de trabajo --}}
-                <option value="trabajo">💼 Bolsa de Trabajo</option>
-            </select>
+        {{-- ── Selector de CATEGORÍA personalizado ── --}}
+        <div class="filtro-grupo" style="position:relative;z-index:250;">
+            <label class="filtro-label">Categoría</label>
+            <div class="custom-select-wrapper"
+                 id="wrapper-categoria"
+                 onclick="toggleDropdown('categoria')">
+                <span id="categoria-display" class="custom-select-display">Todas</span>
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+                <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
+                    <div class="custom-select-option seleccionado"
+                         onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
+                    @foreach ($categorias as $categoria)
+                        <div class="custom-select-option"
+                             onclick="seleccionarFiltro('categoria','{{ $categoria->id }}','{{ $categoria->nombre }}',event)">
+                            {{ $categoria->nombre }}
+                        </div>
+                    @endforeach
+                    <div class="custom-select-option"
+                         onclick="seleccionarFiltro('categoria','trabajo','💼 Bolsa de Trabajo',event)">
+                        💼 Bolsa de Trabajo
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="filtro-categoria" value="">
         </div>
 
-        {{-- Selector de ubicación --}}
-        <div class="filtro-grupo">
-            <label class="filtro-label" for="filtro-ubicacion">Ubicación</label>
-            <select id="filtro-ubicacion"
-                    class="filtro-select"
-                    onchange="aplicarFiltros()">
-                <option value="">Todas las ciudades</option>
-                @foreach ($ubicaciones as $ubicacion)
-                    <option value="{{ $ubicacion }}">{{ $ubicacion }}</option>
-                @endforeach
-            </select>
+        {{-- ── Selector de UBICACIÓN personalizado ── --}}
+        <div class="filtro-grupo" style="position:relative;z-index:240;">
+            <label class="filtro-label">Ubicación</label>
+            <div class="custom-select-wrapper"
+                 id="wrapper-ubicacion"
+                 onclick="toggleDropdown('ubicacion')">
+                <span id="ubicacion-display" class="custom-select-display">Todas las ciudades</span>
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+                <div id="ubicacion-dropdown" class="custom-select-dropdown" style="display:none">
+                    <div class="custom-select-option seleccionado"
+                         onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">
+                        Todas las ciudades
+                    </div>
+                    @foreach ($ubicaciones as $ubicacion)
+                        <div class="custom-select-option"
+                             onclick="seleccionarFiltro('ubicacion','{{ $ubicacion }}','{{ $ubicacion }}',event)">
+                            {{ $ubicacion }}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            <input type="hidden" id="filtro-ubicacion" value="">
         </div>
 
-        {{-- Botón para limpiar filtros --}}
-        <button class="btn-limpiar"
-                onclick="limpiarFiltros()">
-            Limpiar
-        </button>
+        {{-- Botón limpiar — wrapped en filtro-grupo con label invisible para alinearlo ── --}}
+        <div class="filtro-grupo">
+            <span class="filtro-label" style="visibility:hidden">–</span>
+            <button class="btn-limpiar" onclick="limpiarFiltros()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+                Limpiar
+            </button>
+        </div>
 
     </div>
 </section>
 
 {{-- ════════════════════════════════════════════════════
-     GRID DE TARJETAS
+     GRID DE TARJETAS (eventos + ofertas mezclados)
      id="grid-resultados" es el target del AJAX
 ════════════════════════════════════════════════════ --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    {{-- Spinner de carga — oculto por defecto, se muestra durante el fetch --}}
+    {{-- Spinner de carga --}}
     <div id="cargando" class="hidden flex justify-center py-16">
         <div class="spinner"></div>
     </div>
 
-    {{-- Mensaje cuando no hay resultados --}}
+    {{-- Mensaje sin resultados --}}
     <div id="sin-resultados" class="hidden text-center py-20">
-        <p class="text-4xl mb-3">🔍</p>
-        <p class="text-navy/60 text-lg font-medium">No hay resultados para estos filtros.</p>
-        <button class="btn-morado mt-4" onclick="limpiarFiltros()">Ver todo</button>
+        <p class="text-5xl mb-3">🔍</p>
+        <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
+        <p class="text-sm mt-1 mb-5" style="color:rgba(15,23,42,0.45)">Prueba a cambiar la categoría o la ciudad</p>
+        <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
     </div>
 
-    {{-- Grid de tarjetas — se reemplaza en cada filtrado --}}
-    <div id="grid-resultados"
-         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {{-- ── Sección EVENTOS ── --}}
+    <div id="seccion-eventos">
+        <div class="seccion-vibez-titulo">
+            <span>🎉</span> Eventos
+        </div>
+        <p class="seccion-vibez-sub">
+            {{ $eventos->count() }} evento{{ $eventos->count() !== 1 ? 's' : '' }} disponible{{ $eventos->count() !== 1 ? 's' : '' }}
+        </p>
 
-        {{-- ── Tarjetas de EVENTOS ── --}}
-        @foreach ($eventos as $evento)
-            <article class="card-evento"
-                     onclick="irADetalle('evento', {{ $evento->id }})">
+        <div id="grid-eventos"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                {{-- Imagen de portada con badges superpuestos --}}
-                <div class="card-imagen-wrap">
-                    <img src="{{ $evento->url_portada }}"
-                         alt="{{ $evento->titulo }}"
-                         class="card-imagen"
-                         onerror="this.src='https://picsum.photos/seed/fallback-{{ $evento->id }}/600/400'">
+            @foreach ($eventos as $evento)
+                <article class="card-evento"
+                         onclick="irADetalle('evento', {{ $evento->id }})">
 
-                    {{-- Badge de categoría (esquina superior izquierda) --}}
-                    <span class="badge-categoria">{{ $evento->categoria?->nombre ?? 'Evento' }}</span>
+                    <div class="card-imagen-wrap">
+                        <img src="{{ $evento->url_portada }}"
+                             alt="{{ $evento->titulo }}"
+                             class="card-imagen"
+                             onerror="this.src='https://picsum.photos/seed/fallback-{{ $evento->id }}/600/400'">
 
-                    {{-- Badge de precio (esquina superior derecha) --}}
-                    <span class="badge-precio {{ $evento->es_gratuito ? 'badge-gratis' : '' }}">
-                        {{ $evento->precio_formateado }}
-                    </span>
-                </div>
+                        {{-- Badge con data-cat para el color CSS --}}
+                        <span class="badge-categoria"
+                              data-cat="{{ $evento->categoria?->nombre ?? 'Evento' }}">
+                            {{ $evento->categoria?->nombre ?? 'Evento' }}
+                        </span>
 
-                {{-- Información del evento --}}
-                <div class="card-cuerpo">
-                    <h3 class="card-titulo">{{ $evento->titulo }}</h3>
+                        <span class="badge-precio {{ $evento->es_gratuito ? 'badge-gratis' : '' }}">
+                            {{ $evento->precio_formateado }}
+                        </span>
+                    </div>
 
-                    {{-- Fecha de inicio formateada --}}
-                    <p class="card-meta">
-                        <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY') }}
-                    </p>
-
-                    {{-- Ubicación (si existe) --}}
-                    @if ($evento->ubicacion_nombre)
+                    <div class="card-cuerpo">
+                        <h3 class="card-titulo">{{ $evento->titulo }}</h3>
                         <p class="card-meta">
                             <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            {{ $evento->ubicacion_nombre }}
+                            {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY') }}
                         </p>
-                    @endif
+                        @if ($evento->ubicacion_nombre)
+                            <p class="card-meta">
+                                <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {{ $evento->ubicacion_nombre }}
+                            </p>
+                        @endif
+                        @if ($evento->organizador?->empresa)
+                            <p class="card-organizador">
+                                {{ $evento->organizador->empresa->nombre_empresa }}
+                            </p>
+                        @endif
+                    </div>
+                </article>
+            @endforeach
 
-                    {{-- Nombre del organizador --}}
-                    @if ($evento->organizador?->empresa)
-                        <p class="card-organizador">
-                            {{ $evento->organizador->empresa->nombre_empresa }}
-                        </p>
-                    @endif
-                </div>
+        </div>{{-- fin #grid-eventos --}}
+    </div>
 
-            </article>
-        @endforeach
+    {{-- ── Separador y sección BOLSA DE TRABAJO ── --}}
+    @if ($ofertas->count() > 0)
+        <hr class="linea-divisora">
 
-        {{-- ── Tarjetas de BOLSA DE TRABAJO ── --}}
-        @foreach ($ofertas as $oferta)
-            <article class="card-trabajo"
-                     onclick="irADetalle('oferta', {{ $oferta->id }})">
+        <div id="seccion-trabajos">
+            <div class="seccion-vibez-titulo">
+                <span>💼</span> Bolsa de Trabajo
+            </div>
+            <p class="seccion-vibez-sub">
+                {{ $ofertas->count() }} oferta{{ $ofertas->count() !== 1 ? 's' : '' }} de empleo en la escena de eventos
+            </p>
 
-                {{-- Cabecera con degradado en lugar de imagen --}}
-                <div class="card-trabajo-header">
-                    <svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    <span class="badge-trabajo">Trabajo</span>
-                </div>
+            <div id="grid-trabajos"
+                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                {{-- Información de la oferta --}}
-                <div class="card-cuerpo">
-                    <h3 class="card-titulo">{{ $oferta->titulo }}</h3>
+                @foreach ($ofertas as $oferta)
+                    <article class="card-trabajo"
+                             onclick="irADetalle('oferta', {{ $oferta->id }})">
 
-                    {{-- Empresa --}}
-                    @if ($oferta->organizador?->empresa)
-                        <p class="card-meta font-semibold text-morado-vibez">
-                            {{ $oferta->organizador->empresa->nombre_empresa }}
-                        </p>
-                    @endif
-
-                    {{-- Ubicación --}}
-                    @if ($oferta->ubicacion)
-                        <p class="card-meta">
-                            <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <div class="card-trabajo-header">
+                            <svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
-                            {{ $oferta->ubicacion }}
-                        </p>
-                    @endif
+                            <span class="badge-trabajo">Trabajo</span>
+                        </div>
 
-                    {{-- Salario --}}
-                    <p class="card-salario">{{ $oferta->salario_formateado }}</p>
+                        <div class="card-cuerpo">
+                            <h3 class="card-titulo">{{ $oferta->titulo }}</h3>
+                            @if ($oferta->organizador?->empresa)
+                                <p class="card-meta font-semibold" style="color:var(--morado)">
+                                    {{ $oferta->organizador->empresa->nombre_empresa }}
+                                </p>
+                            @endif
+                            @if ($oferta->ubicacion)
+                                <p class="card-meta">
+                                    <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    </svg>
+                                    {{ $oferta->ubicacion }}
+                                </p>
+                            @endif
+                            <p class="card-salario">{{ $oferta->salario_formateado }}</p>
+                            <p class="card-meta" style="font-size:0.75rem">
+                                {{ $oferta->vacantes }} vacante{{ $oferta->vacantes !== 1 ? 's' : '' }}
+                            </p>
+                        </div>
+                    </article>
+                @endforeach
 
-                    {{-- Número de vacantes --}}
-                    <p class="card-meta text-xs">
-                        {{ $oferta->vacantes }} vacante{{ $oferta->vacantes !== 1 ? 's' : '' }}
-                    </p>
-                </div>
+            </div>{{-- fin #grid-trabajos --}}
+        </div>
+    @endif
 
-            </article>
-        @endforeach
-
-    </div>{{-- fin #grid-resultados --}}
+    {{-- Grid unificado para el AJAX (target del filtrado) --}}
+    <div id="grid-resultados" class="hidden">
+        <div id="grid-resultados-inner"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        </div>
+    </div>
 
 </section>
 
 @endsection
 
 {{-- ════════════════════════════════════════════════════
-     SCRIPTS DE LA HOME — filtrado AJAX con fetch()
+     SCRIPTS — Filtrado AJAX + Custom Selects
 ════════════════════════════════════════════════════ --}}
 @push('scripts')
 <script>
+
 /**
- * Redirige al detalle del evento o la oferta de trabajo al hacer clic en una tarjeta.
- * @param {string} tipo   - 'evento' o 'oferta'
- * @param {number} id     - ID del registro en la BD
+ * Abre o cierra el dropdown personalizado de un selector.
+ * Usa un overlay invisible para detectar clics fuera del selector.
  */
-function irADetalle(tipo, id) {
-    if (tipo === 'evento') {
-        window.location.href = '/eventos/' + id;
-    } else {
-        window.location.href = '/trabajos/' + id;
+function toggleDropdown(id) {
+    var dropdown = document.getElementById(id + '-dropdown');
+    var wrapper  = document.getElementById('wrapper-' + id);
+    var overlay  = document.getElementById('overlay-dropdowns');
+    var estaAbierto = dropdown.style.display === 'block';
+
+    cerrarTodosDropdowns();
+
+    if (!estaAbierto) {
+        dropdown.style.display = 'block';
+        wrapper.classList.add('abierto');
+        overlay.style.display = 'block';
     }
 }
 
 /**
- * Lee los valores actuales de los dos selectores de filtro
- * y hace una petición AJAX al endpoint /api/filtrar.
- * Al recibir la respuesta, actualiza el grid sin recargar la página.
+ * Cierra todos los custom selects y oculta el overlay.
+ */
+function cerrarTodosDropdowns() {
+    ['categoria', 'ubicacion'].forEach(function(id) {
+        var d = document.getElementById(id + '-dropdown');
+        var w = document.getElementById('wrapper-' + id);
+        if (d) d.style.display = 'none';
+        if (w) w.classList.remove('abierto');
+    });
+    var overlay = document.getElementById('overlay-dropdowns');
+    if (overlay) overlay.style.display = 'none';
+}
+
+/**
+ * Selecciona una opción del custom select, actualiza el input hidden
+ * y dispara el filtrado AJAX.
+ * @param {string} filtroId  - 'categoria' o 'ubicacion'
+ * @param {string} valor     - Valor a guardar en el input hidden
+ * @param {string} texto     - Texto visible en el selector
+ * @param {Event}  event     - Evento del click (para stopPropagation)
+ */
+function seleccionarFiltro(filtroId, valor, texto, event) {
+    event.stopPropagation();
+
+    // Actualizar input hidden y texto visible
+    var inputHidden = document.getElementById('filtro-' + filtroId);
+    var display = document.getElementById(filtroId + '-display');
+    if (inputHidden) inputHidden.value = valor;
+    if (display) display.textContent = texto;
+
+    // Marcar la opción como seleccionada visualmente
+    var dropdown = document.getElementById(filtroId + '-dropdown');
+    if (dropdown) {
+        dropdown.querySelectorAll('.custom-select-option').forEach(function(op) {
+            op.classList.remove('seleccionado');
+        });
+        if (event.target && event.target.classList) {
+            event.target.classList.add('seleccionado');
+        }
+    }
+
+    cerrarTodosDropdowns();
+    aplicarFiltros();
+}
+
+/**
+ * Lee los filtros activos y hace fetch AJAX al endpoint /api/filtrar.
+ * Muestra el grid unificado de AJAX ocultando las secciones estáticas.
  */
 function aplicarFiltros() {
-    const categoria = document.getElementById('filtro-categoria').value;
-    const ubicacion = document.getElementById('filtro-ubicacion').value;
+    var categoria = document.getElementById('filtro-categoria').value;
+    var ubicacion = document.getElementById('filtro-ubicacion').value;
 
-    // Mostrar spinner y ocultar grid mientras carga
+    // Mostrar spinner, ocultar secciones
     document.getElementById('cargando').classList.remove('hidden');
     document.getElementById('grid-resultados').classList.add('hidden');
     document.getElementById('sin-resultados').classList.add('hidden');
 
-    // Llamada AJAX al backend
-    fetch(`/api/filtrar?categoria=${encodeURIComponent(categoria)}&ubicacion=${encodeURIComponent(ubicacion)}`)
-        .then(function(respuesta) {
-            // Convertir la respuesta a JSON
-            return respuesta.json();
-        })
-        .then(function(datos) {
-            // Actualizar el contador de resultados
-            document.getElementById('contador-resultados').textContent = datos.total;
+    var seccionEventos  = document.getElementById('seccion-eventos');
+    var seccionTrabajos = document.getElementById('seccion-trabajos');
+    if (seccionEventos)  seccionEventos.style.display  = 'none';
+    if (seccionTrabajos) seccionTrabajos.style.display = 'none';
 
-            // Ocultar spinner
+    fetch('/api/filtrar?categoria=' + encodeURIComponent(categoria) + '&ubicacion=' + encodeURIComponent(ubicacion))
+        .then(function(respuesta) { return respuesta.json(); })
+        .then(function(datos) {
+
+            document.getElementById('contador-resultados').textContent = datos.total;
             document.getElementById('cargando').classList.add('hidden');
 
-            // Si no hay resultados, mostrar mensaje vacío
             if (datos.total === 0) {
                 document.getElementById('sin-resultados').classList.remove('hidden');
                 return;
             }
 
-            // Construir el HTML de todas las tarjetas
-            let htmlGrid = '';
-
-            // Renderizar tarjetas de eventos
+            // Construir HTML del grid combinado
+            var htmlGrid = '';
             datos.eventos.forEach(function(evento) {
                 htmlGrid += crearTarjetaEvento(evento);
             });
-
-            // Renderizar tarjetas de ofertas de trabajo
             datos.ofertas.forEach(function(oferta) {
                 htmlGrid += crearTarjetaOferta(oferta);
             });
 
-            // Inyectar el HTML en el grid y mostrarlo
-            const grid = document.getElementById('grid-resultados');
-            grid.innerHTML = htmlGrid;
-            grid.classList.remove('hidden');
+            document.getElementById('grid-resultados-inner').innerHTML = htmlGrid;
+            document.getElementById('grid-resultados').classList.remove('hidden');
         })
         .catch(function(error) {
-            // En caso de error de red, mostrar el grid como estaba
             console.error('Error al filtrar:', error);
             document.getElementById('cargando').classList.add('hidden');
-            document.getElementById('grid-resultados').classList.remove('hidden');
+            // Mostrar de nuevo las secciones estáticas
+            if (seccionEventos)  seccionEventos.style.display  = '';
+            if (seccionTrabajos) seccionTrabajos.style.display = '';
         });
 }
 
 /**
- * Resetea los dos selectores a su valor por defecto
- * y vuelve a cargar todos los eventos.
+ * Resetea todos los filtros y vuelve a mostrar las secciones estáticas.
  */
 function limpiarFiltros() {
+    // Resetear inputs hidden
     document.getElementById('filtro-categoria').value = '';
     document.getElementById('filtro-ubicacion').value = '';
-    aplicarFiltros();
-}
 
-/**
- * Genera el HTML de una tarjeta de evento a partir de los datos JSON.
- * @param {Object} evento - Objeto con los datos del evento devueltos por la API
- * @returns {string} HTML de la tarjeta lista para insertar en el DOM
- */
-function crearTarjetaEvento(evento) {
-    // Formatear la fecha a formato español (ej: "20 jul. 2026")
-    const fecha = new Date(evento.fecha_inicio).toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
+    // Resetear textos del custom select
+    document.getElementById('categoria-display').textContent = 'Todas';
+    document.getElementById('ubicacion-display').textContent = 'Todas las ciudades';
+
+    // Resetear marcas de seleccionado
+    document.querySelectorAll('.custom-select-dropdown .custom-select-option').forEach(function(op) {
+        op.classList.remove('seleccionado');
+    });
+    // Marcar primera opción de cada dropdown como seleccionada
+    ['categoria-dropdown', 'ubicacion-dropdown'].forEach(function(id) {
+        var primera = document.querySelector('#' + id + ' .custom-select-option');
+        if (primera) primera.classList.add('seleccionado');
     });
 
-    // Si no viene imagen, usar placeholder de picsum con ID como semilla
-    const imagen = evento.portada || ('https://picsum.photos/seed/evento-' + evento.id + '/600/400');
+    // Ocultar el grid AJAX y mostrar las secciones estáticas
+    document.getElementById('grid-resultados').classList.add('hidden');
+    document.getElementById('sin-resultados').classList.add('hidden');
 
-    // Construir la línea de ubicación solo si existe
-    const ubicacionHtml = evento.ubicacion_nombre
-        ? `<p class="card-meta">
-               <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-               </svg>
-               ${evento.ubicacion_nombre}
-           </p>`
-        : '';
+    var seccionEventos  = document.getElementById('seccion-eventos');
+    var seccionTrabajos = document.getElementById('seccion-trabajos');
+    if (seccionEventos)  seccionEventos.style.display  = '';
+    if (seccionTrabajos) seccionTrabajos.style.display = '';
 
-    return `
-        <article class="card-evento" onclick="irADetalle('evento', ${evento.id})">
-            <div class="card-imagen-wrap">
-                <img src="${imagen}"
-                     alt="${evento.titulo}"
-                     class="card-imagen"
-                     onerror="this.src='https://picsum.photos/seed/fallback-${evento.id}/600/400'">
-                <span class="badge-categoria">${evento.categoria}</span>
-                <span class="badge-precio ${evento.es_gratuito ? 'badge-gratis' : ''}">${evento.precio_formateado}</span>
-            </div>
-            <div class="card-cuerpo">
-                <h3 class="card-titulo">${evento.titulo}</h3>
-                <p class="card-meta">
-                    <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    ${fecha}
-                </p>
-                ${ubicacionHtml}
-                <p class="card-organizador">${evento.organizador}</p>
-            </div>
-        </article>
-    `;
+    // Actualizar contador con total real
+    var totalEventos  = {{ $eventos->count() }};
+    var totalOfertas  = {{ $ofertas->count() }};
+    document.getElementById('contador-resultados').textContent = totalEventos + totalOfertas;
 }
 
 /**
- * Genera el HTML de una tarjeta de oferta de trabajo.
- * @param {Object} oferta - Datos de la oferta devueltos por la API
- * @returns {string} HTML de la tarjeta lista para insertar en el DOM
+ * Navega al detalle del evento o la oferta al hacer clic en una tarjeta.
  */
-function crearTarjetaOferta(oferta) {
-    const ubicacionHtml = oferta.ubicacion_nombre
-        ? `<p class="card-meta">
-               <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-               </svg>
-               ${oferta.ubicacion_nombre}
-           </p>`
+function irADetalle(tipo, id) {
+    window.location.href = tipo === 'evento' ? '/eventos/' + id : '/trabajos/' + id;
+}
+
+/**
+ * Genera el HTML de una tarjeta de evento para el grid AJAX.
+ */
+function crearTarjetaEvento(evento) {
+    var fecha = new Date(evento.fecha_inicio).toLocaleDateString('es-ES', {
+        day: 'numeric', month: 'short', year: 'numeric'
+    });
+    var imagen = evento.portada || ('https://picsum.photos/seed/evento-' + evento.id + '/600/400');
+    var ubicacionHtml = evento.ubicacion_nombre
+        ? '<p class="card-meta"><svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>' + evento.ubicacion_nombre + '</p>'
         : '';
 
-    return `
-        <article class="card-trabajo" onclick="irADetalle('oferta', ${oferta.id})">
-            <div class="card-trabajo-header">
-                <svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                          d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-                <span class="badge-trabajo">Trabajo</span>
-            </div>
-            <div class="card-cuerpo">
-                <h3 class="card-titulo">${oferta.titulo}</h3>
-                <p class="card-meta font-semibold text-morado-vibez">${oferta.organizador}</p>
-                ${ubicacionHtml}
-                <p class="card-salario">${oferta.salario_formateado}</p>
-                <p class="card-meta text-xs">${oferta.vacantes} vacante${oferta.vacantes !== 1 ? 's' : ''}</p>
-            </div>
-        </article>
-    `;
+    return '<article class="card-evento" onclick="irADetalle(\'evento\',' + evento.id + ')">'
+        + '<div class="card-imagen-wrap">'
+        + '<img src="' + imagen + '" alt="' + evento.titulo + '" class="card-imagen" onerror="this.src=\'https://picsum.photos/seed/fallback-' + evento.id + '/600/400\'">'
+        + '<span class="badge-categoria" data-cat="' + evento.categoria + '">' + evento.categoria + '</span>'
+        + '<span class="badge-precio ' + (evento.es_gratuito ? 'badge-gratis' : '') + '">' + evento.precio_formateado + '</span>'
+        + '</div>'
+        + '<div class="card-cuerpo">'
+        + '<h3 class="card-titulo">' + evento.titulo + '</h3>'
+        + '<p class="card-meta"><svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' + fecha + '</p>'
+        + ubicacionHtml
+        + '<p class="card-organizador">' + evento.organizador + '</p>'
+        + '</div></article>';
+}
+
+/**
+ * Genera el HTML de una tarjeta de oferta de trabajo para el grid AJAX.
+ */
+function crearTarjetaOferta(oferta) {
+    var ubicacionHtml = oferta.ubicacion_nombre
+        ? '<p class="card-meta"><svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>' + oferta.ubicacion_nombre + '</p>'
+        : '';
+
+    return '<article class="card-trabajo" onclick="irADetalle(\'oferta\',' + oferta.id + ')">'
+        + '<div class="card-trabajo-header">'
+        + '<svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'
+        + '<span class="badge-trabajo">Trabajo</span>'
+        + '</div>'
+        + '<div class="card-cuerpo">'
+        + '<h3 class="card-titulo">' + oferta.titulo + '</h3>'
+        + '<p class="card-meta" style="font-weight:600;color:var(--morado)">' + oferta.organizador + '</p>'
+        + ubicacionHtml
+        + '<p class="card-salario">' + oferta.salario_formateado + '</p>'
+        + '<p class="card-meta" style="font-size:0.75rem">' + oferta.vacantes + ' vacante' + (oferta.vacantes !== 1 ? 's' : '') + '</p>'
+        + '</div></article>';
 }
 </script>
 @endpush

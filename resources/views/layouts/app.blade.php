@@ -9,9 +9,14 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
 
-    {{-- CSS y JS compilados por Vite --}}
+    {{-- CSS y JS compilados por Vite (cuando está corriendo npm run dev / build) --}}
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        {{-- Fallback CDN: Tailwind v4 (procesa clases utility en tiempo real) --}}
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        {{-- Estilos personalizados VIBEZ servidos como archivo estático --}}
+        <link rel="stylesheet" href="/css/vibez.css">
     @endif
 
     {{-- Espacio para estilos específicos de cada página (ej: Leaflet en el detalle) --}}
@@ -38,7 +43,8 @@
                    class="nav-link {{ request()->routeIs('home') ? 'nav-link-activo' : '' }}">
                     Explorar
                 </a>
-                <a href="{{ route('home') }}?categoria=trabajo" class="nav-link">
+                <a href="{{ route('trabajos.index') }}"
+                   class="nav-link {{ request()->routeIs('trabajos.index') ? 'nav-link-activo' : '' }}">
                     Bolsa de Trabajo
                 </a>
             </nav>

@@ -12,6 +12,9 @@
     <!-- CSS y JS compilados por Vite -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <link rel="stylesheet" href="/css/vibez.css">
     @endif
 </head>
 <body class="min-h-screen relative flex flex-col">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Evento;
 use App\Models\CategoriaEvento;
 use App\Models\BolsaOfertaTrabajo;
+use App\Models\CategoriaTrabajo;
 use Illuminate\Http\Request;
 
 class EventoController extends Controller
@@ -157,6 +158,79 @@ class EventoController extends Controller
         ->findOrFail($id);
 
         return view('eventos.detalle', compact('evento'));
+    }
+
+    /**
+     * Página completa de Bolsa de Trabajo.
+     * Muestra todas las ofertas activas con filtros por ciudad y categoría.
+     */
+    public function bolsaTrabajo()
+    {
+        // Todas las ofertas activas con empresa y categoría
+        $ofertas = BolsaOfertaTrabajo::with(['organizador.empresa', 'categoria'])
+            ->where('estado', 1)
+            ->orderBy('fecha_creacion', 'desc')
+            ->get();
+
+        // Categorías de trabajo para el filtro
+        $categoriasTrabajo = CategoriaTrabajo::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        // Ciudades únicas para el filtro
+        $ciudades = BolsaOfertaTrabajo::where('estado', 1)
+            ->whereNotNull('ubicacion')
+            ->distinct()
+            ->orderBy('ubicacion')
+            ->pluck('ubicacion');
+
+        return view('trabajos.index', compact('ofertas', 'categoriasTrabajo', 'ciudades'));
+    }
+
+    /**
+     * Endpoint AJAX para filtrar ofertas de trabajo.
+     * Acepta ?categoria= (ID de categoría_trabajo) y ?ciudad= (nombre ciudad).
+     * Devuelve JSON con el array 'ofertas' y el 'total'.
+     */
+    public function filtrarTrabajos(Request $request)
+    {
+        $categoriaId = $request->input('categoria', '');
+        $ciudad      = $request->input('ciudad', '');
+
+        $query = BolsaOfertaTrabajo::with(['organizador.empresa', 'categoria'])
+            ->where('estado', 1);
+
+        if ($categoriaId) {
+            $query->where('categoria_trabajo_id', $categoriaId);
+        }
+        if ($ciudad) {
+            $query->where('ubicacion', 'like', "%{$ciudad}%");
+        }
+
+        $ofertas = $query->orderBy('fecha_creacion', 'desc')->get();
+
+        $ofertasData = $ofertas->map(function ($oferta) {
+            return [
+                'id'                => $oferta->id,
+                'titulo'            => $oferta->titulo,
+                'descripcion'       => $oferta->descripcion
+                    ? mb_substr($oferta->descripcion, 0, 120) . '…'
+                    : '',
+                'ubicacion'         => $oferta->ubicacion ?? '–',
+                'salario_formateado'=> $oferta->salario_formateado,
+                'vacantes'          => $oferta->vacantes,
+                'categoria'         => $oferta->categoria?->nombre ?? 'General',
+                'organizador'       => $oferta->organizador?->empresa?->nombre_empresa ?? 'Empresa',
+                'fecha_inicio'      => $oferta->fecha_inicio_trabajo
+                    ? \Carbon\Carbon::parse($oferta->fecha_inicio_trabajo)->format('d/m/Y')
+                    : null,
+            ];
+        });
+
+        return response()->json([
+            'ofertas' => $ofertasData,
+            'total'   => $ofertasData->count(),
+        ]);
     }
 
     /**
