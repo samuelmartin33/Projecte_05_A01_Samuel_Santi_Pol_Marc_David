@@ -156,7 +156,7 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
             setTimeout(() => {
                 document.body.style.transition = 'opacity 0.35s ease';
                 document.body.style.opacity    = '0';
-                setTimeout(() => { window.location.href = '/index'; }, 360);
+                setTimeout(() => { window.location.href = '/home'; }, 360);
             }, 750);
 
         } else {

@@ -148,5 +148,65 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
 
     // — Activar spinner y enviar el formulario —
     submitBtn.classList.add('loading');
-    this.submit();
+
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept':       'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                nombre,
+                apellido1,
+                apellido2,
+                email,
+                password,
+                password_confirmation: passwordConfirmation,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            submitBtn.innerHTML = `
+                <span class="btn-text success-check">
+                    <svg class="check-icon" viewBox="0 0 24 24" fill="none"
+                         stroke="white" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    ¡Cuenta creada!
+                </span>
+            `;
+            submitBtn.classList.remove('loading');
+            submitBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
+
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.35s ease';
+                document.body.style.opacity    = '0';
+                setTimeout(() => { window.location.href = '/home'; }, 360);
+            }, 750);
+
+        } else {
+            submitBtn.classList.remove('loading');
+
+            if (data.errors && typeof data.errors === 'object') {
+                Object.entries(data.errors).forEach(([field, messages]) => {
+                    showFieldError(`field-${field}`, `error-${field}`, messages[0]);
+                });
+            }
+
+            showAlert(data.message || 'No se pudo crear la cuenta. Revisa los datos.');
+            shakeElement(document.getElementById('registerForm'));
+        }
+
+    } catch (err) {
+        submitBtn.classList.remove('loading');
+        showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
+        console.error('[VIBEZ] Error en register:', err);
+    }
 });
