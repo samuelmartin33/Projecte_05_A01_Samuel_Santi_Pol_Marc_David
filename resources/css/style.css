@@ -320,20 +320,23 @@ body.auth-page {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* min() garantiza que el padding vertical nunca supere el 3.5% del
-       viewport height, así el contenido siempre cabe sin scroll */
-    padding: min(var(--space-xl), 3.5vh)
-             clamp(2rem, 5vw, 4.5rem)
-             min(var(--space-xl), 3.5vh)
-             clamp(2.5rem, 5.5vw, 5rem);
+    padding: 0 clamp(2.5rem, 6vw, 5rem);
     position: relative;
     z-index: 1;
     overflow: hidden;
 }
 
+/* Espaciadores flex que empujan el contenido al centro */
+.form-panel::before,
+.form-panel::after {
+    content: '';
+    display: block;
+    flex: 1;
+    max-height: 2rem;
+}
+
 .form-header {
-    /* min() acota el margen inferior al 2.5% del vh para pantallas bajas */
-    margin-bottom: min(var(--space-xl), 2.5vh);
+    margin-bottom: min(1.25rem, 2vh);
 }
 
 .form-title {
@@ -360,9 +363,8 @@ body.auth-page {
 .field-group {
     display: flex;
     flex-direction: column;
-    /* gap y margin acotados con min() para no exceder el vh disponible */
-    gap: min(var(--space-md), 1.8vh);
-    margin-bottom: min(var(--space-lg), 2vh);
+    gap: min(0.85rem, 1.4vh);
+    margin-bottom: min(1rem, 1.5vh);
 }
 
 /* Fila de dos campos en paralelo (apellidos) */
@@ -375,7 +377,7 @@ body.auth-page {
 /* Wrapper de cada campo: padding superior para el label flotante */
 .field {
     position: relative;
-    padding-top: min(1.3rem, 2vh);
+    padding-top: min(1.1rem, 1.8vh);
 }
 
 .field input {
@@ -383,7 +385,7 @@ body.auth-page {
     border: none;
     border-bottom: 1.5px solid #D1D5DB;
     background: transparent;
-    padding: 0.65rem 0 0.45rem;
+    padding: 0.5rem 0 0.35rem;
     font-size: var(--font-base);
     color: var(--ink);
     outline: none;
@@ -421,6 +423,26 @@ body.auth-page {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+/* Date input: el browser muestra su propio formato (dd/mm/yyyy), por lo que
+   el label debe estar siempre en la posición flotada para no solaparse */
+.field input[type="date"] ~ label {
+    top: 0;
+    font-size: var(--font-xs);
+    color: #9CA3AF;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.field:focus-within input[type="date"] ~ label {
+    color: var(--violet-primary);
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.45;
+    cursor: pointer;
 }
 
 /* La línea animada se expande desde el centro hacia los extremos */
@@ -475,6 +497,56 @@ body.auth-page {
     transform: translateY(0);
 }
 
+/* Select flotante — mismo sistema visual que los inputs */
+.field-select {
+    position: relative;
+}
+
+.field-select select {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid #D1D5DB;
+    background: transparent;
+    padding: 1.4rem 1rem 0.35rem 0;
+    font-size: var(--font-sm);
+    color: #1F2937;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.25s ease;
+}
+
+.field-select select:focus {
+    border-color: var(--violet-primary);
+}
+
+.field-select select:focus ~ label,
+.field-select select:not([value=""]) ~ label {
+    top: 0;
+    font-size: var(--font-xs);
+    color: var(--violet-primary);
+    font-weight: 700;
+}
+
+.field-select::after {
+    content: '▾';
+    position: absolute;
+    right: 0;
+    top: 1.6rem;
+    color: #9CA3AF;
+    pointer-events: none;
+    font-size: 0.85rem;
+}
+
+.field-hint {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+    min-height: 1em;
+    transition: color 0.2s ease;
+}
+
 /* ==========================================
    9. BOTÓN CON EFECTO RIPPLE LÍQUIDO
    Al hacer clic, se genera una onda circular
@@ -494,12 +566,12 @@ body.auth-page {
     letter-spacing: 0.04em;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.3s ease;
-    margin-bottom: min(var(--space-md), 1.5vh);
+    margin-bottom: min(0.6rem, 1vh);
     font-family: inherit;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: min(52px, 6.5vh);
+    min-height: min(48px, 6vh);
 }
 
 .btn-primary:hover {
@@ -559,13 +631,42 @@ body.auth-page {
 }
 
 /* ==========================================
-   10. ENLACE DE NAVEGACIÓN login ↔ register
+   10. DIVISOR SOCIAL + BOTÓN GOOGLE
+   ========================================== */
+/* Fila de dos botones en paralelo: submit + Google */
+.btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    margin-bottom: min(0.5rem, 1vh);
+}
+
+/* El btn-primary dentro de btn-row ocupa su celda completa */
+.btn-row .btn-primary {
+    margin-bottom: 0;
+}
+
+.google-btn-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.google-btn-wrapper > div,
+.google-btn-wrapper iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ==========================================
+   11. ENLACE DE NAVEGACIÓN login ↔ register
    ========================================== */
 .form-switch {
     text-align: center;
     font-size: var(--font-sm);
     color: #6B7280;
-    margin-top: var(--space-sm);
+    margin-top: 0.4rem;
 }
 
 .form-switch a {
@@ -592,13 +693,13 @@ body.auth-page {
 .form-switch a:hover { color: var(--violet-deep); }
 
 /* ==========================================
-   11. ALERTAS GLOBALES (respuestas AJAX)
+   12. ALERTAS GLOBALES (respuestas AJAX)
    ========================================== */
 .alert {
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-size: var(--font-sm);
-    margin-bottom: var(--space-md);
+    margin-bottom: min(0.75rem, 1.2vh);
     border-left: 3px solid;
     display: none;
     font-weight: 500;
@@ -619,6 +720,12 @@ body.auth-page {
     background: #F0FDF4;
     border-color: #22C55E;
     color: #166534;
+}
+
+.alert-warning {
+    background: #FFFBEB;
+    border-color: #F59E0B;
+    color: #78350F;
 }
 
 @keyframes slideDown {
@@ -824,6 +931,28 @@ body.auth-page {
     margin-bottom: var(--space-md);
 }
 
+/* Botón panel admin — solo visible para admins */
+.btn-admin {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: var(--font-sm);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-sm);
+    transition: transform 0.15s ease, box-shadow 0.3s ease;
+}
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(124,58,237,0.4);
+}
+
 /* Botón de logout: outlined que se rellena en hover */
 .btn-logout {
     position: relative;
@@ -886,7 +1015,11 @@ body.auth-page {
     .brand-name { font-size: clamp(2.4rem, 9vw, 3.5rem); }
 
     .form-panel {
-        padding: var(--space-xl) var(--space-lg);
+        padding: 0 var(--space-lg);
+    }
+
+    .btn-row {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -895,4 +1028,365 @@ body.auth-page {
         padding: 2rem 1.5rem;
         border-radius: 16px;
     }
+}
+
+/* ==========================================
+   16. ROL ADMIN — badge inline en user-info
+   ========================================== */
+.role-admin {
+    color: #C4B5FD;
+    font-weight: 600;
+}
+
+/* ==========================================
+   17. FORMULARIOS SIN MARGEN (admin tables)
+   ========================================== */
+.form-inline {
+    margin: 0;
+}
+
+/* ==========================================
+   18. PÁGINA PENDIENTE DE VERIFICACIÓN
+   ========================================== */
+.pending-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.pending-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(91,33,182,0.12);
+    animation: pageFadeIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+.pending-icon {
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 28px rgba(124,58,237,0.35);
+}
+
+.pending-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1F2937;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.pending-text {
+    font-size: 0.95rem;
+    color: #6B7280;
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+}
+
+.pending-subtext {
+    font-size: 0.85rem;
+    color: #9CA3AF;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.pending-divider {
+    border: none;
+    border-top: 1px solid #E5E7EB;
+    margin-bottom: 1.5rem;
+}
+
+.pending-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #7C3AED;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.pending-back-link:hover {
+    opacity: 0.75;
+}
+
+/* Estado pending inline (dentro del formulario de registro) */
+.pending-inline {
+    text-align: center;
+    padding: 1.5rem 0;
+}
+.pending-inline-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+}
+.pending-inline-title {
+    font-size: 1.25rem; font-weight: 800; color: #1F2937; margin-bottom: 0.5rem;
+}
+.pending-inline-text {
+    font-size: 0.9rem; color: #6B7280; line-height: 1.6;
+    max-width: 320px; margin: 0 auto 1.5rem;
+}
+.pending-inline-text strong { color: #7C3AED; }
+
+/* ==========================================
+   19. ADMIN PANEL (dashboard inline)
+   ========================================== */
+.admin-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.admin-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+.admin-icon svg { width: 20px; height: 20px; }
+
+.admin-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+.admin-subtitle {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 1.75rem;
+}
+
+.admin-stats {
+    display: flex; gap: 1rem; margin-bottom: 1.75rem; flex-wrap: wrap;
+}
+.stat-card {
+    flex: 1; min-width: 180px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.stat-number {
+    font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1;
+}
+.stat-number.purple { color: #C4B5FD; }
+.stat-number.green  { color: #86EFAC; }
+.stat-number.blue   { color: #93C5FD; }
+.stat-label {
+    font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.35rem;
+}
+
+.admin-tabs {
+    display: flex; gap: 0.25rem; margin-bottom: 1.5rem;
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 4px;
+    width: fit-content;
+}
+.admin-tab {
+    padding: 0.6rem 1.3rem;
+    border: none; background: transparent;
+    font-family: inherit; font-size: 0.85rem; font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    border-radius: 9px; cursor: pointer;
+    transition: all 0.25s;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.admin-tab.active {
+    background: rgba(124, 58, 237, 0.5);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+.admin-tab:hover:not(.active) {
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.05);
+}
+.admin-tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 20px; padding: 0 6px;
+    border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+}
+.admin-tab.active .admin-tab-badge {
+    background: rgba(255,255,255,0.2); color: #fff;
+}
+.admin-tab:not(.active) .admin-tab-badge {
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+}
+
+.admin-tab-panel { display: none; }
+.admin-tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.admin-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.admin-table { width: 100%; border-collapse: collapse; }
+
+.admin-table thead th {
+    padding: 0.8rem 1.1rem;
+    text-align: left;
+    font-size: 0.7rem; font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+}
+
+.admin-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s;
+}
+.admin-table tbody tr:last-child { border-bottom: none; }
+.admin-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+
+.admin-table td {
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.8);
+    vertical-align: middle;
+}
+
+.admin-user-name { font-weight: 600; color: #fff; margin-bottom: 2px; }
+.admin-user-email { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+.admin-muted { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+
+.badge-pending {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700;
+    background: rgba(251, 191, 36, 0.15); color: #FBBF24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+.badge-pending::before {
+    content: ''; width: 6px; height: 6px;
+    border-radius: 50%; background: #FBBF24;
+    animation: pulse-dot 2s infinite;
+}
+.badge-verified {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700;
+    background: rgba(34, 197, 94, 0.15); color: #22C55E;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.badge-verified::before { content: '✓'; font-size: 0.7rem; }
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.btn-verify {
+    padding: 7px 18px; border-radius: 8px;
+    font-family: inherit; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; border: none;
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    color: #fff;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+.btn-verify:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4); }
+.btn-verify:active { transform: translateY(0); }
+
+.btn-reject {
+    padding: 7px 14px; border-radius: 8px;
+    font-family: inherit; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer;
+    background: rgba(239, 68, 68, 0.15);
+    color: #FCA5A5;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    transition: all 0.2s;
+}
+.btn-reject:hover { background: rgba(239, 68, 68, 0.3); color: #fff; transform: translateY(-1px); }
+
+.action-group { display: flex; gap: 0.5rem; align-items: center; }
+
+.admin-empty {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.9rem;
+}
+.admin-empty svg { margin-bottom: 0.75rem; display: block; margin-inline: auto; }
+
+.admin-flash {
+    padding: 0.85rem 1.2rem;
+    border-radius: 12px;
+    font-size: 0.88rem; font-weight: 500;
+    margin-bottom: 1.25rem;
+    border-left: 4px solid;
+    animation: fadeIn 0.3s ease;
+}
+.admin-flash.success { background: rgba(34, 197, 94, 0.12); border-color: #22C55E; color: #86EFAC; }
+.admin-flash.error   { background: rgba(239, 68, 68, 0.12); border-color: #EF4444; color: #FCA5A5; }
+.admin-flash.warning { background: rgba(251, 191, 36, 0.12); border-color: #FBBF24; color: #FDE68A; }
+
+.admin-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    margin: 2.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .admin-section { padding: 0 1rem 3rem; }
+    .admin-table thead { display: none; }
+    .admin-table tbody tr { display: block; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .admin-table td { display: flex; justify-content: space-between; padding: 0.4rem 0; border: none; }
+    .admin-table td::before { content: attr(data-label); font-weight: 700; font-size: 0.72rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .stat-card { min-width: 140px; }
 }

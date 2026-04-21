@@ -59,6 +59,7 @@ function showAlert(message, type = 'error') {
 function clearAlert() {
     const alert = document.getElementById('alert-global');
     alert.className = 'alert alert-error';
+    alert.textContent = '';
 }
 
 function shakeElement(element) {
@@ -110,5 +111,80 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
 
     // — Activar spinner y enviar el formulario —
     submitBtn.classList.add('loading');
+<<<<<<< HEAD:public/js/login.js
     this.submit();
+=======
+
+    try {
+        // Leer el CSRF token del meta tag inyectado por Laravel
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')
+                                  .getAttribute('content');
+
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type':  'application/json',
+                'Accept':        'application/json',
+                'X-CSRF-TOKEN':  csrfToken,
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // — Estado de éxito: checkmark animado + mensaje —
+            submitBtn.innerHTML = `
+                <span class="btn-text success-check">
+                    <svg class="check-icon"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="white"
+                         stroke-width="2.5"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    ¡Sesión iniciada!
+                </span>
+            `;
+            submitBtn.classList.remove('loading');
+            submitBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
+
+            // Pequeño delay para que el usuario vea el checkmark
+            // luego fade-out de la página y redirect
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.35s ease';
+                document.body.style.opacity    = '0';
+                setTimeout(() => { window.location.href = '/index'; }, 360);
+            }, 750);
+
+        } else {
+            submitBtn.classList.remove('loading');
+
+            // Cuenta registrada pero aún no verificada por el admin:
+            // permanecer en login y mostrar aviso claro (no redirigir)
+            if (data.unverified) {
+                showAlert(data.message, 'warning');
+                return;
+            }
+
+            // Errores de validación por campo (422)
+            if (data.errors && typeof data.errors === 'object') {
+                Object.entries(data.errors).forEach(([field, messages]) => {
+                    showFieldError(`field-${field}`, `error-${field}`, messages[0]);
+                });
+            }
+
+            showAlert(data.message || 'Credenciales incorrectas. Inténtalo de nuevo.');
+            shakeElement(document.getElementById('loginForm'));
+        }
+
+    } catch (err) {
+        // — Error de red o servidor inesperado —
+        submitBtn.classList.remove('loading');
+        showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
+        console.error('[VIBEZ] Error en login:', err);
+    }
+>>>>>>> db5117e7b4522061967f6f7ba729f8bf9e834190:resources/js/login.js
 });

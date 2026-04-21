@@ -11,10 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Alias para el middleware de roles.
-        // Uso: ->middleware('role:admin') o ->middleware('role:admin,empresa')
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'admin'      => \App\Http\Middleware\EsAdmin::class,
+            'verificado' => \App\Http\Middleware\EstaVerificado::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

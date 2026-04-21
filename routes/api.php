@@ -30,3 +30,8 @@ Route::post('/register', [AuthController::class, 'register'])
 Route::post('/logout',   [AuthController::class, 'logout'])
      ->middleware('auth')
      ->name('api.logout');
+
+// Google Identity Services — verifica el credential JWT y crea/loguea al usuario
+Route::post('/auth/google', [AuthController::class, 'googleAuth'])
+     ->middleware('throttle:10,1')
+     ->name('api.auth.google');

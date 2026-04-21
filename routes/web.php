@@ -5,10 +5,10 @@
  *
  * Estructura de rutas organizada por rol:
  *
- *  Públicas:
- *    GET  /              → welcome
- *    GET  /login         → vista login
- *    GET  /register      → vista registro
+ * Estructura:
+ *   GET  /login     → vista login
+ *   GET  /register  → vista register
+ *   GET  /index     → dashboard (protegido por auth)
  *
  *  AJAX (heredan middleware web desde este archivo):
  *    POST /api/login     → AuthController@login     (form POST, devuelve redirect)
@@ -40,58 +40,15 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
 
-/* ——————————————————————————————————————————
-   ENDPOINTS AJAX — heredan middleware 'web' (sesión + CSRF)
-   —————————————————————————————————————————— */
-Route::prefix('api')->group(base_path('routes/api.php'));
-
-/* ——————————————————————————————————————————
-   DASHBOARD USUARIO — cualquier usuario autenticado
-   —————————————————————————————————————————— */
+/* — Dashboard: protegido por auth + verificado (email_verificado = true) — */
 Route::get('/index', [AuthController::class, 'showIndex'])
-     ->middleware('auth')
+     ->middleware(['auth', 'verificado'])
      ->name('index');
 
-/* ——————————————————————————————————————————
-   ÁREA ADMIN — solo administradores (es_admin = 1)
-   —————————————————————————————————————————— */
-Route::middleware(['auth', 'role:admin'])
-     ->prefix('admin')
-     ->name('admin.')
-     ->group(function () {
-         Route::get('/dashboard', [AdminDashboard::class, 'index'])
-              ->name('dashboard');
+/* — Página informativa para usuarios pendientes de verificación — */
+Route::get('/pendiente-verificacion', fn () => view('pendiente-verificacion'))
+     ->name('pendiente-verificacion');
 
-         // Aquí añadir más rutas de admin:
-         // Route::resource('usuarios', AdminUsuariosController::class);
-         // Route::resource('eventos',  AdminEventosController::class);
-     });
-
-/* ——————————————————————————————————————————
-   ÁREA ORGANIZADOR — solo organizadores
-   —————————————————————————————————————————— */
-Route::middleware(['auth', 'role:organizador'])
-     ->prefix('organizador')
-     ->name('organizador.')
-     ->group(function () {
-         Route::get('/dashboard', [OrganizadorDashboard::class, 'index'])
-              ->name('dashboard');
-
-         // Aquí añadir más rutas de organizador:
-         // Route::resource('eventos', OrganizadorEventosController::class);
-     });
-
-/* ——————————————————————————————————————————
-   ÁREA EMPRESA — solo empresas / entidades colaboradoras
-   —————————————————————————————————————————— */
-Route::middleware(['auth', 'role:empresa'])
-     ->prefix('empresa')
-     ->name('empresa.')
-     ->group(function () {
-         Route::get('/dashboard', [EmpresaDashboard::class, 'index'])
-              ->name('dashboard');
-
-         // Aquí añadir más rutas de empresa:
-         // Route::resource('cupones',  EmpresaCuponesController::class);
-         // Route::resource('ofertas',  EmpresaOfertasController::class);
-     });
+/* — Endpoints AJAX: cargados desde api.php con prefijo /api —
+     Heredan el middleware 'web' al estar dentro de web.php */
+Route::prefix('api')->group(base_path('routes/api.php'));
