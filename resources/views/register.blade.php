@@ -170,32 +170,31 @@
                           role="alert">@error('email'){{ $message }}@enderror</span>
                 </div>
 
-                {{-- Campo contraseña --}}
-                <div class="field @error('password') has-error @enderror" id="field-password">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder=" "
-                        autocomplete="new-password"
-                    >
-                    <label for="password">Contraseña</label>
-                    <span class="field-error @error('password') visible @enderror"
-                          id="error-password"
-                          role="alert">@error('password'){{ $message }}@enderror</span>
-                </div>
+                {{-- Contraseñas en una fila --}}
+                <div class="field-row">
+                    <div class="field" id="field-password">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder=" "
+                            autocomplete="new-password"
+                        >
+                        <label for="password">Contraseña</label>
+                        <span class="field-error" id="error-password" role="alert"></span>
+                    </div>
 
-                {{-- Campo confirmación --}}
-                <div class="field" id="field-password_confirmation">
-                    <input
-                        type="password"
-                        id="password_confirmation"
-                        name="password_confirmation"
-                        placeholder=" "
-                        autocomplete="new-password"
-                    >
-                    <label for="password_confirmation">Confirmar contraseña</label>
-                    <span class="field-error" id="error-password_confirmation" role="alert"></span>
+                    <div class="field" id="field-password_confirmation">
+                        <input
+                            type="password"
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            placeholder=" "
+                            autocomplete="new-password"
+                        >
+                        <label for="password_confirmation">Confirmar contraseña</label>
+                        <span class="field-error" id="error-password_confirmation" role="alert"></span>
+                    </div>
                 </div>
 
                 {{-- Tipo de cuenta --}}
@@ -207,7 +206,6 @@
                     </select>
                     <label for="tipo_cuenta">Tipo de cuenta</label>
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
-                    <span class="field-hint" id="hint-tipo_cuenta"></span>
                 </div>
 
                 {{-- Fecha de nacimiento y teléfono en una fila --}}

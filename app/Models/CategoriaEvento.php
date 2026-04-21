@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,4 +18,16 @@ class CategoriaEvento extends Model
     public $timestamps = false;
 
     protected $fillable = ['nombre', 'descripcion', 'icono_url', 'estado'];
+=======
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class CategoriaEvento extends Model
+{
+    use HasFactory;
+
+    protected $table = 'categorias_evento';
+
+    public $timestamps = false;
+>>>>>>> 842cf758743629209c59f3b6b6ec472ffcd429bf
 }

@@ -1,84 +1,56 @@
-@extends('layouts.app')
+@extends('admin.layouts.dashboard')
 
-@section('title', 'Panel Admin — VIBEZ')
+@section('title', 'Admin | Dashboard')
 
 @section('content')
-
-<div class="auth-bg">
-    <div class="aurora-blob"></div>
-    <div class="aurora-blob"></div>
-    <div class="aurora-blob"></div>
-    <div class="aurora-blob"></div>
-</div>
-
-<div class="index-wrapper page-transition">
-    <div class="glass-card">
-
-        {{-- Avatar --}}
-        <div class="index-avatar">
-            {{ strtoupper(mb_substr(auth()->user()->nombre, 0, 1)) }}
+    <header class="admin-header">
+        <div>
+            <h1>Dashboard inicial</h1>
+            <p>Primera version del panel. Actualmente solo se administra el modulo de eventos.</p>
         </div>
+        <a class="btn btn-secondary" href="{{ route('home') }}">Volver al inicio</a>
+    </header>
 
-        {{-- Saludo --}}
-        <h1 class="index-greeting">
-            Panel de Administración
-        </h1>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-            Bienvenido, <strong>{{ auth()->user()->nombre }}</strong>
-        </p>
-
-        {{-- Verificación de rol en Blade --}}
-        @if(auth()->user()->isAdmin())
-            <div style="
-                background: rgba(124,58,237,0.12);
-                border: 1px solid rgba(124,58,237,0.3);
-                border-radius: 12px;
-                padding: 1rem 1.25rem;
-                margin-bottom: 1.5rem;
-                font-size: 0.85rem;
-                color: #c4b5fd;
-            ">
-                Tienes acceso completo al sistema.
-            </div>
-        @endif
-
-        {{-- Estadísticas básicas --}}
-        @isset($stats)
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-            <div style="text-align:center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                <div style="font-size: 1.8rem; font-weight: 700; color: #c4b5fd;">{{ $stats['total_usuarios'] }}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Usuarios</div>
-            </div>
-            <div style="text-align:center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                <div style="font-size: 1.8rem; font-weight: 700; color: #c4b5fd;">{{ $stats['admins'] }}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Admins</div>
-            </div>
-            <div style="text-align:center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                <div style="font-size: 1.8rem; font-weight: 700; color: #c4b5fd;">{{ $stats['usuarios_activos'] }}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Activos</div>
-            </div>
+    <section class="card quick-actions">
+        <h2>Acciones rapidas</h2>
+        <div class="quick-actions-grid">
+            <a class="quick-action-item" href="{{ route('admin.eventos.create') }}">Crear evento</a>
+            <span class="quick-action-item disabled">Crear usuario (proximamente)</span>
+            <span class="quick-action-item disabled">Crear empresa (proximamente)</span>
+            <span class="quick-action-item disabled">Crear pedido (proximamente)</span>
+            <span class="quick-action-item disabled">Registrar pago (proximamente)</span>
         </div>
-        @endisset
+    </section>
 
-        {{-- Ejemplo hasRole() con múltiples roles --}}
-        @if(auth()->user()->hasRole('admin'))
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-                <code style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">
-                    hasRole('admin') → true
-                </code>
-            </p>
-        @endif
+    <section class="dashboard-cards">
+        <article class="card stat-card">
+            <h2>Total eventos</h2>
+            <p class="stat-number">{{ $totalEventos }}</p>
+        </article>
 
-        {{-- Botón de logout --}}
-        <button id="logoutBtn" class="btn-primary" style="margin-top: 0.5rem;">
-            Cerrar sesión
-        </button>
+        <article class="card stat-card">
+            <h2>Eventos activos</h2>
+            <p class="stat-number">{{ $eventosActivos }}</p>
+        </article>
 
-    </div>
-</div>
+        <article class="card stat-card muted">
+            <h2>Usuarios</h2>
+            <p class="soon">Proximamente</p>
+        </article>
 
-@endsection
+        <article class="card stat-card muted">
+            <h2>Empresas</h2>
+            <p class="soon">Proximamente</p>
+        </article>
 
-@section('scripts')
-    <script src="{{ asset('js/index.js') }}"></script>
+        <article class="card stat-card muted">
+            <h2>Pedidos</h2>
+            <p class="soon">Proximamente</p>
+        </article>
+
+        <article class="card stat-card muted">
+            <h2>Pagos</h2>
+            <p class="soon">Proximamente</p>
+        </article>
+    </section>
 @endsection

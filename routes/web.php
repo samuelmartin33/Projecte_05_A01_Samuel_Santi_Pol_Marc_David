@@ -26,8 +26,8 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Empresa\DashboardController as EmpresaDashboard;
-use App\Http\Controllers\Organizador\DashboardController as OrganizadorDashboard;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EventoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventoController;
 
@@ -82,9 +82,25 @@ Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
      ->middleware('auth')
      ->name('empresa.home');
 
-/* — Página informativa para usuarios pendientes de verificación — */
-Route::get('/pendiente-verificacion', fn () => view('pendiente-verificacion'))
-     ->name('pendiente-verificacion');
+/* — Dashboard de Admin: protegido por middlewares auth e IsAdmin — */
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [DashboardController::class, 'index'])
+         ->name('admin.dashboard');
+    
+    /* Rutas de eventos */
+    Route::get('/admin/eventos', [EventoController::class, 'index'])
+         ->name('admin.eventos.index');
+    Route::get('/admin/eventos/crear', [EventoController::class, 'create'])
+         ->name('admin.eventos.create');
+    Route::post('/admin/eventos', [EventoController::class, 'store'])
+         ->name('admin.eventos.store');
+    Route::get('/admin/eventos/{evento}/editar', [EventoController::class, 'edit'])
+         ->name('admin.eventos.edit');
+    Route::put('/admin/eventos/{evento}', [EventoController::class, 'update'])
+         ->name('admin.eventos.update');
+    Route::delete('/admin/eventos/{evento}', [EventoController::class, 'destroy'])
+         ->name('admin.eventos.destroy');
+});
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —
      Heredan el middleware 'web' al estar dentro de web.php */
