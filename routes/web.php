@@ -6,10 +6,11 @@
  * Rutas web (middleware 'web': sesión, CSRF, cookies, etc.)
  *
  * Estructura:
- *   GET  /          → redirige a /login
- *   GET  /login     → vista login
- *   GET  /register  → vista register
- *   GET  /index     → dashboard (protegido por auth)
+ *   GET  /               → welcome (landing pública)
+ *   GET  /login          → vista login
+ *   GET  /register       → vista register
+ *   GET  /home           → home de usuario (protegido por auth)
+ *   GET  /empresa/home   → home de empresa (protegido por auth)
  *
  *   POST /api/login    → AJAX (incluido desde api.php)
  *   POST /api/register → AJAX (incluido desde api.php)
@@ -32,8 +33,10 @@ use App\Http\Controllers\EventoController;
 |
 */
 
-// --- Página de inicio: grid de eventos con filtros ---
-Route::get('/', [EventoController::class, 'index'])->name('home');
+// --- Landing de bienvenida: primera página que ve el usuario ---
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
 
 // --- Detalle de un evento específico ---
 Route::get('/eventos/{id}', [EventoController::class, 'detalle'])
@@ -57,11 +60,6 @@ Route::get('/bolsa-de-trabajo', [EventoController::class, 'bolsaTrabajo'])
 Route::get('/api/filtrar-trabajos', [EventoController::class, 'filtrarTrabajos'])
     ->name('api.filtrar-trabajos');
 
-// --- Landing de bienvenida (página estática de marketing) ---
-Route::get('/bienvenida', function () {
-    return view('welcome');
-})->name('bienvenida');
-
 /* — Vistas de autenticación — */
 Route::get('/login',    [AuthController::class, 'showLogin'])
      ->name('login');
@@ -69,11 +67,15 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
 
-/* — Dashboard: protegido por middleware auth —
-     Si no hay sesión, Laravel redirige automáticamente a la ruta 'login' */
-Route::get('/index',    [AuthController::class, 'showIndex'])
+/* — Home de usuario: protegido por middleware auth — */
+Route::get('/home', [AuthController::class, 'showHome'])
      ->middleware('auth')
-     ->name('index');
+     ->name('home');
+
+/* — Home de empresa: protegido por middleware auth — */
+Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
+     ->middleware('auth')
+     ->name('empresa.home');
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —
      Heredan el middleware 'web' al estar dentro de web.php */
