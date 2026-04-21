@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Http\Controllers\EventoController;
 
 class AuthController extends Controller
 {
@@ -17,34 +18,43 @@ class AuthController extends Controller
 
     /**
      * Muestra la vista de login.
-     * Si ya hay sesión activa redirige directo al dashboard.
+     * Si ya hay sesión activa redirige directo al home de usuario.
      */
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('index');
+            return redirect()->route('home');
         }
         return view('login');
     }
 
     /**
      * Muestra la vista de registro.
-     * Si ya hay sesión activa redirige directo al dashboard.
+     * Si ya hay sesión activa redirige directo al home de usuario.
      */
     public function showRegister(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('index');
+            return redirect()->route('home');
         }
         return view('register');
     }
 
     /**
-     * Muestra el dashboard (protegido por middleware 'auth').
+     * Home del usuario autenticado (explorar eventos, bolsa de trabajo, cupones).
+     * Delega en EventoController para cargar los datos necesarios.
      */
-    public function showIndex(): View
+    public function showHome(): mixed
     {
-        return view('index');
+        return (new EventoController())->index();
+    }
+
+    /**
+     * Home de empresa autenticada (crear eventos, subir ofertas, etc.).
+     */
+    public function showEmpresaHome(): View
+    {
+        return view('empresa.home');
     }
 
     /* ============================================================
