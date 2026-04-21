@@ -332,11 +332,11 @@ body.auth-page {
     content: '';
     display: block;
     flex: 1;
-    max-height: 2rem;
+    max-height: 1.5rem;
 }
 
 .form-header {
-    margin-bottom: min(1.25rem, 2vh);
+    margin-bottom: min(0.85rem, 1.4vh);
 }
 
 .form-title {
@@ -363,8 +363,8 @@ body.auth-page {
 .field-group {
     display: flex;
     flex-direction: column;
-    gap: min(0.85rem, 1.4vh);
-    margin-bottom: min(1rem, 1.5vh);
+    gap: min(0.6rem, 1vh);
+    margin-bottom: min(0.6rem, 1vh);
 }
 
 /* Fila de dos campos en paralelo (apellidos) */
@@ -377,7 +377,14 @@ body.auth-page {
 /* Wrapper de cada campo: padding superior para el label flotante */
 .field {
     position: relative;
-    padding-top: min(1.1rem, 1.8vh);
+    padding-top: min(0.9rem, 1.4vh);
+}
+
+/* Row de 3 columnas para tipo + fecha + teléfono */
+.field-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
 }
 
 .field input {
@@ -507,7 +514,7 @@ body.auth-page {
     border: none;
     border-bottom: 1.5px solid #D1D5DB;
     background: transparent;
-    padding: 1.4rem 1rem 0.35rem 0;
+    padding: 0.5rem 1rem 0.35rem 0;
     font-size: var(--font-sm);
     color: #1F2937;
     cursor: pointer;
@@ -521,19 +528,25 @@ body.auth-page {
     border-color: var(--violet-primary);
 }
 
-.field-select select:focus ~ label,
-.field-select select:not([value=""]) ~ label {
+.field-select label {
     top: 0;
     font-size: var(--font-xs);
-    color: var(--violet-primary);
+    color: #9CA3AF;
     font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.field-select select:focus ~ label,
+.field-select select:not([value=""]) ~ label {
+    color: var(--violet-primary);
 }
 
 .field-select::after {
     content: '▾';
     position: absolute;
     right: 0;
-    top: 1.6rem;
+    top: 1.4rem;
     color: #9CA3AF;
     pointer-events: none;
     font-size: 0.85rem;
@@ -1019,6 +1032,10 @@ body.auth-page {
     }
 
     .btn-row {
+        grid-template-columns: 1fr;
+    }
+
+    .field-row-3 {
         grid-template-columns: 1fr;
     }
 }
