@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(composer dump-autoload *)",
+      "Bash(php -l app/Http/Controllers/EventoController.php)",
+      "Bash(php -l app/Models/Evento.php)",
+      "Bash(php -l app/Models/BolsaOfertaTrabajo.php)"
+    ]
+  }
+}
