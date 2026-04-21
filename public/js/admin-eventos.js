@@ -2,6 +2,28 @@ var AdminEventos = {
     iniciar: function () {
         AdminEventos.configurarConfirmacionBorrado();
         AdminEventos.configurarEventoGratuito();
+        AdminEventos.configurarMenuHamburguesa();
+    },
+
+    configurarMenuHamburguesa: function () {
+        var toggle = document.getElementById('menuToggle');
+        var menu   = document.getElementById('mainMenu');
+
+        if (!toggle || !menu) {
+            return;
+        }
+
+        toggle.addEventListener('click', function () {
+            var isOpen = menu.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
     },
 
     configurarConfirmacionBorrado: function () {

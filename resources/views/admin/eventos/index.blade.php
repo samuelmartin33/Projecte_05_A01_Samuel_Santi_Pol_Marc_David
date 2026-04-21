@@ -31,17 +31,17 @@
             <tbody>
             @forelse ($eventos as $evento)
                 <tr>
-                    <td>{{ $evento->id }}</td>
-                    <td>{{ $evento->titulo }}</td>
-                    <td>{{ $evento->categoriaEvento->nombre ?? 'Sin categoria' }}</td>
-                    <td>#{{ $evento->organizador_id }}</td>
-                    <td>{{ optional($evento->fecha_inicio)->format('d/m/Y H:i') }}</td>
-                    <td>
+                    <td data-label="ID">{{ $evento->id }}</td>
+                    <td data-label="Titulo">{{ $evento->titulo }}</td>
+                    <td data-label="Categoria">{{ $evento->categoriaEvento->nombre ?? 'Sin categoria' }}</td>
+                    <td data-label="Organizador">#{{ $evento->organizador_id }}</td>
+                    <td data-label="Inicio">{{ optional($evento->fecha_inicio)->format('d/m/Y H:i') }}</td>
+                    <td data-label="Estado">
                         <span class="estado {{ $evento->estado ? 'activo' : 'inactivo' }}">
                             {{ $evento->estado ? 'Activo' : 'Inactivo' }}
                         </span>
                     </td>
-                    <td class="acciones">
+                    <td data-label="Acciones" class="acciones">
                         <a class="btn btn-secondary" href="{{ route('admin.eventos.edit', $evento) }}">Editar</a>
                         <form method="POST" action="{{ route('admin.eventos.destroy', $evento) }}" class="delete-form">
                             @csrf

@@ -13,7 +13,14 @@
             <span>VIBEZ</span>
         </div>
 
-        <nav class="menu">
+        {{-- Botón hamburguesa (solo visible en móvil, controlado por CSS) --}}
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="menu" id="mainMenu">
             <a href="{{ route('admin.dashboard') }}" class="menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Inicio</a>
             <a href="{{ route('admin.eventos.index') }}" class="menu-link {{ request()->routeIs('admin.eventos.*') ? 'active' : '' }}">Eventos</a>
             <span class="menu-link disabled">Usuarios (proximamente)</span>
@@ -32,5 +39,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/admin-eventos.js') }}"></script>
+
+
 </body>
 </html>

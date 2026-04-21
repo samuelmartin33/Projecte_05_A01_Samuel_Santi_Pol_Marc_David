@@ -33,6 +33,7 @@ body {
     display: block;
 }
 
+/* ─── SIDEBAR / TOPBAR ─────────────────────────────────── */
 .dashboard-sidebar {
     background-color: #7c3aed;
     color: #ffffff;
@@ -56,6 +57,29 @@ body {
     white-space: nowrap;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
+}
+
+/* Hamburger button — hidden on desktop */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    color: #fff;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.25s, opacity 0.25s;
 }
 
 .menu {
@@ -89,6 +113,7 @@ body {
     min-width: 0;
 }
 
+/* ─── HEADER ───────────────────────────────────────────── */
 .admin-header {
     display: flex;
     align-items: center;
@@ -106,6 +131,7 @@ body {
     color: #7c58c7;
 }
 
+/* ─── CARDS ────────────────────────────────────────────── */
 .card {
     background: var(--paper);
     border: 1px solid var(--border);
@@ -114,6 +140,7 @@ body {
     overflow: hidden;
 }
 
+/* ─── TABLE ────────────────────────────────────────────── */
 .tabla-eventos {
     width: 100%;
     border-collapse: collapse;
@@ -141,6 +168,7 @@ body {
     flex-wrap: wrap;
 }
 
+/* ─── BUTTONS ──────────────────────────────────────────── */
 .btn {
     border: 0;
     text-decoration: none;
@@ -168,6 +196,7 @@ body {
     color: #fff;
 }
 
+/* ─── ESTADO BADGE ─────────────────────────────────────── */
 .estado {
     display: inline-flex;
     border-radius: 999px;
@@ -190,6 +219,7 @@ body {
     color: #52606d;
 }
 
+/* ─── PAGINACION ───────────────────────────────────────── */
 .paginacion {
     margin-top: 1rem;
 }
@@ -206,6 +236,7 @@ body {
     border: 0;
 }
 
+/* ─── DASHBOARD CARDS GRID ─────────────────────────────── */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -234,6 +265,7 @@ body {
     color: #7c3aed;
 }
 
+/* ─── QUICK ACTIONS ────────────────────────────────────── */
 .quick-actions {
     margin-bottom: 1rem;
     padding: 1rem;
@@ -289,6 +321,7 @@ body {
     color: #c084fc;
 }
 
+/* ─── FORM ─────────────────────────────────────────────── */
 .evento-form {
     padding: 1rem;
 }
@@ -347,6 +380,7 @@ body {
     gap: 0.6rem;
 }
 
+/* ─── ALERTS ───────────────────────────────────────────── */
 .alert {
     border-radius: 10px;
     padding: 0.8rem 1rem;
@@ -370,6 +404,9 @@ body {
     padding-left: 1.2rem;
 }
 
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — Tablet  (≤ 900px)
+═══════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
     .dashboard-sidebar {
         flex-direction: column;
@@ -405,12 +442,261 @@ body {
     }
 }
 
-@media (max-width: 560px) {
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — Mobile  (≤ 800px)
+═══════════════════════════════════════════════════════ */
+@media (max-width: 800px) {
     .dashboard-cards {
         grid-template-columns: 1fr;
     }
 
     .quick-actions-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — iPhone  (≤ 600px)
+═══════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+    /* --- Topbar / menú hamburguesa --- */
+    .dashboard-sidebar {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.6rem 1rem;
+        flex-wrap: nowrap;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    /* El menú se convierte en un panel desplegable */
+    .menu {
+        display: none;
+        flex-direction: column;
+        gap: 0.3rem;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #6d28d9;
+        padding: 0.75rem 1rem 1rem;
+        border-top: 1px solid rgba(255,255,255,0.15);
+        z-index: 29;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    }
+
+    .menu.open {
+        display: flex;
+    }
+
+    .menu-link {
+        padding: 0.65rem 1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    .menu-link.active {
+        background: #fff;
+        color: #7c3aed;
+    }
+
+    /* Necesario para el posicionamiento absoluto del menú */
+    .dashboard-sidebar {
+        position: sticky;
+        overflow: visible;
+    }
+
+    /* --- Shell padding --- */
+    .admin-shell {
+        padding: 0 0.75rem 1rem;
+        margin: 0.8rem auto;
+    }
+
+    /* --- Header --- */
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+
+    .admin-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .admin-header .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    /* --- Dashboard stat cards --- */
+    .dashboard-cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+    }
+
+    .stat-card {
+        min-height: 120px;
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    /* --- Quick actions --- */
+    .quick-actions-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .quick-action-item {
+        min-height: 52px;
+        font-size: 0.82rem;
+    }
+
+    /* --- Tabla → tarjetas en móvil --- */
+    .tabla-eventos {
+        display: block;
+        white-space: normal;
+        overflow: visible;
+    }
+
+    .tabla-eventos thead {
+        display: none; /* Ocultamos las cabeceras */
+    }
+
+    .tabla-eventos tbody,
+    .tabla-eventos tr {
+        display: block;
+    }
+
+    .tabla-eventos tr {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+    }
+
+    /* Cada celda usa el atributo data-label como etiqueta */
+    .tabla-eventos td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #ede9fe;
+        font-size: 0.9rem;
+        gap: 0.4rem;
+    }
+
+    .tabla-eventos td:last-child {
+        border-bottom: none;
+        padding-top: 0.6rem;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .tabla-eventos td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #7c3aed;
+        flex: 0 0 auto;
+    }
+
+    /* Ocultar celda vacía de tabla en modo tarjeta */
+    .tabla-eventos td.empty {
+        display: block;
+        text-align: center;
+        padding: 1.2rem;
+        border: none;
+    }
+
+    .tabla-eventos td.empty::before {
+        display: none;
+    }
+
+    /* Fila del card sin border extra */
+    .tabla-eventos .card {
+        overflow: visible;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    /* Acciones en cada tarjeta */
+    .acciones {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .acciones .btn,
+    .acciones button.btn {
+        flex: 1 1 auto;
+        text-align: center;
+        justify-content: center;
+        padding: 0.55rem 0.6rem;
+        font-size: 0.88rem;
+    }
+
+    /* --- Form --- */
+    .evento-form {
+        padding: 0.75rem;
+    }
+
+    .grid-form {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .grid-form input:not([type="checkbox"]),
+    .grid-form select,
+    .grid-form textarea {
+        padding: 0.7rem;
+        font-size: 1rem; /* evita zoom en iOS */
+    }
+
+    .grid-form label {
+        font-size: 0.88rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1rem;
+        font-size: 0.97rem;
+    }
+
+    .checkbox-wrap {
+        align-self: flex-start;
+    }
+
+    /* --- Paginacion --- */
+    .paginacion {
+        display: flex;
+        justify-content: center;
+    }
+
+    .paginacion nav {
+        flex-wrap: wrap;
+        border-radius: 12px;
     }
 }
