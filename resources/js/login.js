@@ -1,8 +1,7 @@
 /**
  * VIBEZ — login.js
- * Valida el formulario en el frontend antes de enviarlo (form POST).
- * Si la validación pasa, activa el spinner y deja que el navegador envíe el form.
- * Los errores del servidor se renderizan directamente en el HTML por Blade.
+ * Valida el formulario en el frontend y lo envía via fetch a /api/login.
+ * Redirige a /home en caso de éxito; muestra errores en caso contrario.
  */
 
 /* ============================================================
@@ -70,12 +69,9 @@ function shakeElement(element) {
 }
 
 /* ============================================================
-   LÓGICA PRINCIPAL — Validación antes del envío
-   El formulario tiene method="POST" y action="/api/login".
-   Si la validación JS pasa → activa spinner y envía el form.
-   Los errores del servidor aparecen en la página a través de Blade.
+   LÓGICA PRINCIPAL — Validación y envío via fetch
    ============================================================ */
-document.getElementById('loginForm').addEventListener('submit', function (e) {
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const email    = document.getElementById('email').value.trim();
@@ -109,14 +105,9 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
         return;
     }
 
-    // — Activar spinner y enviar el formulario —
     submitBtn.classList.add('loading');
-<<<<<<< HEAD:public/js/login.js
-    this.submit();
-=======
 
     try {
-        // Leer el CSRF token del meta tag inyectado por Laravel
         const csrfToken = document.querySelector('meta[name="csrf-token"]')
                                   .getAttribute('content');
 
@@ -133,7 +124,6 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
         const data = await response.json();
 
         if (data.success) {
-            // — Estado de éxito: checkmark animado + mensaje —
             submitBtn.innerHTML = `
                 <span class="btn-text success-check">
                     <svg class="check-icon"
@@ -151,8 +141,6 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
             submitBtn.classList.remove('loading');
             submitBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
 
-            // Pequeño delay para que el usuario vea el checkmark
-            // luego fade-out de la página y redirect
             setTimeout(() => {
                 document.body.style.transition = 'opacity 0.35s ease';
                 document.body.style.opacity    = '0';
@@ -162,14 +150,11 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
         } else {
             submitBtn.classList.remove('loading');
 
-            // Cuenta registrada pero aún no verificada por el admin:
-            // permanecer en login y mostrar aviso claro (no redirigir)
             if (data.unverified) {
                 showAlert(data.message, 'warning');
                 return;
             }
 
-            // Errores de validación por campo (422)
             if (data.errors && typeof data.errors === 'object') {
                 Object.entries(data.errors).forEach(([field, messages]) => {
                     showFieldError(`field-${field}`, `error-${field}`, messages[0]);
@@ -181,10 +166,8 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
         }
 
     } catch (err) {
-        // — Error de red o servidor inesperado —
         submitBtn.classList.remove('loading');
         showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
         console.error('[VIBEZ] Error en login:', err);
     }
->>>>>>> db5117e7b4522061967f6f7ba729f8bf9e834190:resources/js/login.js
 });

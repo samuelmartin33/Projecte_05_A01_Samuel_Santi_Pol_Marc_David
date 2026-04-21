@@ -12,9 +12,6 @@
     <!-- CSS y JS compilados por Vite -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <link rel="stylesheet" href="/css/vibez.css">
     @endif
 </head>
 <body class="min-h-screen relative flex flex-col">
@@ -44,11 +41,7 @@
         <div class="hero-content flex flex-col items-center text-center max-w-2xl mx-auto gap-4">
 
             <!-- Logo grande -->
-<<<<<<< HEAD
-            <img src="{{ Vite::asset('resources/images/logo_vibez.png') }}"
-=======
             <img src="{{ asset('images/logo_vibez.png') }}"
->>>>>>> db5117e7b4522061967f6f7ba729f8bf9e834190
                  alt="VIBEZ logo" class="h-60 w-auto">
 
             <!-- Título principal -->

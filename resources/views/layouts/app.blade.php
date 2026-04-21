@@ -15,15 +15,13 @@
 
     {{-- CSS y JS compilados por Vite (cuando está corriendo npm run dev / build) --}}
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/style.css', 'resources/js/app.js'])
     @else
         {{-- Fallback CDN: Tailwind v4 (procesa clases utility en tiempo real) --}}
         <script src="https://cdn.tailwindcss.com"></script>
         {{-- Estilos personalizados VIBEZ servidos como archivo estático --}}
         <link rel="stylesheet" href="/css/vibez.css">
     @endif
-
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     {{-- Espacio para estilos específicos de cada página (ej: Leaflet en el detalle) --}}
     @stack('estilos')

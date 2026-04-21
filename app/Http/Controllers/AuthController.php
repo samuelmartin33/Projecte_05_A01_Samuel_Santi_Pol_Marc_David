@@ -77,7 +77,7 @@ class AuthController extends Controller
      *
      * Rate limiting: máx 5 intentos/minuto (configurado en routes/api.php).
      */
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'email'    => ['required', 'email'],
@@ -140,7 +140,7 @@ class AuthController extends Controller
      * Los nuevos usuarios siempre son 'usuario' (sin empresa ni organizador).
      * Hace auto-login tras el registro y redirige al dashboard de usuario.
      */
-    public function register(Request $request): RedirectResponse
+    public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'nombre'                => ['required', 'string', 'min:2', 'max:100'],
