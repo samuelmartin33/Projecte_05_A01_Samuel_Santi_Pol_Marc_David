@@ -131,6 +131,13 @@ body {
     color: #7c58c7;
 }
 
+.admin-header-actions {
+    display: inline-flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
 /* ─── CARDS ────────────────────────────────────────────── */
 .card {
     background: var(--paper);
@@ -525,6 +532,10 @@ body {
 
     .admin-header h1 {
         font-size: 1.3rem;
+    }
+
+    .admin-header-actions {
+        width: 100%;
     }
 
     .admin-header .btn {

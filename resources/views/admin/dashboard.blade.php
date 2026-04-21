@@ -8,7 +8,10 @@
             <h1>Dashboard inicial</h1>
             <p>Primera version del panel. Actualmente solo se administra el modulo de eventos.</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('admin.eventos.index') }}">Gestionar eventos</a>
+        <div class="admin-header-actions">
+            <a class="btn btn-secondary" href="{{ route('home') }}">Volver al inicio</a>
+            <a class="btn btn-primary" href="{{ route('admin.eventos.index') }}">Gestionar eventos</a>
+        </div>
     </header>
 
     <section class="card quick-actions">
