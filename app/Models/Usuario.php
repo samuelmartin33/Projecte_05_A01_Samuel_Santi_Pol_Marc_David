@@ -19,12 +19,14 @@ class Usuario extends Authenticatable
         'apellido1',
         'apellido2',
         'email',
-        'password_hash',                    // columna real en la tabla
+        'password_hash',
         'foto_url',
         'biografia',
         'fecha_nacimiento',
         'telefono',
         'email_verificado',
+        'tipo_cuenta',
+        'estado_registro',
         'es_admin',
         'ultimo_acceso',
         'estado',
@@ -39,12 +41,12 @@ class Usuario extends Authenticatable
     protected function casts(): array
     {
         return [
-            // El cast 'hashed' encripta automáticamente al asignar
-            'password_hash'     => 'hashed',
-            'email_verificado'  => 'boolean',
-            'es_admin'          => 'boolean',
+            'password_hash'    => 'hashed',
+            'email_verificado' => 'boolean',
+            'es_admin'         => 'boolean',
         ];
     }
+
 
     /* ——— Métodos que Laravel Auth necesita sobreescribir ——— */
 

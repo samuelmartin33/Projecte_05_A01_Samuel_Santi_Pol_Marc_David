@@ -84,6 +84,7 @@ function showAlert(message, type = 'error') {
 function clearAlert() {
     const alert = document.getElementById('alert-global');
     alert.className = 'alert alert-error';
+    alert.textContent = '';
 }
 
 /**
@@ -183,8 +184,14 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             }, 750);
 
         } else {
-            // — Estado de error: mostrar mensajes del backend —
             submitBtn.classList.remove('loading');
+
+            // Cuenta registrada pero aún no verificada por el admin:
+            // permanecer en login y mostrar aviso claro (no redirigir)
+            if (data.unverified) {
+                showAlert(data.message, 'warning');
+                return;
+            }
 
             // Errores de validación por campo (422)
             if (data.errors && typeof data.errors === 'object') {

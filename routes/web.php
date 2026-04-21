@@ -6,7 +6,6 @@
  * Rutas web (middleware 'web': sesión, CSRF, cookies, etc.)
  *
  * Estructura:
- *   GET  /          → redirige a /login
  *   GET  /login     → vista login
  *   GET  /register  → vista register
  *   GET  /index     → dashboard (protegido por auth)
@@ -33,11 +32,14 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
 
-/* — Dashboard: protegido por middleware auth —
-     Si no hay sesión, Laravel redirige automáticamente a la ruta 'login' */
-Route::get('/index',    [AuthController::class, 'showIndex'])
-     ->middleware('auth')
+/* — Dashboard: protegido por auth + verificado (email_verificado = true) — */
+Route::get('/index', [AuthController::class, 'showIndex'])
+     ->middleware(['auth', 'verificado'])
      ->name('index');
+
+/* — Página informativa para usuarios pendientes de verificación — */
+Route::get('/pendiente-verificacion', fn () => view('pendiente-verificacion'))
+     ->name('pendiente-verificacion');
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —
      Heredan el middleware 'web' al estar dentro de web.php */

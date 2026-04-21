@@ -176,14 +176,60 @@
                     <span class="field-error" id="error-password_confirmation" role="alert"></span>
                 </div>
 
+                {{-- Tipo de cuenta --}}
+                <div class="field field-select" id="field-tipo_cuenta">
+                    <select id="tipo_cuenta" name="tipo_cuenta">
+                        <option value="" disabled selected hidden></option>
+                        <option value="cliente">Cliente</option>
+                        <option value="empresa">Empresa</option>
+                    </select>
+                    <label for="tipo_cuenta">Tipo de cuenta</label>
+                    <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
+                    <span class="field-hint" id="hint-tipo_cuenta"></span>
+                </div>
+
+                {{-- Fecha de nacimiento y teléfono en una fila --}}
+                <div class="field-row">
+                    <div class="field" id="field-fecha_nacimiento">
+                        <input
+                            type="date"
+                            id="fecha_nacimiento"
+                            name="fecha_nacimiento"
+                            placeholder=" "
+                        >
+                        <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                        <span class="field-error" id="error-fecha_nacimiento" role="alert"></span>
+                    </div>
+
+                    <div class="field" id="field-telefono">
+                        <input
+                            type="tel"
+                            id="telefono"
+                            name="telefono"
+                            placeholder=" "
+                            autocomplete="tel"
+                            inputmode="tel"
+                        >
+                        <label for="telefono">Teléfono</label>
+                        <span class="field-error" id="error-telefono" role="alert"></span>
+                    </div>
+                </div>
+
             </div>
 
-            <button type="submit" class="btn-primary" id="submitBtn">
-                <span class="btn-text">Crear cuenta</span>
-                <span class="btn-spinner" aria-hidden="true">
-                    <span class="spinner-ring"></span>
-                </span>
-            </button>
+            {{-- Fila de botones: submit + Google en paralelo --}}
+            <div class="btn-row">
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <span class="btn-text">Crear cuenta</span>
+                    <span class="btn-spinner" aria-hidden="true">
+                        <span class="spinner-ring"></span>
+                    </span>
+                </button>
+
+                <div class="google-btn-wrapper">
+                    <div id="google-signin-btn" data-client-id="{{ config('services.google.client_id') }}"></div>
+                </div>
+            </div>
 
         </form>
 
@@ -198,5 +244,6 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/register.js') }}"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    @vite(['resources/js/register.js'])
 @endsection

@@ -1,8 +1,12 @@
 /**
  * VIBEZ — index.js
  * Maneja el logout por AJAX desde el dashboard
+ * + Panel admin: tabs para gestión de usuarios
  */
 
+/* ============================================================
+   LOGOUT
+   ============================================================ */
 document.getElementById('logoutBtn').addEventListener('click', async function () {
     this.classList.add('loading');
     this.textContent = 'Cerrando sesión...';
@@ -39,3 +43,35 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
         console.error('[VIBEZ] Error de conexión en logout:', err);
     }
 });
+
+
+/* ============================================================
+   ADMIN PANEL — Tabs (solo si el panel existe en el DOM)
+   ============================================================ */
+(function () {
+    const adminPanel = document.getElementById('adminPanel');
+    if (!adminPanel) return;
+
+    const tabBtns  = adminPanel.querySelectorAll('.admin-tab');
+    const tabPanels = adminPanel.querySelectorAll('.admin-tab-panel');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-tab');
+
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanels.forEach(p => p.classList.remove('active'));
+
+            btn.classList.add('active');
+            document.getElementById('panel-' + target).classList.add('active');
+        });
+    });
+
+    // Auto-scroll al panel admin si hay un flash message
+    const flash = adminPanel.querySelector('.admin-flash');
+    if (flash) {
+        setTimeout(() => {
+            adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+    }
+})();
