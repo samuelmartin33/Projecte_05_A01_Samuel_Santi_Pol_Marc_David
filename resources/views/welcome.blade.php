@@ -41,7 +41,7 @@
         <div class="hero-content flex flex-col items-center text-center max-w-2xl mx-auto gap-4">
 
             <!-- Logo grande -->
-            <img src="{{ Vite::asset('resources/images/logo_vibez (1).png') }}"
+            <img src="{{ Vite::asset('resources/images/logo_vibez.png') }}"
                  alt="VIBEZ logo" class="h-60 w-auto">
 
             <!-- Título principal -->

@@ -1,7 +1,8 @@
 /**
  * VIBEZ — register.js
- * Maneja el formulario de registro con Fetch API (AJAX)
- * Campos: nombre, apellido1, apellido2, email, password, password_confirmation
+ * Valida el formulario en el frontend antes de enviarlo (form POST).
+ * Si la validación pasa, activa el spinner y deja que el navegador envíe el form.
+ * Los errores del servidor se renderizan directamente en el HTML por Blade.
  */
 
 /* ============================================================
@@ -66,18 +67,18 @@ function shakeElement(element) {
 }
 
 /* ============================================================
-   SUBMIT
+   LÓGICA PRINCIPAL — Validación antes del envío
    ============================================================ */
-document.getElementById('registerForm').addEventListener('submit', async function (e) {
+document.getElementById('registerForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const nombre                = document.getElementById('nombre').value.trim();
-    const apellido1             = document.getElementById('apellido1').value.trim();
-    const apellido2             = document.getElementById('apellido2').value.trim();
-    const email                 = document.getElementById('email').value.trim();
-    const password              = document.getElementById('password').value;
-    const passwordConfirmation  = document.getElementById('password_confirmation').value;
-    let valid                   = true;
+    const nombre               = document.getElementById('nombre').value.trim();
+    const apellido1            = document.getElementById('apellido1').value.trim();
+    const apellido2            = document.getElementById('apellido2').value.trim();
+    const email                = document.getElementById('email').value.trim();
+    const password             = document.getElementById('password').value;
+    const passwordConfirmation = document.getElementById('password_confirmation').value;
+    let valid                  = true;
 
     // Limpiar todos los errores
     [
@@ -145,66 +146,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         return;
     }
 
+    // — Activar spinner y enviar el formulario —
     submitBtn.classList.add('loading');
-
-    try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept':       'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify({
-                nombre,
-                apellido1,
-                apellido2,
-                email,
-                password,
-                password_confirmation: passwordConfirmation,
-            }),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            submitBtn.innerHTML = `
-                <span class="btn-text success-check">
-                    <svg class="check-icon" viewBox="0 0 24 24" fill="none"
-                         stroke="white" stroke-width="2.5"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    ¡Cuenta creada!
-                </span>
-            `;
-            submitBtn.classList.remove('loading');
-            submitBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
-
-            setTimeout(() => {
-                document.body.style.transition = 'opacity 0.35s ease';
-                document.body.style.opacity    = '0';
-                setTimeout(() => { window.location.href = '/index'; }, 360);
-            }, 750);
-
-        } else {
-            submitBtn.classList.remove('loading');
-
-            if (data.errors && typeof data.errors === 'object') {
-                Object.entries(data.errors).forEach(([field, messages]) => {
-                    showFieldError(`field-${field}`, `error-${field}`, messages[0]);
-                });
-            }
-
-            showAlert(data.message || 'No se pudo crear la cuenta. Revisa los datos.');
-            shakeElement(document.getElementById('registerForm'));
-        }
-
-    } catch (err) {
-        submitBtn.classList.remove('loading');
-        showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
-        console.error('[VIBEZ] Error en register:', err);
-    }
+    this.submit();
 });

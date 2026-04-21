@@ -17,30 +17,30 @@ class AuthController extends Controller
 
     /**
      * Muestra la vista de login.
-     * Si ya hay sesión activa redirige directo al dashboard.
+     * Si ya hay sesión activa redirige al dashboard del rol correspondiente.
      */
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('index');
+            return redirect($this->redirectByRole());
         }
         return view('login');
     }
 
     /**
      * Muestra la vista de registro.
-     * Si ya hay sesión activa redirige directo al dashboard.
+     * Si ya hay sesión activa redirige al dashboard del rol correspondiente.
      */
     public function showRegister(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('index');
+            return redirect($this->redirectByRole());
         }
         return view('register');
     }
 
     /**
-     * Muestra el dashboard (protegido por middleware 'auth').
+     * Muestra el dashboard de usuario (protegido por middleware 'auth').
      */
     public function showIndex(): View
     {
@@ -48,68 +48,59 @@ class AuthController extends Controller
     }
 
     /* ============================================================
-       ENDPOINTS AJAX — respuestas JSON consistentes:
-       { success: bool, data: mixed, message: string }
+       AUTENTICACIÓN — Form POST con redirección basada en rol
        ============================================================ */
 
     /**
-     * Procesa el login por AJAX contra la tabla 'usuarios'.
-     * Auth::attempt busca por 'email' y verifica con getAuthPasswordName()
-     * que en el modelo Usuario devuelve 'password_hash'.
-     * Rate limiting: máx 5 intentos/minuto (configurado en rutas).
+     * Procesa el login enviado desde el formulario HTML (form POST).
+     *
+     * En caso de éxito, redirige al dashboard según el rol:
+     *   admin      → /admin/dashboard
+     *   empresa    → /empresa/dashboard
+     *   organizador → /organizador/dashboard
+     *   usuario    → /index
+     *
+     * En caso de error, redirige de vuelta con los errores de validación
+     * y el email anterior para no obligar al usuario a reescribirlo.
+     *
+     * Rate limiting: máx 5 intentos/minuto (configurado en routes/api.php).
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required', 'min:8'],
         ], [
-            'email.required'    => 'El email es obligatorio',
-            'email.email'       => 'El formato del email no es válido',
-            'password.required' => 'La contraseña es obligatoria',
-            'password.min'      => 'La contraseña debe tener al menos 8 caracteres',
+            'email.required'    => 'El email es obligatorio.',
+            'email.email'       => 'El formato del email no es válido.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min'      => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
         // Auth::attempt usa el modelo configurado en auth.php (Usuario)
-        // 'password' en el array siempre es el valor en texto plano a verificar;
-        // Laravel internamente llama a getAuthPasswordName() para saber contra
-        // qué columna comparar (en este caso, 'password_hash')
+        // y verifica contra la columna que devuelve getAuthPasswordName() → 'password_hash'
         if (! Auth::attempt([
             'email'    => $validated['email'],
             'password' => $validated['password'],
         ])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Credenciales incorrectas. Revisa tu email y contraseña.',
-                'data'    => null,
-            ], 401);
+            return back()
+                ->withInput($request->only('email'))
+                ->with('error', 'Credenciales incorrectas. Revisa tu email y contraseña.');
         }
 
         $request->session()->regenerate();
 
-        /** @var Usuario $usuario */
-        $usuario = Auth::user();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Sesión iniciada correctamente',
-            'data'    => [
-                'user' => [
-                    'id'     => $usuario->id,
-                    'nombre' => $usuario->nombre,
-                    'email'  => $usuario->email,
-                ],
-            ],
-        ]);
+        // redirect()->intended() respeta la URL a la que el usuario intentaba acceder
+        // antes de ser redirigido al login; si no existe, usa el dashboard del rol
+        return redirect()->intended($this->redirectByRole());
     }
 
     /**
-     * Procesa el registro por AJAX y guarda en la tabla 'usuarios'.
-     * El cast 'hashed' en password_hash encripta automáticamente.
-     * Hace auto-login tras el registro.
-     * Rate limiting: máx 5 intentos/minuto (configurado en rutas).
+     * Procesa el registro enviado desde el formulario HTML (form POST).
+     * Los nuevos usuarios siempre son 'usuario' (sin empresa ni organizador).
+     * Hace auto-login tras el registro y redirige al dashboard de usuario.
      */
-    public function register(Request $request): JsonResponse
+    public function register(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'nombre'                => ['required', 'string', 'min:2', 'max:100'],
@@ -119,19 +110,19 @@ class AuthController extends Controller
             'password'              => ['required', 'min:8', 'confirmed'],
             'password_confirmation' => ['required'],
         ], [
-            'nombre.required'                => 'El nombre es obligatorio',
-            'nombre.min'                     => 'El nombre debe tener al menos 2 caracteres',
-            'apellido1.required'             => 'El primer apellido es obligatorio',
-            'apellido1.min'                  => 'El primer apellido debe tener al menos 2 caracteres',
-            'apellido2.required'             => 'El segundo apellido es obligatorio',
-            'apellido2.min'                  => 'El segundo apellido debe tener al menos 2 caracteres',
-            'email.required'                 => 'El email es obligatorio',
-            'email.email'                    => 'El formato del email no es válido',
-            'email.unique'                   => 'Este email ya está registrado',
-            'password.required'              => 'La contraseña es obligatoria',
-            'password.min'                   => 'La contraseña debe tener al menos 8 caracteres',
-            'password.confirmed'             => 'Las contraseñas no coinciden',
-            'password_confirmation.required' => 'Confirma tu contraseña',
+            'nombre.required'                => 'El nombre es obligatorio.',
+            'nombre.min'                     => 'El nombre debe tener al menos 2 caracteres.',
+            'apellido1.required'             => 'El primer apellido es obligatorio.',
+            'apellido1.min'                  => 'El primer apellido debe tener al menos 2 caracteres.',
+            'apellido2.required'             => 'El segundo apellido es obligatorio.',
+            'apellido2.min'                  => 'El segundo apellido debe tener al menos 2 caracteres.',
+            'email.required'                 => 'El email es obligatorio.',
+            'email.email'                    => 'El formato del email no es válido.',
+            'email.unique'                   => 'Este email ya está registrado.',
+            'password.required'              => 'La contraseña es obligatoria.',
+            'password.min'                   => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed'             => 'Las contraseñas no coinciden.',
+            'password_confirmation.required' => 'Confirma tu contraseña.',
         ]);
 
         $usuario = Usuario::create([
@@ -139,30 +130,23 @@ class AuthController extends Controller
             'apellido1'        => $validated['apellido1'],
             'apellido2'        => $validated['apellido2'],
             'email'            => $validated['email'],
-            'password_hash'    => $validated['password'],
+            'password_hash'    => $validated['password'],  // cast 'hashed' lo encripta
             'fecha_creacion'   => now(),
             'estado'           => 1,
             'email_verificado' => 0,
+            'es_admin'         => 0,
         ]);
 
         Auth::login($usuario);
         $request->session()->regenerate();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cuenta creada correctamente. ¡Bienvenido!',
-            'data'    => [
-                'user' => [
-                    'id'     => $usuario->id,
-                    'nombre' => $usuario->nombre,
-                    'email'  => $usuario->email,
-                ],
-            ],
-        ], 201);
+        return redirect()->route('index')
+            ->with('success', '¡Cuenta creada correctamente! Bienvenido a VIBEZ.');
     }
 
     /**
-     * Cierra la sesión por AJAX.
+     * Cierra la sesión por AJAX (usada desde index.js y dashboards).
+     * Devuelve JSON para mantener compatibilidad con el JS existente.
      */
     public function logout(Request $request): JsonResponse
     {
@@ -172,8 +156,36 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Sesión cerrada correctamente',
+            'message' => 'Sesión cerrada correctamente.',
             'data'    => null,
         ]);
+    }
+
+    /* ============================================================
+       MÉTODOS PRIVADOS
+       ============================================================ */
+
+    /**
+     * Devuelve la URL del dashboard según el rol del usuario autenticado.
+     * Prioridad: admin > empresa > organizador > usuario
+     */
+    private function redirectByRole(): string
+    {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        if ($usuario->isAdmin()) {
+            return route('admin.dashboard');
+        }
+
+        if ($usuario->isEmpresa()) {
+            return route('empresa.dashboard');
+        }
+
+        if ($usuario->isOrganizador()) {
+            return route('organizador.dashboard');
+        }
+
+        return route('index');
     }
 }
