@@ -1,9 +1,7 @@
 :root {
-    --bg: #f7f5ff;
     --paper: #ffffff;
     --ink: #1e1b4b;
     --accent: #7c3aed;
-    --accent-soft: #ede9fe;
     --danger: #be123c;
     --border: #c4b5fd;
 }
@@ -129,13 +127,6 @@ body {
 .admin-header p {
     margin: 0.4rem 0 0;
     color: #7c58c7;
-}
-
-.admin-header-actions {
-    display: inline-flex;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
 }
 
 /* ─── CARDS ────────────────────────────────────────────── */
@@ -534,10 +525,6 @@ body {
         font-size: 1.3rem;
     }
 
-    .admin-header-actions {
-        width: 100%;
-    }
-
     .admin-header .btn {
         width: 100%;
         justify-content: center;
@@ -634,15 +621,6 @@ body {
 
     .tabla-eventos td.empty::before {
         display: none;
-    }
-
-    /* Fila del card sin border extra */
-    .tabla-eventos .card {
-        overflow: visible;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        border-radius: 0;
     }
 
     /* Acciones en cada tarjeta */
