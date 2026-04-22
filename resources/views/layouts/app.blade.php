@@ -58,6 +58,11 @@
             {{-- Botones de acción --}}
             <div class="flex items-center gap-3">
                 @auth
+                    @if (Auth::user()->es_admin)
+                        <a href="{{ route('admin.dashboard') }}" class="btn-nav-solido text-sm px-4 py-2">
+                            Panel de Admin
+                        </a>
+                    @endif
                     <div class="nav-user-info hidden sm:flex items-center gap-2">
                         <div class="nav-avatar">{{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}</div>
                         <span class="text-white/70 text-sm font-medium">{{ Auth::user()->nombre }}</span>
