@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard')</title>
-    <link rel="stylesheet" href="{{ asset('css/admin-eventos.css') }}">
+    @vite(['resources/css/admin-eventos.css', 'resources/js/admin-eventos.js'])
 </head>
 <body>
 <div class="dashboard-wrap">
@@ -38,8 +38,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/admin-eventos.js') }}"></script>
-
 
 </body>
 </html>

@@ -27,7 +27,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
-use App\Http\Controllers\EventoController;
+use App\Http\Controllers\EventoController as PublicEventoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,25 +44,25 @@ Route::get('/', function () {
 })->name('welcome');
 
 // --- Detalle de un evento específico ---
-Route::get('/eventos/{id}', [EventoController::class, 'detalle'])
+Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
     ->where('id', '[0-9]+')
     ->name('eventos.detalle');
 
 // --- Detalle de una oferta de trabajo ---
-Route::get('/trabajos/{id}', [EventoController::class, 'detalleOferta'])
+Route::get('/trabajos/{id}', [PublicEventoController::class, 'detalleOferta'])
     ->where('id', '[0-9]+')
     ->name('trabajos.detalle');
 
 // --- API AJAX: filtrar eventos y ofertas (responde JSON) ---
-Route::get('/api/filtrar', [EventoController::class, 'filtrar'])
+Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
     ->name('api.filtrar');
 
 // --- Página completa de Bolsa de Trabajo ---
-Route::get('/bolsa-de-trabajo', [EventoController::class, 'bolsaTrabajo'])
+Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
     ->name('trabajos.index');
 
 // --- API AJAX: filtrar solo ofertas de trabajo ---
-Route::get('/api/filtrar-trabajos', [EventoController::class, 'filtrarTrabajos'])
+Route::get('/api/filtrar-trabajos', [PublicEventoController::class, 'filtrarTrabajos'])
     ->name('api.filtrar-trabajos');
 
 Route::get('/login',    [AuthController::class, 'showLogin'])
