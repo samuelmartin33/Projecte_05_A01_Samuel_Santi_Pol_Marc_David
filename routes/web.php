@@ -24,12 +24,11 @@
  *    GET  /empresa/dashboard      → dashboard empresa  (auth + role:empresa)
  */
 
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EventoController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\EventoController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,17 +87,17 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.dashboard');
     
     /* Rutas de eventos */
-    Route::get('/admin/eventos', [EventoController::class, 'index'])
+    Route::get('/admin/eventos', [AdminEventoController::class, 'index'])
          ->name('admin.eventos.index');
-    Route::get('/admin/eventos/crear', [EventoController::class, 'create'])
+    Route::get('/admin/eventos/crear', [AdminEventoController::class, 'create'])
          ->name('admin.eventos.create');
-    Route::post('/admin/eventos', [EventoController::class, 'store'])
+    Route::post('/admin/eventos', [AdminEventoController::class, 'store'])
          ->name('admin.eventos.store');
-    Route::get('/admin/eventos/{evento}/editar', [EventoController::class, 'edit'])
+    Route::get('/admin/eventos/{evento}/editar', [AdminEventoController::class, 'edit'])
          ->name('admin.eventos.edit');
-    Route::put('/admin/eventos/{evento}', [EventoController::class, 'update'])
+    Route::put('/admin/eventos/{evento}', [AdminEventoController::class, 'update'])
          ->name('admin.eventos.update');
-    Route::delete('/admin/eventos/{evento}', [EventoController::class, 'destroy'])
+    Route::delete('/admin/eventos/{evento}', [AdminEventoController::class, 'destroy'])
          ->name('admin.eventos.destroy');
 });
 

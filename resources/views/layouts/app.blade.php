@@ -57,8 +57,13 @@
 
             {{-- Botones de acción --}}
             <div class="flex items-center gap-3">
-                <a href="{{ route('login') }}" class="btn-nav-ghost">Entrar</a>
-                <a href="{{ route('register') }}" class="btn-nav-solido">Registro</a>
+                @auth
+                    <span class="text-white/50 text-sm hidden sm:block">{{ Auth::user()->nombre }}</span>
+                    <button onclick="cerrarSesion()" class="btn-nav-ghost">Cerrar sesión</button>
+                @else
+                    <a href="{{ route('login') }}" class="btn-nav-ghost">Entrar</a>
+                    <a href="{{ route('register') }}" class="btn-nav-solido">Registro</a>
+                @endauth
             </div>
 
         </div>
@@ -97,5 +102,21 @@
     {{-- Espacio para scripts específicos de cada página (ej: Leaflet, AJAX) --}}
     @stack('scripts')
     @yield('scripts')
+
+    @auth
+    <script>
+    function cerrarSesion() {
+        fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+        }).then(function() {
+            window.location.href = '/';
+        });
+    }
+    </script>
+    @endauth
 </body>
 </html>

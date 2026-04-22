@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan *)"
+      "Bash(php artisan *)",
+      "Bash(php -l app/Models/Organizador.php)",
+      "Bash(php -l app/Http/Controllers/Admin/DashboardController.php)",
+      "Bash(php -l app/Models/CategoriaEvento.php)",
+      "Bash(php -l app/Models/Evento.php)",
+      "Bash(php -l routes/web.php)"
     ]
   }
 }
