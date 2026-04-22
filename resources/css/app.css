@@ -138,6 +138,23 @@ body {
 .bg-navy               { background-color: var(--navy); }
 .bg-morado-vibez       { background-color: var(--morado); }
 
+/* --- Tipografía Premium --- */
+.font-premium {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.text-justify {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.text-center-block {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* ============================================================
    NAVBAR DE LA APP (layouts/app.blade.php)
    ============================================================ */
@@ -196,16 +213,58 @@ body {
 .btn-nav-solido {
     background: linear-gradient(135deg, var(--morado), var(--morado-claro));
     color: white;
-    padding: 6px 18px;
+    padding: 8px 24px;
     border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     text-decoration: none;
-    transition: opacity 0.15s, transform 0.15s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
 }
 .btn-nav-solido:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+/* Estilos adicionales para el navbar profesional */
+.nav-user-info {
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s;
+}
+.nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--morado);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.75rem;
+}
+.nav-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+}
+.btn-nav-logout {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-nav-logout:hover {
+    color: white;
 }
 
 /* Footer oscuro coherente con el nav */
@@ -220,6 +279,18 @@ body {
 
 .hero-home {
     background: linear-gradient(160deg, var(--navy) 0%, #1e1035 60%, #2e1065 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+.hero-home p {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 /* Texto con degradado claro (sobre fondo oscuro) */
@@ -230,6 +301,26 @@ body {
     background-clip: text;
 }
 
+/* --- Pills Premium --- */
+.pill-premium {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+.pill-premium:hover {
+    background: var(--morado);
+    border-color: var(--morado-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+}
+
 /* ============================================================
    BARRA DE FILTROS — sticky bajo el navbar
    ============================================================ */
@@ -238,6 +329,13 @@ body {
     background: white;
     border-bottom: 1px solid #ede9fe;
     box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
+    position: relative;
+}
+.barra-filtros .text-sm.font-semibold {
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* Agrupación de label + select */
@@ -815,17 +913,20 @@ body {
 .seccion-vibez-titulo {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     font-weight: 900;
     color: var(--navy);
+    text-align: center;
 }
 .seccion-vibez-sub {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     color: rgba(15,23,42,0.45);
     font-weight: 400;
-    margin-top: 2px;
-    margin-bottom: 20px;
+    margin-top: 4px;
+    margin-bottom: 32px;
+    text-align: center;
 }
 .linea-divisora {
     border: none;

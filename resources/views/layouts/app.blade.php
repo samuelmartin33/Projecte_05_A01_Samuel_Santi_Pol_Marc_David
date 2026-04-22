@@ -44,7 +44,7 @@
             </a>
 
             {{-- Navegación central --}}
-            <nav class="hidden md:flex items-center gap-6">
+            <nav class="hidden md:flex items-center gap-8">
                 <a href="{{ route('home') }}"
                    class="nav-link {{ request()->routeIs('home') ? 'nav-link-activo' : '' }}">
                     Explorar
@@ -58,8 +58,17 @@
             {{-- Botones de acción --}}
             <div class="flex items-center gap-3">
                 @auth
-                    <span class="text-white/50 text-sm hidden sm:block">{{ Auth::user()->nombre }}</span>
-                    <button onclick="cerrarSesion()" class="btn-nav-ghost">Cerrar sesión</button>
+                    <div class="nav-user-info hidden sm:flex items-center gap-2">
+                        <div class="nav-avatar">{{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}</div>
+                        <span class="text-white/70 text-sm font-medium">{{ Auth::user()->nombre }}</span>
+                    </div>
+                    <div class="nav-divider"></div>
+                    <button onclick="cerrarSesion()" class="btn-nav-logout">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                        </svg>
+                        Cerrar sesión
+                    </button>
                 @else
                     <a href="{{ route('login') }}" class="btn-nav-ghost">Entrar</a>
                     <a href="{{ route('register') }}" class="btn-nav-solido">Registro</a>
@@ -83,16 +92,18 @@
     ═══════════════════════════════════════════════════════ --}}
     @if(!View::hasSection('content'))
     <footer class="footer-vibez">
-        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col items-center justify-center text-center gap-6">
             <div class="flex items-center gap-2">
-                <div class="logo-isotipo text-sm w-7 h-7">V</div>
-                <span class="font-bold text-white">VIBEZ</span>
+                <div class="logo-isotipo text-sm w-8 h-8">V</div>
+                <span class="font-bold text-white text-lg tracking-tight">VIBEZ</span>
             </div>
-            <p class="text-white/50 text-sm">
-                &copy; {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes
+            <p class="text-white/40 text-sm max-w-md">
+                &copy; {{ date('Y') }} VIBEZ — La plataforma definitiva de eventos para jóvenes. 
+                Descubre, crea y conecta.
             </p>
-            <div class="flex gap-5 text-white/60 text-sm">
+            <div class="flex gap-8 text-white/50 text-sm font-medium">
                 <a href="#" class="hover:text-white transition-colors">Privacidad</a>
+                <a href="#" class="hover:text-white transition-colors">Términos</a>
                 <a href="#" class="hover:text-white transition-colors">Contacto</a>
             </div>
         </div>
