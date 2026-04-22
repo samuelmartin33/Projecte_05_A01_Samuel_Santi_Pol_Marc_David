@@ -304,20 +304,24 @@ class AuthController extends Controller
     }
 
     /**
-     * Cierra la sesión por AJAX (usada desde index.js y dashboards).
-     * Devuelve JSON para mantener compatibilidad con el JS existente.
+     * Cierra la sesión.
+     * Si la petición es AJAX devuelve JSON; si es un form POST normal redirige al inicio.
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request): JsonResponse|RedirectResponse
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sesión cerrada correctamente.',
-            'data'    => null,
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión cerrada correctamente.',
+                'data'    => null,
+            ]);
+        }
+
+        return redirect()->route('welcome');
     }
 
     /* ============================================================

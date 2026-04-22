@@ -1,15 +1,11 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Explorar Eventos'); ?>
 
-@section('titulo', 'Explorar Eventos')
+<?php $__env->startSection('contenido'); ?>
 
-@section('contenido')
 
-{{-- ════════════════════════════════════════════════════
-     BANNER HERO — Fondo oscuro con orbs neon animados
-════════════════════════════════════════════════════ --}}
 <section class="hero-home">
 
-    {{-- Partículas decorativas --}}
+    
     <div class="hero-particula hero-particula-1"></div>
     <div class="hero-particula hero-particula-2"></div>
     <div class="hero-particula hero-particula-3"></div>
@@ -19,7 +15,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col items-center justify-center relative z-10" 
          style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
 
-        {{-- Badge de bienvenida --}}
+        
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold mb-8"
              style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);color:#c084fc;letter-spacing:0.1em;text-transform:uppercase; display: inline-flex !important;">
             La plataforma de la escena joven
@@ -37,7 +33,7 @@
             VIBEZ es la comunidad donde la escena cobra vida.
         </p>
 
-        {{-- Pills de categorías interactivas --}}
+        
         <div class="flex flex-wrap justify-center gap-3 mt-4" 
              style="display: flex !important; justify-content: center !important; width: 100% !important;">
             <span class="pill-premium" onclick="seleccionarFiltro('categoria', '1', 'Música', {stopPropagation:function(){}})">Música</span>
@@ -50,13 +46,10 @@
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     BARRA DE FILTROS — sticky bajo el nav
-     Usa custom selects (sin look nativo del navegador)
-════════════════════════════════════════════════════ --}}
+
 <section class="barra-filtros sticky top-16 z-40">
 
-    {{-- Overlay transparente para cerrar dropdowns al pulsar fuera --}}
+    
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
          onclick="cerrarTodosDropdowns()"></div>
@@ -64,14 +57,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end justify-center gap-6 relative" 
          style="display: flex !important; justify-content: center !important; align-items: flex-end !important;">
 
-        {{-- Contador de resultados (oculto en móvil para centrar mejor) --}}
+        
         <p class="text-sm font-semibold hidden lg:block"
            style="color:rgba(15,23,42,0.5); position: absolute; left: 2rem; top: 50%; transform: translateY(-50%);">
-            <span id="contador-resultados">{{ $eventos->count() + $ofertas->count() }}</span>
+            <span id="contador-resultados"><?php echo e($eventos->count() + $ofertas->count()); ?></span>
             <span style="color:var(--morado)"> resultados</span>
         </p>
 
-        {{-- ── Selector de CATEGORÍA personalizado ── --}}
+        
         <div class="filtro-grupo" style="position:relative;z-index:250;">
             <label class="filtro-label">Categoría</label>
             <div class="custom-select-wrapper"
@@ -85,12 +78,13 @@
                 <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
                     <div class="custom-select-option seleccionado"
                          onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
-                    @foreach ($categorias as $categoria)
+                    <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoria): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="custom-select-option"
-                             onclick="seleccionarFiltro('categoria','{{ $categoria->id }}','{{ $categoria->nombre }}',event)">
-                            {{ $categoria->nombre }}
+                             onclick="seleccionarFiltro('categoria','<?php echo e($categoria->id); ?>','<?php echo e($categoria->nombre); ?>',event)">
+                            <?php echo e($categoria->nombre); ?>
+
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     <div class="custom-select-option"
                          onclick="seleccionarFiltro('categoria','trabajo','Bolsa de Trabajo',event)">
                         Bolsa de Trabajo
@@ -100,7 +94,7 @@
             <input type="hidden" id="filtro-categoria" value="">
         </div>
 
-        {{-- ── Selector de UBICACIÓN personalizado ── --}}
+        
         <div class="filtro-grupo" style="position:relative;z-index:240;">
             <label class="filtro-label">Ubicación</label>
             <div class="custom-select-wrapper"
@@ -116,18 +110,19 @@
                          onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">
                         Todas las ciudades
                     </div>
-                    @foreach ($ubicaciones as $ubicacion)
+                    <?php $__currentLoopData = $ubicaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ubicacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="custom-select-option"
-                             onclick="seleccionarFiltro('ubicacion','{{ $ubicacion }}','{{ $ubicacion }}',event)">
-                            {{ $ubicacion }}
+                             onclick="seleccionarFiltro('ubicacion','<?php echo e($ubicacion); ?>','<?php echo e($ubicacion); ?>',event)">
+                            <?php echo e($ubicacion); ?>
+
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
             <input type="hidden" id="filtro-ubicacion" value="">
         </div>
 
-        {{-- Botón limpiar — wrapped en filtro-grupo con label invisible para alinearlo ── --}}
+        
         <div class="filtro-grupo">
             <span class="filtro-label" style="visibility:hidden">–</span>
             <button class="btn-limpiar" onclick="limpiarFiltros()">
@@ -142,18 +137,15 @@
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     GRID DE TARJETAS (eventos + ofertas mezclados)
-     id="grid-resultados" es el target del AJAX
-════════════════════════════════════════════════════ --}}
+
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    {{-- Spinner de carga --}}
+    
     <div id="cargando" class="hidden flex justify-center py-16">
         <div class="spinner"></div>
     </div>
 
-    {{-- Mensaje sin resultados --}}
+    
     <div id="sin-resultados" class="hidden text-center py-20">
         <p class="text-5xl mb-3"></p>
         <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
@@ -161,49 +153,53 @@
         <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
     </div>
 
-    {{-- ── Sección EVENTOS ── --}}
+    
     <div id="seccion-eventos">
         <div class="seccion-vibez-titulo">
             Eventos destacados
         </div>
         <p class="seccion-vibez-sub">
-            {{ $eventos->count() }} evento{{ $eventos->count() !== 1 ? 's' : '' }} disponible{{ $eventos->count() !== 1 ? 's' : '' }}
+            <?php echo e($eventos->count()); ?> evento<?php echo e($eventos->count() !== 1 ? 's' : ''); ?> disponible<?php echo e($eventos->count() !== 1 ? 's' : ''); ?>
+
         </p>
 
         <div id="grid-eventos"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-            @foreach ($eventos as $evento)
+            <?php $__currentLoopData = $eventos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $evento): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <article class="card-evento"
-                         onclick="irADetalle('evento', {{ $evento->id }})">
+                         onclick="irADetalle('evento', <?php echo e($evento->id); ?>)">
 
                     <div class="card-imagen-wrap">
-                        <img src="{{ $evento->url_portada }}"
-                             alt="{{ $evento->titulo }}"
+                        <img src="<?php echo e($evento->url_portada); ?>"
+                             alt="<?php echo e($evento->titulo); ?>"
                              class="card-imagen"
-                             onerror="this.src='https://picsum.photos/seed/fallback-{{ $evento->id }}/600/400'">
+                             onerror="this.src='https://picsum.photos/seed/fallback-<?php echo e($evento->id); ?>/600/400'">
 
-                        {{-- Badge con data-cat para el color CSS --}}
+                        
                         <span class="badge-categoria"
-                              data-cat="{{ $evento->categoria?->nombre ?? 'Evento' }}">
-                            {{ $evento->categoria?->nombre ?? 'Evento' }}
+                              data-cat="<?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>">
+                            <?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>
+
                         </span>
 
-                        <span class="badge-precio {{ $evento->es_gratuito ? 'badge-gratis' : '' }}">
-                            {{ $evento->precio_formateado }}
+                        <span class="badge-precio <?php echo e($evento->es_gratuito ? 'badge-gratis' : ''); ?>">
+                            <?php echo e($evento->precio_formateado); ?>
+
                         </span>
                     </div>
 
                     <div class="card-cuerpo">
-                        <h3 class="card-titulo">{{ $evento->titulo }}</h3>
+                        <h3 class="card-titulo"><?php echo e($evento->titulo); ?></h3>
                         <p class="card-meta">
                             <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY') }}
+                            <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY')); ?>
+
                         </p>
-                        @if ($evento->ubicacion_nombre)
+                        <?php if($evento->ubicacion_nombre): ?>
                             <p class="card-meta">
                                 <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -211,23 +207,25 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                                {{ $evento->ubicacion_nombre }}
+                                <?php echo e($evento->ubicacion_nombre); ?>
+
                             </p>
-                        @endif
-                        @if ($evento->organizador?->empresa)
+                        <?php endif; ?>
+                        <?php if($evento->organizador?->empresa): ?>
                             <p class="card-organizador">
-                                {{ $evento->organizador->empresa->nombre_empresa }}
+                                <?php echo e($evento->organizador->empresa->nombre_empresa); ?>
+
                             </p>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </article>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-        </div>{{-- fin #grid-eventos --}}
+        </div>
     </div>
 
-    {{-- ── Separador y sección BOLSA DE TRABAJO ── --}}
-    @if ($ofertas->count() > 0)
+    
+    <?php if($ofertas->count() > 0): ?>
         <hr class="linea-divisora">
 
         <div id="seccion-trabajos">
@@ -235,15 +233,15 @@
                 Bolsa de Trabajo
             </div>
             <p class="seccion-vibez-sub">
-                {{ $ofertas->count() }} oferta{{ $ofertas->count() !== 1 ? 's' : '' }} de empleo en la escena de eventos
+                <?php echo e($ofertas->count()); ?> oferta<?php echo e($ofertas->count() !== 1 ? 's' : ''); ?> de empleo en la escena de eventos
             </p>
 
             <div id="grid-trabajos"
                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                @foreach ($ofertas as $oferta)
+                <?php $__currentLoopData = $ofertas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oferta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <article class="card-trabajo"
-                             onclick="irADetalle('oferta', {{ $oferta->id }})">
+                             onclick="irADetalle('oferta', <?php echo e($oferta->id); ?>)">
 
                         <div class="card-trabajo-header">
                             <svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -254,34 +252,37 @@
                         </div>
 
                         <div class="card-cuerpo">
-                            <h3 class="card-titulo">{{ $oferta->titulo }}</h3>
-                            @if ($oferta->organizador?->empresa)
+                            <h3 class="card-titulo"><?php echo e($oferta->titulo); ?></h3>
+                            <?php if($oferta->organizador?->empresa): ?>
                                 <p class="card-meta font-semibold" style="color:var(--morado)">
-                                    {{ $oferta->organizador->empresa->nombre_empresa }}
+                                    <?php echo e($oferta->organizador->empresa->nombre_empresa); ?>
+
                                 </p>
-                            @endif
-                            @if ($oferta->ubicacion)
+                            <?php endif; ?>
+                            <?php if($oferta->ubicacion): ?>
                                 <p class="card-meta">
                                     <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                     </svg>
-                                    {{ $oferta->ubicacion }}
+                                    <?php echo e($oferta->ubicacion); ?>
+
                                 </p>
-                            @endif
-                            <p class="card-salario">{{ $oferta->salario_formateado }}</p>
+                            <?php endif; ?>
+                            <p class="card-salario"><?php echo e($oferta->salario_formateado); ?></p>
                             <p class="card-meta" style="font-size:0.75rem">
-                                {{ $oferta->vacantes }} vacante{{ $oferta->vacantes !== 1 ? 's' : '' }}
+                                <?php echo e($oferta->vacantes); ?> vacante<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?>
+
                             </p>
                         </div>
                     </article>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            </div>{{-- fin #grid-trabajos --}}
+            </div>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Grid unificado para el AJAX (target del filtrado) --}}
+    
     <div id="grid-resultados" class="hidden">
         <div id="grid-resultados-inner"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -290,12 +291,10 @@
 
 </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-{{-- ════════════════════════════════════════════════════
-     SCRIPTS — Filtrado AJAX + Custom Selects
-════════════════════════════════════════════════════ --}}
-@push('scripts')
+
+<?php $__env->startPush('scripts'); ?>
 <script>
 
 /**
@@ -446,8 +445,8 @@ function limpiarFiltros() {
     if (seccionTrabajos) seccionTrabajos.style.display = '';
 
     // Actualizar contador con total real
-    var totalEventos  = {{ $eventos->count() }};
-    var totalOfertas  = {{ $ofertas->count() }};
+    var totalEventos  = <?php echo e($eventos->count()); ?>;
+    var totalOfertas  = <?php echo e($ofertas->count()); ?>;
     document.getElementById('contador-resultados').textContent = totalEventos + totalOfertas;
 }
 
@@ -506,5 +505,7 @@ function crearTarjetaOferta(oferta) {
         + '</div></article>';
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/home.blade.php ENDPATH**/ ?>

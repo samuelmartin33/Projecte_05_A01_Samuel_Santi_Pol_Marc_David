@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,9 +10,9 @@
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
 
     <!-- CSS y JS compilados por Vite -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
+        <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <?php endif; ?>
 </head>
 <body class="min-h-screen relative flex flex-col">
 
@@ -31,23 +31,23 @@
 
         <!-- Botones de navegación -->
         <div class="flex items-center gap-3">
-            @auth
-                @if (auth()->user()->es_admin)
+            <?php if(auth()->guard()->check()): ?>
+                <?php if(auth()->user()->es_admin): ?>
                     <a href="/admin" class="btn-cta text-sm font-semibold px-5 py-2 rounded-full">
                         Panel de Admin
                     </a>
-                @endif
+                <?php endif; ?>
                 <form method="POST" action="/api/logout" style="display: inline;">
-                    @csrf
+                    <?php echo csrf_field(); ?>
                     <button type="submit" class="btn-ghost text-sm font-semibold px-5 py-2 rounded-full">
                         Cerrar sesión
                     </button>
                 </form>
-            @else
+            <?php else: ?>
                 <a href="/login" class="btn-ghost text-sm font-semibold px-5 py-2 rounded-full">
                     Iniciar sesión
                 </a>
-            @endauth
+            <?php endif; ?>
         </div>
 
     </header>
@@ -57,7 +57,7 @@
         <div class="hero-content flex flex-col items-center text-center max-w-2xl mx-auto gap-4">
 
             <!-- Logo grande -->
-            <img src="{{ asset('images/logo_vibez.png') }}"
+            <img src="<?php echo e(asset('images/logo_vibez.png')); ?>"
                  alt="VIBEZ logo" class="h-60 w-auto">
 
             <!-- Título principal -->
@@ -92,9 +92,10 @@
 
     <!-- ── PIE DE PÁGINA ─────────────────────────────────────── -->
     <footer class="relative z-10 text-center pb-8 text-slate-400 text-xs">
-        &copy; {{ date('Y') }} VIBEZ — Todos los derechos reservados.
+        &copy; <?php echo e(date('Y')); ?> VIBEZ — Todos los derechos reservados.
     </footer>
 
 </body>
 </html>
 
+<?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/welcome.blade.php ENDPATH**/ ?>
