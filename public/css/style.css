@@ -1,0 +1,1409 @@
+/* ============================================================
+   VIBEZ — Sistema de Autenticación
+   CSS Moderno: Variables, clamp(), grid, keyframes, glassmorphism
+   Diseño: Split asimétrico + Aurora mesh + Inputs animados + Ripple
+   ============================================================ */
+
+/* ==========================================
+   1. VARIABLES CSS
+   ========================================== */
+:root {
+    --violet-deep:    #5B21B6;
+    --violet-primary: #7C3AED;
+    --lilac-soft:     #C4B5FD;
+    --lilac-mist:     #EDE9FE;
+    --white-pure:     #FFFFFF;
+    --white-off:      #FAFAFF;
+    --ink:            #1E1B4B;
+    --glass:          rgba(255, 255, 255, 0.6);
+
+    /* Espaciado fluid con clamp() */
+    --space-xs: clamp(0.25rem, 0.5vw,  0.5rem);
+    --space-sm: clamp(0.5rem,  1vw,    0.875rem);
+    --space-md: clamp(0.875rem,2vw,    1.5rem);
+    --space-lg: clamp(1.5rem,  3vw,    2.5rem);
+    --space-xl: clamp(2rem,    5vw,    4rem);
+
+    /* Tipografía fluid */
+    --font-xs:   clamp(0.65rem,  1.2vw, 0.75rem);
+    --font-sm:   clamp(0.75rem,  1.5vw, 0.875rem);
+    --font-base: clamp(0.875rem, 2vw,   1rem);
+    --font-lg:   clamp(1rem,     2.5vw, 1.25rem);
+    --font-xl:   clamp(1.5rem,   3vw,   2rem);
+    --font-hero: clamp(2.2rem,   5.5vw, 3.8rem);
+}
+
+/* ==========================================
+   2. RESET Y BASE
+   ========================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--white-off);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ==========================================
+   3. AURORA MESH GRADIENT BACKGROUND
+   Cuatro radial-gradients animados independientemente
+   crean un efecto "aurora boreal" sutil y orgánico
+   ========================================== */
+.auth-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--white-off);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Cada blob tiene tamaño, posición y animación distintos
+   para que el movimiento se sienta orgánico y aleatorio */
+.aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+}
+
+/* Blob principal: violeta grande, esquina superior izquierda */
+.aurora-blob:nth-child(1) {
+    width: clamp(300px, 55vw, 700px);
+    height: clamp(300px, 55vw, 700px);
+    background: radial-gradient(circle at center, rgba(124,58,237,0.28) 0%, transparent 70%);
+    top: -15%;
+    left: -10%;
+    animation: aurora1 14s ease-in-out infinite alternate;
+}
+
+/* Blob secundario: profundo, esquina inferior derecha */
+.aurora-blob:nth-child(2) {
+    width: clamp(250px, 45vw, 600px);
+    height: clamp(250px, 45vw, 600px);
+    background: radial-gradient(circle at center, rgba(91,33,182,0.22) 0%, transparent 70%);
+    bottom: -10%;
+    right: -5%;
+    animation: aurora2 18s ease-in-out infinite alternate;
+}
+
+/* Blob lila: centro-derecha */
+.aurora-blob:nth-child(3) {
+    width: clamp(200px, 38vw, 500px);
+    height: clamp(200px, 38vw, 500px);
+    background: radial-gradient(circle at center, rgba(196,181,253,0.3) 0%, transparent 70%);
+    top: 35%;
+    left: 40%;
+    animation: aurora3 10s ease-in-out infinite alternate;
+}
+
+/* Blob mist: sutil, parte superior derecha */
+.aurora-blob:nth-child(4) {
+    width: clamp(180px, 30vw, 400px);
+    height: clamp(180px, 30vw, 400px);
+    background: radial-gradient(circle at center, rgba(237,233,254,0.5) 0%, transparent 70%);
+    top: 5%;
+    right: 10%;
+    animation: aurora4 16s ease-in-out infinite alternate;
+}
+
+@keyframes aurora1 {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(4%, 7%) scale(1.08); }
+    66%  { transform: translate(-2%, 3%) scale(0.97); }
+    100% { transform: translate(6%, -4%) scale(1.05); }
+}
+
+@keyframes aurora2 {
+    0%   { transform: translate(0, 0) scale(1); }
+    40%  { transform: translate(-5%, -6%) scale(1.12); }
+    80%  { transform: translate(3%, -2%) scale(0.92); }
+    100% { transform: translate(-7%, 4%) scale(1.06); }
+}
+
+@keyframes aurora3 {
+    0%   { transform: translate(0, 0) scale(1); opacity: 0.7; }
+    50%  { transform: translate(5%, -8%) scale(1.2); opacity: 0.5; }
+    100% { transform: translate(-4%, 4%) scale(1.05); opacity: 0.8; }
+}
+
+@keyframes aurora4 {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    60%  { transform: translate(-3%, 5%) rotate(12deg); }
+    100% { transform: translate(4%, -3%) rotate(-8deg); }
+}
+
+/* ==========================================
+   4. PREVENIR SCROLL EN PÁGINAS DE AUTH
+   Clase .auth-page inyectada en <html> y <body> desde
+   los @section('html-class') / @section('body-class') de
+   login.blade.php y register.blade.php.
+   Funciona en todos los navegadores sin depender de :has().
+   ========================================== */
+html.auth-page,
+body.auth-page {
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+}
+
+/* ==========================================
+   4B. LAYOUT SPLIT ASIMÉTRICO
+   Panel izquierdo 58% (arte) — Panel derecho 42% (formulario)
+   height: 100vh fijo + overflow:hidden bloquean el scroll
+   ========================================== */
+.auth-wrapper {
+    display: grid;
+    grid-template-columns: 58fr 42fr;
+    height: 100vh;      /* fijo, no min-height: no permite crecer más */
+    overflow: hidden;   /* recorta cualquier desbordamiento interno */
+}
+
+/* ==========================================
+   5. PANEL DE ARTE (izquierdo)
+   ========================================== */
+.art-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: min(var(--space-xl), 3vh) min(var(--space-xl), 4vw);
+    overflow: hidden;
+}
+
+/* Tinte suave sobre el fondo aurora para diferenciar el panel */
+.art-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        145deg,
+        rgba(237, 233, 254, 0.25) 0%,
+        rgba(196, 181, 253, 0.1)  50%,
+        transparent 100%
+    );
+    z-index: 0;
+}
+
+/* Separador vertical sutil en el borde derecho del panel */
+.art-panel::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 10%;
+    height: 80%;
+    width: 1px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(196, 181, 253, 0.4) 30%,
+        rgba(124, 58,  237, 0.3) 50%,
+        rgba(196, 181, 253, 0.4) 70%,
+        transparent
+    );
+    z-index: 2;
+}
+
+.art-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 460px;
+    width: 100%;
+}
+
+/* Nombre de marca con gradiente de texto */
+.brand-name {
+    font-size: var(--font-hero);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    background: linear-gradient(
+        135deg,
+        var(--violet-deep)    0%,
+        var(--violet-primary) 45%,
+        var(--lilac-soft)     100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-xs);
+    user-select: none;
+}
+
+.brand-tagline {
+    font-size: var(--font-sm);
+    color: var(--violet-deep);
+    opacity: 0.65;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+/* SVG ilustración centrada — margen acotado con min() para vh */
+.art-svg {
+    width: clamp(180px, 28vw, 400px);
+    height: auto;
+    margin: min(var(--space-lg), 2.5vh) auto;
+    display: block;
+    filter: drop-shadow(0 8px 32px rgba(91,33,182,0.12));
+}
+
+/* ==========================================
+   6. ANIMACIONES SVG — BLOBS ORGÁNICOS
+   Cada blob flota de forma independiente y con
+   timing diferente para una sensación orgánica
+   ========================================== */
+.blob-1 { animation: blobFloat1  7s ease-in-out infinite; }
+.blob-2 { animation: blobFloat2  9s ease-in-out infinite; transform-origin: center; }
+.blob-3 { animation: blobFloat3  6s ease-in-out infinite; }
+.blob-4 { animation: blobFloat4  8s ease-in-out infinite; }
+.blob-5 { animation: blobFloat5 10s ease-in-out infinite; }
+.orb-1  { animation: orbPulse1   4s ease-in-out infinite; transform-origin: center; }
+.orb-2  { animation: orbPulse2   5s ease-in-out infinite; transform-origin: center; }
+.orb-3  { animation: orbPulse3  3.5s ease-in-out infinite; transform-origin: center; }
+
+@keyframes blobFloat1 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%       { transform: translateY(-14px) rotate(5deg); }
+}
+@keyframes blobFloat2 {
+    0%, 100% { transform: translateY(0) scale(1); }
+    40%       { transform: translateY(11px) scale(1.05); }
+    80%       { transform: translateY(-5px) scale(0.97); }
+}
+@keyframes blobFloat3 {
+    0%, 100% { transform: translate(0, 0); }
+    60%       { transform: translate(6px, -10px); }
+}
+@keyframes blobFloat4 {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%       { transform: translateY(15px) scale(0.95); }
+}
+@keyframes blobFloat5 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    30%       { transform: translateY(-7px) rotate(7deg); }
+    70%       { transform: translateY(9px) rotate(-5deg); }
+}
+@keyframes orbPulse1 {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50%       { opacity: 0.9; transform: scale(1.25); }
+}
+@keyframes orbPulse2 {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50%       { opacity: 0.7; transform: scale(0.75); }
+}
+@keyframes orbPulse3 {
+    0%, 100% { opacity: 0.65; transform: scale(1) translateY(0); }
+    50%       { opacity: 0.25; transform: scale(1.35) translateY(-5px); }
+}
+
+/* ==========================================
+   7. PANEL DE FORMULARIO (derecho)
+   Sin card ni caja — el formulario flota sobre
+   el fondo directamente, efecto limpio y moderno
+   ========================================== */
+.form-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 clamp(2.5rem, 6vw, 5rem);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Espaciadores flex que empujan el contenido al centro */
+.form-panel::before,
+.form-panel::after {
+    content: '';
+    display: block;
+    flex: 1;
+    max-height: 1.5rem;
+}
+
+.form-header {
+    margin-bottom: min(0.85rem, 1.4vh);
+}
+
+.form-title {
+    font-size: var(--font-xl);
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.02em;
+}
+
+.form-subtitle {
+    font-size: var(--font-sm);
+    color: #6B7280;
+    font-weight: 400;
+}
+
+/* ==========================================
+   8. INPUTS CON LÍNEA ANIMADA (underline)
+   Sin bordes clásicos — solo una línea inferior
+   que se expande desde el centro en el focus.
+   El label flota hacia arriba al escribir.
+   ========================================== */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: min(0.6rem, 1vh);
+    margin-bottom: min(0.6rem, 1vh);
+}
+
+/* Fila de dos campos en paralelo (apellidos) */
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+/* Wrapper de cada campo: padding superior para el label flotante */
+.field {
+    position: relative;
+    padding-top: min(0.9rem, 1.4vh);
+}
+
+/* Row de 3 columnas para tipo + fecha + teléfono */
+.field-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.field input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid #D1D5DB;
+    background: transparent;
+    padding: 0.5rem 0 0.35rem;
+    font-size: var(--font-base);
+    color: var(--ink);
+    outline: none;
+    font-family: inherit;
+    caret-color: var(--violet-primary);
+    transition: border-color 0.3s ease;
+    /* placeholder transparent: la etiqueta hace de placeholder */
+}
+
+.field input::placeholder {
+    color: transparent;
+}
+
+/* Etiqueta flotante: empieza en posición de placeholder */
+.field label {
+    position: absolute;
+    left: 0;
+    top: min(1.95rem, 2.8vh);           /* alineada con el input */
+    font-size: var(--font-base);
+    color: #9CA3AF;
+    font-weight: 400;
+    pointer-events: none;
+    transition: top 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                font-size 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                letter-spacing 0.25s ease;
+}
+
+/* Label sube al hacer focus O cuando el campo tiene valor */
+.field input:focus ~ label,
+.field input:not(:placeholder-shown) ~ label {
+    top: 0;
+    font-size: var(--font-xs);
+    color: var(--violet-primary);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Date input: el browser muestra su propio formato (dd/mm/yyyy), por lo que
+   el label debe estar siempre en la posición flotada para no solaparse */
+.field input[type="date"] ~ label {
+    top: 0;
+    font-size: var(--font-xs);
+    color: #9CA3AF;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.field:focus-within input[type="date"] ~ label {
+    color: var(--violet-primary);
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.45;
+    cursor: pointer;
+}
+
+/* La línea animada se expande desde el centro hacia los extremos */
+.field::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--violet-primary), var(--lilac-soft));
+    border-radius: 2px;
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Al hacer focus en cualquier input del wrapper, la línea se expande */
+.field:focus-within::after {
+    width: 100%;
+}
+
+/* Estado de error: línea roja, label roja */
+.field.has-error::after {
+    background: #EF4444;
+    width: 100%;
+}
+.field.has-error input {
+    border-bottom-color: #FCA5A5;
+}
+.field.has-error label,
+.field.has-error input:focus ~ label,
+.field.has-error input:not(:placeholder-shown) ~ label {
+    color: #DC2626;
+}
+
+/* Mensaje de error inline: aparece con transición suave */
+.field-error {
+    display: block;
+    font-size: 0.68rem;
+    color: #DC2626;
+    font-weight: 500;
+    margin-top: 0.3rem;
+    min-height: 1.1em;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+
+.field-error.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Select flotante — mismo sistema visual que los inputs */
+.field-select {
+    position: relative;
+}
+
+.field-select select {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid #D1D5DB;
+    background: transparent;
+    padding: 0.5rem 1rem 0.35rem 0;
+    font-size: var(--font-sm);
+    color: #1F2937;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.25s ease;
+}
+
+.field-select select:focus {
+    border-color: var(--violet-primary);
+}
+
+.field-select label {
+    top: 0;
+    font-size: var(--font-xs);
+    color: #9CA3AF;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.field-select select:focus ~ label,
+.field-select select:not([value=""]) ~ label {
+    color: var(--violet-primary);
+}
+
+.field-select::after {
+    content: '▾';
+    position: absolute;
+    right: 0;
+    top: 1.4rem;
+    color: #9CA3AF;
+    pointer-events: none;
+    font-size: 0.85rem;
+}
+
+.field-hint {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+    min-height: 1em;
+    transition: color 0.2s ease;
+}
+
+/* ==========================================
+   9. BOTÓN CON EFECTO RIPPLE LÍQUIDO
+   Al hacer clic, se genera una onda circular
+   desde el punto exacto del cursor
+   ========================================== */
+.btn-primary {
+    position: relative;
+    overflow: hidden;           /* recorta las ondas ripple */
+    width: 100%;
+    padding: min(0.95rem, 1.5vh) 2rem;
+    background: linear-gradient(135deg, var(--violet-primary) 0%, var(--violet-deep) 100%);
+    color: var(--white-pure);
+    border: none;
+    border-radius: 10px;
+    font-size: var(--font-base);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.3s ease;
+    margin-bottom: min(0.6rem, 1vh);
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: min(48px, 6vh);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 45px rgba(124, 58, 237, 0.45);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Ondas ripple: span insertado por JS en el punto del cursor */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.32);
+    transform: scale(0);
+    animation: ripple-expand 0.65s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-expand {
+    to {
+        transform: scale(4.5);
+        opacity: 0;
+    }
+}
+
+/* Estados del botón: loading oculta el texto y muestra el spinner */
+.btn-primary.loading    { pointer-events: none; opacity: 0.85; }
+.btn-primary .btn-text  { transition: opacity 0.2s ease; }
+.btn-primary.loading .btn-text { opacity: 0; }
+
+.btn-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.btn-primary.loading .btn-spinner { opacity: 1; }
+
+/* Ring animado del spinner */
+.spinner-ring {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   10. DIVISOR SOCIAL + BOTÓN GOOGLE
+   ========================================== */
+/* Fila de dos botones en paralelo: submit + Google */
+.btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    margin-bottom: min(0.5rem, 1vh);
+}
+
+/* El btn-primary dentro de btn-row ocupa su celda completa */
+.btn-row .btn-primary {
+    margin-bottom: 0;
+}
+
+.google-btn-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.google-btn-wrapper > div,
+.google-btn-wrapper iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ==========================================
+   11. ENLACE DE NAVEGACIÓN login ↔ register
+   ========================================== */
+.form-switch {
+    text-align: center;
+    font-size: var(--font-sm);
+    color: #6B7280;
+    margin-top: 0.4rem;
+}
+
+.form-switch a {
+    color: var(--violet-primary);
+    font-weight: 700;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+/* Underline que se expande en hover */
+.form-switch a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background: var(--violet-primary);
+    transition: width 0.3s ease;
+}
+
+.form-switch a:hover::after { width: 100%; }
+.form-switch a:hover { color: var(--violet-deep); }
+
+/* ==========================================
+   12. ALERTAS GLOBALES (respuestas AJAX)
+   ========================================== */
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: var(--font-sm);
+    margin-bottom: min(0.75rem, 1.2vh);
+    border-left: 3px solid;
+    display: none;
+    font-weight: 500;
+}
+
+.alert.visible {
+    display: block;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.alert-error {
+    background: #FEF2F2;
+    border-color: #EF4444;
+    color: #991B1B;
+}
+
+.alert-success {
+    background: #F0FDF4;
+    border-color: #22C55E;
+    color: #166534;
+}
+
+.alert-warning {
+    background: #FFFBEB;
+    border-color: #F59E0B;
+    color: #78350F;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   12. MICRO-ANIMACIONES Y FEEDBACK VISUAL
+   ========================================== */
+
+/* Shake animation: feedback de error en el formulario */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    15%       { transform: translateX(-7px); }
+    30%       { transform: translateX(7px); }
+    45%       { transform: translateX(-5px); }
+    60%       { transform: translateX(5px); }
+    75%       { transform: translateX(-3px); }
+    90%       { transform: translateX(3px); }
+}
+
+.shake {
+    animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Checkmark SVG animado en estado de éxito */
+.check-icon {
+    width: 20px;
+    height: 20px;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: drawCheck 0.45s ease forwards 0.1s;
+    flex-shrink: 0;
+}
+
+@keyframes drawCheck {
+    to { stroke-dashoffset: 0; }
+}
+
+.success-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ==========================================
+   13. TRANSICIÓN ENTRE PÁGINAS
+   Fade + desplazamiento vertical suave
+   ========================================== */
+.page-transition {
+    animation: pageFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   14. INDEX / DASHBOARD — GLASSMORPHISM
+   backdrop-filter: blur() aplicado SOLO aquí,
+   no en login/register (como se especificó)
+   ========================================== */
+.index-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    position: relative;
+}
+
+/* Tarjeta glassmorphism */
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 22px;
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 6vw, 4.5rem);
+    max-width: 500px;
+    width: 100%;
+    box-shadow:
+        0 8px 32px rgba(91, 33, 182, 0.1),
+        0 2px 8px  rgba(91, 33, 182, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    text-align: center;
+    animation: cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes cardAppear {
+    from { opacity: 0; transform: translateY(28px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Avatar circular con inicial del usuario */
+.index-avatar {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet-primary), var(--violet-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-md);
+    font-size: 1.85rem;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.03em;
+    box-shadow:
+        0 8px 28px rgba(124, 58, 237, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Saludo con nombre en gradiente */
+.index-greeting {
+    font-size: var(--font-xl);
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.index-greeting span {
+    background: linear-gradient(135deg, var(--violet-primary), var(--violet-deep));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Badge "Sesión activa" con punto verde pulsante */
+.session-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(196, 181, 253, 0.2);
+    border: 1px solid rgba(196, 181, 253, 0.55);
+    border-radius: 999px;
+    padding: 0.3rem 0.95rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--violet-deep);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: var(--space-sm) 0 var(--space-md);
+}
+
+.session-badge::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+    animation: pulseDot 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(1.5); }
+}
+
+/* Panel de información del usuario */
+.user-info {
+    background: rgba(237, 233, 254, 0.45);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+    border-radius: 12px;
+    padding: var(--space-sm) var(--space-md);
+    margin: var(--space-md) 0;
+    text-align: left;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.5rem 0;
+    font-size: var(--font-sm);
+    color: #374151;
+}
+
+.info-row:not(:last-child) {
+    border-bottom: 1px solid rgba(196, 181, 253, 0.25);
+}
+
+.info-label {
+    font-weight: 700;
+    color: var(--violet-deep);
+    min-width: 65px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    flex-shrink: 0;
+}
+
+.index-note {
+    font-size: 0.76rem;
+    color: #9CA3AF;
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
+}
+
+/* Botón panel admin — solo visible para admins */
+.btn-admin {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: var(--font-sm);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-sm);
+    transition: transform 0.15s ease, box-shadow 0.3s ease;
+}
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(124,58,237,0.4);
+}
+
+/* Botón de logout: outlined que se rellena en hover */
+.btn-logout {
+    position: relative;
+    overflow: hidden;
+    padding: 0.75rem 2.5rem;
+    background: transparent;
+    color: var(--violet-primary);
+    border: 2px solid var(--violet-primary);
+    border-radius: 10px;
+    font-size: var(--font-sm);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease,
+                color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.15s ease;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+}
+
+.btn-logout:hover {
+    background: var(--violet-primary);
+    color: white;
+    box-shadow: 0 10px 28px rgba(124, 58, 237, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-logout:active {
+    transform: translateY(0);
+}
+
+.btn-logout.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* ==========================================
+   15. RESPONSIVE — mobile: una columna
+   ========================================== */
+@media (max-width: 800px) {
+    .auth-wrapper {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+
+    /* El panel de arte se convierte en header compacto */
+    .art-panel {
+        padding: var(--space-lg) var(--space-lg) var(--space-xl);
+        min-height: 38vh;
+    }
+
+    /* Ocultar el separador vertical */
+    .art-panel::after { display: none; }
+
+    .art-svg {
+        width: clamp(160px, 45vw, 260px);
+        margin: var(--space-sm) auto;
+    }
+
+    .brand-name { font-size: clamp(2.4rem, 9vw, 3.5rem); }
+
+    .form-panel {
+        padding: 0 var(--space-lg);
+    }
+
+    .btn-row {
+        grid-template-columns: 1fr;
+    }
+
+    .field-row-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .glass-card {
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
+    }
+}
+
+/* ==========================================
+   16. ROL ADMIN — badge inline en user-info
+   ========================================== */
+.role-admin {
+    color: #C4B5FD;
+    font-weight: 600;
+}
+
+/* ==========================================
+   17. FORMULARIOS SIN MARGEN (admin tables)
+   ========================================== */
+.form-inline {
+    margin: 0;
+}
+
+/* ==========================================
+   18. PÁGINA PENDIENTE DE VERIFICACIÓN
+   ========================================== */
+.pending-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.pending-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(91,33,182,0.12);
+    animation: pageFadeIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+.pending-icon {
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 28px rgba(124,58,237,0.35);
+}
+
+.pending-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1F2937;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.pending-text {
+    font-size: 0.95rem;
+    color: #6B7280;
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+}
+
+.pending-subtext {
+    font-size: 0.85rem;
+    color: #9CA3AF;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.pending-divider {
+    border: none;
+    border-top: 1px solid #E5E7EB;
+    margin-bottom: 1.5rem;
+}
+
+.pending-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #7C3AED;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.pending-back-link:hover {
+    opacity: 0.75;
+}
+
+/* Estado pending inline (dentro del formulario de registro) */
+.pending-inline {
+    text-align: center;
+    padding: 1.5rem 0;
+}
+.pending-inline-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+}
+.pending-inline-title {
+    font-size: 1.25rem; font-weight: 800; color: #1F2937; margin-bottom: 0.5rem;
+}
+.pending-inline-text {
+    font-size: 0.9rem; color: #6B7280; line-height: 1.6;
+    max-width: 320px; margin: 0 auto 1.5rem;
+}
+.pending-inline-text strong { color: #7C3AED; }
+
+/* ==========================================
+   19. ADMIN PANEL (dashboard inline)
+   ========================================== */
+.admin-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.admin-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+.admin-icon svg { width: 20px; height: 20px; }
+
+.admin-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+.admin-subtitle {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 1.75rem;
+}
+
+.admin-stats {
+    display: flex; gap: 1rem; margin-bottom: 1.75rem; flex-wrap: wrap;
+}
+.stat-card {
+    flex: 1; min-width: 180px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.stat-number {
+    font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1;
+}
+.stat-number.purple { color: #C4B5FD; }
+.stat-number.green  { color: #86EFAC; }
+.stat-number.blue   { color: #93C5FD; }
+.stat-label {
+    font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.35rem;
+}
+
+.admin-tabs {
+    display: flex; gap: 0.25rem; margin-bottom: 1.5rem;
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 4px;
+    width: fit-content;
+}
+.admin-tab {
+    padding: 0.6rem 1.3rem;
+    border: none; background: transparent;
+    font-family: inherit; font-size: 0.85rem; font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    border-radius: 9px; cursor: pointer;
+    transition: all 0.25s;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.admin-tab.active {
+    background: rgba(124, 58, 237, 0.5);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+.admin-tab:hover:not(.active) {
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.05);
+}
+.admin-tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 20px; padding: 0 6px;
+    border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+}
+.admin-tab.active .admin-tab-badge {
+    background: rgba(255,255,255,0.2); color: #fff;
+}
+.admin-tab:not(.active) .admin-tab-badge {
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+}
+
+.admin-tab-panel { display: none; }
+.admin-tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.admin-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.admin-table { width: 100%; border-collapse: collapse; }
+
+.admin-table thead th {
+    padding: 0.8rem 1.1rem;
+    text-align: left;
+    font-size: 0.7rem; font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+}
+
+.admin-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s;
+}
+.admin-table tbody tr:last-child { border-bottom: none; }
+.admin-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+
+.admin-table td {
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.8);
+    vertical-align: middle;
+}
+
+.admin-user-name { font-weight: 600; color: #fff; margin-bottom: 2px; }
+.admin-user-email { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+.admin-muted { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+
+.badge-pending {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700;
+    background: rgba(251, 191, 36, 0.15); color: #FBBF24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+.badge-pending::before {
+    content: ''; width: 6px; height: 6px;
+    border-radius: 50%; background: #FBBF24;
+    animation: pulse-dot 2s infinite;
+}
+.badge-verified {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700;
+    background: rgba(34, 197, 94, 0.15); color: #22C55E;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.badge-verified::before { content: '✓'; font-size: 0.7rem; }
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.btn-verify {
+    padding: 7px 18px; border-radius: 8px;
+    font-family: inherit; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; border: none;
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    color: #fff;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+.btn-verify:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4); }
+.btn-verify:active { transform: translateY(0); }
+
+.btn-reject {
+    padding: 7px 14px; border-radius: 8px;
+    font-family: inherit; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer;
+    background: rgba(239, 68, 68, 0.15);
+    color: #FCA5A5;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    transition: all 0.2s;
+}
+.btn-reject:hover { background: rgba(239, 68, 68, 0.3); color: #fff; transform: translateY(-1px); }
+
+.action-group { display: flex; gap: 0.5rem; align-items: center; }
+
+.admin-empty {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.9rem;
+}
+.admin-empty svg { margin-bottom: 0.75rem; display: block; margin-inline: auto; }
+
+.admin-flash {
+    padding: 0.85rem 1.2rem;
+    border-radius: 12px;
+    font-size: 0.88rem; font-weight: 500;
+    margin-bottom: 1.25rem;
+    border-left: 4px solid;
+    animation: fadeIn 0.3s ease;
+}
+.admin-flash.success { background: rgba(34, 197, 94, 0.12); border-color: #22C55E; color: #86EFAC; }
+.admin-flash.error   { background: rgba(239, 68, 68, 0.12); border-color: #EF4444; color: #FCA5A5; }
+.admin-flash.warning { background: rgba(251, 191, 36, 0.12); border-color: #FBBF24; color: #FDE68A; }
+
+.admin-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    margin: 2.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .admin-section { padding: 0 1rem 3rem; }
+    .admin-table thead { display: none; }
+    .admin-table tbody tr { display: block; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .admin-table td { display: flex; justify-content: space-between; padding: 0.4rem 0; border: none; }
+    .admin-table td::before { content: attr(data-label); font-weight: 700; font-size: 0.72rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .stat-card { min-width: 140px; }
+}

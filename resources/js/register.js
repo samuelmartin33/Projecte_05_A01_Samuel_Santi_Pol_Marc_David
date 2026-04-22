@@ -56,7 +56,7 @@ window.handleGoogleCredential = async function (response) {
         if (data.success) {
             document.body.style.transition = 'opacity 0.35s ease';
             document.body.style.opacity    = '0';
-            setTimeout(() => { window.location.href = '/index'; }, 360);
+            setTimeout(() => { window.location.href = '/home'; }, 360);
         } else {
             alertEl.textContent = data.message || 'Error al iniciar sesión con Google.';
             alertEl.className   = 'alert alert-error visible';
@@ -288,7 +288,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         if (data.success && data.status === 'active') {
             document.body.style.transition = 'opacity 0.35s ease';
             document.body.style.opacity    = '0';
-            setTimeout(() => { window.location.href = '/index'; }, 360);
+            setTimeout(() => { window.location.href = '/home'; }, 360);
             return;
         }
 

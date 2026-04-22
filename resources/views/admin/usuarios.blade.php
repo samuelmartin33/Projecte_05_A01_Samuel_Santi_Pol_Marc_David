@@ -7,7 +7,9 @@
     <title>Panel Admin — VIBEZ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/admin.css', 'resources/js/admin.js'])
+    @endif
 </head>
 <body>
 
