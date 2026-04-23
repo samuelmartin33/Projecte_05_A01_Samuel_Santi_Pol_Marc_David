@@ -12,54 +12,53 @@
     <div class="hero-particula hero-particula-4"></div>
     <div class="hero-particula hero-particula-5"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col items-center justify-center relative z-10" 
-         style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10">
 
         
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold mb-8"
-             style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);color:#c084fc;letter-spacing:0.1em;text-transform:uppercase; display: inline-flex !important;">
-            La plataforma de la escena joven
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
+             style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#c084fc;letter-spacing:0.06em;text-transform:uppercase;">
+            🔥 La plataforma de la escena joven
         </div>
 
-        <h1 class="text-5xl sm:text-7xl font-black text-white tracking-tight leading-none mb-6" 
-            style="text-align: center !important; width: 100% !important;">
+        <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
             Tu próxima<br>
             <span class="text-gradient-claro">aventura empieza aquí</span>
         </h1>
 
-        <p class="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed mb-10" 
-           style="text-align: center !important; display: block !important; margin: 0 auto !important;">
-            Descubre eventos, conciertos y oportunidades laborales en un solo lugar. 
-            VIBEZ es la comunidad donde la escena cobra vida.
+        <p class="mt-5 text-white/60 text-base max-w-lg mx-auto leading-relaxed">
+            Eventos, conciertos, festivales y trabajo — todo lo que vive tu escena, en un solo lugar.
         </p>
 
         
-        <div class="flex flex-wrap justify-center gap-3 mt-4" 
-             style="display: flex !important; justify-content: center !important; width: 100% !important;">
-            <span class="pill-premium" onclick="seleccionarFiltro('categoria', '1', 'Música', {stopPropagation:function(){}})">Música</span>
-            <span class="pill-premium" onclick="seleccionarFiltro('categoria', '3', 'Deporte', {stopPropagation:function(){}})">Deporte</span>
-            <span class="pill-premium" onclick="seleccionarFiltro('categoria', '2', 'Cultura', {stopPropagation:function(){}})">Cultura</span>
-            <span class="pill-premium" onclick="seleccionarFiltro('categoria', '4', 'Gastro', {stopPropagation:function(){}})">Gastro</span>
-            <span class="pill-premium" onclick="seleccionarFiltro('categoria', 'trabajo', 'Trabajo', {stopPropagation:function(){}})">Trabajo</span>
+        <div class="flex flex-wrap justify-center gap-2 mt-7">
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '1', '🎵 Música', {stopPropagation:function(){}})">🎵 Música</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '3', '⚽ Deporte', {stopPropagation:function(){}})">⚽ Deporte</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '2', '🎭 Cultura', {stopPropagation:function(){}})">🎭 Cultura</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', '4', '🍕 Gastro', {stopPropagation:function(){}})">🍕 Gastro</span>
+            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
+                  onclick="seleccionarFiltro('categoria', 'trabajo', '💼 Trabajo', {stopPropagation:function(){}})">💼 Trabajo</span>
         </div>
 
     </div>
 </section>
 
 
-<section class="barra-filtros sticky top-16 z-40">
+<section class="barra-filtros sticky top-0 z-40">
 
     
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
          onclick="cerrarTodosDropdowns()"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end justify-center gap-6 relative" 
-         style="display: flex !important; justify-content: center !important; align-items: flex-end !important;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
 
         
-        <p class="text-sm font-semibold hidden lg:block"
-           style="color:rgba(15,23,42,0.5); position: absolute; left: 2rem; top: 50%; transform: translateY(-50%);">
+        <p class="text-sm font-semibold mr-auto self-center"
+           style="color:rgba(15,23,42,0.5)">
             <span id="contador-resultados"><?php echo e($eventos->count() + $ofertas->count()); ?></span>
             <span style="color:var(--morado)"> resultados</span>
         </p>
@@ -86,8 +85,8 @@
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     <div class="custom-select-option"
-                         onclick="seleccionarFiltro('categoria','trabajo','Bolsa de Trabajo',event)">
-                        Bolsa de Trabajo
+                         onclick="seleccionarFiltro('categoria','trabajo','💼 Bolsa de Trabajo',event)">
+                        💼 Bolsa de Trabajo
                     </div>
                 </div>
             </div>
@@ -147,7 +146,7 @@
 
     
     <div id="sin-resultados" class="hidden text-center py-20">
-        <p class="text-5xl mb-3"></p>
+        <p class="text-5xl mb-3">🔍</p>
         <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
         <p class="text-sm mt-1 mb-5" style="color:rgba(15,23,42,0.45)">Prueba a cambiar la categoría o la ciudad</p>
         <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
@@ -156,7 +155,7 @@
     
     <div id="seccion-eventos">
         <div class="seccion-vibez-titulo">
-            Eventos destacados
+            <span>🎉</span> Eventos
         </div>
         <p class="seccion-vibez-sub">
             <?php echo e($eventos->count()); ?> evento<?php echo e($eventos->count() !== 1 ? 's' : ''); ?> disponible<?php echo e($eventos->count() !== 1 ? 's' : ''); ?>
@@ -230,7 +229,7 @@
 
         <div id="seccion-trabajos">
             <div class="seccion-vibez-titulo">
-                Bolsa de Trabajo
+                <span>💼</span> Bolsa de Trabajo
             </div>
             <p class="seccion-vibez-sub">
                 <?php echo e($ofertas->count()); ?> oferta<?php echo e($ofertas->count() !== 1 ? 's' : ''); ?> de empleo en la escena de eventos
@@ -506,6 +505,5 @@ function crearTarjetaOferta(oferta) {
 }
 </script>
 <?php $__env->stopPush(); ?>
-
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/home.blade.php ENDPATH**/ ?>
