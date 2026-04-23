@@ -58,7 +58,37 @@
         </table>
     </section>
 
-    <div class="paginacion"><?php echo e($eventos->links()); ?></div>
+    <?php if($eventos->hasPages()): ?>
+        <nav class="paginacion" aria-label="Paginacion de eventos">
+            <div class="pagination-summary">
+                Mostrando <strong><?php echo e($eventos->firstItem()); ?></strong>
+                a <strong><?php echo e($eventos->lastItem()); ?></strong>
+                de <strong><?php echo e($eventos->total()); ?></strong> resultados
+            </div>
+
+            <div class="pagination-controls">
+                <?php if($eventos->onFirstPage()): ?>
+                    <span class="pagination-arrow disabled" aria-hidden="true">‹</span>
+                <?php else: ?>
+                    <a class="pagination-arrow" href="<?php echo e($eventos->previousPageUrl()); ?>" rel="prev" aria-label="Pagina anterior">‹</a>
+                <?php endif; ?>
+
+                <?php for($page = 1; $page <= $eventos->lastPage(); $page++): ?>
+                    <?php if($page === $eventos->currentPage()): ?>
+                        <span class="pagination-page active" aria-current="page"><?php echo e($page); ?></span>
+                    <?php else: ?>
+                        <a class="pagination-page" href="<?php echo e($eventos->url($page)); ?>" aria-label="Ir a la pagina <?php echo e($page); ?>"><?php echo e($page); ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if($eventos->hasMorePages()): ?>
+                    <a class="pagination-arrow" href="<?php echo e($eventos->nextPageUrl()); ?>" rel="next" aria-label="Pagina siguiente">›</a>
+                <?php else: ?>
+                    <span class="pagination-arrow disabled" aria-hidden="true">›</span>
+                <?php endif; ?>
+            </div>
+        </nav>
+    <?php endif; ?>
 <?php $__env->stopSection(); ?>
 
 

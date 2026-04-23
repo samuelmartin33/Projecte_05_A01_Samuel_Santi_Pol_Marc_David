@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $__env->yieldContent('title', 'Admin Dashboard'); ?></title>
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/admin-eventos.css', 'resources/js/admin-eventos.js']); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/admin-eventos.css']); ?>
 </head>
 <body>
 <div class="dashboard-wrap">
@@ -38,6 +38,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php echo app('Illuminate\Foundation\Vite')(['resources/js/admin-eventos.js']); ?>
+
 
 </body>
 </html>
