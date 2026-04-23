@@ -220,18 +220,70 @@ body {
 /* ─── PAGINACION ───────────────────────────────────────── */
 .paginacion {
     margin-top: 1rem;
-}
-
-.paginacion nav {
-    display: inline-flex;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.95rem 1rem;
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 999px;
-    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(76, 29, 149, 0.08);
 }
 
-.paginacion .relative.inline-flex.items-center {
-    border: 0;
+.pagination-summary {
+    color: #6d28d9;
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.pagination-page,
+.pagination-arrow {
+    min-width: 2.3rem;
+    height: 2.3rem;
+    padding: 0 0.7rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #6d28d9;
+    font-weight: 700;
+    line-height: 1;
+    background: #f8f5ff;
+}
+
+.pagination-page:hover,
+.pagination-arrow:hover {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+}
+
+.pagination-page.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 6px 14px rgba(124, 58, 237, 0.24);
+}
+
+.pagination-arrow {
+    font-size: 1.35rem;
+    padding-bottom: 0.15rem;
+}
+
+.pagination-arrow.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* ─── DASHBOARD CARDS GRID ─────────────────────────────── */

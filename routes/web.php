@@ -3,7 +3,7 @@
 /**
  * VIBEZ — routes/web.php
  *
- * Rutas web (middleware 'web': sesión, CSRF, cookies, etc.)
+ * Estructura de rutas organizada por rol:
  *
  * Estructura:
  *   GET  /               → welcome (landing pública)
@@ -12,19 +12,27 @@
  *   GET  /home           → home de usuario (protegido por auth)
  *   GET  /empresa/home   → home de empresa (protegido por auth)
  *
- *   POST /api/login    → AJAX (incluido desde api.php)
- *   POST /api/register → AJAX (incluido desde api.php)
- *   POST /api/logout   → AJAX (incluido desde api.php)
+ *  AJAX (heredan middleware web desde este archivo):
+ *    POST /api/login     → AuthController@login     (form POST, devuelve redirect)
+ *    POST /api/register  → AuthController@register  (form POST, devuelve redirect)
+ *    POST /api/logout    → AuthController@logout    (AJAX, devuelve JSON)
  *
- * NOTA: Las rutas /api/* se cargan desde routes/api.php con el prefijo
- * 'api' dentro del grupo web. Así tienen acceso completo a la sesión
- * sin necesitar Sanctum ni ningún paquete externo.
+ *  Protegidas por autenticación:
+ *    GET  /index                  → dashboard usuario  (auth)
+ *    GET  /admin/dashboard        → dashboard admin    (auth + role:admin)
+ *    GET  /organizador/dashboard  → dashboard org.     (auth + role:organizador)
+ *    GET  /empresa/dashboard      → dashboard empresa  (auth + role:empresa)
  */
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EventoController as AdminEventoController;
+use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventoController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,28 +48,27 @@ Route::get('/', function () {
 })->name('welcome');
 
 // --- Detalle de un evento específico ---
-Route::get('/eventos/{id}', [EventoController::class, 'detalle'])
+Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
     ->where('id', '[0-9]+')
     ->name('eventos.detalle');
 
 // --- Detalle de una oferta de trabajo ---
-Route::get('/trabajos/{id}', [EventoController::class, 'detalleOferta'])
+Route::get('/trabajos/{id}', [PublicEventoController::class, 'detalleOferta'])
     ->where('id', '[0-9]+')
     ->name('trabajos.detalle');
 
 // --- API AJAX: filtrar eventos y ofertas (responde JSON) ---
-Route::get('/api/filtrar', [EventoController::class, 'filtrar'])
+Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
     ->name('api.filtrar');
 
 // --- Página completa de Bolsa de Trabajo ---
-Route::get('/bolsa-de-trabajo', [EventoController::class, 'bolsaTrabajo'])
+Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
     ->name('trabajos.index');
 
 // --- API AJAX: filtrar solo ofertas de trabajo ---
-Route::get('/api/filtrar-trabajos', [EventoController::class, 'filtrarTrabajos'])
+Route::get('/api/filtrar-trabajos', [PublicEventoController::class, 'filtrarTrabajos'])
     ->name('api.filtrar-trabajos');
 
-/* — Vistas de autenticación — */
 Route::get('/login',    [AuthController::class, 'showLogin'])
      ->name('login');
 
@@ -104,17 +111,17 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.dashboard');
     
     /* Rutas de eventos */
-    Route::get('/admin/eventos', [EventoController::class, 'index'])
+    Route::get('/admin/eventos', [AdminEventoController::class, 'index'])
          ->name('admin.eventos.index');
-    Route::get('/admin/eventos/crear', [EventoController::class, 'create'])
+    Route::get('/admin/eventos/crear', [AdminEventoController::class, 'create'])
          ->name('admin.eventos.create');
-    Route::post('/admin/eventos', [EventoController::class, 'store'])
+    Route::post('/admin/eventos', [AdminEventoController::class, 'store'])
          ->name('admin.eventos.store');
-    Route::get('/admin/eventos/{evento}/editar', [EventoController::class, 'edit'])
+    Route::get('/admin/eventos/{evento}/editar', [AdminEventoController::class, 'edit'])
          ->name('admin.eventos.edit');
-    Route::put('/admin/eventos/{evento}', [EventoController::class, 'update'])
+    Route::put('/admin/eventos/{evento}', [AdminEventoController::class, 'update'])
          ->name('admin.eventos.update');
-    Route::delete('/admin/eventos/{evento}', [EventoController::class, 'destroy'])
+    Route::delete('/admin/eventos/{evento}', [AdminEventoController::class, 'destroy'])
          ->name('admin.eventos.destroy');
 });
 

@@ -59,6 +59,36 @@
         </table>
     </section>
 
-    <div class="paginacion">{{ $eventos->links() }}</div>
+    @if ($eventos->hasPages())
+        <nav class="paginacion" aria-label="Paginacion de eventos">
+            <div class="pagination-summary">
+                Mostrando <strong>{{ $eventos->firstItem() }}</strong>
+                a <strong>{{ $eventos->lastItem() }}</strong>
+                de <strong>{{ $eventos->total() }}</strong> resultados
+            </div>
+
+            <div class="pagination-controls">
+                @if ($eventos->onFirstPage())
+                    <span class="pagination-arrow disabled" aria-hidden="true">‹</span>
+                @else
+                    <a class="pagination-arrow" href="{{ $eventos->previousPageUrl() }}" rel="prev" aria-label="Pagina anterior">‹</a>
+                @endif
+
+                @for ($page = 1; $page <= $eventos->lastPage(); $page++)
+                    @if ($page === $eventos->currentPage())
+                        <span class="pagination-page active" aria-current="page">{{ $page }}</span>
+                    @else
+                        <a class="pagination-page" href="{{ $eventos->url($page) }}" aria-label="Ir a la pagina {{ $page }}">{{ $page }}</a>
+                    @endif
+                @endfor
+
+                @if ($eventos->hasMorePages())
+                    <a class="pagination-arrow" href="{{ $eventos->nextPageUrl() }}" rel="next" aria-label="Pagina siguiente">›</a>
+                @else
+                    <span class="pagination-arrow disabled" aria-hidden="true">›</span>
+                @endif
+            </div>
+        </nav>
+    @endif
 @endsection
 

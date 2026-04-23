@@ -14,7 +14,7 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->es_admin) {
+        if (! $request->user()?->es_admin) {
             abort(403, 'No tienes permisos de administrador');
         }
 

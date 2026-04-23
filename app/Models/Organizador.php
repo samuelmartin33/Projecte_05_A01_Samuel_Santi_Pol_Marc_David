@@ -2,32 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Modelo para la tabla organizadores.
- * Un organizador es un usuario de tipo empresa que crea eventos y publica ofertas.
- */
 class Organizador extends Model
 {
+    use HasFactory;
+
     protected $table = 'organizadores';
+
     public $timestamps = false;
 
-    protected $fillable = ['usuario_id', 'empresa_id', 'estado'];
+    protected $fillable = [
+        'usuario_id',
+        'empresa_id',
+        'estado',
+        'fecha_creacion',
+        'fecha_actualizacion',
+    ];
 
-    /**
-     * Relación: un organizador pertenece a una empresa.
-     */
-    public function empresa()
+    public function usuario(): BelongsTo
     {
-        return $this->belongsTo(Empresa::class, 'empresa_id');
+        return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
-    /**
-     * Relación: un organizador es un usuario de la tabla usuarios.
-     */
-    public function usuario()
+    public function empresa(): BelongsTo
     {
-        return $this->belongsTo(UsuarioVibez::class, 'usuario_id');
+        return $this->belongsTo(Empresa::class, 'empresa_id');
     }
 }
