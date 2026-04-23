@@ -15,7 +15,7 @@
 
     
     <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/css/style.css', 'resources/js/app.js']); ?>
+        <?php echo app('Illuminate\Foundation\Vite')(['resources/css/style.css', 'resources/js/app.js']); ?>
     <?php else: ?>
         
         <script src="https://cdn.tailwindcss.com"></script>
@@ -113,17 +113,56 @@
     <?php echo $__env->yieldContent('scripts'); ?>
 
     <?php if(auth()->guard()->check()): ?>
+    
     <script>
+    /**
+     * Abre/cierra el dropdown del avatar de usuario en la navbar.
+     * Gestiona el aria-expanded para accesibilidad.
+     */
+    function toggleNavDropdown() {
+        const dropdown = document.getElementById('navDropdown');
+        const btn      = document.getElementById('navAvatarBtn');
+        const abierto  = dropdown.style.display === 'block';
+
+        dropdown.style.display = abierto ? 'none' : 'block';
+        btn.setAttribute('aria-expanded', String(!abierto));
+
+        // Animar entrada
+        if (!abierto) {
+            dropdown.style.animation = 'none';
+            dropdown.offsetHeight;  // reflow
+            dropdown.style.animation = 'dropdownEntrar 0.18s ease';
+        }
+    }
+
+    /** Cierra el dropdown si se pulsa fuera */
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('navAvatarWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            const dropdown = document.getElementById('navDropdown');
+            const btn      = document.getElementById('navAvatarBtn');
+            if (dropdown) dropdown.style.display = 'none';
+            if (btn)      btn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    /**
+     * Cierra la sesión del usuario mediante AJAX.
+     * Redirige a la landing tras el logout.
+     */
     function cerrarSesion() {
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch('/api/logout', {
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-        }).then(function() {
-            window.location.href = '/';
-        });
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+        })
+        .then(() => {
+            document.body.style.transition = 'opacity 0.3s';
+            document.body.style.opacity    = '0';
+            setTimeout(() => { window.location.href = '/'; }, 320);
+        })
+        .catch(() => { window.location.href = '/'; });
     }
     </script>
     <?php endif; ?>

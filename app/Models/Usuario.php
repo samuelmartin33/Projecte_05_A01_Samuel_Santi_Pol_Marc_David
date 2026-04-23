@@ -23,6 +23,7 @@ class Usuario extends Authenticatable
         'password_hash',
         'foto_url',
         'biografia',
+        'mood',
         'fecha_nacimiento',
         'telefono',
         'email_verificado',

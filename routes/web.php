@@ -28,7 +28,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\EventoController as PublicEventoController;
+use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventoController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +84,26 @@ Route::get('/home', [AuthController::class, 'showHome'])
 Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
      ->middleware('auth')
      ->name('empresa.home');
+
+/* — Perfil de usuario — */
+Route::middleware('auth')->group(function () {
+
+    // Vista principal del perfil
+    Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
+
+    // Formulario de datos personales (POST simple, sin AJAX)
+    Route::post('/perfil', [PerfilController::class, 'actualizar'])->name('perfil.actualizar');
+
+    // Formulario de foto (POST con archivo, sin AJAX)
+    Route::post('/perfil/foto', [PerfilController::class, 'actualizarFoto'])->name('perfil.foto');
+
+    // Formulario de mood/estado de ánimo (POST simple)
+    Route::post('/perfil/mood', [PerfilController::class, 'actualizarMood'])->name('perfil.mood');
+
+    // Aceptar / rechazar solicitudes de amistad (botones de formulario)
+    Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
+    Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
+});
 
 /* — Dashboard de Admin: protegido por middlewares auth e IsAdmin — */
 Route::middleware(['auth', 'admin'])->group(function () {

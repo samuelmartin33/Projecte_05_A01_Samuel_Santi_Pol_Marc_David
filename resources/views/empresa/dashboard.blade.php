@@ -67,5 +67,5 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/index.js') }}"></script>
+    @vite(['resources/js/index.js'])
 @endsection
