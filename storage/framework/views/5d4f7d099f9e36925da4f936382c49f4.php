@@ -11,7 +11,7 @@
 
     <!-- CSS y JS compilados por Vite -->
     <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
     <?php endif; ?>
 </head>
 <body class="min-h-screen relative flex flex-col">

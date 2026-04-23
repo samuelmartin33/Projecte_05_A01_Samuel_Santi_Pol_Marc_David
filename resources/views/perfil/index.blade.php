@@ -315,5 +315,5 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/perfil.js') }}"></script>
+    @vite(['resources/js/perfil.js'])
 @endsection
