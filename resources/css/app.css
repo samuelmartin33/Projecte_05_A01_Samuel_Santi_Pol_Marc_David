@@ -332,10 +332,10 @@ body {
     position: relative;
 }
 .barra-filtros .text-sm.font-semibold {
-    position: absolute;
-    left: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    transform: none;
+    margin-right: auto;
+    padding-right: 0.75rem;
 }
 
 /* Agrupación de label + select */

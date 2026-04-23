@@ -312,7 +312,11 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/js/perfil.js']); ?>
+    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
+        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/perfil.js']); ?>
+    <?php else: ?>
+        <script src="<?php echo e(asset('js/perfil.js')); ?>"></script>
+    <?php endif; ?>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\0616\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/perfil/index.blade.php ENDPATH**/ ?>
