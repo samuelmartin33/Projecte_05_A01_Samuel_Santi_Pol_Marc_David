@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard')</title>
-    @vite(['resources/css/admin-eventos.css'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/admin-eventos.css'])
+    @else
+        <link rel="stylesheet" href="{{ asset('css/admin-eventos.css') }}">
+    @endif
 </head>
 <body>
 <div class="dashboard-wrap">
@@ -38,7 +42,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@vite(['resources/js/admin-eventos.js'])
+@if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+    @vite(['resources/js/admin-eventos.js'])
+@else
+    <script src="{{ asset('js/admin-eventos.js') }}"></script>
+@endif
 
 
 </body>

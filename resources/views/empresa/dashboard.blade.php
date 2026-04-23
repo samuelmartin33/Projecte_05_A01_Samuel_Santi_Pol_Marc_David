@@ -67,5 +67,9 @@
 @endsection
 
 @section('scripts')
-    @vite(['resources/js/index.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/js/index.js'])
+    @else
+        <script src="{{ asset('js/index.js') }}"></script>
+    @endif
 @endsection
