@@ -60,41 +60,44 @@ class AuthController extends Controller
     }
 
     /* ============================================================
-       ENDPOINTS AJAX — respuestas JSON consistentes:
-       { success: bool, data: mixed, message: string }
+       AUTENTICACIÓN — Form POST con redirección basada en rol
        ============================================================ */
 
     /**
-     * Procesa el login por AJAX contra la tabla 'usuarios'.
-     * Auth::attempt busca por 'email' y verifica con getAuthPasswordName()
-     * que en el modelo Usuario devuelve 'password_hash'.
-     * Rate limiting: máx 5 intentos/minuto (configurado en rutas).
+     * Procesa el login enviado desde el formulario HTML (form POST).
+     *
+     * En caso de éxito, redirige al dashboard según el rol:
+     *   admin      → /admin/dashboard
+     *   empresa    → /empresa/dashboard
+     *   organizador → /organizador/dashboard
+     *   usuario    → /index
+     *
+     * En caso de error, redirige de vuelta con los errores de validación
+     * y el email anterior para no obligar al usuario a reescribirlo.
+     *
+     * Rate limiting: máx 5 intentos/minuto (configurado en routes/api.php).
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required', 'min:8'],
         ], [
-            'email.required'    => 'El email es obligatorio',
-            'email.email'       => 'El formato del email no es válido',
-            'password.required' => 'La contraseña es obligatoria',
-            'password.min'      => 'La contraseña debe tener al menos 8 caracteres',
+            'email.required'    => 'El email es obligatorio.',
+            'email.email'       => 'El formato del email no es válido.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min'      => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
         // Auth::attempt usa el modelo configurado en auth.php (Usuario)
-        // 'password' en el array siempre es el valor en texto plano a verificar;
-        // Laravel internamente llama a getAuthPasswordName() para saber contra
-        // qué columna comparar (en este caso, 'password_hash')
+        // y verifica contra la columna que devuelve getAuthPasswordName() → 'password_hash'
         if (! Auth::attempt([
             'email'    => $validated['email'],
             'password' => $validated['password'],
         ])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Credenciales incorrectas. Revisa tu email y contraseña.',
-                'data'    => null,
-            ], 401);
+            return back()
+                ->withInput($request->only('email'))
+                ->with('error', 'Credenciales incorrectas. Revisa tu email y contraseña.');
         }
 
         /** @var Usuario $usuario */
@@ -133,10 +136,9 @@ class AuthController extends Controller
     }
 
     /**
-     * Procesa el registro por AJAX y guarda en la tabla 'usuarios'.
-     * El cast 'hashed' en password_hash encripta automáticamente.
-     * Hace auto-login tras el registro.
-     * Rate limiting: máx 5 intentos/minuto (configurado en rutas).
+     * Procesa el registro enviado desde el formulario HTML (form POST).
+     * Los nuevos usuarios siempre son 'usuario' (sin empresa ni organizador).
+     * Hace auto-login tras el registro y redirige al dashboard de usuario.
      */
     public function register(Request $request): JsonResponse
     {
@@ -302,18 +304,51 @@ class AuthController extends Controller
     }
 
     /**
-     * Cierra la sesión por AJAX.
+     * Cierra la sesión.
+     * Si la petición es AJAX devuelve JSON; si es un form POST normal redirige al inicio.
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request): JsonResponse|RedirectResponse
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sesión cerrada correctamente',
-            'data'    => null,
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión cerrada correctamente.',
+                'data'    => null,
+            ]);
+        }
+
+        return redirect()->route('welcome');
+    }
+
+    /* ============================================================
+       MÉTODOS PRIVADOS
+       ============================================================ */
+
+    /**
+     * Devuelve la URL del dashboard según el rol del usuario autenticado.
+     * Prioridad: admin > empresa > organizador > usuario
+     */
+    private function redirectByRole(): string
+    {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        if ($usuario->isAdmin()) {
+            return route('admin.dashboard');
+        }
+
+        if ($usuario->isEmpresa()) {
+            return route('empresa.dashboard');
+        }
+
+        if ($usuario->isOrganizador()) {
+            return route('organizador.dashboard');
+        }
+
+        return route('index');
     }
 }

@@ -1,29 +1,25 @@
 /**
  * VIBEZ — login.js
- * Maneja el formulario de login con Fetch API (AJAX)
- * Incluye: validación frontend, ripple en botón, estados loading/error/éxito
+ * Valida el formulario en el frontend y lo envía via fetch a /api/login.
+ * Redirige a /home en caso de éxito; muestra errores en caso contrario.
  */
 
 /* ============================================================
    RIPPLE EFFECT — onda circular desde el punto del cursor
-   Se crea un <span> en la posición exacta del click y se anima
    ============================================================ */
 const submitBtn = document.getElementById('submitBtn');
 
 submitBtn.addEventListener('click', function (e) {
-    // Calcular posición relativa del cursor dentro del botón
-    const rect    = this.getBoundingClientRect();
-    const size    = Math.max(rect.width, rect.height);
-    const x       = e.clientX - rect.left - size / 2;
-    const y       = e.clientY - rect.top  - size / 2;
+    const rect   = this.getBoundingClientRect();
+    const size   = Math.max(rect.width, rect.height);
+    const x      = e.clientX - rect.left - size / 2;
+    const y      = e.clientY - rect.top  - size / 2;
 
-    // Crear el elemento onda
     const ripple = document.createElement('span');
     ripple.classList.add('ripple');
     ripple.style.cssText = `width:${size}px; height:${size}px; left:${x}px; top:${y}px`;
     this.appendChild(ripple);
 
-    // Eliminar tras la animación (0.65s definido en CSS)
     setTimeout(() => ripple.remove(), 700);
 });
 
@@ -31,21 +27,10 @@ submitBtn.addEventListener('click', function (e) {
    UTILIDADES DE VALIDACIÓN Y UI
    ============================================================ */
 
-/**
- * Valida formato de email con expresión regular
- * @param {string} email
- * @returns {boolean}
- */
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
-/**
- * Muestra error en un campo específico
- * @param {string} fieldId  - id del .field wrapper
- * @param {string} errorId  - id del .field-error span
- * @param {string} message  - texto del error
- */
 function showFieldError(fieldId, errorId, message) {
     const field = document.getElementById(fieldId);
     const error = document.getElementById(errorId);
@@ -55,11 +40,6 @@ function showFieldError(fieldId, errorId, message) {
     error.classList.add('visible');
 }
 
-/**
- * Limpia el error de un campo
- * @param {string} fieldId
- * @param {string} errorId
- */
 function clearFieldError(fieldId, errorId) {
     const field = document.getElementById(fieldId);
     const error = document.getElementById(errorId);
@@ -69,38 +49,27 @@ function clearFieldError(fieldId, errorId) {
     error.classList.remove('visible');
 }
 
-/**
- * Muestra la alerta global (errores de servidor)
- * @param {string} message
- * @param {'error'|'success'} type
- */
 function showAlert(message, type = 'error') {
     const alert = document.getElementById('alert-global');
     alert.textContent = message;
     alert.className   = `alert alert-${type} visible`;
 }
 
-/** Oculta la alerta global */
 function clearAlert() {
     const alert = document.getElementById('alert-global');
     alert.className = 'alert alert-error';
     alert.textContent = '';
 }
 
-/**
- * Aplica la animación de shake al formulario (feedback de error)
- * @param {HTMLElement} element
- */
 function shakeElement(element) {
     element.classList.add('shake');
-    // Eliminar la clase tras la animación para poder reutilizarla
     element.addEventListener('animationend', () => {
         element.classList.remove('shake');
     }, { once: true });
 }
 
 /* ============================================================
-   LÓGICA PRINCIPAL — Submit del formulario
+   LÓGICA PRINCIPAL — Validación y envío via fetch
    ============================================================ */
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -136,11 +105,9 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         return;
     }
 
-    // — Activar estado loading —
     submitBtn.classList.add('loading');
 
     try {
-        // Leer el CSRF token del meta tag inyectado por Laravel
         const csrfToken = document.querySelector('meta[name="csrf-token"]')
                                   .getAttribute('content');
 
@@ -157,7 +124,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         const data = await response.json();
 
         if (data.success) {
-            // — Estado de éxito: checkmark animado + mensaje —
             submitBtn.innerHTML = `
                 <span class="btn-text success-check">
                     <svg class="check-icon"
@@ -175,8 +141,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             submitBtn.classList.remove('loading');
             submitBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
 
-            // Pequeño delay para que el usuario vea el checkmark
-            // luego fade-out de la página y redirect
             setTimeout(() => {
                 document.body.style.transition = 'opacity 0.35s ease';
                 document.body.style.opacity    = '0';
@@ -186,14 +150,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         } else {
             submitBtn.classList.remove('loading');
 
-            // Cuenta registrada pero aún no verificada por el admin:
-            // permanecer en login y mostrar aviso claro (no redirigir)
             if (data.unverified) {
                 showAlert(data.message, 'warning');
                 return;
             }
 
-            // Errores de validación por campo (422)
             if (data.errors && typeof data.errors === 'object') {
                 Object.entries(data.errors).forEach(([field, messages]) => {
                     showFieldError(`field-${field}`, `error-${field}`, messages[0]);
@@ -205,7 +166,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         }
 
     } catch (err) {
-        // — Error de red o servidor inesperado —
         submitBtn.classList.remove('loading');
         showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
         console.error('[VIBEZ] Error en login:', err);

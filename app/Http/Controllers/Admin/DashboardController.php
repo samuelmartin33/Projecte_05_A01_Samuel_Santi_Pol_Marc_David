@@ -11,7 +11,7 @@ class DashboardController extends Controller
     public function index(): View
     {
         return view('admin.dashboard', [
-            'totalEventos' => Evento::count(),
+            'totalEventos'   => Evento::count(),
             'eventosActivos' => Evento::where('estado', 1)->count(),
         ]);
     }

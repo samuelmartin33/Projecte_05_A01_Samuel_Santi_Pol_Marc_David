@@ -12,9 +12,6 @@
     <!-- CSS y JS compilados por Vite -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <link rel="stylesheet" href="/css/vibez.css">
     @endif
 </head>
 <body class="min-h-screen relative flex flex-col">
@@ -64,30 +61,30 @@
                  alt="VIBEZ logo" class="h-60 w-auto">
 
             <!-- Título principal -->
-            <h1 class="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+            <h1 class="text-5xl sm:text-7xl font-black text-navy tracking-tight leading-none mb-4">
                 Descubre tu próximo<br>
                 <span class="text-gradient">evento</span>
             </h1>
 
             <!-- Subtítulo -->
-            <p class="text-slate-500 text-sm max-w-md leading-relaxed font-light">
+            <p class="text-slate-500 text-lg max-w-2xl leading-relaxed mb-8 text-center">
                 La plataforma de eventos para jóvenes. Descubre, crea,
-                compra entradas y conecta con tu escena.
+                compra entradas y conecta con tu escena. VIBEZ es el lugar donde ocurre todo lo que te importa.
             </p>
 
             <!-- Botón CTA -->
             <a href="/register"
-               class="btn-cta font-semibold text-sm px-8 py-2.5 rounded-full">
+               class="btn-nav-solido text-lg px-10 py-4 mb-10">
                 Regístrate gratis
             </a>
 
             <!-- Pills de características -->
-            <div class="flex flex-wrap justify-center gap-2">
-                <span class="pill text-xs font-medium px-4 py-1.5 rounded-full">🎟️ Entradas con QR</span>
-                <span class="pill text-xs font-medium px-4 py-1.5 rounded-full">🎉 Crea eventos</span>
-                <span class="pill text-xs font-medium px-4 py-1.5 rounded-full">🏷️ Cupones</span>
-                <span class="pill text-xs font-medium px-4 py-1.5 rounded-full">💼 Bolsa de trabajo</span>
-                <span class="pill text-xs font-medium px-4 py-1.5 rounded-full">👥 Social</span>
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="pill-premium bg-morado text-white">Entradas con QR</span>
+                <span class="pill-premium bg-morado text-white">Crea eventos</span>
+                <span class="pill-premium bg-morado text-white">Cupones</span>
+                <span class="pill-premium bg-morado text-white">Bolsa de trabajo</span>
+                <span class="pill-premium bg-morado text-white">Social</span>
             </div>
 
         </div>
@@ -100,3 +97,4 @@
 
 </body>
 </html>
+

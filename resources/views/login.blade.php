@@ -93,30 +93,40 @@
             <p class="form-subtitle">Accede a tu cuenta para continuar</p>
         </div>
 
-        {{-- Alerta global: errores del backend --}}
-        <div id="alert-global" class="alert alert-error" role="alert"></div>
+        {{-- Alerta global: errores de credenciales del servidor --}}
+        <div id="alert-global"
+             class="alert alert-error{{ session('error') ? ' visible' : '' }}"
+             role="alert">{{ session('error', '') }}</div>
 
-        {{-- Formulario — novalidate: usamos nuestra propia validación JS --}}
-        <form id="loginForm" novalidate autocomplete="off">
+        {{-- Formulario — form POST con CSRF y validación JS en frontend --}}
+        <form id="loginForm"
+              method="POST"
+              action="{{ route('api.login') }}"
+              novalidate
+              autocomplete="off">
+            @csrf
 
             <div class="field-group">
 
                 {{-- Campo email --}}
-                <div class="field" id="field-email">
+                <div class="field @error('email') has-error @enderror" id="field-email">
                     <input
                         type="email"
                         id="email"
                         name="email"
                         placeholder=" "
+                        value="{{ old('email') }}"
                         autocomplete="email"
                         inputmode="email"
                     >
                     <label for="email">Correo electrónico</label>
-                    <span class="field-error" id="error-email" role="alert"></span>
+                    <span class="field-error @error('email') visible @enderror"
+                          id="error-email"
+                          role="alert">@error('email'){{ $message }}@enderror</span>
                 </div>
 
                 {{-- Campo contraseña --}}
-                <div class="field" id="field-password">
+                <div class="field @error('password') has-error @enderror" id="field-password">
                     <input
                         type="password"
                         id="password"
@@ -125,7 +135,9 @@
                         autocomplete="current-password"
                     >
                     <label for="password">Contraseña</label>
-                    <span class="field-error" id="error-password" role="alert"></span>
+                    <span class="field-error @error('password') visible @enderror"
+                          id="error-password"
+                          role="alert">@error('password'){{ $message }}@enderror</span>
                 </div>
 
             </div>

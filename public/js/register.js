@@ -1,7 +1,8 @@
 /**
  * VIBEZ — register.js
- * Maneja el formulario de registro con Fetch API (AJAX)
- * Campos: nombre, apellido1, apellido2, email, password, password_confirmation
+ * Valida el formulario en el frontend antes de enviarlo (form POST).
+ * Si la validación pasa, activa el spinner y deja que el navegador envíe el form.
+ * Los errores del servidor se renderizan directamente en el HTML por Blade.
  */
 
 /* ============================================================
@@ -66,18 +67,18 @@ function shakeElement(element) {
 }
 
 /* ============================================================
-   SUBMIT
+   LÓGICA PRINCIPAL — Validación antes del envío
    ============================================================ */
-document.getElementById('registerForm').addEventListener('submit', async function (e) {
+document.getElementById('registerForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const nombre                = document.getElementById('nombre').value.trim();
-    const apellido1             = document.getElementById('apellido1').value.trim();
-    const apellido2             = document.getElementById('apellido2').value.trim();
-    const email                 = document.getElementById('email').value.trim();
-    const password              = document.getElementById('password').value;
-    const passwordConfirmation  = document.getElementById('password_confirmation').value;
-    let valid                   = true;
+    const nombre               = document.getElementById('nombre').value.trim();
+    const apellido1            = document.getElementById('apellido1').value.trim();
+    const apellido2            = document.getElementById('apellido2').value.trim();
+    const email                = document.getElementById('email').value.trim();
+    const password             = document.getElementById('password').value;
+    const passwordConfirmation = document.getElementById('password_confirmation').value;
+    let valid                  = true;
 
     // Limpiar todos los errores
     [
@@ -145,6 +146,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         return;
     }
 
+    // — Activar spinner y enviar el formulario —
     submitBtn.classList.add('loading');
 
     try {

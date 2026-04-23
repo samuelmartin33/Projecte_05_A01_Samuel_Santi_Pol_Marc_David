@@ -15,15 +15,13 @@
 
     {{-- CSS y JS compilados por Vite (cuando está corriendo npm run dev / build) --}}
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/style.css', 'resources/js/app.js'])
     @else
         {{-- Fallback CDN: Tailwind v4 (procesa clases utility en tiempo real) --}}
         <script src="https://cdn.tailwindcss.com"></script>
         {{-- Estilos personalizados VIBEZ servidos como archivo estático --}}
         <link rel="stylesheet" href="/css/vibez.css">
     @endif
-
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     {{-- Espacio para estilos específicos de cada página (ej: Leaflet en el detalle) --}}
     @stack('estilos')
@@ -46,7 +44,7 @@
             </a>
 
             {{-- Navegación central --}}
-            <nav class="hidden md:flex items-center gap-6">
+            <nav class="hidden md:flex items-center gap-8">
                 <a href="{{ route('home') }}"
                    class="nav-link {{ request()->routeIs('home') ? 'nav-link-activo' : '' }}">
                     Explorar
@@ -59,86 +57,22 @@
 
             {{-- Botones de acción: guest → login/registro | auth → avatar --}}
             <div class="flex items-center gap-3">
-                @guest
+                @auth
+                    <div class="nav-user-info hidden sm:flex items-center gap-2">
+                        <div class="nav-avatar">{{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}</div>
+                        <span class="text-white/70 text-sm font-medium">{{ Auth::user()->nombre }}</span>
+                    </div>
+                    <div class="nav-divider"></div>
+                    <button onclick="cerrarSesion()" class="btn-nav-logout">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                        </svg>
+                        Cerrar sesión
+                    </button>
+                @else
                     <a href="{{ route('login') }}" class="btn-nav-ghost">Entrar</a>
                     <a href="{{ route('register') }}" class="btn-nav-solido">Registro</a>
-                @else
-                    {{-- Avatar con dropdown de perfil --}}
-                    <div class="nav-avatar-wrapper" id="navAvatarWrapper">
-
-                        {{-- Botón circular con foto o iniciales --}}
-                        {{-- position:relative para poder colocar el badge de mood encima --}}
-                        <div style="position:relative;display:inline-block">
-                            <button class="nav-avatar" id="navAvatarBtn"
-                                    onclick="toggleNavDropdown()"
-                                    aria-haspopup="true" aria-expanded="false">
-                                @if(Auth::user()->foto_url)
-                                    <img src="{{ Auth::user()->foto_url }}"
-                                         alt="{{ Auth::user()->nombre }}"
-                                         class="nav-avatar-img">
-                                @else
-                                    <span class="nav-avatar-iniciales">
-                                        {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}{{ strtoupper(substr(Auth::user()->apellido1 ?? '', 0, 1)) }}
-                                    </span>
-                                @endif
-                            </button>
-
-                            {{-- Badge de mood: solo el emoji, flotante en la esquina del avatar --}}
-                            @if(Auth::user()->mood)
-                                <span class="nav-mood-badge" title="{{ Auth::user()->mood }}">
-                                    {{-- Extraemos solo el emoji (primera palabra antes del espacio) --}}
-                                    {{ explode(' ', Auth::user()->mood, 2)[0] }}
-                                </span>
-                            @endif
-                        </div>
-
-                        {{-- Dropdown --}}
-                        <div class="nav-dropdown" id="navDropdown" style="display:none">
-
-                            {{-- Cabecera: nombre y mood completo si lo tiene --}}
-                            <div class="nav-dropdown-header">
-                                <p class="nav-dropdown-nombre">{{ Auth::user()->nombre }} {{ Auth::user()->apellido1 }}</p>
-                                <p class="nav-dropdown-email">{{ Auth::user()->email }}</p>
-                                @if(Auth::user()->mood)
-                                    <p class="nav-dropdown-mood">{{ Auth::user()->mood }}</p>
-                                @endif
-                            </div>
-
-                            <div class="nav-dropdown-divider"></div>
-
-                            {{-- Perfil --}}
-                            <a href="{{ route('perfil') }}" class="nav-dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                                Mi perfil
-                            </a>
-
-                            {{-- Amigos --}}
-                            <a href="{{ route('perfil') }}#amigos" class="nav-dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                Amigos
-                            </a>
-
-                            <div class="nav-dropdown-divider"></div>
-
-                            {{-- Cerrar sesión --}}
-                            <button class="nav-dropdown-item nav-dropdown-logout"
-                                    onclick="cerrarSesion()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                </svg>
-                                Cerrar sesión
-                            </button>
-
-                        </div>
-                    </div>
-                @endguest
+                @endauth
             </div>
 
         </div>
@@ -158,16 +92,18 @@
     ═══════════════════════════════════════════════════════ --}}
     @if(!View::hasSection('content'))
     <footer class="footer-vibez">
-        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col items-center justify-center text-center gap-6">
             <div class="flex items-center gap-2">
-                <div class="logo-isotipo text-sm w-7 h-7">V</div>
-                <span class="font-bold text-white">VIBEZ</span>
+                <div class="logo-isotipo text-sm w-8 h-8">V</div>
+                <span class="font-bold text-white text-lg tracking-tight">VIBEZ</span>
             </div>
-            <p class="text-white/50 text-sm">
-                &copy; {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes
+            <p class="text-white/40 text-sm max-w-md">
+                &copy; {{ date('Y') }} VIBEZ — La plataforma definitiva de eventos para jóvenes. 
+                Descubre, crea y conecta.
             </p>
-            <div class="flex gap-5 text-white/60 text-sm">
+            <div class="flex gap-8 text-white/50 text-sm font-medium">
                 <a href="#" class="hover:text-white transition-colors">Privacidad</a>
+                <a href="#" class="hover:text-white transition-colors">Términos</a>
                 <a href="#" class="hover:text-white transition-colors">Contacto</a>
             </div>
         </div>

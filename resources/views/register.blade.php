@@ -87,67 +87,87 @@
             <p class="form-subtitle">Únete a VIBEZ y empieza a vibrar</p>
         </div>
 
-        <div id="alert-global" class="alert alert-error" role="alert"></div>
+        <div id="alert-global"
+             class="alert alert-error{{ session('error') ? ' visible' : '' }}"
+             role="alert">{{ session('error', '') }}</div>
 
-        <form id="registerForm" novalidate autocomplete="off">
+        {{-- Formulario — form POST con CSRF y validación JS en frontend --}}
+        <form id="registerForm"
+              method="POST"
+              action="{{ route('api.register') }}"
+              novalidate
+              autocomplete="off">
+            @csrf
 
             <div class="field-group">
 
                 {{-- Campo nombre --}}
-                <div class="field" id="field-nombre">
+                <div class="field @error('nombre') has-error @enderror" id="field-nombre">
                     <input
                         type="text"
                         id="nombre"
                         name="nombre"
                         placeholder=" "
+                        value="{{ old('nombre') }}"
                         autocomplete="given-name"
                         inputmode="text"
                     >
                     <label for="nombre">Nombre</label>
-                    <span class="field-error" id="error-nombre" role="alert"></span>
+                    <span class="field-error @error('nombre') visible @enderror"
+                          id="error-nombre"
+                          role="alert">@error('nombre'){{ $message }}@enderror</span>
                 </div>
 
                 {{-- Dos apellidos en una fila --}}
                 <div class="field-row">
-                    <div class="field" id="field-apellido1">
+                    <div class="field @error('apellido1') has-error @enderror" id="field-apellido1">
                         <input
                             type="text"
                             id="apellido1"
                             name="apellido1"
                             placeholder=" "
+                            value="{{ old('apellido1') }}"
                             autocomplete="family-name"
                             inputmode="text"
                         >
                         <label for="apellido1">Primer apellido</label>
-                        <span class="field-error" id="error-apellido1" role="alert"></span>
+                        <span class="field-error @error('apellido1') visible @enderror"
+                              id="error-apellido1"
+                              role="alert">@error('apellido1'){{ $message }}@enderror</span>
                     </div>
 
-                    <div class="field" id="field-apellido2">
+                    <div class="field @error('apellido2') has-error @enderror" id="field-apellido2">
                         <input
                             type="text"
                             id="apellido2"
                             name="apellido2"
                             placeholder=" "
+                            value="{{ old('apellido2') }}"
                             autocomplete="additional-name"
                             inputmode="text"
                         >
                         <label for="apellido2">Segundo apellido</label>
-                        <span class="field-error" id="error-apellido2" role="alert"></span>
+                        <span class="field-error @error('apellido2') visible @enderror"
+                              id="error-apellido2"
+                              role="alert">@error('apellido2'){{ $message }}@enderror</span>
                     </div>
                 </div>
 
                 {{-- Campo email --}}
-                <div class="field" id="field-email">
+                <div class="field @error('email') has-error @enderror" id="field-email">
                     <input
                         type="email"
                         id="email"
                         name="email"
                         placeholder=" "
+                        value="{{ old('email') }}"
                         autocomplete="email"
                         inputmode="email"
                     >
                     <label for="email">Correo electrónico</label>
-                    <span class="field-error" id="error-email" role="alert"></span>
+                    <span class="field-error @error('email') visible @enderror"
+                          id="error-email"
+                          role="alert">@error('email'){{ $message }}@enderror</span>
                 </div>
 
                 {{-- Contraseñas en una fila --}}
