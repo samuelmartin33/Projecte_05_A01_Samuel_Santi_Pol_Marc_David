@@ -15,6 +15,7 @@
  */
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,9 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::middleware('auth')->group(function () {
     Route::get('/amigos/buscar',    [PerfilController::class, 'buscarUsuarios'])->name('api.amigos.buscar');
     Route::post('/amigos/solicitud', [PerfilController::class, 'enviarSolicitud'])->name('api.amigos.solicitud');
+
+    // Compra de entradas
+    Route::post('/entradas/comprar', [EntradaController::class, 'comprar'])->name('api.entradas.comprar');
 });
 
 // ── Sección Social ──────────────────────────────────────────

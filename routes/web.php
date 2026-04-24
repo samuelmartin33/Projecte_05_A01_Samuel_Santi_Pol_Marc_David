@@ -92,6 +92,14 @@ Route::middleware('auth')->group(function () {
     // Vista principal del perfil
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
 
+    // Mis entradas (wallet de QRs)
+    Route::get('/mis-entradas', [\App\Http\Controllers\EntradaController::class, 'misEntradas'])
+         ->name('entradas.mis-entradas');
+
+    // Confirmación de compra de entradas
+    Route::get('/entradas/confirmacion/{pedido}', [\App\Http\Controllers\EntradaController::class, 'confirmacion'])
+         ->name('entradas.confirmacion');
+
     // Formulario de datos personales (POST simple, sin AJAX)
     Route::post('/perfil', [PerfilController::class, 'actualizar'])->name('perfil.actualizar');
 
