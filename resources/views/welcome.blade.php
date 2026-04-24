@@ -32,10 +32,26 @@
             <span class="text-white text-xl font-black tracking-tight">VIBEZ</span>
         </div>
 
-        <!-- Botón de login -->
-        <a href="/login" class="btn-ghost text-sm font-semibold px-5 py-2 rounded-full">
-            Iniciar sesión
-        </a>
+        <!-- Botones de navegación -->
+        <div class="flex items-center gap-3">
+            @auth
+                @if (auth()->user()->es_admin)
+                    <a href="/admin" class="btn-cta text-sm font-semibold px-5 py-2 rounded-full">
+                        Panel de Admin
+                    </a>
+                @endif
+                <form method="POST" action="/api/logout" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn-ghost text-sm font-semibold px-5 py-2 rounded-full">
+                        Cerrar sesión
+                    </button>
+                </form>
+            @else
+                <a href="/login" class="btn-ghost text-sm font-semibold px-5 py-2 rounded-full">
+                    Iniciar sesión
+                </a>
+            @endauth
+        </div>
 
     </header>
 

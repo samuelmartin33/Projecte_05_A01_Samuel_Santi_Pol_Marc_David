@@ -82,7 +82,7 @@
 {{-- ════════════════════════════════════════════════════
      BARRA DE FILTROS — sticky bajo el nav
 ════════════════════════════════════════════════════ --}}
-<section class="barra-filtros sticky top-16 z-40">
+<section class="barra-filtros sticky top-0 z-40">
 
     {{-- Overlay para cerrar dropdowns --}}
     <div id="overlay-dropdowns"

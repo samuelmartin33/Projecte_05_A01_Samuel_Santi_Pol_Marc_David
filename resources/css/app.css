@@ -138,6 +138,23 @@ body {
 .bg-navy               { background-color: var(--navy); }
 .bg-morado-vibez       { background-color: var(--morado); }
 
+/* --- Tipografía Premium --- */
+.font-premium {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.text-justify {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.text-center-block {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* ============================================================
    NAVBAR DE LA APP (layouts/app.blade.php)
    ============================================================ */
@@ -196,16 +213,58 @@ body {
 .btn-nav-solido {
     background: linear-gradient(135deg, var(--morado), var(--morado-claro));
     color: white;
-    padding: 6px 18px;
+    padding: 8px 24px;
     border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     text-decoration: none;
-    transition: opacity 0.15s, transform 0.15s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
 }
 .btn-nav-solido:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+/* Estilos adicionales para el navbar profesional */
+.nav-user-info {
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s;
+}
+.nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--morado);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.75rem;
+}
+.nav-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+}
+.btn-nav-logout {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-nav-logout:hover {
+    color: white;
 }
 
 /* Footer oscuro coherente con el nav */
@@ -220,6 +279,18 @@ body {
 
 .hero-home {
     background: linear-gradient(160deg, var(--navy) 0%, #1e1035 60%, #2e1065 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+.hero-home p {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 /* Texto con degradado claro (sobre fondo oscuro) */
@@ -230,6 +301,26 @@ body {
     background-clip: text;
 }
 
+/* --- Pills Premium --- */
+.pill-premium {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+.pill-premium:hover {
+    background: var(--morado);
+    border-color: var(--morado-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+}
+
 /* ============================================================
    BARRA DE FILTROS — sticky bajo el navbar
    ============================================================ */
@@ -238,6 +329,14 @@ body {
     background: white;
     border-bottom: 1px solid #ede9fe;
     box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
+    position: relative;
+    overflow: visible;
+}
+.barra-filtros .text-sm.font-semibold {
+    position: static;
+    transform: none;
+    margin-right: auto;
+    padding-right: 0.75rem;
 }
 
 /* Agrupación de label + select */
@@ -706,4 +805,496 @@ body {
     border-radius: 20px;
     padding: 24px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03);
+}
+
+/* ============================================================
+   HOME — Partículas decorativas del hero
+   ============================================================ */
+.hero-particula {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.hero-particula-1 { width:7px; height:7px; background:#a855f7; top:22%; left:12%; opacity:0.7; animation: parpadear 3s ease infinite; }
+.hero-particula-2 { width:5px; height:5px; background:#ec4899; top:38%; right:18%; opacity:0.6; animation: parpadear 2.5s ease infinite 1s; }
+.hero-particula-3 { width:9px; height:9px; background:#c084fc; bottom:28%; left:22%; opacity:0.5; animation: parpadear 4s ease infinite 0.5s; }
+.hero-particula-4 { width:5px; height:5px; background:#f0abfc; top:55%; right:12%; opacity:0.7; animation: parpadear 2s ease infinite 1.5s; }
+.hero-particula-5 { width:6px; height:6px; background:#818cf8; top:70%; left:40%; opacity:0.5; animation: parpadear 3.5s ease infinite 2s; }
+@keyframes parpadear {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50%       { opacity: 0.9; transform: scale(1.6); }
+}
+
+/* ============================================================
+   HOME — Custom Select (reemplaza el <select> nativo)
+   ============================================================ */
+.custom-select-wrapper {
+    position: relative;
+    background: #f7f4ff;
+    border: 1.5px solid #ddd6fe;
+    border-radius: 10px;
+    padding: 8px 36px 8px 14px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--navy);
+    cursor: pointer;
+    min-width: 155px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.custom-select-wrapper:hover { border-color: rgba(124,58,237,0.5); }
+.custom-select-wrapper.abierto {
+    border-color: var(--morado);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.13);
+    border-radius: 10px 10px 0 0;
+    border-bottom-color: transparent;
+}
+.custom-select-display {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.custom-select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--morado);
+    transition: transform 0.2s ease;
+    pointer-events: none;
+}
+.custom-select-wrapper.abierto .custom-select-arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+.custom-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: -1.5px;
+    right: -1.5px;
+    background: white;
+    border: 1.5px solid var(--morado);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 12px 36px rgba(124,58,237,0.2);
+    z-index: 300;
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ddd6fe transparent;
+}
+.custom-select-dropdown::-webkit-scrollbar { width: 4px; }
+.custom-select-dropdown::-webkit-scrollbar-thumb { background: #ddd6fe; border-radius: 99px; }
+.custom-select-option {
+    padding: 9px 14px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--navy);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.custom-select-option:hover { background: #f0eeff; color: var(--morado); }
+.custom-select-option.seleccionado {
+    background: linear-gradient(90deg, #ede9fe, #f5f3ff);
+    color: var(--morado);
+    font-weight: 700;
+}
+.custom-select-option.seleccionado::before { content: '✓'; font-size: 0.72rem; }
+
+/* ============================================================
+   HOME — Secciones de resultados
+   ============================================================ */
+.seccion-vibez-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--navy);
+    text-align: center;
+}
+.seccion-vibez-sub {
+    font-size: 0.95rem;
+    color: rgba(15,23,42,0.45);
+    font-weight: 400;
+    margin-top: 4px;
+    margin-bottom: 32px;
+    text-align: center;
+}
+.linea-divisora {
+    border: none;
+    border-top: 2px solid #ede9fe;
+    margin: 40px 0 28px;
+}
+
+/* ============================================================
+   Colores de badge por categoría
+   ============================================================ */
+.badge-categoria[data-cat="Música"]      { background: linear-gradient(135deg, #db2777, #f43f5e); }
+.badge-categoria[data-cat="Cultura"]     { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.badge-categoria[data-cat="Deporte"]     { background: linear-gradient(135deg, #1d4ed8, #0ea5e9); }
+.badge-categoria[data-cat="Gastronomía"] { background: linear-gradient(135deg, #059669, #22c55e); }
+.badge-categoria[data-cat="Networking"]  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+.badge-categoria[data-cat="Tecnología"]  { background: linear-gradient(135deg, #0284c7, #06b6d4); }
+.badge-categoria[data-cat="Moda"]        { background: linear-gradient(135deg, #9d174d, #a855f7); }
+.badge-categoria[data-cat="Infantil"]    { background: linear-gradient(135deg, #b45309, #f59e0b); }
+
+/* ============================================================
+   Salario con texto en gradiente
+   ============================================================ */
+.card-salario {
+    font-size: 0.85rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #059669, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 4px;
+}
+
+/* ============================================================
+   NAVBAR — AVATAR DE USUARIO + DROPDOWN
+   ============================================================ */
+.nav-avatar-wrapper {
+    position: relative;
+}
+.nav-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: 2px solid rgba(168,85,247,0.55);
+    cursor: pointer; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 0;
+}
+.nav-avatar:hover, .nav-avatar[aria-expanded="true"] {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.28);
+}
+.nav-avatar-img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.nav-avatar-iniciales {
+    color: white; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.02em;
+}
+.nav-avatar-mood-dot {
+    position: absolute; bottom: 1px; right: 1px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+    border: 2px solid #0f172a;
+}
+
+/* Dropdown */
+.nav-dropdown {
+    position: absolute; right: 0; top: calc(100% + 10px);
+    width: 230px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(124,58,237,0.1);
+    overflow: hidden;
+    z-index: 999;
+    animation: dropdownEntrar 0.18s ease;
+}
+@keyframes dropdownEntrar {
+    from { opacity:0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.nav-dropdown-header {
+    padding: 14px 16px 12px;
+    background: linear-gradient(135deg, #05000f, #1e1035);
+}
+.nav-dropdown-nombre {
+    color: #fff; font-weight: 800; font-size: 0.875rem; margin: 0;
+}
+.nav-dropdown-email {
+    color: rgba(255,255,255,0.45); font-size: 0.72rem; margin: 2px 0 0;
+}
+.nav-dropdown-mood {
+    margin-top: 5px;
+    display: inline-block;
+    background: rgba(168,85,247,0.2);
+    border: 1px solid rgba(168,85,247,0.3);
+    color: #c084fc;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 2px 10px; border-radius: 999px;
+}
+.nav-dropdown-divider {
+    height: 1px; background: #f0eeff; margin: 0;
+}
+.nav-dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px;
+    color: #0f172a; font-size: 0.875rem; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    transition: background 0.12s;
+    background: none; border: none; width: 100%; text-align: left;
+}
+.nav-dropdown-item svg {
+    width: 17px; height: 17px; flex-shrink: 0; color: #7c3aed; stroke-width: 2;
+}
+.nav-dropdown-item:hover { background: #f7f5ff; }
+.nav-dropdown-logout {
+    color: #dc2626 !important;
+}
+.nav-dropdown-logout svg { color: #dc2626 !important; }
+.nav-dropdown-logout:hover { background: #fff5f5 !important; }
+
+/* ============================================================
+   NAVBAR — Badge de mood flotante sobre el avatar
+   ============================================================ */
+.nav-mood-badge {
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: 22px; height: 22px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid rgba(124,58,237,0.35);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; line-height: 1;
+    cursor: default; pointer-events: none;
+}
+
+/* ============================================================
+   PÁGINA DE PERFIL
+   ============================================================ */
+.perfil-hero {
+    background: linear-gradient(160deg, #05000f 0%, #130228 50%, #0f172a 100%);
+    border-bottom: 1px solid rgba(168,85,247,0.15);
+}
+
+/* Avatar grande */
+.perfil-avatar-wrap {
+    position: relative; cursor: pointer; flex-shrink: 0;
+}
+.perfil-avatar {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: 3px solid rgba(168,85,247,0.6);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 28px rgba(168,85,247,0.45);
+}
+.perfil-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-avatar-iniciales { color: white; font-weight: 900; font-size: 2rem; }
+.perfil-avatar-overlay {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: rgba(0,0,0,0.52);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+}
+.perfil-avatar-wrap:hover .perfil-avatar-overlay { opacity: 1; }
+
+/* Tarjetas de sección */
+.perfil-card {
+    background: white; border-radius: 20px; padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(124,58,237,0.07);
+}
+.perfil-card-titulo {
+    font-size: 1rem; font-weight: 800; color: #0f172a;
+    margin-bottom: 4px;
+}
+.perfil-card-sub {
+    font-size: 0.8rem; color: rgba(15,23,42,0.45);
+    margin-bottom: 16px;
+}
+
+/* Campos del formulario de perfil */
+.perfil-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 480px) { .perfil-grid-2 { grid-template-columns: 1fr; } }
+
+.perfil-field {
+    display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px;
+}
+.perfil-field label {
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(15,23,42,0.45);
+}
+.perfil-field input,
+.perfil-field textarea {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px; padding: 9px 13px;
+    font-size: 0.875rem; color: #0f172a;
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit; background: #fafafa;
+}
+.perfil-field input:focus,
+.perfil-field textarea:focus {
+    border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    background: white;
+}
+.perfil-field-hint { font-size: 0.7rem; color: rgba(15,23,42,0.35); }
+
+/* Alerta del formulario */
+.perfil-alerta {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 0.85rem; font-weight: 600; margin-bottom: 14px;
+}
+.perfil-alerta-ok    { background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; }
+.perfil-alerta-error { background: #fef2f2; border: 1.5px solid #fca5a5; color: #991b1b; }
+
+/* Botón guardar */
+.btn-perfil-guardar {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; border: none; border-radius: 999px;
+    padding: 10px 26px; font-size: 0.875rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    margin-top: 4px;
+}
+.btn-perfil-guardar:hover { opacity: 0.9; transform: scale(1.03); }
+.btn-perfil-guardar:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+/* Alerta de foto (cerca del avatar) */
+.perfil-foto-error {
+    font-size: 0.75rem; font-weight: 600; color: #991b1b;
+    background: #fef2f2; border: 1px solid #fca5a5;
+    border-radius: 8px; padding: 5px 10px; margin-top: 18px;
+    display: none; text-align: center; max-width: 140px;
+}
+
+/* Sección amigos */
+.perfil-solicitudes-wrap { margin-top: 16px; }
+.perfil-solicitudes-titulo {
+    font-size: 0.78rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(15,23,42,0.45);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.perfil-badge-count {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; font-size: 0.65rem; font-weight: 900;
+    padding: 1px 7px; border-radius: 999px;
+}
+.perfil-solicitud-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid #f0eeff;
+}
+.perfil-solicitud-item:last-child { border-bottom: none; }
+.perfil-solicitud-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+    color: white; font-weight: 800; font-size: 0.8rem;
+}
+.perfil-solicitud-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-btn-aceptar, .perfil-btn-rechazar {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: none; cursor: pointer; font-size: 0.75rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, opacity 0.15s;
+}
+.perfil-btn-aceptar { background: #22c55e; color: white; }
+.perfil-btn-rechazar { background: #ef4444; color: white; }
+.perfil-btn-aceptar:hover, .perfil-btn-rechazar:hover { transform: scale(1.12); }
+
+/* Resultados búsqueda amigos */
+.perfil-busqueda-lista {
+    border: 1.5px solid #e2e8f0; border-radius: 12px;
+    overflow: hidden; margin-bottom: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.perfil-busqueda-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; cursor: default;
+    border-bottom: 1px solid #f0eeff; background: white;
+    transition: background 0.1s;
+}
+.perfil-busqueda-item:last-child { border-bottom: none; }
+.perfil-busqueda-item:hover { background: #f7f5ff; }
+.btn-enviar-solicitud {
+    margin-left: auto; flex-shrink: 0;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; border: none; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 5px 12px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+}
+.btn-enviar-solicitud:hover { opacity: 0.88; transform: scale(1.04); }
+.btn-enviado { background: #e2e8f0 !important; color: #64748b !important; cursor: default !important; }
+
+/* ============================================================
+   PERFIL — Bio en hero
+   ============================================================ */
+.perfil-bio-hero {
+    color: rgba(255,255,255,0.75); font-size: 0.9rem;
+    margin-top: 8px; line-height: 1.5; max-width: 480px;
+}
+
+/* ============================================================
+   PERFIL — Mood en hero (badge grande, visible para todos)
+   ============================================================ */
+.perfil-mood-hero {
+    display: inline-block; margin-top: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px; padding: 5px 14px;
+    font-size: 0.9rem; color: white; font-weight: 600;
+    backdrop-filter: blur(6px);
+}
+
+/* ============================================================
+   PERFIL — Botón "Guardar foto" junto al avatar en el hero
+   ============================================================ */
+.btn-foto-hero {
+    display: block; margin-top: 10px;
+    font-size: 0.78rem; padding: 7px 18px;
+}
+
+/* ============================================================
+   PERFIL — Badge "Pública" junto al label de biografía
+   ============================================================ */
+.perfil-badge-publica {
+    display: inline-block; font-size: 0.6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; padding: 1px 7px; border-radius: 999px;
+    vertical-align: middle; margin-left: 5px;
+}
+
+/* ============================================================
+   PERFIL — Selector de mood (grid de chips tipo radio)
+   ============================================================ */
+.perfil-mood-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Cada opción de mood es un label que envuelve un radio oculto */
+.perfil-mood-opcion {
+    display: flex; align-items: center; gap: 6px;
+    border: 1.5px solid #e2e8f0; border-radius: 12px;
+    padding: 8px 12px; cursor: pointer; background: #fafafa;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    font-size: 0.82rem; font-weight: 600; color: #0f172a;
+    user-select: none;
+}
+/* Ocultamos el radio nativo; el estilo lo da el label */
+.perfil-mood-opcion input[type="radio"] { display: none; }
+
+.perfil-mood-opcion:hover {
+    border-color: #a855f7;
+    background: #f7f5ff;
+}
+
+/* Opción seleccionada actualmente */
+.perfil-mood-activo {
+    border-color: #7c3aed !important;
+    background: #f0eeff !important;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    color: #6d28d9;
 }

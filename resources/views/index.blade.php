@@ -2,6 +2,7 @@
 
 @section('title', 'Dashboard — VIBEZ')
 
+
 @section('content')
 
 {{-- Aurora mesh gradient: mismo sistema visual --}}
@@ -47,6 +48,12 @@
                 <span class="info-label">ID</span>
                 <span>#{{ auth()->user()->id }}</span>
             </div>
+            @if(auth()->user()->es_admin)
+            <div class="info-row">
+                <span class="info-label">Rol</span>
+                <span class="role-admin">⚡ Administrador</span>
+            </div>
+            @endif
         </div>
 
         <p class="index-note">
@@ -65,5 +72,9 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/index.js') }}"></script>
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/js/index.js'])
+    @else
+        <script src="{{ asset('js/index.js') }}"></script>
+    @endif
 @endsection
