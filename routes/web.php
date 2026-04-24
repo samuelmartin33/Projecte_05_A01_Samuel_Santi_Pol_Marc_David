@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventoController;
 use Illuminate\Support\Facades\Auth;
@@ -104,6 +105,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
     Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
 });
+
+/* — Página Social: protegida por auth — */
+Route::middleware('auth')->get('/social', [SocialController::class, 'index'])
+    ->name('social');
 
 /* — Dashboard de Admin: protegido por middlewares auth e IsAdmin — */
 Route::middleware(['auth', 'admin'])->group(function () {
