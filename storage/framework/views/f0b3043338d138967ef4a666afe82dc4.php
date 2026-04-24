@@ -1,9 +1,7 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', $evento->titulo); ?>
 
-@section('titulo', $evento->titulo)
 
-{{-- Cargar Leaflet CSS solo en esta página --}}
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         /* Altura fija para el mapa de Leaflet */
@@ -54,69 +52,70 @@
             pointer-events: none;
         }
     </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('contenido')
+<?php $__env->startSection('contenido'); ?>
 
-{{-- ════════════════════════════════════════════════════
-     HERO DEL EVENTO — imagen de portada con overlay
-════════════════════════════════════════════════════ --}}
-<div class="hero-detalle" style="background-image: url('{{ $evento->url_portada }}')">
-    {{-- Overlay oscuro con degradado para legibilidad del texto --}}
+
+<div class="hero-detalle" style="background-image: url('<?php echo e($evento->url_portada); ?>')">
+    
     <div class="hero-detalle-overlay">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
-            {{-- Botón volver --}}
-            <a href="{{ route('home') }}" class="btn-volver">
+            
+            <a href="<?php echo e(route('home')); ?>" class="btn-volver">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 Volver
             </a>
 
-            {{-- Badge de categoría --}}
+            
             <span class="badge-categoria-hero mt-6 inline-block">
-                {{ $evento->categoria?->nombre ?? 'Evento' }}
+                <?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>
+
             </span>
 
-            {{-- Título del evento --}}
+            
             <h1 class="text-3xl sm:text-5xl font-black text-white mt-3 leading-tight max-w-3xl">
-                {{ $evento->titulo }}
+                <?php echo e($evento->titulo); ?>
+
             </h1>
 
-            {{-- Datos clave: fecha, ubicación, precio --}}
+            
             <div class="flex flex-wrap gap-6 mt-6">
 
-                {{-- Fecha --}}
+                
                 <div class="dato-hero">
                     <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                     <span>
-                        {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
-                        · {{ \Carbon\Carbon::parse($evento->fecha_inicio)->format('H:i') }}h
+                        <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY')); ?>
+
+                        · <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->format('H:i')); ?>h
                     </span>
                 </div>
 
-                {{-- Ubicación --}}
-                @if ($evento->ubicacion_nombre)
+                
+                <?php if($evento->ubicacion_nombre): ?>
                     <div class="dato-hero">
                         <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                         </svg>
-                        <span>{{ $evento->ubicacion_nombre }}</span>
+                        <span><?php echo e($evento->ubicacion_nombre); ?></span>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                {{-- Precio --}}
+                
                 <div class="dato-hero">
                     <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M15 9a2 2 0 10-4 0v5a2 2 0 01-2 2h6m-6-4h4m8 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span class="font-bold text-lg">{{ $evento->precio_formateado }}</span>
+                    <span class="font-bold text-lg"><?php echo e($evento->precio_formateado); ?></span>
                 </div>
 
             </div>
@@ -125,204 +124,207 @@
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     CUERPO DEL DETALLE — layout de 2 columnas
-     Izquierda (2/3): descripción, organizador, galería
-     Derecha (1/3): ficha de compra + mapa
-════════════════════════════════════════════════════ --}}
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        {{-- ─── COLUMNA IZQUIERDA ─── --}}
+        
         <div class="lg:col-span-2 space-y-10">
 
-            {{-- Descripción completa del evento --}}
+            
             <section class="seccion-detalle">
                 <h2 class="seccion-titulo">Sobre el evento</h2>
                 <p class="text-navy/80 leading-relaxed text-base">
-                    {{ $evento->descripcion ?? 'No hay descripción disponible.' }}
+                    <?php echo e($evento->descripcion ?? 'No hay descripción disponible.'); ?>
+
                 </p>
             </section>
 
-            {{-- Datos adicionales: aforo, edad mínima, tipo --}}
+            
             <section class="seccion-detalle">
                 <h2 class="seccion-titulo">Información adicional</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
 
-                    {{-- Aforo máximo --}}
-                    @if ($evento->aforo_maximo)
+                    
+                    <?php if($evento->aforo_maximo): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Aforo máximo</span>
-                            <span class="ficha-dato-valor">{{ number_format($evento->aforo_maximo) }} personas</span>
+                            <span class="ficha-dato-valor"><?php echo e(number_format($evento->aforo_maximo)); ?> personas</span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Entradas disponibles --}}
-                    @if ($evento->aforo_maximo)
-                        @php
+                    
+                    <?php if($evento->aforo_maximo): ?>
+                        <?php
                             $disponibles = $evento->aforo_maximo - $evento->aforo_actual;
-                        @endphp
+                        ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Disponibles</span>
-                            <span class="ficha-dato-valor {{ $disponibles < 50 ? 'text-red-600' : 'text-green-600' }}">
-                                {{ number_format($disponibles) }}
+                            <span class="ficha-dato-valor <?php echo e($disponibles < 50 ? 'text-red-600' : 'text-green-600'); ?>">
+                                <?php echo e(number_format($disponibles)); ?>
+
                             </span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Edad mínima --}}
-                    @if ($evento->edad_minima)
+                    
+                    <?php if($evento->edad_minima): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Edad mínima</span>
-                            <span class="ficha-dato-valor">+{{ $evento->edad_minima }}</span>
+                            <span class="ficha-dato-valor">+<?php echo e($evento->edad_minima); ?></span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Fecha de fin --}}
-                    @if ($evento->fecha_fin)
+                    
+                    <?php if($evento->fecha_fin): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Finaliza</span>
                             <span class="ficha-dato-valor">
-                                {{ \Carbon\Carbon::parse($evento->fecha_fin)->format('H:i') }}h
+                                <?php echo e(\Carbon\Carbon::parse($evento->fecha_fin)->format('H:i')); ?>h
                             </span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                 </div>
             </section>
 
-            {{-- Organizador del evento --}}
-            @if ($evento->organizador?->empresa)
+            
+            <?php if($evento->organizador?->empresa): ?>
                 <section class="seccion-detalle">
                     <h2 class="seccion-titulo">Organiza</h2>
                     <div class="card-organizador-detalle">
-                        {{-- Logo de la empresa o inicial del nombre --}}
+                        
                         <div class="logo-empresa">
-                            @if ($evento->organizador->empresa->logo_url)
-                                <img src="{{ $evento->organizador->empresa->logo_url }}"
-                                     alt="{{ $evento->organizador->empresa->nombre_empresa }}"
+                            <?php if($evento->organizador->empresa->logo_url): ?>
+                                <img src="<?php echo e($evento->organizador->empresa->logo_url); ?>"
+                                     alt="<?php echo e($evento->organizador->empresa->nombre_empresa); ?>"
                                      class="w-full h-full object-cover">
-                            @else
+                            <?php else: ?>
                                 <span class="text-white font-black text-xl">
-                                    {{ strtoupper(substr($evento->organizador->empresa->nombre_empresa, 0, 1)) }}
+                                    <?php echo e(strtoupper(substr($evento->organizador->empresa->nombre_empresa, 0, 1))); ?>
+
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </div>
                         <div>
                             <p class="font-bold text-navy text-lg">
-                                {{ $evento->organizador->empresa->nombre_empresa }}
+                                <?php echo e($evento->organizador->empresa->nombre_empresa); ?>
+
                             </p>
-                            @if ($evento->organizador->empresa->descripcion)
+                            <?php if($evento->organizador->empresa->descripcion): ?>
                                 <p class="text-navy/60 text-sm mt-1 line-clamp-2">
-                                    {{ $evento->organizador->empresa->descripcion }}
+                                    <?php echo e($evento->organizador->empresa->descripcion); ?>
+
                                 </p>
-                            @endif
-                            @if ($evento->organizador->empresa->sitio_web)
-                                <a href="{{ $evento->organizador->empresa->sitio_web }}"
+                            <?php endif; ?>
+                            <?php if($evento->organizador->empresa->sitio_web): ?>
+                                <a href="<?php echo e($evento->organizador->empresa->sitio_web); ?>"
                                    target="_blank"
                                    class="texto-enlace text-sm mt-2 inline-block">
                                     Visitar web →
                                 </a>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                 </section>
-            @endif
+            <?php endif; ?>
 
-            {{-- Galería de imágenes adicionales --}}
-            @if ($evento->imagenes->where('es_portada', 0)->count() > 0)
+            
+            <?php if($evento->imagenes->where('es_portada', 0)->count() > 0): ?>
                 <section class="seccion-detalle">
                     <h2 class="seccion-titulo">Galería</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        @foreach ($evento->imagenes->where('es_portada', 0) as $imagen)
+                        <?php $__currentLoopData = $evento->imagenes->where('es_portada', 0); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $imagen): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="overflow-hidden rounded-xl aspect-video">
-                                <img src="{{ $imagen->imagen_url }}"
-                                     alt="{{ $imagen->descripcion ?? $evento->titulo }}"
+                                <img src="<?php echo e($imagen->imagen_url); ?>"
+                                     alt="<?php echo e($imagen->descripcion ?? $evento->titulo); ?>"
                                      class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                      onerror="this.parentElement.remove()">
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </section>
-            @endif
+            <?php endif; ?>
 
-        </div>{{-- fin columna izquierda --}}
+        </div>
 
-        {{-- ─── COLUMNA DERECHA (sticky) ─── --}}
+        
         <div class="lg:col-span-1">
             <div class="lg:sticky lg:top-24 space-y-6">
 
-                {{-- Tarjeta de compra / acción principal --}}
+                
                 <div class="ficha-compra">
 
-                    {{-- Precio destacado --}}
+                    
                     <div class="text-center mb-6">
                         <p class="text-navy/50 text-sm uppercase tracking-widest font-semibold mb-1">Precio</p>
                         <p class="text-4xl font-black text-gradient">
-                            {{ $evento->precio_formateado }}
+                            <?php echo e($evento->precio_formateado); ?>
+
                         </p>
-                        @if (!$evento->es_gratuito)
+                        <?php if(!$evento->es_gratuito): ?>
                             <p class="text-navy/40 text-xs mt-1">por persona · IVA incluido</p>
-                        @endif
+                        <?php endif; ?>
                     </div>
 
-                    {{-- Barra de ocupación del aforo --}}
-                    @if ($evento->aforo_maximo)
-                        @php
+                    
+                    <?php if($evento->aforo_maximo): ?>
+                        <?php
                             $porcentajeOcupacion = ($evento->aforo_actual / $evento->aforo_maximo) * 100;
-                        @endphp
+                        ?>
                         <div class="mb-6">
                             <div class="flex justify-between text-xs text-navy/50 mb-1">
-                                <span>{{ number_format($evento->aforo_maximo - $evento->aforo_actual) }} entradas disponibles</span>
-                                <span>{{ round($porcentajeOcupacion) }}% ocupado</span>
+                                <span><?php echo e(number_format($evento->aforo_maximo - $evento->aforo_actual)); ?> entradas disponibles</span>
+                                <span><?php echo e(round($porcentajeOcupacion)); ?>% ocupado</span>
                             </div>
                             <div class="barra-aforo-fondo">
-                                <div class="barra-aforo-relleno {{ $porcentajeOcupacion > 80 ? 'barra-aforo-critico' : '' }}"
-                                     style="width: {{ min($porcentajeOcupacion, 100) }}%"></div>
+                                <div class="barra-aforo-relleno <?php echo e($porcentajeOcupacion > 80 ? 'barra-aforo-critico' : ''); ?>"
+                                     style="width: <?php echo e(min($porcentajeOcupacion, 100)); ?>%"></div>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Botón principal de acción --}}
+                    
                     <button class="btn-comprar w-full"
-                            onclick="abrirCompra({{ $evento->id }})">
-                        {{ $evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada' }}
+                            onclick="abrirCompra(<?php echo e($evento->id); ?>)">
+                        <?php echo e($evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada'); ?>
+
                     </button>
 
-                    @auth
+                    <?php if(auth()->guard()->check()): ?>
                         <button type="button"
                                 id="btn-favorito-detalle"
-                                class="btn-favorito-detalle {{ $esFavorito ? 'activo' : '' }}"
-                                data-evento-id="{{ $evento->id }}"
-                                data-favorito="{{ $esFavorito ? '1' : '0' }}"
-                                aria-pressed="{{ $esFavorito ? 'true' : 'false' }}"
+                                class="btn-favorito-detalle <?php echo e($esFavorito ? 'activo' : ''); ?>"
+                                data-evento-id="<?php echo e($evento->id); ?>"
+                                data-favorito="<?php echo e($esFavorito ? '1' : '0'); ?>"
+                                aria-pressed="<?php echo e($esFavorito ? 'true' : 'false'); ?>"
                                 onclick="toggleFavoritoDetalle(this)">
                             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
                             </svg>
-                            <span id="btn-favorito-detalle-texto">{{ $esFavorito ? 'En favoritos' : 'Guardar en favoritos' }}</span>
+                            <span id="btn-favorito-detalle-texto"><?php echo e($esFavorito ? 'En favoritos' : 'Guardar en favoritos'); ?></span>
                         </button>
-                    @endauth
+                    <?php endif; ?>
 
-                    {{-- Enlace externo si lo hay --}}
-                    @if ($evento->url_externa)
-                        <a href="{{ $evento->url_externa }}"
+                    
+                    <?php if($evento->url_externa): ?>
+                        <a href="<?php echo e($evento->url_externa); ?>"
                            target="_blank"
                            class="btn-secundario w-full mt-3 block text-center">
                             Ver en web oficial
                         </a>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Información de garantía --}}
+                    
                     <p class="text-center text-navy/40 text-xs mt-4">
                         🔒 Compra segura · Entrada con código QR
                     </p>
 
                 </div>
 
-                {{-- ── MAPA DE LEAFLET ── --}}
-                @if ($evento->latitud && $evento->longitud)
+                
+                <?php if($evento->latitud && $evento->longitud): ?>
                     <div class="ficha-mapa">
                         <h3 class="font-bold text-navy mb-3 flex items-center gap-2">
                             <svg class="w-4 h-4 text-morado-vibez" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -332,41 +334,39 @@
                             Ubicación
                         </h3>
 
-                        {{-- Dirección textual --}}
-                        @if ($evento->ubicacion_direccion)
-                            <p class="text-navy/60 text-sm mb-3">{{ $evento->ubicacion_direccion }}</p>
-                        @endif
+                        
+                        <?php if($evento->ubicacion_direccion): ?>
+                            <p class="text-navy/60 text-sm mb-3"><?php echo e($evento->ubicacion_direccion); ?></p>
+                        <?php endif; ?>
 
-                        {{-- Contenedor del mapa — Leaflet se inicializa en el script --}}
+                        
                         <div id="mapa-evento"></div>
 
-                        {{-- Enlace a Google Maps --}}
-                        <a href="https://www.google.com/maps?q={{ $evento->latitud }},{{ $evento->longitud }}"
+                        
+                        <a href="https://www.google.com/maps?q=<?php echo e($evento->latitud); ?>,<?php echo e($evento->longitud); ?>"
                            target="_blank"
                            class="texto-enlace text-sm mt-3 inline-block">
                             Abrir en Google Maps →
                         </a>
                     </div>
-                @else
-                    {{-- Mensaje si el evento no tiene coordenadas --}}
+                <?php else: ?>
+                    
                     <div class="ficha-mapa text-center py-6">
                         <p class="text-navy/40 text-sm">📍 Ubicación no disponible</p>
                     </div>
-                @endif
+                <?php endif; ?>
 
             </div>
-        </div>{{-- fin columna derecha --}}
+        </div>
 
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-{{-- ════════════════════════════════════════════════════
-     SCRIPTS DEL DETALLE — Leaflet y acción de compra
-════════════════════════════════════════════════════ --}}
-@push('scripts')
-{{-- Librería de mapas Leaflet (gratuita, sin API key) --}}
+
+<?php $__env->startPush('scripts'); ?>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
@@ -405,13 +405,13 @@ function inicializarMapa(latitud, longitud, nombreUbicacion) {
 }
 
 // Llamar a la función directamente — los datos vienen del blade (PHP → JS)
-@if ($evento->latitud && $evento->longitud)
+<?php if($evento->latitud && $evento->longitud): ?>
     inicializarMapa(
-        {{ $evento->latitud }},
-        {{ $evento->longitud }},
-        '{{ addslashes($evento->ubicacion_nombre ?? 'Ubicación del evento') }}'
+        <?php echo e($evento->latitud); ?>,
+        <?php echo e($evento->longitud); ?>,
+        '<?php echo e(addslashes($evento->ubicacion_nombre ?? 'Ubicación del evento')); ?>'
     );
-@endif
+<?php endif; ?>
 
 function actualizarBotonFavoritoDetalle(btn, esFavorito) {
     btn.dataset.favorito = esFavorito ? '1' : '0';
@@ -448,7 +448,7 @@ function toggleFavoritoDetalle(btn) {
     })
     .then(function(response) {
         if (response.status === 401) {
-            window.location.href = '{{ route('login') }}';
+            window.location.href = '<?php echo e(route('login')); ?>';
             return null;
         }
 
@@ -485,4 +485,6 @@ function abrirCompra(eventoId) {
     alert('Próximamente: flujo de compra para el evento #' + eventoId);
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\0616\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/eventos/detalle.blade.php ENDPATH**/ ?>

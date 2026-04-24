@@ -2,6 +2,76 @@
 
 @section('titulo', 'Explorar Eventos')
 
+@push('estilos')
+<style>
+    .btn-favorito-card {
+        position: absolute;
+        bottom: 0.65rem;
+        right: 0.65rem;
+        z-index: 12;
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: 999px;
+        border: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        background: rgba(15, 23, 42, 0.48);
+        backdrop-filter: blur(5px);
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-favorito-card:hover {
+        transform: scale(1.06);
+        background: rgba(15, 23, 42, 0.62);
+    }
+
+    .btn-favorito-card svg {
+        width: 1.05rem;
+        height: 1.05rem;
+    }
+
+    .btn-favorito-card.activo {
+        background: rgba(244, 63, 94, 0.92);
+    }
+
+    .btn-favorito-card.activo svg {
+        fill: currentColor;
+    }
+
+    .btn-favorito-card.cargando {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .btn-favoritos-filtro {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid rgba(124, 58, 237, 0.25);
+        background: #ffffff;
+        color: #6d28d9;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0.58rem 0.78rem;
+        border-radius: 0.8rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-favoritos-filtro:hover {
+        border-color: rgba(124, 58, 237, 0.45);
+        background: #f8f5ff;
+    }
+
+    .btn-favoritos-filtro.activo {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        color: #ffffff;
+        border-color: transparent;
+    }
+</style>
+@endpush
+
 @section('contenido')
 
 {{-- ════════════════════════════════════════════════════
@@ -126,6 +196,18 @@
             <input type="hidden" id="filtro-ubicacion" value="">
         </div>
 
+        {{-- ── Toggle SOLO FAVORITOS ── --}}
+        <div class="filtro-grupo">
+            <label class="filtro-label">Favoritos</label>
+            <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
+                </svg>
+                <span id="texto-solo-favoritos">Solo favoritos</span>
+            </button>
+            <input type="hidden" id="filtro-favoritos" value="0">
+        </div>
+
         {{-- Botón limpiar — wrapped en filtro-grupo con label invisible para alinearlo ── --}}
         <div class="filtro-grupo">
             <span class="filtro-label" style="visibility:hidden">–</span>
@@ -177,6 +259,19 @@
                          onclick="irADetalle('evento', {{ $evento->id }})">
 
                     <div class="card-imagen-wrap">
+                        <button type="button"
+                                class="btn-favorito-card {{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'activo' : '' }}"
+                                data-evento-id="{{ $evento->id }}"
+                                data-favorito="{{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? '1' : '0' }}"
+                                aria-label="Marcar favorito"
+                                aria-pressed="{{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'true' : 'false' }}"
+                                onclick="toggleFavorito(event, this)">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
+                            </svg>
+                        </button>
+
                         <img src="{{ $evento->url_portada }}"
                              alt="{{ $evento->titulo }}"
                              class="card-imagen"
@@ -296,6 +391,19 @@
 ════════════════════════════════════════════════════ --}}
 @push('scripts')
 <script>
+window.vibezFavoritosConfig = {
+    userAuthenticated: @json(Auth::check()),
+    loginUrl: @json(route('login'))
+};
+
+window.vibezHomeConfig = {
+    totalEventos: {{ $eventos->count() }},
+    totalOfertas: {{ $ofertas->count() }}
+};
+</script>
+<script src="{{ asset('js/favoritos.js') }}"></script>
+<script>
+var HOME_CFG = window.vibezHomeConfig || {};
 
 /**
  * Abre o cierra el dropdown personalizado de un selector.
@@ -369,6 +477,7 @@ function seleccionarFiltro(filtroId, valor, texto, event) {
 function aplicarFiltros() {
     var categoria = document.getElementById('filtro-categoria').value;
     var ubicacion = document.getElementById('filtro-ubicacion').value;
+    var favoritos = document.getElementById('filtro-favoritos').value;
 
     // Mostrar spinner, ocultar secciones
     document.getElementById('cargando').classList.remove('hidden');
@@ -380,7 +489,7 @@ function aplicarFiltros() {
     if (seccionEventos)  seccionEventos.style.display  = 'none';
     if (seccionTrabajos) seccionTrabajos.style.display = 'none';
 
-    fetch('/api/filtrar?categoria=' + encodeURIComponent(categoria) + '&ubicacion=' + encodeURIComponent(ubicacion))
+    fetch('/api/filtrar?categoria=' + encodeURIComponent(categoria) + '&ubicacion=' + encodeURIComponent(ubicacion) + '&favoritos=' + encodeURIComponent(favoritos))
         .then(function(respuesta) { return respuesta.json(); })
         .then(function(datos) {
 
@@ -420,6 +529,8 @@ function limpiarFiltros() {
     // Resetear inputs hidden
     document.getElementById('filtro-categoria').value = '';
     document.getElementById('filtro-ubicacion').value = '';
+    document.getElementById('filtro-favoritos').value = '0';
+    document.getElementById('btn-solo-favoritos').classList.remove('activo');
 
     // Resetear textos del custom select
     document.getElementById('categoria-display').textContent = 'Todas';
@@ -445,9 +556,32 @@ function limpiarFiltros() {
     if (seccionTrabajos) seccionTrabajos.style.display = '';
 
     // Actualizar contador con total real
-    var totalEventos  = {{ $eventos->count() }};
-    var totalOfertas  = {{ $ofertas->count() }};
+    var totalEventos  = Number(HOME_CFG.totalEventos || 0);
+    var totalOfertas  = Number(HOME_CFG.totalOfertas || 0);
     document.getElementById('contador-resultados').textContent = totalEventos + totalOfertas;
+}
+
+/**
+ * Alterna el estado del filtro de solo favoritos.
+ */
+function toggleSoloFavoritos() {
+    if (!window.vibezFavoritosConfig.userAuthenticated) {
+        window.location.href = window.vibezFavoritosConfig.loginUrl;
+        return;
+    }
+    
+    var btn = document.getElementById('btn-solo-favoritos');
+    var input = document.getElementById('filtro-favoritos');
+    
+    if (input.value === '1') {
+        input.value = '0';
+        btn.classList.remove('activo');
+    } else {
+        input.value = '1';
+        btn.classList.add('activo');
+    }
+    
+    aplicarFiltros();
 }
 
 /**
@@ -471,6 +605,7 @@ function crearTarjetaEvento(evento) {
 
     return '<article class="card-evento" onclick="irADetalle(\'evento\',' + evento.id + ')">'
         + '<div class="card-imagen-wrap">'
+        + crearBotonFavorito(evento.id, Boolean(evento.is_favorito))
         + '<img src="' + imagen + '" alt="' + evento.titulo + '" class="card-imagen" onerror="this.src=\'https://picsum.photos/seed/fallback-' + evento.id + '/600/400\'">'
         + '<span class="badge-categoria" data-cat="' + evento.categoria + '">' + evento.categoria + '</span>'
         + '<span class="badge-precio ' + (evento.es_gratuito ? 'badge-gratis' : '') + '">' + evento.precio_formateado + '</span>'

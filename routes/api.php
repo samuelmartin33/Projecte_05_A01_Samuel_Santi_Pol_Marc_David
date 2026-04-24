@@ -15,6 +15,7 @@
  */
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FavoritoController;
 use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // Búsqueda dinámica de amigos y envío de solicitud
 // Usan AJAX porque los resultados se muestran sin recargar la página
 Route::middleware('auth')->group(function () {
-    Route::get('/amigos/buscar',    [PerfilController::class, 'buscarUsuarios'])->name('api.amigos.buscar');
-    Route::post('/amigos/solicitud', [PerfilController::class, 'enviarSolicitud'])->name('api.amigos.solicitud');
+     Route::get('/amigos/buscar', [PerfilController::class, 'buscarUsuarios'])->name('api.amigos.buscar');
+     Route::post('/amigos/solicitud', [PerfilController::class, 'enviarSolicitud'])->name('api.amigos.solicitud');
+     Route::post('/favoritos/toggle', [FavoritoController::class, 'toggle'])->name('api.favoritos.toggle');
 });
