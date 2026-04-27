@@ -263,7 +263,12 @@
     }
 
     /** Cierra el dropdown si se pulsa fuera */
-    document.addEventListener('click', function(e) {
+    const anteriorClickDocumento = document.onclick;
+    document.onclick = function(e) {
+        if (typeof anteriorClickDocumento === 'function') {
+            anteriorClickDocumento(e);
+        }
+
         const wrapper = document.getElementById('navAvatarWrapper');
         if (wrapper && !wrapper.contains(e.target)) {
             const dropdown = document.getElementById('navDropdown');
@@ -271,7 +276,7 @@
             if (dropdown) dropdown.style.display = 'none';
             if (btn)      btn.setAttribute('aria-expanded', 'false');
         }
-    });
+    };
 
     /**
      * Cierra la sesión del usuario mediante AJAX.
