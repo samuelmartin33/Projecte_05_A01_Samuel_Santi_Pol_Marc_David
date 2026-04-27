@@ -14,7 +14,7 @@
         <div class="quick-actions-grid">
             <a class="quick-action-item" href="<?php echo e(route('admin.eventos.create')); ?>">Crear evento</a>
             <span class="quick-action-item disabled">Crear usuario (proximamente)</span>
-            <span class="quick-action-item disabled">Crear empresa (proximamente)</span>
+            <a class="quick-action-item" href="<?php echo e(route('admin.empresas.index')); ?>">Gestionar empresas</a>
             <span class="quick-action-item disabled">Crear pedido (proximamente)</span>
             <span class="quick-action-item disabled">Registrar pago (proximamente)</span>
         </div>
@@ -36,10 +36,13 @@
             <p class="soon">Proximamente</p>
         </article>
 
-        <article class="card stat-card muted">
-            <h2>Empresas</h2>
-            <p class="soon">Proximamente</p>
-        </article>
+        <a href="<?php echo e(route('admin.empresas.index')); ?>" class="card stat-card <?php echo e($empresasPendientes > 0 ? 'stat-card--alert' : ''); ?>" style="text-decoration:none;color:inherit;">
+            <h2>Empresas pendientes</h2>
+            <p class="stat-number"><?php echo e($empresasPendientes); ?></p>
+            <?php if($empresasPendientes > 0): ?>
+                <p class="stat-hint">Requieren revisión</p>
+            <?php endif; ?>
+        </a>
 
         <article class="card stat-card muted">
             <h2>Pedidos</h2>
