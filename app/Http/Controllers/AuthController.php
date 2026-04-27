@@ -106,11 +106,19 @@ class AuthController extends Controller
         // Bloquear acceso hasta que el admin verifique la cuenta
         if (! $usuario->email_verificado) {
             Auth::logout();
+
+            if ($usuario->estado_registro === 'rechazado') {
+                $mensaje = 'Tu cuenta está rechazada, si no estás de acuerdo habla con atención al cliente.';
+            } else {
+                $mensaje = 'Tu cuenta está pendiente de revisión. El administrador la aprobará pronto y recibirás un correo cuando esté activa.';
+            }
+
             return response()->json([
-                'success'    => false,
-                'unverified' => true,
-                'message'    => 'Tu cuenta aún no ha sido verificada por el administrador. Revisa tu Gmail: recibirás un correo cuando tu cuenta esté activa y puedas iniciar sesión.',
-                'data'       => null,
+                'success'         => false,
+                'unverified'      => true,
+                'estado_registro' => $usuario->estado_registro,
+                'message'         => $mensaje,
+                'data'            => null,
             ], 403);
         }
 
