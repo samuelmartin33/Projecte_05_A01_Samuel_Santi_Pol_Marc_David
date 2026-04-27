@@ -7,6 +7,7 @@ use App\Models\CategoriaEvento;
 use App\Models\BolsaOfertaTrabajo;
 use App\Models\CategoriaTrabajo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventoController extends Controller
 {
@@ -41,7 +42,19 @@ class EventoController extends Controller
             ->distinct()
             ->pluck('ubicacion_nombre');
 
-        return view('home', compact('eventos', 'categorias', 'ofertas', 'ubicaciones'));
+        $favoritosIds = [];
+        if (Auth::check()) {
+            /** @var \App\Models\Usuario $usuario */
+            $usuario = Auth::user();
+
+            $favoritosIds = $usuario
+                ->favoritos()
+                ->pluck('eventos.id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        return view('home', compact('eventos', 'categorias', 'ofertas', 'ubicaciones', 'favoritosIds'));
     }
 
     /**
@@ -58,9 +71,48 @@ class EventoController extends Controller
     {
         $categoriaId = $request->input('categoria', '');
         $ubicacion   = $request->input('ubicacion', '');
+        $soloFavoritos = $request->boolean('favoritos');
 
-        // --- Determinar qué mostrar según el filtro de categoría ---
-        if ($categoriaId === 'trabajo') {
+        $favoritosIds = [];
+        if (Auth::check()) {
+            /** @var \App\Models\Usuario $usuario */
+            $usuario = Auth::user();
+
+            $favoritosIds = $usuario
+                ->favoritos()
+                ->pluck('eventos.id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        // --- Determinar qué mostrar según filtros activos ---
+        if ($soloFavoritos) {
+            // Solo eventos marcados como favorito (sin ofertas)
+            if ($categoriaId === 'trabajo') {
+                $eventos = collect();
+            } else {
+                $eventosQuery = Evento::with(['categoria', 'portada', 'organizador.empresa'])
+                    ->where('estado', 1);
+
+                if (count($favoritosIds) > 0) {
+                    $eventosQuery->whereIn('id', $favoritosIds);
+                } else {
+                    $eventosQuery->whereRaw('1 = 0');
+                }
+
+                if ($categoriaId) {
+                    $eventosQuery->where('categoria_evento_id', $categoriaId);
+                }
+
+                if ($ubicacion) {
+                    $eventosQuery->where('ubicacion_nombre', 'like', "%{$ubicacion}%");
+                }
+
+                $eventos = $eventosQuery->orderBy('fecha_inicio', 'asc')->get();
+            }
+
+            $ofertas = collect();
+        } elseif ($categoriaId === 'trabajo') {
             // Solo mostrar ofertas de trabajo
             $eventos = collect();
             $ofertasQuery = BolsaOfertaTrabajo::with(['organizador.empresa'])
@@ -103,7 +155,7 @@ class EventoController extends Controller
         }
 
         // --- Formatear eventos para JSON ---
-        $eventosData = $eventos->map(function ($evento) {
+        $eventosData = $eventos->map(function ($evento) use ($favoritosIds) {
             return [
                 'id'               => $evento->id,
                 'tipo'             => 'evento',
@@ -117,6 +169,7 @@ class EventoController extends Controller
                 'portada'          => $evento->portada?->imagen_url
                                        ?? "https://picsum.photos/seed/evento-{$evento->id}/600/400",
                 'organizador'      => $evento->organizador?->empresa?->nombre_empresa ?? 'Organizador',
+                'is_favorito'      => in_array((int) $evento->id, $favoritosIds, true),
             ];
         });
 
@@ -157,7 +210,18 @@ class EventoController extends Controller
         ->where('estado', 1)
         ->findOrFail($id);
 
-        return view('eventos.detalle', compact('evento'));
+        $esFavorito = false;
+        if (Auth::check()) {
+            /** @var \App\Models\Usuario $usuario */
+            $usuario = Auth::user();
+
+            $esFavorito = $usuario
+                ->favoritos()
+                ->where('eventos.id', $evento->id)
+                ->exists();
+        }
+
+        return view('eventos.detalle', compact('evento', 'esFavorito'));
     }
 
     /**

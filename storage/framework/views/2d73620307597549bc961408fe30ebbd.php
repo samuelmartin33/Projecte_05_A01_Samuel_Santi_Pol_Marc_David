@@ -184,7 +184,10 @@ function mostrarAlerta(msg, tipo = 'error') {
 
 function sacudirElemento(el) {
     el.classList.add('shake');
-    el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    el.onanimationend = function() {
+        el.classList.remove('shake');
+        el.onanimationend = null;
+    };
 }
 
 /** Submit del formulario de login */
