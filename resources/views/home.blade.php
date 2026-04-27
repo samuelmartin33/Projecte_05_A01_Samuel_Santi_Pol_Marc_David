@@ -30,6 +30,8 @@
     .btn-favorito-card svg {
         width: 1.05rem;
         height: 1.05rem;
+        fill: currentColor;
+        opacity: 0.78;
     }
 
     .btn-favorito-card.activo {
@@ -37,7 +39,7 @@
     }
 
     .btn-favorito-card.activo svg {
-        fill: currentColor;
+        opacity: 1;
     }
 
     .btn-favorito-card.cargando {
@@ -200,8 +202,8 @@
         <div class="filtro-grupo">
             <label class="filtro-label">Favoritos</label>
             <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path d="M8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-1.066 2.08-.163 4.905 2.54 7.568L8 15l4.06-4.379c2.703-2.663 3.606-5.488 2.54-7.568-1.114-2.175-4.2-2.772-5.883-1.042L8 2.748z"/>
                 </svg>
                 <span id="texto-solo-favoritos">Solo favoritos</span>
             </button>
@@ -266,9 +268,8 @@
                                 aria-label="Marcar favorito"
                                 aria-pressed="{{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'true' : 'false' }}"
                                 onclick="toggleFavorito(event, this)">
-                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
+                            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                <path d="M8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-1.066 2.08-.163 4.905 2.54 7.568L8 15l4.06-4.379c2.703-2.663 3.606-5.488 2.54-7.568-1.114-2.175-4.2-2.772-5.883-1.042L8 2.748z"/>
                             </svg>
                         </button>
 
