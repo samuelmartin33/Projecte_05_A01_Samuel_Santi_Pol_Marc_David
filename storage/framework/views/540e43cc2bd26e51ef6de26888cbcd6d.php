@@ -47,7 +47,7 @@
 </section>
 
 
-<section class="barra-filtros sticky top-16 z-40">
+<section class="barra-filtros sticky top-0 z-40">
 
     
     <div id="overlay-dropdowns"
