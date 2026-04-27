@@ -41,10 +41,11 @@
     <header class="nav-vibez sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
-            {{-- Logo y nombre de la app --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-2 group">
-                <div class="logo-isotipo">V</div>
-                <span class="text-white font-black text-xl tracking-tight">VIBEZ</span>
+            {{-- Logo corporativo --}}
+            <a href="{{ route('home') }}" class="nav-logo-link group">
+                <img src="{{ asset('images/logo_vibez_white.png') }}"
+                     alt="VIBEZ"
+                     class="nav-logo-img">
             </a>
 
             {{-- Navegación central --}}
@@ -57,6 +58,13 @@
                    class="nav-link {{ request()->routeIs('trabajos.index') ? 'nav-link-activo' : '' }}">
                     Bolsa de Trabajo
                 </a>
+                @auth
+                <a href="{{ route('social') }}"
+                   class="nav-link nav-social-link {{ request()->routeIs('social') ? 'nav-link-activo' : '' }}">
+                    Social
+                    <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
+                </a>
+                @endauth
             </nav>
 
             {{-- Botones de acción: guest → login/registro | auth → avatar --}}
@@ -117,6 +125,15 @@
                                 Mi perfil
                             </a>
 
+                            {{-- Mis entradas --}}
+                            <a href="{{ route('entradas.mis-entradas') }}" class="nav-dropdown-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                                </svg>
+                                Mis entradas
+                            </a>
+
                             {{-- Amigos --}}
                             <a href="{{ route('perfil') }}#amigos" class="nav-dropdown-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -173,9 +190,10 @@
     @if(!View::hasSection('content'))
     <footer class="footer-vibez">
         <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <div class="logo-isotipo text-sm w-7 h-7">V</div>
-                <span class="font-bold text-white">VIBEZ</span>
+            <div class="flex items-center">
+                <img src="{{ asset('images/logo_vibez.png') }}"
+                     alt="VIBEZ"
+                     class="footer-logo-img">
             </div>
             <p class="text-white/50 text-sm">
                 &copy; {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes
@@ -193,6 +211,35 @@
     @yield('scripts')
 
     @auth
+    {{-- ── Badge Social en el navbar: se actualiza en todas las páginas ── --}}
+    <script>
+    (function () {
+        // Consulta el contador cada 30 segundos y actualiza el badge del navbar
+        function refrescarBadgeSocial() {
+            fetch('/api/social/contador', { headers: { 'Accept': 'application/json' } })
+                .then(function (r) { return r.json(); })
+                .then(function (resp) {
+                    if (!resp.exito) return;
+                    var badge = document.getElementById('nav-badge-social');
+                    if (!badge) return;
+                    var total = resp.datos.total;
+                    if (total > 0) {
+                        badge.textContent   = total > 99 ? '99+' : total;
+                        badge.style.display = 'inline-flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(function () { /* silencioso */ });
+        }
+
+        // Primera consulta al cargar la página
+        refrescarBadgeSocial();
+        // Refresco periódico cada 30 segundos
+        setInterval(refrescarBadgeSocial, 30000);
+    })();
+    </script>
+
     {{-- ── Scripts globales de navegación (navbar avatar, logout) ── --}}
     <script>
     /**
