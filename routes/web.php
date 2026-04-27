@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventoController;
 use Illuminate\Support\Facades\Auth;
@@ -91,6 +92,14 @@ Route::middleware('auth')->group(function () {
     // Vista principal del perfil
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
 
+    // Mis entradas (wallet de QRs)
+    Route::get('/mis-entradas', [\App\Http\Controllers\EntradaController::class, 'misEntradas'])
+         ->name('entradas.mis-entradas');
+
+    // Confirmación de compra de entradas
+    Route::get('/entradas/confirmacion/{pedido}', [\App\Http\Controllers\EntradaController::class, 'confirmacion'])
+         ->name('entradas.confirmacion');
+
     // Formulario de datos personales (POST simple, sin AJAX)
     Route::post('/perfil', [PerfilController::class, 'actualizar'])->name('perfil.actualizar');
 
@@ -104,6 +113,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
     Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
 });
+
+/* — Página Social: protegida por auth — */
+Route::middleware('auth')->get('/social', [SocialController::class, 'index'])
+    ->name('social');
 
 /* — Dashboard de Admin: protegido por middlewares auth e IsAdmin — */
 Route::middleware(['auth', 'admin'])->group(function () {

@@ -6,7 +6,12 @@
       "Bash(php -l app/Http/Controllers/Admin/DashboardController.php)",
       "Bash(php -l app/Models/CategoriaEvento.php)",
       "Bash(php -l app/Models/Evento.php)",
-      "Bash(php -l routes/web.php)"
+      "Bash(php -l routes/web.php)",
+      "Bash(composer require *)",
+      "Bash(php -l app/Models/Pedido.php)",
+      "Bash(php -l app/Models/Entrada.php)",
+      "Bash(php -l app/Http/Controllers/EntradaController.php)",
+      "Bash(xargs grep *)"
     ]
   }
 }

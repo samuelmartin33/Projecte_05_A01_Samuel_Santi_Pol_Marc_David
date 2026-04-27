@@ -267,6 +267,40 @@ body {
     color: white;
 }
 
+/* Logo corporativo en la navbar */
+.nav-logo-link {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    text-decoration: none;
+    flex-shrink: 0;
+    line-height: 0;
+}
+.nav-logo-img {
+    height: 50px;
+    width: auto;
+    display: block;
+    transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    filter: drop-shadow(0 0 8px rgba(168,85,247,0.35));
+}
+.nav-logo-link:hover .nav-logo-img {
+    opacity: 0.92;
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 14px rgba(168,85,247,0.7));
+}
+
+/* Logo en el footer */
+.footer-logo-img {
+    height: 26px;
+    width: auto;
+    display: block;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+}
+.footer-logo-img:hover {
+    opacity: 1;
+}
+
 /* Footer oscuro coherente con el nav */
 .footer-vibez {
     background-color: var(--navy);
