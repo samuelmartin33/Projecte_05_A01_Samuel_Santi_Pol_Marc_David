@@ -39,9 +39,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
             
-            <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-2 group">
-                <div class="logo-isotipo">V</div>
-                <span class="text-white font-black text-xl tracking-tight">VIBEZ</span>
+            <a href="<?php echo e(route('home')); ?>" class="nav-logo-link group">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>"
+                     alt="VIBEZ"
+                     class="nav-logo-img">
             </a>
 
             
@@ -54,6 +55,13 @@
                    class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
                     Bolsa de Trabajo
                 </a>
+                <?php if(auth()->guard()->check()): ?>
+                <a href="<?php echo e(route('social')); ?>"
+                   class="nav-link nav-social-link <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
+                    Social
+                    <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
+                </a>
+                <?php endif; ?>
             </nav>
 
             
@@ -117,6 +125,15 @@
                             </a>
 
                             
+                            <a href="<?php echo e(route('entradas.mis-entradas')); ?>" class="nav-dropdown-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                                </svg>
+                                Mis entradas
+                            </a>
+
+                            
                             <a href="<?php echo e(route('perfil')); ?>#amigos" class="nav-dropdown-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -168,9 +185,10 @@
     <?php if(!View::hasSection('content')): ?>
     <footer class="footer-vibez">
         <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <div class="logo-isotipo text-sm w-7 h-7">V</div>
-                <span class="font-bold text-white">VIBEZ</span>
+            <div class="flex items-center">
+                <img src="<?php echo e(asset('images/logo_vibez.png')); ?>"
+                     alt="VIBEZ"
+                     class="footer-logo-img">
             </div>
             <p class="text-white/50 text-sm">
                 &copy; <?php echo e(date('Y')); ?> VIBEZ — Plataforma de eventos para jóvenes
@@ -188,6 +206,35 @@
     <?php echo $__env->yieldContent('scripts'); ?>
 
     <?php if(auth()->guard()->check()): ?>
+    
+    <script>
+    (function () {
+        // Consulta el contador cada 30 segundos y actualiza el badge del navbar
+        function refrescarBadgeSocial() {
+            fetch('/api/social/contador', { headers: { 'Accept': 'application/json' } })
+                .then(function (r) { return r.json(); })
+                .then(function (resp) {
+                    if (!resp.exito) return;
+                    var badge = document.getElementById('nav-badge-social');
+                    if (!badge) return;
+                    var total = resp.datos.total;
+                    if (total > 0) {
+                        badge.textContent   = total > 99 ? '99+' : total;
+                        badge.style.display = 'inline-flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(function () { /* silencioso */ });
+        }
+
+        // Primera consulta al cargar la página
+        refrescarBadgeSocial();
+        // Refresco periódico cada 30 segundos
+        setInterval(refrescarBadgeSocial, 30000);
+    })();
+    </script>
+
     
     <script>
     /**
@@ -211,7 +258,12 @@
     }
 
     /** Cierra el dropdown si se pulsa fuera */
-    document.addEventListener('click', function(e) {
+    const anteriorClickDocumento = document.onclick;
+    document.onclick = function(e) {
+        if (typeof anteriorClickDocumento === 'function') {
+            anteriorClickDocumento(e);
+        }
+
         const wrapper = document.getElementById('navAvatarWrapper');
         if (wrapper && !wrapper.contains(e.target)) {
             const dropdown = document.getElementById('navDropdown');
@@ -219,7 +271,7 @@
             if (dropdown) dropdown.style.display = 'none';
             if (btn)      btn.setAttribute('aria-expanded', 'false');
         }
-    });
+    };
 
     /**
      * Cierra la sesión del usuario mediante AJAX.
