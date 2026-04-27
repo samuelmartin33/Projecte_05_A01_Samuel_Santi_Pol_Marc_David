@@ -100,11 +100,6 @@
                 {{-- Entradas --}}
                 <div style="padding:0 28px">
                     @foreach($pedido->entradas as $i => $entrada)
-                        @php
-                            $qrSvg = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
-                                        ->size(200)->margin(1)->generate($entrada->codigo_qr);
-                        @endphp
-
                         {{-- Separador talonario --}}
                         <div style="position:relative;margin:0 -28px;border-top:2px dashed #ede9fe">
                             <div style="position:absolute;left:-11px;top:-11px;width:22px;height:22px;
@@ -138,7 +133,8 @@
                                 <div style="display:inline-block;padding:10px;background:#fff;
                                             border:2px solid #ede9fe;border-radius:14px;
                                             box-shadow:0 4px 20px rgba(124,58,237,0.1)">
-                                    {!! $qrSvg !!}
+                                    <div id="qr-canvas-{{ $entrada->id }}" data-codigo="{{ $entrada->codigo_qr }}"
+                                         style="width:200px;height:200px;margin:0 auto"></div>
                                 </div>
                                 <p style="font-size:0.72rem;color:#94a3b8;margin:8px 0 0">
                                     Presenta este QR en la entrada del evento
@@ -160,7 +156,17 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+document.querySelectorAll('[data-codigo]').forEach(function(el) {
+    new QRCode(el, {
+        text: el.dataset.codigo,
+        width: 200,
+        height: 200,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+    });
+});
 function toggleQr(qrId, btnId) {
     const panel   = document.getElementById(qrId);
     const btn     = document.getElementById(btnId);

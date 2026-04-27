@@ -10,7 +10,8 @@
       "Bash(composer require *)",
       "Bash(php -l app/Models/Pedido.php)",
       "Bash(php -l app/Models/Entrada.php)",
-      "Bash(php -l app/Http/Controllers/EntradaController.php)"
+      "Bash(php -l app/Http/Controllers/EntradaController.php)",
+      "Bash(xargs grep *)"
     ]
   }
 }

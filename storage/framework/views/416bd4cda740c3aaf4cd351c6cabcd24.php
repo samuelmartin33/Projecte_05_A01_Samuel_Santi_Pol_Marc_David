@@ -73,10 +73,6 @@
     </h2>
 
     <?php $__currentLoopData = $pedido->entradas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $entrada): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <?php
-            $qrSvg = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(220)->margin(2)->generate($entrada->codigo_qr);
-        ?>
-
         <div class="ficha-evento" style="margin-bottom:1.25rem;overflow:hidden">
             
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
@@ -107,8 +103,8 @@
                 <div style="display:inline-block;padding:12px;background:#fff;
                             border:3px solid #ede9fe;border-radius:16px;
                             box-shadow:0 4px 20px rgba(124,58,237,0.08)">
-                    <?php echo $qrSvg; ?>
-
+                    <div id="qr-<?php echo e($i); ?>" data-codigo="<?php echo e($entrada->codigo_qr); ?>"
+                         style="width:220px;height:220px;margin:0 auto"></div>
                 </div>
                 <p style="font-size:0.75rem;color:#94a3b8;margin:10px 0 0">
                     Presenta este QR en la entrada del evento
@@ -130,5 +126,20 @@
 </div>
 
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+document.querySelectorAll('[data-codigo]').forEach(function(el) {
+    new QRCode(el, {
+        text: el.dataset.codigo,
+        width: parseInt(el.style.width) || 220,
+        height: parseInt(el.style.height) || 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+    });
+});
+</script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/entradas/confirmacion.blade.php ENDPATH**/ ?>

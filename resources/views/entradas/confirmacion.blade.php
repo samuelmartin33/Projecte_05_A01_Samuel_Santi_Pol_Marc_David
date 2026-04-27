@@ -72,10 +72,6 @@
     </h2>
 
     @foreach ($pedido->entradas as $i => $entrada)
-        @php
-            $qrSvg = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(220)->margin(2)->generate($entrada->codigo_qr);
-        @endphp
-
         <div class="ficha-evento" style="margin-bottom:1.25rem;overflow:hidden">
             {{-- Cabecera de la entrada --}}
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
@@ -104,7 +100,8 @@
                 <div style="display:inline-block;padding:12px;background:#fff;
                             border:3px solid #ede9fe;border-radius:16px;
                             box-shadow:0 4px 20px rgba(124,58,237,0.08)">
-                    {!! $qrSvg !!}
+                    <div id="qr-{{ $i }}" data-codigo="{{ $entrada->codigo_qr }}"
+                         style="width:220px;height:220px;margin:0 auto"></div>
                 </div>
                 <p style="font-size:0.75rem;color:#94a3b8;margin:10px 0 0">
                     Presenta este QR en la entrada del evento
@@ -126,3 +123,18 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+document.querySelectorAll('[data-codigo]').forEach(function(el) {
+    new QRCode(el, {
+        text: el.dataset.codigo,
+        width: parseInt(el.style.width) || 220,
+        height: parseInt(el.style.height) || 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+    });
+});
+</script>
+@endpush
