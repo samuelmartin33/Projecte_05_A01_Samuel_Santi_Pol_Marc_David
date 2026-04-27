@@ -1,0 +1,792 @@
+================================================================================
+  VIBEZ — DOCUMENTACIÓN DEL MÓDULO SOCIAL
+  Proyecto: Projecte_05 — A01 (Samuel, Santi, Pol, Marc, David)
+  Tecnologías: Laravel 13.5 · PHP 8.3 · JavaScript (Fetch/AJAX) · CSS
+================================================================================
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. QUÉ ES Y PARA QUÉ SIRVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+El módulo Social añade una mini red social dentro de VIBEZ. Permite a los
+usuarios registrados:
+
+  1. Enviar y recibir solicitudes de amistad.
+  2. Aceptar o rechazar solicitudes.
+  3. Ver su lista de amigos.
+  4. Buscar personas nuevas para añadirlas como amigos.
+  5. Abrir un chat privado con cualquier amigo aceptado.
+  6. Enviar y recibir mensajes en tiempo (casi) real mediante polling.
+  7. Ver un badge en el navbar con el total de mensajes no leídos
+     más solicitudes pendientes.
+
+Toda la interacción es dinámica: ninguna acción recarga la página completa.
+Se usa JavaScript puro con fetch() (AJAX) y el servidor responde siempre en JSON.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. TABLAS DE BASE DE DATOS IMPLICADAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+El módulo usa tres tablas que ya estaban definidas en las migraciones del
+proyecto. No se ha modificado ni creado ninguna tabla nueva.
+
+──────────────────────────────────────────────────────────────────────────────
+  2.1  Tabla: amigos
+──────────────────────────────────────────────────────────────────────────────
+
+Almacena las relaciones de amistad entre pares de usuarios.
+
+  Columna              Tipo              Descripción
+  ─────────────────    ──────────────    ─────────────────────────────────────
+  id                   INT AUTO_INC      Clave primaria
+  solicitante_id       INT (FK)          Usuario que envió la solicitud
+  receptor_id          INT (FK)          Usuario que la recibe
+  estado               TINYINT           0=pendiente  1=aceptada  2=rechazada
+  fecha_creacion       DATETIME          Cuándo se creó la solicitud
+  fecha_actualizacion  DATETIME NULL     Cuándo cambió el estado
+
+  Restricción UNIQUE en (solicitante_id, receptor_id): evita duplicados.
+  Ambas FKs apuntan a la tabla "usuarios".
+
+Ejemplo de registros:
+
+  id | solicitante_id | receptor_id | estado | fecha_creacion
+  ---|----------------|-------------|--------|--------------------
+   1 |      3         |      7      |   0    | 2026-04-24 10:00:00  ← pendiente
+   2 |      5         |     12      |   1    | 2026-04-20 15:30:00  ← aceptada
+   3 |      8         |      3      |   2    | 2026-04-18 09:00:00  ← rechazada
+
+──────────────────────────────────────────────────────────────────────────────
+  2.2  Tabla: chats
+──────────────────────────────────────────────────────────────────────────────
+
+Representa una conversación. Para chats directos entre dos usuarios el campo
+"nombre" identifica a los participantes (ver apartado 3).
+
+  Columna              Tipo              Descripción
+  ─────────────────    ──────────────    ─────────────────────────────────────
+  id                   INT AUTO_INC      Clave primaria
+  tipo_chat            TINYINT           1 = chat directo entre dos personas
+  evento_id            INT NULL (FK)     Solo para chats de evento (no usado aquí)
+  candidatura_id       INT NULL          Solo para chats de candidatura (no usado)
+  nombre               VARCHAR(200)      Identificador del chat (ver convención)
+  estado               TINYINT           1 = activo
+  fecha_creacion       DATETIME          Cuándo se creó el chat
+  fecha_actualizacion  DATETIME NULL     Se actualiza al recibir un mensaje nuevo
+
+Convención del campo "nombre" para chats directos:
+  → Formato: dm_{idMenor}_{idMayor}
+  → Siempre el ID más pequeño va primero.
+  → Ejemplo: si el usuario 5 chatea con el usuario 12 → nombre = "dm_5_12"
+  → Esto garantiza que el mismo chat se encuentra igual sin importar
+    quién lo busca: el usuario 5 buscará "dm_5_12" y el 12 también.
+
+Ejemplo de registros:
+
+  id | tipo_chat | nombre    | estado | fecha_creacion
+  ---|-----------|-----------|--------|--------------------
+   1 |     1     | dm_3_7    |   1    | 2026-04-22 11:00:00
+   2 |     1     | dm_5_12   |   1    | 2026-04-23 16:45:00
+
+──────────────────────────────────────────────────────────────────────────────
+  2.3  Tabla: mensajes
+──────────────────────────────────────────────────────────────────────────────
+
+Almacena cada mensaje enviado en un chat.
+
+  Columna              Tipo              Descripción
+  ─────────────────    ──────────────    ─────────────────────────────────────
+  id                   INT AUTO_INC      Clave primaria
+  chat_id              INT (FK)          A qué chat pertenece
+  usuario_id           INT (FK)          Quién lo envió
+  contenido            TEXT              Texto del mensaje
+  leido                TINYINT           0 = no leído   1 = leído
+  estado               TINYINT           1 = activo (no borrado)
+  fecha_creacion       DATETIME          Cuándo se envió
+  fecha_actualizacion  DATETIME NULL     Se rellena al marcar como leído
+
+  FKs: chat_id → chats.id  /  usuario_id → usuarios.id
+
+Ejemplo de registros:
+
+  id | chat_id | usuario_id | contenido          | leido | fecha_creacion
+  ---|---------|------------|--------------------|-------|--------------------
+   1 |    2    |     5      | ¡Hola! ¿Qué tal?   |   1   | 2026-04-23 16:46:00
+   2 |    2    |    12      | ¡Bien, y tú!       |   1   | 2026-04-23 16:47:00
+   3 |    2    |     5      | Todo bien gracias  |   0   | 2026-04-23 16:48:00
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. CÓMO SE IDENTIFICA UN CHAT ENTRE DOS USUARIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+La tabla "chats" no tiene una tabla pivote de participantes. Para resolver esto
+sin tocar la base de datos se usa una convención en el campo "nombre":
+
+  nombre = "dm_" + min(idUsuario1, idUsuario2) + "_" + max(idUsuario1, idUsuario2)
+
+Ejemplo: usuario 15 abre chat con usuario 4:
+  min(15, 4) = 4  →  max(15, 4) = 15  →  nombre = "dm_4_15"
+
+Para buscar el chat de un usuario con ID=X se hacen dos consultas LIKE:
+  WHERE nombre LIKE 'dm_X_%'    ← X es el id menor
+  OR    nombre LIKE 'dm_%_X'    ← X es el id mayor
+
+Esto permite encontrar todos los chats de un usuario con una sola query
+y también verificar si ya existe un chat entre dos personas concretas.
+
+Si no existe, se crea con firstOrCreate() — si dos peticiones simultáneas
+intentan crearlo a la vez, la segunda simplemente encuentra el existente.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. FLUJOS COMPLETOS PASO A PASO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+──────────────────────────────────────────────────────────────────────────────
+  4.1  FLUJO: Enviar solicitud de amistad
+──────────────────────────────────────────────────────────────────────────────
+
+  Paso 1 — El usuario entra en la tab "Descubrir" y escribe un nombre.
+  Paso 2 — JavaScript espera 350ms (debounce) y lanza:
+              GET /api/social/usuarios/buscar?q=Marc
+  Paso 3 — SocialController::buscarUsuarios() consulta la BD:
+              - Excluye al propio usuario
+              - Excluye usuarios ya relacionados (pendiente/aceptado/rechazado)
+              - Filtra por nombre, apellido o email con LIKE %Marc%
+              - Devuelve máximo 8 resultados en JSON
+  Paso 4 — El JS renderiza los resultados con un botón "Añadir".
+  Paso 5 — El usuario pulsa "Añadir":
+              POST /api/social/solicitud
+              Body: { receptor_id: 7 }
+  Paso 6 — SocialController::enviarSolicitud():
+              - Valida que receptor_id existe en la tabla usuarios
+              - Comprueba que no hay relación previa en ninguna dirección
+              - Si todo OK → INSERT en tabla amigos:
+
+              INSERT INTO amigos
+                (solicitante_id, receptor_id, estado, fecha_creacion)
+              VALUES
+                (3, 7, 0, '2026-04-24 12:00:00');
+
+              - Devuelve JSON: { exito: true, mensaje: "Solicitud enviada" }
+  Paso 7 — El JS cambia el botón a "Enviado ✓" y lo deshabilita.
+
+──────────────────────────────────────────────────────────────────────────────
+  4.2  FLUJO: Aceptar o rechazar solicitud
+──────────────────────────────────────────────────────────────────────────────
+
+  Paso 1 — El receptor entra en la tab "Amigos".
+  Paso 2 — JS carga las solicitudes pendientes:
+              GET /api/social/solicitudes
+              → SELECT * FROM amigos WHERE receptor_id=7 AND estado=0
+  Paso 3 — Aparecen las solicitudes con botones ✓ y ✕.
+  Paso 4a — Si acepta:
+              POST /api/social/solicitudes/1/aceptar
+              → UPDATE amigos SET estado=1, fecha_actualizacion=NOW() WHERE id=1
+              → La relación queda como "amistad aceptada"
+  Paso 4b — Si rechaza:
+              POST /api/social/solicitudes/1/rechazar
+              → UPDATE amigos SET estado=2, fecha_actualizacion=NOW() WHERE id=1
+  Paso 5 — El JS elimina el elemento del DOM con animación y recarga
+            la lista de amigos y el badge del navbar.
+
+  Estados de la columna "estado" en la tabla amigos:
+    0 → Pendiente (solicitud enviada, esperando respuesta)
+    1 → Aceptada  (son amigos, pueden chatear)
+    2 → Rechazada (se ignora en la UI, no se puede volver a enviar)
+
+──────────────────────────────────────────────────────────────────────────────
+  4.3  FLUJO: Abrir un chat y enviar mensajes
+──────────────────────────────────────────────────────────────────────────────
+
+  Paso 1 — El usuario pulsa el icono de chat junto a un amigo (tab Amigos)
+            o hace clic en una conversación existente (tab Mensajes).
+
+  Paso 2 — JS llama a:
+              POST /api/social/chats/abrir
+              Body: { amigo_id: 12 }
+
+  Paso 3 — SocialController::abrirChat():
+              a) Verifica que los dos son amigos (estado=1 en tabla amigos).
+              b) Calcula el nombre del chat: dm_5_12 (asumiendo IDs 5 y 12).
+              c) Busca si ya existe ese chat:
+                   SELECT * FROM chats WHERE nombre='dm_5_12' LIMIT 1
+              d) Si no existe, lo crea:
+                   INSERT INTO chats (tipo_chat, nombre, estado, fecha_creacion)
+                   VALUES (1, 'dm_5_12', 1, '2026-04-24 12:05:00');
+              e) Devuelve: { exito: true, datos: { chat_id: 2, amigo: {...} } }
+
+  Paso 4 — JS muestra la ventana de chat y llama a:
+              GET /api/social/chats/2/mensajes
+              → SELECT * FROM mensajes
+                WHERE chat_id=2 AND estado=1
+                ORDER BY fecha_creacion ASC
+
+  Paso 5 — JS renderiza las burbujas de mensaje y hace scroll al final.
+            Además marca como leídos los mensajes del otro usuario:
+              UPDATE mensajes
+              SET leido=1, fecha_actualizacion=NOW()
+              WHERE chat_id=2 AND usuario_id != 5 AND leido=0
+
+  Paso 6 — El usuario escribe un mensaje y pulsa Enter o el botón enviar.
+              POST /api/social/chats/2/mensajes
+              Body: { contenido: "¡Hola! ¿Cómo estás?" }
+              → INSERT INTO mensajes
+                  (chat_id, usuario_id, contenido, leido, estado, fecha_creacion)
+                VALUES
+                  (2, 5, '¡Hola! ¿Cómo estás?', 0, 1, '2026-04-24 12:06:00');
+              → UPDATE chats SET fecha_actualizacion=NOW() WHERE id=2
+
+  Paso 7 — JS añade la burbuja a la pantalla sin esperar el polling.
+
+──────────────────────────────────────────────────────────────────────────────
+  4.4  FLUJO: Polling de mensajes nuevos
+──────────────────────────────────────────────────────────────────────────────
+
+Mientras hay un chat abierto, JavaScript ejecuta cada 3 segundos:
+
+  GET /api/social/chats/2/nuevos?desde=15
+
+  El parámetro "desde" es el ID del último mensaje que el cliente ya tiene
+  cargado en pantalla. El servidor devuelve solo los mensajes con ID > 15.
+
+  → SELECT * FROM mensajes
+    WHERE chat_id=2 AND id > 15 AND estado=1
+    ORDER BY id ASC
+
+  Si hay mensajes nuevos:
+    - Se añaden las burbujas al área de chat.
+    - Si el usuario estaba en el final del scroll, se desplaza automáticamente.
+    - Si estaba leyendo mensajes anteriores, NO se desplaza (para no molestarlo).
+    - Se actualizan como leídos los del otro usuario.
+
+  Si no hay mensajes nuevos: el servidor devuelve datos=[] y JS no hace nada.
+
+  Esto se llama "short polling": el cliente pregunta periódicamente al servidor.
+  Es la técnica más sencilla para tiempo casi real, sin necesidad de WebSockets.
+  El polling se detiene automáticamente al cerrar el chat o salir de la página.
+
+──────────────────────────────────────────────────────────────────────────────
+  4.5  FLUJO: Badge del navbar
+──────────────────────────────────────────────────────────────────────────────
+
+En TODAS las páginas de la aplicación (no solo en /social), cada 30 segundos
+el navbar consulta:
+
+  GET /api/social/contador
+
+  El servidor calcula:
+    a) Mensajes no leídos:
+         → Busca todos los chats del usuario (LIKE dm_X_% OR dm_%_X)
+         → Cuenta mensajes con leido=0 y usuario_id != yo en esos chats
+    b) Solicitudes pendientes:
+         → COUNT(*) FROM amigos WHERE receptor_id=yo AND estado=0
+
+    c) Devuelve: { mensajes: 2, solicitudes: 1, total: 3 }
+
+  El JS muestra el número en el badge rosa del enlace "Social" del navbar.
+  Si total=0, el badge se oculta. Si total>99, muestra "99+".
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. ARCHIVOS CREADOS O MODIFICADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+──────────────────────────────────────────────────────────────────────────────
+  ARCHIVOS NUEVOS
+──────────────────────────────────────────────────────────────────────────────
+
+  app/Models/Chat.php
+    Modelo Eloquent para la tabla "chats".
+    Relaciones definidas:
+      - mensajes()      → hasMany(Mensaje) — todos los mensajes del chat
+      - ultimoMensaje() → hasOne(Mensaje) ordenado por id DESC
+                          (se usa para la vista previa en la lista de chats)
+
+  app/Models/Mensaje.php
+    Modelo Eloquent para la tabla "mensajes".
+    Relaciones definidas:
+      - usuario() → belongsTo(Usuario) — quién lo envió
+      - chat()    → belongsTo(Chat)    — a qué chat pertenece
+
+  app/Http/Controllers/SocialController.php
+    Controlador principal del módulo. Contiene 10 métodos públicos:
+
+    Método                Ruta                              Descripción
+    ───────────────────   ───────────────────────────────   ──────────────────
+    index()               GET /social                       Carga la vista
+    misAmigos()           GET /api/social/amigos            Lista de amigos
+    solicitudesPendientes GET /api/social/solicitudes       Solicitudes recibidas
+    aceptarSolicitud()    POST /api/social/solicitudes/{id}/aceptar
+    rechazarSolicitud()   POST /api/social/solicitudes/{id}/rechazar
+    buscarUsuarios()      GET /api/social/usuarios/buscar   Buscador
+    enviarSolicitud()     POST /api/social/solicitud        Nueva solicitud
+    misChats()            GET /api/social/chats             Lista de chats
+    abrirChat()           POST /api/social/chats/abrir      Crear/obtener chat
+    mensajesChat()        GET /api/social/chats/{id}/mensajes
+    enviarMensaje()       POST /api/social/chats/{id}/mensajes
+    mensajesNuevos()      GET /api/social/chats/{id}/nuevos Polling
+    contadorNoLeidos()    GET /api/social/contador          Badge navbar
+
+    Método privado:
+    verificarAccesoChat() Comprueba que el usuario pertenece al chat.
+                          Si no, devuelve HTTP 403. Evita que alguien lea
+                          chats ajenos manipulando el ID en la URL.
+
+  resources/views/social/index.blade.php
+    Vista Blade de la página /social. Extiende layouts/app.blade.php.
+    Estructura HTML:
+      - <aside class="social-sidebar">  → panel izquierdo con 3 tabs
+          Tab "Mensajes":  lista de conversaciones con vista previa
+          Tab "Amigos":    solicitudes pendientes + lista de amigos
+          Tab "Descubrir": buscador para encontrar personas nuevas
+      - <section class="social-chat-area"> → panel derecho
+          Estado vacío (cuando no hay chat abierto)
+          Ventana de chat (cabecera + burbujas + textarea de envío)
+
+  public/js/social.js
+    Toda la lógica del cliente. Funciones principales:
+      cargarChats()            Carga y renderiza la lista de conversaciones
+      abrirChat()              Abre/crea el chat y carga sus mensajes
+      cargarMensajes()         Carga todos los mensajes de un chat
+      enviarMensaje()          Envía un mensaje (POST AJAX)
+      iniciarPolling()         Arranca el setInterval de 3 segundos
+      detenerPolling()         Limpia el intervalo
+      cerrarChat()             Vuelve al sidebar (especialmente en móvil)
+      cargarAmigos()           Carga la lista de amigos aceptados
+      cargarSolicitudes()      Carga las solicitudes pendientes recibidas
+      aceptarSolicitud()       Acepta una solicitud (POST AJAX)
+      rechazarSolicitud()      Rechaza una solicitud (POST AJAX)
+      buscarPersonas()         Buscador con debounce de 350ms
+      enviarSolicitudDescubrir() Envía solicitud desde la tab Descubrir
+      actualizarContadorNavbar() Actualiza el badge del navbar
+      construirAvatar()        Genera HTML del avatar (foto o iniciales)
+      crearBurbujaMensaje()    Genera el HTML de una burbuja de mensaje
+      escaparHtml()            Escapa caracteres para prevenir XSS
+
+  public/css/social.css
+    Estilos exclusivos del módulo social. Incluye:
+      - Layout de dos paneles con flexbox
+      - Tabs de navegación
+      - Ítems de chat, amigos y solicitudes
+      - Burbujas de mensaje (propias en morado, ajenas en blanco)
+      - Barra de escritura con textarea autoexpandible
+      - Skeletons de carga animados
+      - Animación fadeOut al aceptar/rechazar solicitudes
+      - Media queries para móvil (< 768px)
+
+──────────────────────────────────────────────────────────────────────────────
+  ARCHIVOS MODIFICADOS
+──────────────────────────────────────────────────────────────────────────────
+
+  routes/web.php
+    Añadido:
+      Route::middleware('auth')->get('/social', [SocialController::class, 'index'])
+           ->name('social');
+
+  routes/api.php
+    Añadido el grupo de rutas bajo el prefijo /api/social/ con middleware auth.
+    Total: 12 endpoints nuevos.
+
+  resources/views/layouts/app.blade.php
+    Dos cambios:
+    a) Enlace "Social" en la navegación central del navbar (solo para usuarios
+       autenticados). Incluye el <span> del badge con id="nav-badge-social".
+    b) Script global (en todas las páginas) que llama a /api/social/contador
+       al cargar la página y cada 30 segundos para mantener el badge actualizado.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. TODAS LAS QUERIES SQL QUE EJECUTA EL SISTEMA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A continuación se muestran las consultas SQL reales que Eloquent genera.
+(Asumimos que el usuario autenticado tiene ID=5 y el amigo ID=12)
+
+────────────────────────────────────
+  Cargar lista de amigos (misAmigos)
+────────────────────────────────────
+  SELECT amigos.*, usuarios.*
+  FROM amigos
+  JOIN usuarios ON usuarios.id = amigos.solicitante_id
+               OR usuarios.id = amigos.receptor_id
+  WHERE (amigos.solicitante_id = 5 OR amigos.receptor_id = 5)
+  AND   amigos.estado = 1;
+
+────────────────────────────────────
+  Cargar solicitudes pendientes
+────────────────────────────────────
+  SELECT amigos.*, usuarios.nombre, usuarios.apellido1, usuarios.foto_url
+  FROM amigos
+  JOIN usuarios ON usuarios.id = amigos.solicitante_id
+  WHERE amigos.receptor_id = 5
+  AND   amigos.estado = 0
+  ORDER BY amigos.fecha_creacion DESC;
+
+────────────────────────────────────
+  Aceptar solicitud (id=1)
+────────────────────────────────────
+  UPDATE amigos
+  SET estado = 1, fecha_actualizacion = '2026-04-24 12:10:00'
+  WHERE id = 1
+  AND   receptor_id = 5
+  AND   estado = 0;
+
+────────────────────────────────────
+  Rechazar solicitud (id=1)
+────────────────────────────────────
+  UPDATE amigos
+  SET estado = 2, fecha_actualizacion = '2026-04-24 12:10:00'
+  WHERE id = 1
+  AND   receptor_id = 5
+  AND   estado = 0;
+
+────────────────────────────────────
+  Buscar usuarios nuevos (q="Ana")
+────────────────────────────────────
+  -- Primero obtener IDs ya relacionados:
+  SELECT solicitante_id, receptor_id FROM amigos
+  WHERE solicitante_id = 5 OR receptor_id = 5;
+
+  -- Luego buscar excluyendo relacionados:
+  SELECT id, nombre, apellido1, foto_url
+  FROM usuarios
+  WHERE id != 5
+  AND   estado = 1
+  AND   id NOT IN (7, 12, 8, ...)    -- IDs ya relacionados
+  AND   (nombre LIKE '%Ana%' OR apellido1 LIKE '%Ana%' OR email LIKE '%Ana%')
+  LIMIT 8;
+
+────────────────────────────────────
+  Enviar solicitud de amistad
+────────────────────────────────────
+  -- Comprobar si ya existe relación:
+  SELECT * FROM amigos
+  WHERE (solicitante_id = 5 AND receptor_id = 9)
+     OR (solicitante_id = 9 AND receptor_id = 5)
+  LIMIT 1;
+
+  -- Si no existe, insertar:
+  INSERT INTO amigos (solicitante_id, receptor_id, estado, fecha_creacion)
+  VALUES (5, 9, 0, '2026-04-24 12:15:00');
+
+────────────────────────────────────
+  Cargar lista de chats (misChats)
+────────────────────────────────────
+  SELECT * FROM chats
+  WHERE tipo_chat = 1
+  AND   estado = 1
+  AND   (nombre LIKE 'dm_5_%' OR nombre LIKE 'dm_%_5');
+
+  -- Para cada chat, obtener el último mensaje:
+  SELECT * FROM mensajes
+  WHERE chat_id = 2
+  ORDER BY id DESC
+  LIMIT 1;
+
+  -- Contar no leídos de cada chat:
+  SELECT COUNT(*) FROM mensajes
+  WHERE chat_id = 2
+  AND   usuario_id != 5
+  AND   leido = 0
+  AND   estado = 1;
+
+────────────────────────────────────
+  Abrir chat (o crear si no existe)
+────────────────────────────────────
+  -- Verificar amistad:
+  SELECT COUNT(*) FROM amigos
+  WHERE estado = 1
+  AND   ((solicitante_id=5 AND receptor_id=12) OR (solicitante_id=12 AND receptor_id=5));
+
+  -- Buscar chat existente:
+  SELECT * FROM chats WHERE nombre = 'dm_5_12' LIMIT 1;
+
+  -- Si no existe, crear:
+  INSERT INTO chats (tipo_chat, nombre, estado, fecha_creacion)
+  VALUES (1, 'dm_5_12', 1, '2026-04-24 12:20:00');
+
+────────────────────────────────────
+  Cargar mensajes de un chat
+────────────────────────────────────
+  -- Verificar acceso (seguridad):
+  SELECT COUNT(*) FROM chats
+  WHERE id = 2 AND tipo_chat = 1 AND estado = 1
+  AND   (nombre LIKE 'dm_5_%' OR nombre LIKE 'dm_%_5');
+
+  -- Obtener mensajes:
+  SELECT mensajes.*, usuarios.nombre, usuarios.apellido1, usuarios.foto_url
+  FROM mensajes
+  JOIN usuarios ON usuarios.id = mensajes.usuario_id
+  WHERE mensajes.chat_id = 2
+  AND   mensajes.estado = 1
+  ORDER BY mensajes.fecha_creacion ASC, mensajes.id ASC;
+
+  -- Marcar como leídos los recibidos:
+  UPDATE mensajes
+  SET leido = 1, fecha_actualizacion = '2026-04-24 12:21:00'
+  WHERE chat_id = 2
+  AND   usuario_id != 5
+  AND   leido = 0;
+
+────────────────────────────────────
+  Enviar un mensaje
+────────────────────────────────────
+  INSERT INTO mensajes (chat_id, usuario_id, contenido, leido, estado, fecha_creacion)
+  VALUES (2, 5, '¡Hola! ¿Cómo estás?', 0, 1, '2026-04-24 12:22:00');
+
+  UPDATE chats
+  SET fecha_actualizacion = '2026-04-24 12:22:00'
+  WHERE id = 2;
+
+────────────────────────────────────
+  Polling: mensajes nuevos desde id=15
+────────────────────────────────────
+  SELECT mensajes.*, usuarios.nombre, usuarios.apellido1, usuarios.foto_url
+  FROM mensajes
+  JOIN usuarios ON usuarios.id = mensajes.usuario_id
+  WHERE mensajes.chat_id = 2
+  AND   mensajes.id > 15
+  AND   mensajes.estado = 1
+  ORDER BY mensajes.id ASC;
+
+────────────────────────────────────
+  Contador de no leídos (badge navbar)
+────────────────────────────────────
+  -- IDs de chats del usuario:
+  SELECT id FROM chats
+  WHERE tipo_chat=1 AND estado=1
+  AND   (nombre LIKE 'dm_5_%' OR nombre LIKE 'dm_%_5');
+
+  -- Mensajes no leídos:
+  SELECT COUNT(*) FROM mensajes
+  WHERE chat_id IN (1, 2, 3)
+  AND   usuario_id != 5
+  AND   leido = 0
+  AND   estado = 1;
+
+  -- Solicitudes pendientes:
+  SELECT COUNT(*) FROM amigos
+  WHERE receptor_id = 5
+  AND   estado = 0;
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. SEGURIDAD IMPLEMENTADA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  a) Todos los endpoints de /api/social/ tienen el middleware "auth".
+     Si un usuario no está autenticado y llama a cualquier endpoint,
+     Laravel devuelve automáticamente HTTP 401.
+
+  b) Verificación de acceso al chat (método privado verificarAccesoChat()):
+     Antes de devolver mensajes o aceptar un mensaje nuevo, el servidor
+     comprueba que el ID del chat pertenece al usuario autenticado buscando
+     su ID en el campo "nombre" del chat. Si no pertenece → HTTP 403.
+     Esto impide que un usuario lea los mensajes de otro manipulando la URL.
+
+  c) Verificación de amistad antes de abrir chat:
+     Solo se puede chatear con usuarios con estado=1 en la tabla amigos.
+     Si alguien intenta abrir un chat con un no-amigo → HTTP 403.
+
+  d) Prevención de XSS en el cliente:
+     Todos los textos que se insertan en el DOM pasan por la función
+     escaparHtml(), que convierte < > & " ' en sus entidades HTML.
+     Esto impide que un mensaje con código HTML o JavaScript malicioso
+     se ejecute en el navegador del receptor.
+
+  e) Protección CSRF:
+     Todos los POST incluyen el token CSRF de Laravel en la cabecera
+     X-CSRF-TOKEN. Si el token no coincide, Laravel rechaza la petición.
+     El token se lee del meta tag que está en el <head> del layout.
+
+  f) Validación de datos en el servidor:
+     Todos los campos recibidos se validan antes de usarlos:
+       - receptor_id: debe ser integer y existir en la tabla usuarios
+       - contenido:   required, string, máximo 2000 caracteres
+     Si la validación falla, Laravel devuelve HTTP 422 con los errores.
+
+  g) No se puede enviar solicitud a uno mismo:
+     El controlador comprueba explícitamente que receptor_id != usuario_id.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. DISEÑO RESPONSIVE (MÓVIL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+En escritorio (≥ 768px):
+  Los dos paneles se muestran lado a lado.
+  El sidebar tiene 320px de ancho fijo.
+  El área de chat ocupa el resto.
+
+En móvil (< 768px):
+  Ambos paneles ocupan el 100% de la pantalla en capas (position: absolute).
+  Por defecto se ve el sidebar (lista de chats/amigos).
+  Al pulsar en un chat o en el botón de mensaje de un amigo:
+    → El sidebar se desliza fuera por la izquierda (transform: translateX(-100%))
+    → El área de chat aparece deslizándose desde la derecha (transform: translateX(0))
+  Al pulsar el botón "← Volver" (visible solo en móvil):
+    → La animación se invierte y vuelve a aparecer el sidebar.
+  Esta transición se gestiona con clases CSS ("oculto-movil" y "activo-movil")
+  que el JavaScript añade/quita al DOM sin ninguna librería externa.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. ESTRUCTURA DE RESPUESTAS JSON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Todos los endpoints siguen el mismo formato de respuesta:
+
+  Respuesta exitosa:
+    { "exito": true, "datos": [ ... ] }
+    { "exito": true, "datos": { ... } }
+    { "exito": true, "mensaje": "Texto informativo" }
+
+  Respuesta de error:
+    { "exito": false, "mensaje": "Descripción del error" }
+    (con código HTTP correspondiente: 422 validación, 403 prohibido, 404 no encontrado)
+
+Ejemplo de respuesta de /api/social/amigos:
+  {
+    "exito": true,
+    "datos": [
+      {
+        "id": 12,
+        "nombre": "Laura",
+        "apellido1": "García",
+        "foto_url": "/fotos/u12_1234567890.jpg",
+        "mood": "😊 Feliz",
+        "relacion_id": 2
+      }
+    ]
+  }
+
+Ejemplo de respuesta de /api/social/chats:
+  {
+    "exito": true,
+    "datos": [
+      {
+        "chat_id": 2,
+        "amigo": { "id": 12, "nombre": "Laura", "apellido1": "García", "foto_url": "...", "mood": "..." },
+        "ultimo_mensaje": {
+          "contenido": "Hasta mañana!",
+          "es_mio": false,
+          "fecha": "2026-04-24 11:30:00"
+        },
+        "no_leidos": 2
+      }
+    ]
+  }
+
+Ejemplo de respuesta del polling /api/social/chats/2/nuevos?desde=15:
+  {
+    "exito": true,
+    "datos": [
+      {
+        "id": 16,
+        "contenido": "¿Quedamos el viernes?",
+        "es_mio": false,
+        "autor": "Laura",
+        "foto": "/fotos/u12_...",
+        "fecha": "2026-04-24 12:25:00"
+      }
+    ]
+  }
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. RESUMEN DE RUTAS REGISTRADAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Método   URL                                    Controlador@método
+  ───────  ─────────────────────────────────────  ─────────────────────────────
+  GET      /social                                SocialController@index
+  GET      /api/social/amigos                     SocialController@misAmigos
+  GET      /api/social/solicitudes                SocialController@solicitudesPendientes
+  POST     /api/social/solicitudes/{id}/aceptar   SocialController@aceptarSolicitud
+  POST     /api/social/solicitudes/{id}/rechazar  SocialController@rechazarSolicitud
+  GET      /api/social/usuarios/buscar            SocialController@buscarUsuarios
+  POST     /api/social/solicitud                  SocialController@enviarSolicitud
+  GET      /api/social/chats                      SocialController@misChats
+  POST     /api/social/chats/abrir                SocialController@abrirChat
+  GET      /api/social/chats/{id}/mensajes        SocialController@mensajesChat
+  POST     /api/social/chats/{id}/mensajes        SocialController@enviarMensaje
+  GET      /api/social/chats/{id}/nuevos          SocialController@mensajesNuevos
+  GET      /api/social/contador                   SocialController@contadorNoLeidos
+
+  Total: 13 rutas (1 web + 12 API)
+  Middleware en todas: auth (requiere sesión activa de usuario)
+  Las rutas API heredan también el middleware "web" (sesión + CSRF)
+  porque se cargan desde web.php con Route::prefix('api').
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. POSIBLES PREGUNTAS EN LA DEFENSA Y SUS RESPUESTAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+P: ¿Por qué usáis polling en lugar de WebSockets?
+R: WebSockets requieren configuración de servidor adicional (Pusher, Redis,
+   Laravel Echo, servidor Node.js o similar). El polling con setInterval es
+   mucho más sencillo de implementar, no requiere dependencias externas y es
+   suficiente para un chat donde la latencia de 3 segundos es aceptable.
+   Para una aplicación de producción con muchos usuarios se usaría WebSockets.
+
+P: ¿Cómo sabéis a qué usuarios pertenece un chat si no hay tabla de participantes?
+R: Usamos el campo "nombre" de la tabla chats con el formato "dm_minId_maxId".
+   Por ejemplo, un chat entre el usuario 5 y el 12 tiene nombre="dm_5_12".
+   Para encontrar todos los chats de un usuario con ID=5 buscamos
+   nombre LIKE 'dm_5_%' OR nombre LIKE 'dm_%_5'.
+
+P: ¿Qué pasa si dos usuarios intentan crear el mismo chat a la vez?
+R: Usamos el método firstOrCreate() de Eloquent, que en una sola operación
+   busca el registro y, solo si no existe, lo crea. En el peor caso, la
+   segunda petición simplemente encuentra el chat ya creado por la primera.
+
+P: ¿Cómo se previene que alguien lea mensajes de un chat que no es suyo?
+R: Antes de devolver mensajes o aceptar uno nuevo, el método privado
+   verificarAccesoChat() comprueba que el nombre del chat contiene el ID
+   del usuario autenticado. Si no lo contiene, abort(403).
+
+P: ¿Qué es el CSRF token y para qué sirve?
+R: Cross-Site Request Forgery. Es un token único por sesión que Laravel
+   genera y guarda en una cookie. Todos los formularios y peticiones POST
+   deben incluirlo en la cabecera X-CSRF-TOKEN. Si alguien desde otra web
+   intenta hacer un POST a nuestra aplicación en nombre del usuario, no
+   tendrá el token y Laravel rechazará la petición.
+
+P: ¿Por qué el badge del navbar se actualiza en todas las páginas?
+R: Porque el script está en el layout base (layouts/app.blade.php) dentro
+   de @auth, por lo que se carga en cualquier página que use ese layout.
+   Así el usuario siempre sabe si tiene mensajes o solicitudes nuevas
+   sin tener que entrar en la página /social.
+
+P: ¿Qué significa estado=0, 1, 2 en la tabla amigos?
+R: 0=pendiente (solicitud enviada sin respuesta), 1=aceptada (son amigos),
+   2=rechazada (el receptor la rechazó). Solo los de estado=1 pueden chatear.
+
+P: ¿Por qué el campo "leido" de mensajes es importante?
+R: Porque sirve para calcular cuántos mensajes no leídos tiene el usuario
+   en cada chat, lo que alimenta el contador del badge del navbar y el
+   indicador de mensajes nuevos en cada ítem de la lista de conversaciones.
+
+P: ¿Cómo funciona el debounce en el buscador de Descubrir?
+R: Cuando el usuario escribe en el campo de búsqueda, se cancela el
+   temporizador anterior y se crea uno nuevo de 350ms. Solo cuando el
+   usuario deja de escribir durante 350ms se lanza la petición al servidor.
+   Sin debounce, cada tecla pulsada generaría una petición AJAX, lo que
+   sobrecargaría el servidor innecesariamente.
+
+P: ¿Cómo se hace la animación de entrada/salida en móvil?
+R: Con CSS transform: translateX(). El sidebar empieza visible y el área
+   de chat empieza desplazada un 100% a la derecha (fuera de la pantalla).
+   Al abrir un chat, JavaScript añade la clase "oculto-movil" al sidebar
+   (que aplica translateX(-100%)) y "activo-movil" al área de chat
+   (que aplica translateX(0)). La propiedad CSS transition: 0.25s ease
+   genera la animación suave automáticamente.
+
+================================================================================
+  Fin del documento
+================================================================================
