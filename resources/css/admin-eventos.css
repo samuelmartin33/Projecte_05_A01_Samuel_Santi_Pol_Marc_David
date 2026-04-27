@@ -366,6 +366,22 @@ body {
     background: #faf5ff;
 }
 
+.stat-card--alert {
+    background: #fff5f5;
+    border: 2px solid #fc8181;
+}
+
+.stat-card--alert h2 {
+    color: #c53030;
+}
+
+.stat-hint {
+    margin: auto 0 0;
+    font-size: .8rem;
+    color: #c53030;
+    font-weight: 600;
+}
+
 .soon {
     margin: auto 0 0;
     color: #c084fc;
