@@ -10,6 +10,47 @@
             border-radius: 16px;
             z-index: 1;
         }
+
+        .btn-favorito-detalle {
+            width: 100%;
+            margin-top: 0.75rem;
+            border-radius: 999px;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            background: #ffffff;
+            color: #4c1d95;
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-favorito-detalle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.12);
+        }
+
+        .btn-favorito-detalle svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .btn-favorito-detalle.activo {
+            background: #f43f5e;
+            border-color: #f43f5e;
+            color: #ffffff;
+        }
+
+        .btn-favorito-detalle.activo svg {
+            fill: currentColor;
+        }
+
+        .btn-favorito-detalle.cargando {
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 <?php $__env->stopPush(); ?>
 
@@ -250,6 +291,22 @@
 
                     </button>
 
+                    <?php if(auth()->guard()->check()): ?>
+                        <button type="button"
+                                id="btn-favorito-detalle"
+                                class="btn-favorito-detalle <?php echo e($esFavorito ? 'activo' : ''); ?>"
+                                data-evento-id="<?php echo e($evento->id); ?>"
+                                data-favorito="<?php echo e($esFavorito ? '1' : '0'); ?>"
+                                aria-pressed="<?php echo e($esFavorito ? 'true' : 'false'); ?>"
+                                onclick="toggleFavoritoDetalle(event.currentTarget)">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
+                            </svg>
+                            <span id="btn-favorito-detalle-texto"><?php echo e($esFavorito ? 'En favoritos' : 'Guardar en favoritos'); ?></span>
+                        </button>
+                    <?php endif; ?>
+
                     
                     <?php if($evento->url_externa): ?>
                         <a href="<?php echo e($evento->url_externa); ?>"
@@ -391,6 +448,9 @@
 
 <?php $__env->startPush('scripts'); ?>
 
+<script src="<?php echo e(asset('js/favoritos.js')); ?>"></script>
+
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
@@ -437,6 +497,14 @@ function inicializarMapa(latitud, longitud, nombreUbicacion) {
     );
 <?php endif; ?>
 
+/**
+ * Gestiona el clic en el botón "Comprar entrada".
+ * Por ahora muestra un SweetAlert — aquí se integrará el flujo de pago.
+ * @param {number} eventoId - ID del evento seleccionado
+ */
+function abrirCompra(eventoId) {
+    // TODO: Integrar con el sistema de pedidos y pagos de VIBEZ
+    alert('Próximamente: flujo de compra para el evento #' + eventoId);
 // Datos del evento pasados desde PHP
 const EVENTO_ID   = <?php echo e($evento->id); ?>;
 const PRECIO_BASE = <?php echo e($evento->precio_base ?? 0); ?>;
