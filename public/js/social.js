@@ -10,6 +10,9 @@
 // ID del chat que está abierto en este momento (null si ninguno)
 var chatActualId = null;
 
+// ID del amigo cuyo chat está abierto (para evitar reabrir el mismo chat)
+var amigoActualId = null;
+
 // ID del último mensaje cargado (para pedir solo los nuevos en el polling)
 var ultimoMensajeId = 0;
 
@@ -156,6 +159,9 @@ function cargarChats() {
  * Llama al servidor para obtener el chat_id y luego carga los mensajes.
  */
 function abrirChat(amigoId, nombreAmigo, fotoUrl) {
+    // Si ya estamos en el chat con este amigo, no hacer nada
+    if (amigoId === amigoActualId) return;
+
     // Detener polling anterior si había uno
     detenerPolling();
 
@@ -178,7 +184,8 @@ function abrirChat(amigoId, nombreAmigo, fotoUrl) {
         var chatId = respuesta.datos.chat_id;
         var amigo  = respuesta.datos.amigo;
 
-        chatActualId = chatId;
+        chatActualId    = chatId;
+        amigoActualId   = amigoId;
         ultimoMensajeId = 0;
 
         // Mostrar la ventana de chat y ocultar el estado vacío
@@ -385,7 +392,8 @@ function detenerPolling() {
 /** Cierra el chat abierto y vuelve al panel lateral (especialmente en móvil). */
 function cerrarChat() {
     detenerPolling();
-    chatActualId = null;
+    chatActualId  = null;
+    amigoActualId = null;
 
     document.getElementById('chat-vacio').style.display   = 'flex';
     document.getElementById('chat-ventana').style.display = 'none';
