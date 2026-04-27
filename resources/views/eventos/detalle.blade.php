@@ -296,7 +296,7 @@
                                 data-evento-id="{{ $evento->id }}"
                                 data-favorito="{{ $esFavorito ? '1' : '0' }}"
                                 aria-pressed="{{ $esFavorito ? 'true' : 'false' }}"
-                                onclick="toggleFavoritoDetalle(this)">
+                                onclick="toggleFavoritoDetalle(event.currentTarget)">
                             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M12 21s-6.716-4.35-9.243-8.242C.71 9.65 2.503 5.25 6.375 5.25c2.106 0 3.14 1.115 3.812 2.19.672-1.075 1.706-2.19 3.813-2.19 3.872 0 5.664 4.4 3.617 7.508C18.716 16.65 12 21 12 21z"/>
@@ -447,6 +447,9 @@
      SCRIPTS DEL DETALLE — Leaflet y acción de compra
 ════════════════════════════════════════════════════ --}}
 @push('scripts')
+{{-- Cargar el archivo de favoritos para que toggleFavoritoDetalle esté disponible --}}
+<script src="{{ asset('js/favoritos.js') }}"></script>
+
 {{-- Librería de mapas Leaflet (gratuita, sin API key) --}}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -493,68 +496,6 @@ function inicializarMapa(latitud, longitud, nombreUbicacion) {
         '{{ addslashes($evento->ubicacion_nombre ?? 'Ubicación del evento') }}'
     );
 @endif
-
-function actualizarBotonFavoritoDetalle(btn, esFavorito) {
-    btn.dataset.favorito = esFavorito ? '1' : '0';
-    btn.classList.toggle('activo', esFavorito);
-    btn.setAttribute('aria-pressed', esFavorito ? 'true' : 'false');
-
-    var texto = document.getElementById('btn-favorito-detalle-texto');
-    if (texto) {
-        texto.textContent = esFavorito ? 'En favoritos' : 'Guardar en favoritos';
-    }
-}
-
-function toggleFavoritoDetalle(btn) {
-    if (btn.dataset.loading === '1') {
-        return;
-    }
-
-    var eventoId = parseInt(btn.dataset.eventoId, 10);
-    if (!eventoId) {
-        return;
-    }
-
-    btn.dataset.loading = '1';
-    btn.classList.add('cargando');
-
-    fetch('/api/favoritos/toggle', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ evento_id: eventoId })
-    })
-    .then(function(response) {
-        if (response.status === 401) {
-            window.location.href = '{{ route('login') }}';
-            return null;
-        }
-
-        if (!response.ok) {
-            throw new Error('No se pudo actualizar favoritos');
-        }
-
-        return response.json();
-    })
-    .then(function(data) {
-        if (!data) {
-            return;
-        }
-
-        actualizarBotonFavoritoDetalle(btn, Boolean(data.favorito));
-    })
-    .catch(function(error) {
-        console.error(error);
-        alert('No se pudo actualizar favoritos. Intenta de nuevo.');
-    })
-    .finally(function() {
-        btn.dataset.loading = '0';
-        btn.classList.remove('cargando');
-    });
-}
 
 /**
  * Gestiona el clic en el botón "Comprar entrada".

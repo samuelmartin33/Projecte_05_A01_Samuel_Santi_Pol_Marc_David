@@ -89,3 +89,102 @@ function toggleFavorito(event, boton) {
         boton.classList.remove('cargando');
     });
 }
+
+/**
+ * Actualizar el estado visual del botón de favoritos en la página de detalle
+ */
+function actualizarBotonFavoritoDetalle(btn, esFavorito) {
+    btn.dataset.favorito = esFavorito ? '1' : '0';
+    btn.classList.toggle('activo', esFavorito);
+    btn.setAttribute('aria-pressed', esFavorito ? 'true' : 'false');
+
+    var texto = document.getElementById('btn-favorito-detalle-texto');
+    if (texto) {
+        texto.textContent = esFavorito ? 'En favoritos' : 'Guardar en favoritos';
+    }
+}
+
+/**
+ * Toggle favorito desde la página de detalle de evento
+ */
+function toggleFavoritoDetalle(btn) {
+    console.log('toggleFavoritoDetalle llamada con btn:', btn);
+    
+    if (!btn) {
+        console.error('toggleFavoritoDetalle: btn es null o undefined');
+        return;
+    }
+
+    if (btn.dataset.loading === '1') {
+        console.log('toggleFavoritoDetalle: ya está cargando, ignorando');
+        return;
+    }
+
+    var eventoId = parseInt(btn.dataset.eventoId, 10);
+    console.log('Evento ID extraído:', eventoId, 'Atributo:', btn.dataset.eventoId);
+    
+    if (isNaN(eventoId) || eventoId <= 0) {
+        console.error('toggleFavoritoDetalle: evento_id inválido', eventoId);
+        alert('Error: No se pudo determinar el ID del evento.');
+        return;
+    }
+
+    btn.dataset.loading = '1';
+    btn.classList.add('cargando');
+
+    var csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error('toggleFavoritoDetalle: token CSRF no encontrado');
+        btn.dataset.loading = '0';
+        btn.classList.remove('cargando');
+        alert('Error: Token CSRF no disponible.');
+        return;
+    }
+
+    console.log('Iniciando fetch a /api/favoritos/toggle con evento_id:', eventoId);
+
+    fetch('/api/favoritos/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+        },
+        body: JSON.stringify({ evento_id: eventoId })
+    })
+    .then(function(response) {
+        console.log('Respuesta recibida, status:', response.status);
+        
+        if (response.status === 401) {
+            console.log('Usuario no autenticado, redirigiendo a login');
+            window.location.href = LOGIN_URL;
+            return null;
+        }
+
+        if (!response.ok) {
+            throw new Error('HTTP error! status: ' + response.status);
+        }
+
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('Datos recibidos:', data);
+        
+        if (!data) {
+            console.log('No hay datos en respuesta');
+            return;
+        }
+
+        actualizarBotonFavoritoDetalle(btn, Boolean(data.favorito));
+        console.log('Botón actualizado, favorito:', data.favorito);
+    })
+    .catch(function(error) {
+        console.error('Error en toggleFavoritoDetalle:', error);
+        alert('No se pudo actualizar favoritos. Intenta de nuevo.\n\nError: ' + error.message);
+    })
+    .finally(function() {
+        btn.dataset.loading = '0';
+        btn.classList.remove('cargando');
+        console.log('toggleFavoritoDetalle finalizado');
+    });
+}
