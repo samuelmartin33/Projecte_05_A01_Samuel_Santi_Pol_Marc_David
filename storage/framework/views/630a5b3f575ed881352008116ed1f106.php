@@ -1,3 +1,7 @@
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('title', 'Crear cuenta — VIBEZ'); ?>
 <?php $__env->startSection('html-class', 'auth-page'); ?>
 <?php $__env->startSection('body-class', 'auth-page'); ?>
@@ -79,171 +83,67 @@
             <p class="form-subtitle">Únete a VIBEZ y empieza a vibrar</p>
         </div>
 
-        <div id="alert-global"
-             class="alert alert-error<?php echo e(session('error') ? ' visible' : ''); ?>"
-             role="alert"><?php echo e(session('error', '')); ?></div>
+        <div id="alert-global" class="alert alert-error" role="alert"></div>
 
-        
-        <form id="registerForm"
-              method="POST"
-              action="<?php echo e(route('api.register')); ?>"
-              novalidate
-              autocomplete="off">
-            <?php echo csrf_field(); ?>
+        <form id="registerForm" novalidate autocomplete="off">
 
             <div class="field-group">
 
                 
-                <div class="field <?php $__errorArgs = ['nombre'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> has-error <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" id="field-nombre">
+                <div class="field" id="field-nombre">
                     <input
                         type="text"
                         id="nombre"
                         name="nombre"
                         placeholder=" "
-                        value="<?php echo e(old('nombre')); ?>"
                         autocomplete="given-name"
                         inputmode="text"
                     >
                     <label for="nombre">Nombre</label>
-                    <span class="field-error <?php $__errorArgs = ['nombre'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> visible <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                          id="error-nombre"
-                          role="alert"><?php $__errorArgs = ['nombre'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><?php echo e($message); ?><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?></span>
+                    <span class="field-error" id="error-nombre" role="alert"></span>
                 </div>
 
                 
                 <div class="field-row">
-                    <div class="field <?php $__errorArgs = ['apellido1'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> has-error <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" id="field-apellido1">
+                    <div class="field" id="field-apellido1">
                         <input
                             type="text"
                             id="apellido1"
                             name="apellido1"
                             placeholder=" "
-                            value="<?php echo e(old('apellido1')); ?>"
                             autocomplete="family-name"
                             inputmode="text"
                         >
                         <label for="apellido1">Primer apellido</label>
-                        <span class="field-error <?php $__errorArgs = ['apellido1'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> visible <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                              id="error-apellido1"
-                              role="alert"><?php $__errorArgs = ['apellido1'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><?php echo e($message); ?><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?></span>
+                        <span class="field-error" id="error-apellido1" role="alert"></span>
                     </div>
 
-                    <div class="field <?php $__errorArgs = ['apellido2'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> has-error <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" id="field-apellido2">
+                    <div class="field" id="field-apellido2">
                         <input
                             type="text"
                             id="apellido2"
                             name="apellido2"
                             placeholder=" "
-                            value="<?php echo e(old('apellido2')); ?>"
                             autocomplete="additional-name"
                             inputmode="text"
                         >
                         <label for="apellido2">Segundo apellido</label>
-                        <span class="field-error <?php $__errorArgs = ['apellido2'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> visible <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                              id="error-apellido2"
-                              role="alert"><?php $__errorArgs = ['apellido2'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><?php echo e($message); ?><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?></span>
+                        <span class="field-error" id="error-apellido2" role="alert"></span>
                     </div>
                 </div>
 
                 
-                <div class="field <?php $__errorArgs = ['email'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> has-error <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" id="field-email">
+                <div class="field" id="field-email">
                     <input
                         type="email"
                         id="email"
                         name="email"
                         placeholder=" "
-                        value="<?php echo e(old('email')); ?>"
                         autocomplete="email"
                         inputmode="email"
                     >
                     <label for="email">Correo electrónico</label>
-                    <span class="field-error <?php $__errorArgs = ['email'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> visible <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                          id="error-email"
-                          role="alert"><?php $__errorArgs = ['email'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><?php echo e($message); ?><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?></span>
+                    <span class="field-error" id="error-email" role="alert"></span>
                 </div>
 
                 
@@ -257,6 +157,10 @@ unset($__errorArgs, $__bag); ?></span>
                             autocomplete="new-password"
                         >
                         <label for="password">Contraseña</label>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password', this)" aria-label="Mostrar contraseña" tabindex="-1">
+                            <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                        </button>
                         <span class="field-error" id="error-password" role="alert"></span>
                     </div>
 
@@ -269,29 +173,35 @@ unset($__errorArgs, $__bag); ?></span>
                             autocomplete="new-password"
                         >
                         <label for="password_confirmation">Confirmar contraseña</label>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password_confirmation', this)" aria-label="Mostrar contraseña" tabindex="-1">
+                            <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                        </button>
                         <span class="field-error" id="error-password_confirmation" role="alert"></span>
                     </div>
                 </div>
 
                 
                 <div class="field field-select" id="field-tipo_cuenta">
-                    <select id="tipo_cuenta" name="tipo_cuenta">
+                    <select id="tipo_cuenta" name="tipo_cuenta" onchange="cambiarTipoCuenta(this)">
                         <option value="" disabled selected hidden></option>
                         <option value="cliente">Cliente</option>
                         <option value="empresa">Empresa</option>
                     </select>
                     <label for="tipo_cuenta">Tipo de cuenta</label>
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
+                    <span id="hint-tipo_cuenta" style="font-size:0.75rem;margin-top:2px;display:block"></span>
                 </div>
 
                 
                 <div class="field-row">
                     <div class="field" id="field-fecha_nacimiento">
                         <input
-                            type="date"
+                            type="text"
                             id="fecha_nacimiento"
                             name="fecha_nacimiento"
                             placeholder=" "
+                            readonly
                         >
                         <label for="fecha_nacimiento">Fecha de nacimiento</label>
                         <span class="field-error" id="error-fecha_nacimiento" role="alert"></span>
@@ -315,7 +225,7 @@ unset($__errorArgs, $__bag); ?></span>
 
             
             <div class="btn-row">
-                <button type="submit" class="btn-primary" id="submitBtn">
+                <button type="submit" class="btn-primary" id="submitBtn" onclick="rippleBtn(event, this)">
                     <span class="btn-text">Crear cuenta</span>
                     <span class="btn-spinner" aria-hidden="true">
                         <span class="spinner-ring"></span>
@@ -341,7 +251,229 @@ unset($__errorArgs, $__bag); ?></span>
 
 <?php $__env->startSection('scripts'); ?>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/js/register.js']); ?>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
+        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/register.js']); ?>
+    <?php else: ?>
+        <script src="<?php echo e(asset('js/register.js')); ?>"></script>
+    <?php endif; ?>
+<script>
+/** Inicializa flatpickr en el campo de fecha de nacimiento */
+document.addEventListener('DOMContentLoaded', function () {
+    flatpickr('#fecha_nacimiento', {
+        locale: 'es',
+        dateFormat: 'Y-m-d',
+        altInput: false,
+        maxDate: 'today',
+        disableMobile: false,
+        onChange: function(selectedDates, dateStr) {
+            const field = document.getElementById('field-fecha_nacimiento');
+            if (field) field.classList.remove('has-error');
+            const err = document.getElementById('error-fecha_nacimiento');
+            if (err) { err.textContent = ''; err.classList.remove('visible'); }
+        },
+    });
+});
+
+/** Google Identity Services — el SDK llama esta función automáticamente */
+window.onGoogleLibraryLoad = function () {
+    const btn = document.getElementById('google-signin-btn');
+    if (!btn) return;
+    const clientId = btn.dataset.clientId;
+    if (!clientId) return;
+    google.accounts.id.initialize({
+        client_id: clientId,
+        callback: window.handleGoogleCredential,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+    });
+    const wrapper  = btn.closest('.google-btn-wrapper');
+    const btnWidth = wrapper ? wrapper.offsetWidth : 200;
+    google.accounts.id.renderButton(btn, {
+        theme: 'outline', size: 'large', width: Math.max(btnWidth, 200),
+        text: 'continue_with', shape: 'rectangular', logo_alignment: 'left', locale: 'es',
+    });
+};
+
+window.handleGoogleCredential = async function (response) {
+    const alertEl = document.getElementById('alert-global');
+    try {
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const res  = await fetch('/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+            body: JSON.stringify({ credential: response.credential }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.body.style.transition = 'opacity 0.35s ease';
+            document.body.style.opacity    = '0';
+            setTimeout(() => { window.location.href = '/home'; }, 360);
+        } else {
+            alertEl.textContent = data.message || 'Error al iniciar sesión con Google.';
+            alertEl.className   = 'alert alert-error visible';
+        }
+    } catch (err) {
+        alertEl.textContent = 'Error de conexión. Inténtalo de nuevo.';
+        alertEl.className   = 'alert alert-error visible';
+    }
+};
+
+function togglePassword(inputId, btn) {
+    const input   = document.getElementById(inputId);
+    const showing = input.type === 'text';
+    input.type    = showing ? 'password' : 'text';
+    btn.querySelector('.eye-open').style.display   = showing ? ''     : 'none';
+    btn.querySelector('.eye-closed').style.display = showing ? 'none' : '';
+    btn.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+}
+
+/** Efecto ripple desde el punto del click */
+function rippleBtn(e, btn) {
+    const rect   = btn.getBoundingClientRect();
+    const size   = Math.max(rect.width, rect.height);
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 700);
+}
+
+/** Muestra hint según tipo de cuenta seleccionado */
+function cambiarTipoCuenta(sel) {
+    const hint = document.getElementById('hint-tipo_cuenta');
+    if (!hint) return;
+    if (sel.value === 'empresa') {
+        hint.textContent = 'Requiere aprobación del administrador.';
+        hint.style.color = '#D97706';
+    } else if (sel.value === 'cliente') {
+        hint.textContent = 'Acceso inmediato tras el registro.';
+        hint.style.color = '#059669';
+    } else {
+        hint.textContent = '';
+    }
+}
+
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
+
+function mostrarErrorCampo(fieldId, errorId, msg) {
+    document.getElementById(fieldId)?.classList.add('has-error');
+    const el = document.getElementById(errorId);
+    if (el) { el.textContent = msg; el.classList.add('visible'); }
+}
+
+function limpiarErrorCampo(fieldId, errorId) {
+    document.getElementById(fieldId)?.classList.remove('has-error');
+    const el = document.getElementById(errorId);
+    if (el) { el.textContent = ''; el.classList.remove('visible'); }
+}
+
+function mostrarAlerta(msg, tipo = 'error') {
+    const el = document.getElementById('alert-global');
+    el.textContent = msg;
+    el.className   = `alert alert-${tipo} visible`;
+}
+
+function sacudirElemento(el) {
+    el.classList.add('shake');
+    el.onanimationend = function() {
+        el.classList.remove('shake');
+        el.onanimationend = null;
+    };
+}
+
+/** Submit del formulario de registro */
+async function registrar(e) {
+    e.preventDefault();
+    const nombre               = document.getElementById('nombre').value.trim();
+    const apellido1            = document.getElementById('apellido1').value.trim();
+    const apellido2            = document.getElementById('apellido2').value.trim();
+    const email                = document.getElementById('email').value.trim();
+    const password             = document.getElementById('password').value;
+    const passwordConfirmation = document.getElementById('password_confirmation').value;
+    const fechaNacimiento      = document.getElementById('fecha_nacimiento').value;
+    const telefono             = document.getElementById('telefono').value.trim();
+    const tipoCuenta           = document.getElementById('tipo_cuenta').value;
+    const btn                  = document.getElementById('submitBtn');
+    const form                 = document.getElementById('registerForm');
+    let valid                  = true;
+
+    [
+        ['field-nombre','error-nombre'], ['field-apellido1','error-apellido1'],
+        ['field-apellido2','error-apellido2'], ['field-email','error-email'],
+        ['field-password','error-password'], ['field-password_confirmation','error-password_confirmation'],
+        ['field-fecha_nacimiento','error-fecha_nacimiento'], ['field-telefono','error-telefono'],
+        ['field-tipo_cuenta','error-tipo_cuenta'],
+    ].forEach(([f, err]) => limpiarErrorCampo(f, err));
+    document.getElementById('alert-global').className = 'alert alert-error';
+
+    if (!nombre || nombre.length < 2)       { mostrarErrorCampo('field-nombre','error-nombre', nombre ? 'Mínimo 2 caracteres' : 'El nombre es obligatorio'); valid = false; }
+    if (!apellido1 || apellido1.length < 2) { mostrarErrorCampo('field-apellido1','error-apellido1', apellido1 ? 'Mínimo 2 caracteres' : 'El primer apellido es obligatorio'); valid = false; }
+    if (!apellido2 || apellido2.length < 2) { mostrarErrorCampo('field-apellido2','error-apellido2', apellido2 ? 'Mínimo 2 caracteres' : 'El segundo apellido es obligatorio'); valid = false; }
+
+    if (!email)                  { mostrarErrorCampo('field-email','error-email', 'El email es obligatorio'); valid = false; }
+    else if (!isValidEmail(email)) { mostrarErrorCampo('field-email','error-email', 'Introduce un email válido'); valid = false; }
+
+    if (!password)               { mostrarErrorCampo('field-password','error-password', 'La contraseña es obligatoria'); valid = false; }
+    else if (password.length < 8){ mostrarErrorCampo('field-password','error-password', 'Mínimo 8 caracteres'); valid = false; }
+
+    if (!passwordConfirmation)                { mostrarErrorCampo('field-password_confirmation','error-password_confirmation', 'Confirma tu contraseña'); valid = false; }
+    else if (password !== passwordConfirmation){ mostrarErrorCampo('field-password_confirmation','error-password_confirmation', 'Las contraseñas no coinciden'); valid = false; }
+
+    if (!fechaNacimiento) {
+        mostrarErrorCampo('field-fecha_nacimiento','error-fecha_nacimiento', 'La fecha de nacimiento es obligatoria'); valid = false;
+    } else {
+        const hoy  = new Date();
+        const nac  = new Date(fechaNacimiento);
+        const edad = hoy.getFullYear() - nac.getFullYear() - (hoy < new Date(hoy.getFullYear(), nac.getMonth(), nac.getDate()) ? 1 : 0);
+        if (edad < 14)  { mostrarErrorCampo('field-fecha_nacimiento','error-fecha_nacimiento', 'Debes tener al menos 14 años'); valid = false; }
+        if (edad > 120) { mostrarErrorCampo('field-fecha_nacimiento','error-fecha_nacimiento', 'Fecha no válida'); valid = false; }
+    }
+
+    if (!telefono)                             { mostrarErrorCampo('field-telefono','error-telefono', 'El teléfono es obligatorio'); valid = false; }
+    else if (!/^\+?[\d\s\-]{7,20}$/.test(telefono)) { mostrarErrorCampo('field-telefono','error-telefono', 'Introduce un teléfono válido'); valid = false; }
+
+    if (!tipoCuenta) { mostrarErrorCampo('field-tipo_cuenta','error-tipo_cuenta', 'Selecciona el tipo de cuenta'); valid = false; }
+
+    if (!valid) { sacudirElemento(form); return; }
+
+    btn.classList.add('loading');
+    try {
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const res  = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+            body: JSON.stringify({ nombre, apellido1, apellido2, email, password, password_confirmation: passwordConfirmation, fecha_nacimiento: fechaNacimiento, telefono, tipo_cuenta: tipoCuenta }),
+        });
+        const data = await res.json();
+
+        if (data.success && data.status === 'active') {
+            document.body.style.transition = 'opacity 0.35s ease';
+            document.body.style.opacity    = '0';
+            setTimeout(() => { window.location.href = '/home'; }, 360);
+            return;
+        }
+        if (data.success && data.status === 'pending') {
+            btn.classList.remove('loading');
+            form.style.display = 'none';
+            document.querySelector('.btn-row')?.remove();
+            const pending = document.createElement('div');
+            pending.innerHTML = `<div class="pending-inline"><div class="pending-inline-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg></div><h2 class="pending-inline-title">Solicitud enviada</h2><p class="pending-inline-text">Tu cuenta está <strong>pendiente de aprobación</strong> por el administrador.</p><a href="/login" class="pending-back-link">← Volver al login</a></div>`;
+            document.querySelector('.form-header').replaceWith(pending);
+        } else {
+            btn.classList.remove('loading');
+            if (data.errors) Object.entries(data.errors).forEach(([f, m]) => mostrarErrorCampo(`field-${f}`, `error-${f}`, m[0]));
+            mostrarAlerta(data.message || 'No se pudo crear la cuenta. Revisa los datos.');
+            sacudirElemento(form);
+        }
+    } catch (err) {
+        btn.classList.remove('loading');
+        mostrarAlerta('Error de conexión. Verifica tu red e inténtalo de nuevo.');
+        console.error('[VIBEZ] Error en registro:', err);
+    }
+}
+</script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\0616\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/register.blade.php ENDPATH**/ ?>

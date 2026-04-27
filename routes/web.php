@@ -27,6 +27,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
+use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
+use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
@@ -136,6 +138,28 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.eventos.update');
     Route::delete('/admin/eventos/{evento}', [AdminEventoController::class, 'destroy'])
          ->name('admin.eventos.destroy');
+
+    /* Rutas de gestión de empresas */
+    Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
+         ->name('admin.empresas.index');
+    Route::post('/admin/empresas/{id}/aprobar', [AdminEmpresaController::class, 'aprobar'])
+         ->name('admin.empresas.aprobar');
+    Route::post('/admin/empresas/{id}/rechazar', [AdminEmpresaController::class, 'rechazar'])
+         ->name('admin.empresas.rechazar');
+
+    /* Rutas de gestión de usuarios */
+    Route::get('/admin/usuarios', [AdminUsuarioController::class, 'index'])
+         ->name('admin.usuarios.index');
+    Route::get('/admin/usuarios/crear', [AdminUsuarioController::class, 'create'])
+         ->name('admin.usuarios.create');
+    Route::post('/admin/usuarios', [AdminUsuarioController::class, 'store'])
+         ->name('admin.usuarios.store');
+    Route::get('/admin/usuarios/{usuario}/editar', [AdminUsuarioController::class, 'edit'])
+         ->name('admin.usuarios.edit');
+    Route::put('/admin/usuarios/{usuario}', [AdminUsuarioController::class, 'update'])
+         ->name('admin.usuarios.update');
+    Route::delete('/admin/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])
+         ->name('admin.usuarios.destroy');
 });
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —

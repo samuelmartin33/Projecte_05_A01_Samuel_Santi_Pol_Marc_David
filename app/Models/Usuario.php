@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -87,6 +88,16 @@ class Usuario extends Authenticatable
     public function empresa(): HasOne
     {
         return $this->hasOne(Empresa::class, 'usuario_id');
+    }
+
+    /**
+     * Eventos marcados como favoritos por el usuario.
+     */
+    public function favoritos(): BelongsToMany
+    {
+        return $this->belongsToMany(Evento::class, 'eventos_favoritos', 'usuario_id', 'evento_id')
+            ->wherePivot('estado', 1)
+            ->withPivot(['estado', 'fecha_creacion', 'fecha_actualizacion']);
     }
 
     /* ——— Helpers de rol ——— */

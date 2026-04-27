@@ -151,7 +151,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             submitBtn.classList.remove('loading');
 
             if (data.unverified) {
-                showAlert(data.message, 'warning');
+                const tipo = data.estado_registro === 'rechazado' ? 'error' : 'warning';
+                showAlert(data.message, tipo);
                 return;
             }
 
