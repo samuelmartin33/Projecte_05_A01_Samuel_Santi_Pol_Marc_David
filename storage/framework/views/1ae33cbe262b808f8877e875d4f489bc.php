@@ -27,8 +27,8 @@
         <nav class="menu" id="mainMenu">
             <a href="<?php echo e(route('admin.dashboard')); ?>" class="menu-link <?php echo e(request()->routeIs('admin.dashboard') ? 'active' : ''); ?>">Inicio</a>
             <a href="<?php echo e(route('admin.eventos.index')); ?>" class="menu-link <?php echo e(request()->routeIs('admin.eventos.*') ? 'active' : ''); ?>">Eventos</a>
-            <span class="menu-link disabled">Usuarios (proximamente)</span>
-            <span class="menu-link disabled">Empresas (proximamente)</span>
+            <a href="<?php echo e(route('admin.empresas.index')); ?>" class="menu-link <?php echo e(request()->routeIs('admin.empresas.*') ? 'active' : ''); ?>">Empresas</a>
+            <a href="<?php echo e(route('admin.usuarios.index')); ?>" class="menu-link <?php echo e(request()->routeIs('admin.usuarios.*') ? 'active' : ''); ?>">Usuarios</a>
             <span class="menu-link disabled">Pedidos (proximamente)</span>
             <span class="menu-link disabled">Pagos (proximamente)</span>
         </nav>
