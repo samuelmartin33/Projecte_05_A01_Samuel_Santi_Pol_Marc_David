@@ -1332,3 +1332,148 @@ body {
     box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
     color: #6d28d9;
 }
+
+/* ============================================================
+   NAVBAR MÓVIL — Hamburguesa y panel lateral deslizable
+   ============================================================ */
+
+/* Botón hamburguesa: oculto en escritorio, visible en móvil */
+.nav-hamburger {
+    display: none;          /* ocultamos por defecto */
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+.nav-hamburger:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-hamburger svg  { width: 22px; height: 22px; display: block; }
+
+/* En móvil (< 768px): mostrar hamburguesa y ocultar botones de invitado */
+@media (max-width: 767px) {
+    .nav-hamburger      { display: flex; }
+    .btn-nav-ghost,
+    .btn-nav-solido     { display: none; }
+}
+
+/* Fondo oscurecido al abrir el panel */
+.nav-movil-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 49;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+.nav-movil-overlay.activo { display: block; }
+
+/* Panel lateral deslizable */
+.nav-movil-panel {
+    position: fixed;
+    top: 0; left: 0;
+    width: 80%;
+    max-width: 300px;
+    height: 100%;
+    background: var(--navy);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.nav-movil-panel.activo { transform: translateX(0); }
+
+/* Cabecera del panel con logo y botón cerrar */
+.nav-movil-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
+}
+.nav-movil-logo   { height: 34px; width: auto; }
+.nav-movil-cerrar {
+    background: none; border: none;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer; padding: 5px;
+    border-radius: 7px;
+    display: flex; align-items: center;
+    transition: background 0.15s, color 0.15s;
+}
+.nav-movil-cerrar:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-movil-cerrar svg   { width: 20px; height: 20px; }
+
+/* Sección de usuario autenticado */
+.nav-movil-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(124,58,237,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+}
+.nav-movil-avatar-sm {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 0.9rem;
+    overflow: hidden; flex-shrink: 0;
+}
+.nav-movil-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.nav-movil-usuario-nombre {
+    color: white; font-weight: 700; font-size: 0.875rem; margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-movil-usuario-email {
+    color: rgba(255,255,255,0.38); font-size: 0.7rem; margin: 2px 0 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Separador horizontal */
+.nav-movil-divisor {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 4px 0;
+    flex-shrink: 0;
+}
+
+/* Enlace de navegación dentro del panel */
+.nav-movil-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    flex-shrink: 0;
+}
+.nav-movil-link svg      { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-movil-link:hover    { background: rgba(255,255,255,0.06); color: white; }
+.nav-movil-activo        {
+    color: white !important;
+    background: rgba(124,58,237,0.18) !important;
+    border-left: 3px solid var(--morado);
+    padding-left: 15px;
+}
+.nav-movil-logout        { color: rgba(239,68,68,0.75) !important; }
+.nav-movil-logout:hover  { color: #ef4444 !important; background: rgba(239,68,68,0.08) !important; }
