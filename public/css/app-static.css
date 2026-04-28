@@ -1,0 +1,1468 @@
+/* ============================================================
+   VIBEZ — estilos base
+   Fondo claro con formas decorativas, cabecera morada
+   ============================================================ */
+
+/* --- Base --- */
+body {
+    background-color: #f7f5ff;   /* blanco con toque lavanda muy suave */
+    color: #1e1b4b;              /* morado muy oscuro, casi negro */
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* --- Cabecera morada --- */
+.header-purple {
+    background-color: #7c3aed;
+}
+
+/* --- Texto con degradado morado --- */
+/* Usado en el título principal y palabras clave */
+.text-gradient {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Botón principal (CTA) --- */
+/* Fondo morado sólido, se agranda un poco al pasar el ratón */
+.btn-cta {
+    background-color: #7c3aed;
+    color: white;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn-cta:hover {
+    background-color: #6d28d9;
+    transform: scale(1.03);
+}
+
+/* --- Botón secundario (login) --- */
+/* Solo borde blanco, sin fondo — diseñado para ir sobre cabecera morada */
+.btn-ghost {
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    color: white;
+    transition: background-color 0.2s ease;
+}
+.btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Etiquetas de características (pills) --- */
+/* Fondo lavanda claro con borde morado suave */
+.pill {
+    background-color: #ede9fe;
+    border: 1px solid #c4b5fd;
+    color: #5b21b6;
+}
+
+/* --- Formas decorativas de fondo --- */
+/* Círculos con desenfoque que dan profundidad al fondo sin tapar el contenido */
+.shape {
+    position: absolute;
+    border-radius: 50%;          /* círculo perfecto */
+    opacity: 0.12;               /* muy suaves, casi invisibles */
+    filter: blur(60px);          /* borde difuminado */
+    pointer-events: none;        /* no interfieren con los clics */
+    z-index: 0;                  /* detrás de todo el contenido */
+}
+
+/* Círculo grande arriba a la izquierda */
+.shape-1 {
+    width: 400px;
+    height: 400px;
+    background-color: #7c3aed;
+    top: -80px;
+    left: -120px;
+}
+
+/* Círculo mediano abajo a la derecha */
+.shape-2 {
+    width: 300px;
+    height: 300px;
+    background-color: #a855f7;
+    bottom: 0;
+    right: -80px;
+}
+
+/* Círculo pequeño en el centro */
+.shape-3 {
+    width: 200px;
+    height: 200px;
+    background-color: #6d28d9;
+    top: 45%;
+    left: 50%;
+}
+
+/* --- Animación de entrada del hero --- */
+/* El contenido sube suavemente al cargar la página */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-content {
+    animation: fadeSlideUp 0.7s ease both;
+}
+
+/* ============================================================
+   VIBEZ — Variables de color
+   ============================================================ */
+:root {
+    --navy:        #0f172a;   /* azul marino oscuro — textos y UI */
+    --morado:      #7c3aed;   /* violeta principal */
+    --morado-claro:#a855f7;   /* púrpura acento */
+    --fondo:       #f7f5ff;   /* fondo lavanda muy suave */
+}
+
+/* Alias de color en clase Tailwind custom */
+.text-navy             { color: var(--navy); }
+.text-morado-vibez     { color: var(--morado); }
+.bg-navy               { background-color: var(--navy); }
+.bg-morado-vibez       { background-color: var(--morado); }
+
+/* --- Tipografía Premium --- */
+.font-premium {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.text-justify {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.text-center-block {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ============================================================
+   NAVBAR DE LA APP (layouts/app.blade.php)
+   ============================================================ */
+
+/* Cabecera con azul marino oscuro */
+.nav-vibez {
+    background-color: var(--navy);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* Isotipo circular con degradado morado — muestra "V" */
+.logo-isotipo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* Enlace de navegación —- color blanco apagado, activo en blanco puro */
+.nav-link {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+    text-decoration: none;
+}
+.nav-link:hover,
+.nav-link-activo {
+    color: #ffffff;
+}
+
+/* Botón "Entrar" — solo borde blanco transparente */
+.btn-nav-ghost {
+    color: rgba(255,255,255,0.7);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+}
+.btn-nav-ghost:hover {
+    color: white;
+    border-color: rgba(255,255,255,0.6);
+}
+
+/* Botón "Registro" — degradado morado */
+.btn-nav-solido {
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    padding: 8px 24px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+}
+.btn-nav-solido:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+/* Estilos adicionales para el navbar profesional */
+.nav-user-info {
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s;
+}
+.nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--morado);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.75rem;
+}
+.nav-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+}
+.btn-nav-logout {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-nav-logout:hover {
+    color: white;
+}
+
+/* Logo corporativo en la navbar */
+.nav-logo-link {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    text-decoration: none;
+    flex-shrink: 0;
+    line-height: 0;
+}
+.nav-logo-img {
+    height: 50px;
+    width: auto;
+    display: block;
+    transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    filter: drop-shadow(0 0 8px rgba(168,85,247,0.35));
+}
+.nav-logo-link:hover .nav-logo-img {
+    opacity: 0.92;
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 14px rgba(168,85,247,0.7));
+}
+
+/* Logo en el footer */
+.footer-logo-img {
+    height: 26px;
+    width: auto;
+    display: block;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+}
+.footer-logo-img:hover {
+    opacity: 1;
+}
+
+/* Footer oscuro coherente con el nav */
+.footer-vibez {
+    background-color: var(--navy);
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ============================================================
+   HOME — Hero banner
+   ============================================================ */
+
+.hero-home {
+    background: linear-gradient(160deg, var(--navy) 0%, #1e1035 60%, #2e1065 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+.hero-home p {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Texto con degradado claro (sobre fondo oscuro) */
+.text-gradient-claro {
+    background: linear-gradient(135deg, #c084fc, #e879f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Pills Premium --- */
+.pill-premium {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+.pill-premium:hover {
+    background: var(--morado);
+    border-color: var(--morado-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+}
+
+/* ============================================================
+   BARRA DE FILTROS — sticky bajo el navbar
+   ============================================================ */
+
+.barra-filtros {
+    background: white;
+    border-bottom: 1px solid #ede9fe;
+    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
+    position: relative;
+    overflow: visible;
+}
+.barra-filtros .text-sm.font-semibold {
+    position: static;
+    transform: none;
+    margin-right: auto;
+    padding-right: 0.75rem;
+}
+
+/* Agrupación de label + select */
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.filtro-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--navy);
+    opacity: 0.45;
+}
+
+.filtro-select {
+    background: #f7f5ff;
+    border: 1.5px solid #ddd6fe;
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--navy);
+    cursor: pointer;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+}
+.filtro-select:focus {
+    outline: none;
+    border-color: var(--morado);
+}
+
+/* Botón limpiar filtros */
+.btn-limpiar {
+    background: transparent;
+    border: 1.5px solid #ddd6fe;
+    color: var(--morado);
+    padding: 7px 16px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.btn-limpiar:hover {
+    background: #ede9fe;
+}
+
+/* ============================================================
+   TARJETAS DE EVENTOS
+   ============================================================ */
+
+.card-evento {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+}
+.card-evento:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+}
+
+/* Contenedor de la imagen — posición relativa para los badges */
+.card-imagen-wrap {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #e0e0f7;
+}
+
+.card-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.card-evento:hover .card-imagen {
+    transform: scale(1.05);
+}
+
+/* Badge de categoría — esquina superior izquierda */
+.badge-categoria {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(15, 23, 42, 0.75);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+}
+
+/* Badge de precio — esquina superior derecha */
+.badge-precio {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+/* Variante "Gratis" en verde */
+.badge-gratis {
+    background: linear-gradient(135deg, #059669, #10b981);
+}
+
+/* Cuerpo de la tarjeta (bajo la imagen) */
+.card-cuerpo {
+    padding: 14px 16px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.card-titulo {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Línea de metadato: icono + texto */
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(15, 23, 42, 0.55);
+    font-size: 0.8rem;
+}
+
+.icono-meta {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    color: var(--morado);
+}
+
+/* Nombre del organizador — al pie de la tarjeta */
+.card-organizador {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #f0eeff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--morado);
+}
+
+/* ============================================================
+   TARJETAS DE BOLSA DE TRABAJO
+   ============================================================ */
+
+.card-trabajo {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    border: 2px solid #ede9fe;
+    display: flex;
+    flex-direction: column;
+}
+.card-trabajo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+    border-color: var(--morado);
+}
+
+/* Cabecera con degradado navy en lugar de imagen */
+.card-trabajo-header {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e1b4b 100%);
+    padding: 24px 20px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+/* Icono de maletín en la cabecera */
+.icono-trabajo {
+    width: 36px;
+    height: 36px;
+    color: rgba(255,255,255,0.7);
+}
+
+/* Badge "Trabajo" en esquina de la cabecera */
+.badge-trabajo {
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+/* Salario destacado en la tarjeta de trabajo */
+.card-salario {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #059669; /* verde */
+    margin-top: 4px;
+}
+
+/* ============================================================
+   SPINNER DE CARGA
+   ============================================================ */
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #ede9fe;
+    border-top-color: var(--morado);
+    border-radius: 50%;
+    animation: girar 0.7s linear infinite;
+}
+@keyframes girar {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   BOTÓN MORADO GENÉRICO
+   ============================================================ */
+
+.btn-morado {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    padding: 10px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.15s;
+}
+.btn-morado:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+
+/* ============================================================
+   DETALLE DE EVENTO
+   ============================================================ */
+
+/* Hero con imagen de fondo */
+.hero-detalle {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 420px;
+    position: relative;
+}
+
+/* Overlay oscuro con degradado para que el texto sea legible */
+.hero-detalle-overlay {
+    background: linear-gradient(
+        to bottom,
+        rgba(10, 10, 30, 0.6) 0%,
+        rgba(10, 10, 30, 0.85) 100%
+    );
+    min-height: 420px;
+}
+
+/* Botón volver con flecha */
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.btn-volver:hover {
+    color: white;
+}
+
+/* Badge de categoría en el hero */
+.badge-categoria-hero {
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 4px 14px;
+    border-radius: 999px;
+}
+
+/* Datos del hero (fecha, ubicación, precio) */
+.dato-hero {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* Sección del cuerpo del detalle */
+.seccion-detalle {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03);
+}
+
+.seccion-titulo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0eeff;
+}
+
+/* Fichas de datos adicionales (aforo, edad, etc.) */
+.ficha-dato {
+    background: #f7f5ff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.ficha-dato-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(15,23,42,0.4);
+}
+.ficha-dato-valor {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+/* Card del organizador en el detalle */
+.card-organizador-detalle {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+.logo-empresa {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--navy), #1e1b4b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.texto-enlace {
+    color: var(--morado);
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+.texto-enlace:hover {
+    opacity: 0.75;
+}
+
+/* ─── Ficha de compra (columna derecha del detalle) ─── */
+.ficha-compra {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.1);
+    border: 2px solid #ede9fe;
+}
+
+/* Barra de ocupación del aforo */
+.barra-aforo-fondo {
+    background: #ede9fe;
+    border-radius: 999px;
+    height: 6px;
+    overflow: hidden;
+}
+.barra-aforo-relleno {
+    height: 100%;
+    background: linear-gradient(90deg, var(--morado), var(--morado-claro));
+    border-radius: 999px;
+    transition: width 0.5s ease;
+}
+/* Rojo cuando queda poca disponibilidad */
+.barra-aforo-critico {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+/* Botón principal "Comprar entrada" */
+.btn-comprar {
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+}
+.btn-comprar:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45);
+}
+
+/* Botón secundario (web oficial, etc.) */
+.btn-secundario {
+    background: transparent;
+    border: 2px solid #ddd6fe;
+    color: var(--morado);
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+}
+.btn-secundario:hover {
+    background: #f7f5ff;
+    border-color: var(--morado);
+}
+
+/* ─── Hero de oferta de trabajo ─── */
+.hero-trabajo {
+    background: linear-gradient(160deg, var(--navy) 0%, #1e1b4b 100%);
+    min-height: 380px;
+}
+
+/* Ficha del mapa (columna derecha) */
+.ficha-mapa {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03);
+}
+
+/* ============================================================
+   HOME — Partículas decorativas del hero
+   ============================================================ */
+.hero-particula {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.hero-particula-1 { width:7px; height:7px; background:#a855f7; top:22%; left:12%; opacity:0.7; animation: parpadear 3s ease infinite; }
+.hero-particula-2 { width:5px; height:5px; background:#ec4899; top:38%; right:18%; opacity:0.6; animation: parpadear 2.5s ease infinite 1s; }
+.hero-particula-3 { width:9px; height:9px; background:#c084fc; bottom:28%; left:22%; opacity:0.5; animation: parpadear 4s ease infinite 0.5s; }
+.hero-particula-4 { width:5px; height:5px; background:#f0abfc; top:55%; right:12%; opacity:0.7; animation: parpadear 2s ease infinite 1.5s; }
+.hero-particula-5 { width:6px; height:6px; background:#818cf8; top:70%; left:40%; opacity:0.5; animation: parpadear 3.5s ease infinite 2s; }
+@keyframes parpadear {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50%       { opacity: 0.9; transform: scale(1.6); }
+}
+
+/* ============================================================
+   HOME — Custom Select (reemplaza el <select> nativo)
+   ============================================================ */
+.custom-select-wrapper {
+    position: relative;
+    background: #f7f4ff;
+    border: 1.5px solid #ddd6fe;
+    border-radius: 10px;
+    padding: 8px 36px 8px 14px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--navy);
+    cursor: pointer;
+    min-width: 155px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.custom-select-wrapper:hover { border-color: rgba(124,58,237,0.5); }
+.custom-select-wrapper.abierto {
+    border-color: var(--morado);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.13);
+    border-radius: 10px 10px 0 0;
+    border-bottom-color: transparent;
+}
+.custom-select-display {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.custom-select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--morado);
+    transition: transform 0.2s ease;
+    pointer-events: none;
+}
+.custom-select-wrapper.abierto .custom-select-arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+.custom-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: -1.5px;
+    right: -1.5px;
+    background: white;
+    border: 1.5px solid var(--morado);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 12px 36px rgba(124,58,237,0.2);
+    z-index: 300;
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ddd6fe transparent;
+}
+.custom-select-dropdown::-webkit-scrollbar { width: 4px; }
+.custom-select-dropdown::-webkit-scrollbar-thumb { background: #ddd6fe; border-radius: 99px; }
+.custom-select-option {
+    padding: 9px 14px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--navy);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.custom-select-option:hover { background: #f0eeff; color: var(--morado); }
+.custom-select-option.seleccionado {
+    background: linear-gradient(90deg, #ede9fe, #f5f3ff);
+    color: var(--morado);
+    font-weight: 700;
+}
+.custom-select-option.seleccionado::before { content: '✓'; font-size: 0.72rem; }
+
+/* ============================================================
+   HOME — Secciones de resultados
+   ============================================================ */
+.seccion-vibez-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--navy);
+    text-align: center;
+}
+.seccion-vibez-sub {
+    font-size: 0.95rem;
+    color: rgba(15,23,42,0.45);
+    font-weight: 400;
+    margin-top: 4px;
+    margin-bottom: 32px;
+    text-align: center;
+}
+.linea-divisora {
+    border: none;
+    border-top: 2px solid #ede9fe;
+    margin: 40px 0 28px;
+}
+
+/* ============================================================
+   Colores de badge por categoría
+   ============================================================ */
+.badge-categoria[data-cat="Música"]      { background: linear-gradient(135deg, #db2777, #f43f5e); }
+.badge-categoria[data-cat="Cultura"]     { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.badge-categoria[data-cat="Deporte"]     { background: linear-gradient(135deg, #1d4ed8, #0ea5e9); }
+.badge-categoria[data-cat="Gastronomía"] { background: linear-gradient(135deg, #059669, #22c55e); }
+.badge-categoria[data-cat="Networking"]  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+.badge-categoria[data-cat="Tecnología"]  { background: linear-gradient(135deg, #0284c7, #06b6d4); }
+.badge-categoria[data-cat="Moda"]        { background: linear-gradient(135deg, #9d174d, #a855f7); }
+.badge-categoria[data-cat="Infantil"]    { background: linear-gradient(135deg, #b45309, #f59e0b); }
+
+/* ============================================================
+   Salario con texto en gradiente
+   ============================================================ */
+.card-salario {
+    font-size: 0.85rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #059669, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 4px;
+}
+
+/* ============================================================
+   NAVBAR — AVATAR DE USUARIO + DROPDOWN
+   ============================================================ */
+.nav-avatar-wrapper {
+    position: relative;
+}
+.nav-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: 2px solid rgba(168,85,247,0.55);
+    cursor: pointer; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 0;
+}
+.nav-avatar:hover, .nav-avatar[aria-expanded="true"] {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.28);
+}
+.nav-avatar-img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.nav-avatar-iniciales {
+    color: white; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.02em;
+}
+.nav-avatar-mood-dot {
+    position: absolute; bottom: 1px; right: 1px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+    border: 2px solid #0f172a;
+}
+
+/* Dropdown */
+.nav-dropdown {
+    position: absolute; right: 0; top: calc(100% + 10px);
+    width: 230px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(124,58,237,0.1);
+    overflow: hidden;
+    z-index: 999;
+    animation: dropdownEntrar 0.18s ease;
+}
+@keyframes dropdownEntrar {
+    from { opacity:0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.nav-dropdown-header {
+    padding: 14px 16px 12px;
+    background: linear-gradient(135deg, #05000f, #1e1035);
+}
+.nav-dropdown-nombre {
+    color: #fff; font-weight: 800; font-size: 0.875rem; margin: 0;
+}
+.nav-dropdown-email {
+    color: rgba(255,255,255,0.45); font-size: 0.72rem; margin: 2px 0 0;
+}
+.nav-dropdown-mood {
+    margin-top: 5px;
+    display: inline-block;
+    background: rgba(168,85,247,0.2);
+    border: 1px solid rgba(168,85,247,0.3);
+    color: #c084fc;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 2px 10px; border-radius: 999px;
+}
+.nav-dropdown-divider {
+    height: 1px; background: #f0eeff; margin: 0;
+}
+.nav-dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px;
+    color: #0f172a; font-size: 0.875rem; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    transition: background 0.12s;
+    background: none; border: none; width: 100%; text-align: left;
+}
+.nav-dropdown-item svg {
+    width: 17px; height: 17px; flex-shrink: 0; color: #7c3aed; stroke-width: 2;
+}
+.nav-dropdown-item:hover { background: #f7f5ff; }
+.nav-dropdown-logout {
+    color: #dc2626 !important;
+}
+.nav-dropdown-logout svg { color: #dc2626 !important; }
+.nav-dropdown-logout:hover { background: #fff5f5 !important; }
+
+/* ============================================================
+   NAVBAR — Badge de mood flotante sobre el avatar
+   ============================================================ */
+.nav-mood-badge {
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: 22px; height: 22px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid rgba(124,58,237,0.35);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; line-height: 1;
+    cursor: default; pointer-events: none;
+}
+
+/* ============================================================
+   PÁGINA DE PERFIL
+   ============================================================ */
+.perfil-hero {
+    background: linear-gradient(160deg, #05000f 0%, #130228 50%, #0f172a 100%);
+    border-bottom: 1px solid rgba(168,85,247,0.15);
+}
+
+/* Avatar grande */
+.perfil-avatar-wrap {
+    position: relative; cursor: pointer; flex-shrink: 0;
+}
+.perfil-avatar {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: 3px solid rgba(168,85,247,0.6);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 28px rgba(168,85,247,0.45);
+}
+.perfil-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-avatar-iniciales { color: white; font-weight: 900; font-size: 2rem; }
+.perfil-avatar-overlay {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: rgba(0,0,0,0.52);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+}
+.perfil-avatar-wrap:hover .perfil-avatar-overlay { opacity: 1; }
+
+/* Tarjetas de sección */
+.perfil-card {
+    background: white; border-radius: 20px; padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(124,58,237,0.07);
+}
+.perfil-card-titulo {
+    font-size: 1rem; font-weight: 800; color: #0f172a;
+    margin-bottom: 4px;
+}
+.perfil-card-sub {
+    font-size: 0.8rem; color: rgba(15,23,42,0.45);
+    margin-bottom: 16px;
+}
+
+/* Campos del formulario de perfil */
+.perfil-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 480px) { .perfil-grid-2 { grid-template-columns: 1fr; } }
+
+.perfil-field {
+    display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px;
+}
+.perfil-field label {
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(15,23,42,0.45);
+}
+.perfil-field input,
+.perfil-field textarea {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px; padding: 9px 13px;
+    font-size: 0.875rem; color: #0f172a;
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit; background: #fafafa;
+}
+.perfil-field input:focus,
+.perfil-field textarea:focus {
+    border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    background: white;
+}
+.perfil-field-hint { font-size: 0.7rem; color: rgba(15,23,42,0.35); }
+
+/* Alerta del formulario */
+.perfil-alerta {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 0.85rem; font-weight: 600; margin-bottom: 14px;
+}
+.perfil-alerta-ok    { background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; }
+.perfil-alerta-error { background: #fef2f2; border: 1.5px solid #fca5a5; color: #991b1b; }
+
+/* Botón guardar */
+.btn-perfil-guardar {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; border: none; border-radius: 999px;
+    padding: 10px 26px; font-size: 0.875rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    margin-top: 4px;
+}
+.btn-perfil-guardar:hover { opacity: 0.9; transform: scale(1.03); }
+.btn-perfil-guardar:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+/* Alerta de foto (cerca del avatar) */
+.perfil-foto-error {
+    font-size: 0.75rem; font-weight: 600; color: #991b1b;
+    background: #fef2f2; border: 1px solid #fca5a5;
+    border-radius: 8px; padding: 5px 10px; margin-top: 18px;
+    display: none; text-align: center; max-width: 140px;
+}
+
+/* Sección amigos */
+.perfil-solicitudes-wrap { margin-top: 16px; }
+.perfil-solicitudes-titulo {
+    font-size: 0.78rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(15,23,42,0.45);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.perfil-badge-count {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; font-size: 0.65rem; font-weight: 900;
+    padding: 1px 7px; border-radius: 999px;
+}
+.perfil-solicitud-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid #f0eeff;
+}
+.perfil-solicitud-item:last-child { border-bottom: none; }
+.perfil-solicitud-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+    color: white; font-weight: 800; font-size: 0.8rem;
+}
+.perfil-solicitud-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-btn-aceptar, .perfil-btn-rechazar {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: none; cursor: pointer; font-size: 0.75rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, opacity 0.15s;
+}
+.perfil-btn-aceptar { background: #22c55e; color: white; }
+.perfil-btn-rechazar { background: #ef4444; color: white; }
+.perfil-btn-aceptar:hover, .perfil-btn-rechazar:hover { transform: scale(1.12); }
+
+/* Resultados búsqueda amigos */
+.perfil-busqueda-lista {
+    border: 1.5px solid #e2e8f0; border-radius: 12px;
+    overflow: hidden; margin-bottom: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.perfil-busqueda-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; cursor: default;
+    border-bottom: 1px solid #f0eeff; background: white;
+    transition: background 0.1s;
+}
+.perfil-busqueda-item:last-child { border-bottom: none; }
+.perfil-busqueda-item:hover { background: #f7f5ff; }
+.btn-enviar-solicitud {
+    margin-left: auto; flex-shrink: 0;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; border: none; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 5px 12px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+}
+.btn-enviar-solicitud:hover { opacity: 0.88; transform: scale(1.04); }
+.btn-enviado { background: #e2e8f0 !important; color: #64748b !important; cursor: default !important; }
+
+/* ============================================================
+   PERFIL — Bio en hero
+   ============================================================ */
+.perfil-bio-hero {
+    color: rgba(255,255,255,0.75); font-size: 0.9rem;
+    margin-top: 8px; line-height: 1.5; max-width: 480px;
+}
+
+/* ============================================================
+   PERFIL — Mood en hero (badge grande, visible para todos)
+   ============================================================ */
+.perfil-mood-hero {
+    display: inline-block; margin-top: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px; padding: 5px 14px;
+    font-size: 0.9rem; color: white; font-weight: 600;
+    backdrop-filter: blur(6px);
+}
+
+/* ============================================================
+   PERFIL — Botón "Guardar foto" junto al avatar en el hero
+   ============================================================ */
+.btn-foto-hero {
+    display: block; margin-top: 10px;
+    font-size: 0.78rem; padding: 7px 18px;
+}
+
+/* ============================================================
+   PERFIL — Badge "Pública" junto al label de biografía
+   ============================================================ */
+.perfil-badge-publica {
+    display: inline-block; font-size: 0.6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white; padding: 1px 7px; border-radius: 999px;
+    vertical-align: middle; margin-left: 5px;
+}
+
+/* ============================================================
+   PERFIL — Selector de mood (grid de chips tipo radio)
+   ============================================================ */
+.perfil-mood-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Cada opción de mood es un label que envuelve un radio oculto */
+.perfil-mood-opcion {
+    display: flex; align-items: center; gap: 6px;
+    border: 1.5px solid #e2e8f0; border-radius: 12px;
+    padding: 8px 12px; cursor: pointer; background: #fafafa;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    font-size: 0.82rem; font-weight: 600; color: #0f172a;
+    user-select: none;
+}
+/* Ocultamos el radio nativo; el estilo lo da el label */
+.perfil-mood-opcion input[type="radio"] { display: none; }
+
+.perfil-mood-opcion:hover {
+    border-color: #a855f7;
+    background: #f7f5ff;
+}
+
+/* Opción seleccionada actualmente */
+.perfil-mood-activo {
+    border-color: #7c3aed !important;
+    background: #f0eeff !important;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    color: #6d28d9;
+}
+
+/* ============================================================
+   NAVBAR MÓVIL — Hamburguesa y panel lateral deslizable
+   ============================================================ */
+
+/* Botón hamburguesa: oculto en escritorio, visible en móvil */
+.nav-hamburger {
+    display: none;          /* ocultamos por defecto */
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+.nav-hamburger:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-hamburger svg  { width: 22px; height: 22px; display: block; }
+
+/* En móvil (< 768px): mostrar hamburguesa y ocultar botones de invitado */
+@media (max-width: 767px) {
+    .nav-hamburger      { display: flex; }
+    .btn-nav-ghost,
+    .btn-nav-solido     { display: none; }
+}
+
+/* Fondo oscurecido al abrir el panel */
+.nav-movil-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 49;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+.nav-movil-overlay.activo { display: block; }
+
+/* Panel lateral deslizable */
+.nav-movil-panel {
+    position: fixed;
+    top: 0; left: 0;
+    width: 80%;
+    max-width: 300px;
+    height: 100%;
+    background: var(--navy);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.nav-movil-panel.activo { transform: translateX(0); }
+
+/* Cabecera del panel con logo y botón cerrar */
+.nav-movil-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
+}
+.nav-movil-logo   { height: 34px; width: auto; }
+.nav-movil-cerrar {
+    background: none; border: none;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer; padding: 5px;
+    border-radius: 7px;
+    display: flex; align-items: center;
+    transition: background 0.15s, color 0.15s;
+}
+.nav-movil-cerrar:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-movil-cerrar svg   { width: 20px; height: 20px; }
+
+/* Sección de usuario autenticado */
+.nav-movil-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(124,58,237,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+}
+.nav-movil-avatar-sm {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 0.9rem;
+    overflow: hidden; flex-shrink: 0;
+}
+.nav-movil-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.nav-movil-usuario-nombre {
+    color: white; font-weight: 700; font-size: 0.875rem; margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-movil-usuario-email {
+    color: rgba(255,255,255,0.38); font-size: 0.7rem; margin: 2px 0 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Separador horizontal */
+.nav-movil-divisor {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 4px 0;
+    flex-shrink: 0;
+}
+
+/* Enlace de navegación dentro del panel */
+.nav-movil-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    flex-shrink: 0;
+}
+.nav-movil-link svg      { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-movil-link:hover    { background: rgba(255,255,255,0.06); color: white; }
+.nav-movil-activo        {
+    color: white !important;
+    background: rgba(124,58,237,0.18) !important;
+    border-left: 3px solid var(--morado);
+    padding-left: 15px;
+}
+.nav-movil-logout        { color: rgba(239,68,68,0.75) !important; }
+.nav-movil-logout:hover  { color: #ef4444 !important; background: rgba(239,68,68,0.08) !important; }

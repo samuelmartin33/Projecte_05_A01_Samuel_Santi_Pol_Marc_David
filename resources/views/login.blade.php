@@ -155,11 +155,7 @@
 @endsection
 
 @section('scripts')
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/js/login.js'])
-    @else
-        <script src="{{ asset('js/login.js') }}"></script>
-    @endif
+    <script src="{{ asset('js/login.js') }}"></script>
 <script>
 function togglePassword(inputId, btn) {
     const input   = document.getElementById(inputId);
