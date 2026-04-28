@@ -1465,4 +1465,45 @@ body {
     padding-left: 15px;
 }
 .nav-movil-logout        { color: rgba(239,68,68,0.75) !important; }
+
+/* ============================================================
+   RESPONSIVE GLOBAL — tablet y mobile
+   ============================================================ */
+
+/* ── Tablet (≤ 768px) ── */
+@media (max-width: 768px) {
+    /* Heroes más compactos */
+    .hero-detalle-overlay { min-height: 300px; }
+    .hero-trabajo         { min-height: 260px; }
+
+    /* Secciones con menos padding */
+    .seccion-detalle { padding: 20px; }
+    .ficha-compra    { padding: 20px; }
+}
+
+/* ── Mobile (≤ 640px) ── */
+@media (max-width: 640px) {
+    /* Navbar: logo más pequeño */
+    .nav-logo-img { height: 38px; }
+
+    /* Barra de filtros: etiquetas ocultas, selects compactos */
+    .filtro-label          { display: none; }
+    .custom-select-wrapper { min-width: 110px; padding: 6px 24px 6px 8px; font-size: 0.78rem; }
+    .btn-limpiar           { padding: 6px 10px; font-size: 0.72rem; }
+
+    /* Heroes más cortos */
+    .hero-detalle-overlay  { min-height: 220px; }
+    .hero-trabajo          { min-height: 200px; }
+
+    /* Secciones con padding reducido */
+    .seccion-detalle       { padding: 14px; border-radius: 14px; }
+    .ficha-compra          { padding: 14px; border-radius: 14px; }
+    .ficha-dato            { padding: 10px 12px; }
+
+    /* Perfil */
+    .perfil-avatar           { width: 80px; height: 80px; }
+    .perfil-avatar-iniciales { font-size: 1.6rem; }
+    .perfil-card             { padding: 16px; border-radius: 16px; }
+    .perfil-hero .max-w-4xl  { padding-top: 20px; padding-bottom: 20px; }
+}
 .nav-movil-logout:hover  { color: #ef4444 !important; background: rgba(239,68,68,0.08) !important; }

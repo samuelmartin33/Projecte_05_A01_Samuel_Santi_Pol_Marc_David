@@ -9,13 +9,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
 
-    <!-- CSS y JS compilados por Vite -->
-    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
-    <?php else: ?>
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <link rel="stylesheet" href="/css/vibez.css">
-    <?php endif; ?>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="/css/vibez.css">
 </head>
 <body class="min-h-screen relative flex flex-col">
 

@@ -12,30 +12,19 @@ use Illuminate\Support\Facades\Auth;
 class EventoController extends Controller
 {
     /**
-     * Página de inicio (home).
-     * Carga todos los eventos activos y las ofertas de trabajo,
-     * junto con los datos necesarios para los filtros.
+     * Página de inicio (home). Solo muestra eventos activos.
      */
     public function index()
     {
-        // Cargar eventos activos con sus relaciones (categoría, portada, empresa organizadora)
         $eventos = Evento::with(['categoria', 'portada', 'organizador.empresa'])
             ->where('estado', 1)
             ->orderBy('fecha_inicio', 'asc')
             ->get();
 
-        // Obtener todas las categorías activas para el selector de filtro
         $categorias = CategoriaEvento::where('estado', 1)
             ->orderBy('nombre')
             ->get();
 
-        // Cargar ofertas de trabajo activas con el nombre de la empresa
-        $ofertas = BolsaOfertaTrabajo::with(['organizador.empresa'])
-            ->where('estado', 1)
-            ->orderBy('fecha_creacion', 'desc')
-            ->get();
-
-        // Obtener ubicaciones únicas de eventos para el selector de filtro
         $ubicaciones = Evento::where('estado', 1)
             ->whereNotNull('ubicacion_nombre')
             ->orderBy('ubicacion_nombre')
@@ -54,7 +43,7 @@ class EventoController extends Controller
                 ->all();
         }
 
-        return view('home', compact('eventos', 'categorias', 'ofertas', 'ubicaciones', 'favoritosIds'));
+        return view('home', compact('eventos', 'categorias', 'ubicaciones', 'favoritosIds'));
     }
 
     /**

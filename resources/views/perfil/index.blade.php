@@ -58,8 +58,8 @@
                 <p class="perfil-bio-hero">{{ $usuario->biografia }}</p>
             @endif
 
-            {{-- Mood actual (visible para todos) --}}
-            @if($usuario->mood)
+            {{-- Mood actual (visible para todos, excepto admin y empresa) --}}
+            @if($usuario->mood && !$usuario->isAdmin() && !$usuario->isEmpresa())
                 <span class="perfil-mood-hero">{{ $usuario->mood }}</span>
             @endif
         </div>
@@ -153,7 +153,8 @@
         </div>
 
         {{-- ══ TARJETA: Estado de ánimo (Mood) ══ --}}
-        {{-- El mood es público: lo puede ver CUALQUIER persona, no solo amigos --}}
+        {{-- Solo para usuarios estándar y organizadores, no admin ni empresa --}}
+        @if(!$usuario->isAdmin() && !$usuario->isEmpresa())
         <div class="perfil-card">
             <h2 class="perfil-card-titulo">Estado de ánimo</h2>
             <p class="perfil-card-sub">
@@ -209,13 +210,15 @@
                 </button>
             </form>
         </div>
+        @endif
 
     </div>
 
     {{-- ── COLUMNA DERECHA (1/3) ── --}}
     <div class="flex flex-col gap-6">
 
-        {{-- ══ TARJETA: Amigos ══ --}}
+        {{-- ══ TARJETA: Amigos (oculta para admin) ══ --}}
+        @if(!$usuario->isAdmin())
         <div class="perfil-card" id="amigos">
             <h2 class="perfil-card-titulo">Amigos</h2>
 
@@ -307,6 +310,7 @@
             </div>
 
         </div>
+        @endif
 
     </div>
 

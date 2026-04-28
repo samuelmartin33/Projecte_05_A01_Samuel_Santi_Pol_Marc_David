@@ -10,6 +10,49 @@
             border-radius: 16px;
             z-index: 1;
         }
+
+        .btn-favorito-detalle {
+            width: 100%;
+            margin-top: 0.75rem;
+            border-radius: 999px;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            background: #ffffff;
+            color: #4c1d95;
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-favorito-detalle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.12);
+        }
+
+        .btn-favorito-detalle svg {
+            width: 1rem;
+            height: 1rem;
+            fill: currentColor;
+            opacity: 0.82;
+        }
+
+        .btn-favorito-detalle.activo {
+            background: #f43f5e;
+            border-color: #f43f5e;
+            color: #ffffff;
+        }
+
+        .btn-favorito-detalle.activo svg {
+            opacity: 1;
+        }
+
+        .btn-favorito-detalle.cargando {
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 <?php $__env->stopPush(); ?>
 
@@ -250,6 +293,21 @@
 
                     </button>
 
+                    <?php if(auth()->guard()->check()): ?>
+                        <button type="button"
+                                id="btn-favorito-detalle"
+                                class="btn-favorito-detalle <?php echo e($esFavorito ? 'activo' : ''); ?>"
+                                data-evento-id="<?php echo e($evento->id); ?>"
+                                data-favorito="<?php echo e($esFavorito ? '1' : '0'); ?>"
+                                aria-pressed="<?php echo e($esFavorito ? 'true' : 'false'); ?>"
+                                onclick="toggleFavoritoDetalle(event.currentTarget)">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                            <span id="btn-favorito-detalle-texto"><?php echo e($esFavorito ? 'En favoritos' : 'Guardar en favoritos'); ?></span>
+                        </button>
+                    <?php endif; ?>
+
                     
                     <?php if($evento->url_externa): ?>
                         <a href="<?php echo e($evento->url_externa); ?>"
@@ -305,10 +363,94 @@
     </div>
 </div>
 
+
+<?php if(auth()->guard()->check()): ?>
+<div id="modal-compra"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);"
+     onclick="if(event.target===this)cerrarModalCompra()">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                background:#fff;border-radius:24px;padding:2rem;width:calc(100% - 2rem);max-width:440px;
+                box-shadow:0 25px 60px rgba(124,58,237,0.25);">
+
+        
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <h2 style="font-weight:900;font-size:1.25rem;color:var(--navy,#0f172a);margin:0">
+                Comprar entradas
+            </h2>
+            <button onclick="cerrarModalCompra()"
+                    style="background:none;border:none;cursor:pointer;font-size:1.75rem;color:#94a3b8;line-height:1">×</button>
+        </div>
+
+        
+        <div style="background:#f0ecff;border-radius:12px;padding:1rem;margin-bottom:1.5rem">
+            <p style="font-weight:700;color:var(--navy,#0f172a);margin:0;font-size:0.95rem"><?php echo e($evento->titulo); ?></p>
+            <p style="color:#7c3aed;font-size:0.85rem;margin:4px 0 0">
+                <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D [de] MMMM [de] YYYY')); ?>
+
+            </p>
+        </div>
+
+        
+        <div style="margin-bottom:1.5rem">
+            <label style="font-weight:600;font-size:0.875rem;color:var(--navy,#0f172a);display:block;margin-bottom:10px">
+                Cantidad de entradas
+            </label>
+            <div style="display:flex;align-items:center;gap:16px">
+                <button type="button" onclick="cambiarCantidad(-1)"
+                        style="width:40px;height:40px;border-radius:50%;border:2px solid #7c3aed;
+                               background:#fff;color:#7c3aed;font-size:1.25rem;cursor:pointer;
+                               font-weight:700;display:flex;align-items:center;justify-content:center;
+                               flex-shrink:0">−</button>
+                <span id="modal-cantidad"
+                      style="font-size:1.5rem;font-weight:900;color:var(--navy,#0f172a);
+                             min-width:40px;text-align:center">1</span>
+                <button type="button" onclick="cambiarCantidad(1)"
+                        style="width:40px;height:40px;border-radius:50%;border:2px solid #7c3aed;
+                               background:#fff;color:#7c3aed;font-size:1.25rem;cursor:pointer;
+                               font-weight:700;display:flex;align-items:center;justify-content:center;
+                               flex-shrink:0">+</button>
+            </div>
+        </div>
+
+        
+        <div style="display:flex;justify-content:space-between;align-items:center;
+                    border-top:1px solid #ede9fe;padding-top:1rem;margin-bottom:1.5rem">
+            <span style="font-weight:600;color:#64748b;font-size:0.9rem">Total</span>
+            <span id="modal-total" class="text-gradient"
+                  style="font-size:1.75rem;font-weight:900">
+                <?php if($evento->es_gratuito): ?> Gratis
+                <?php else: ?> <?php echo e(number_format($evento->precio_base, 2)); ?> €
+                <?php endif; ?>
+            </span>
+        </div>
+
+        
+        <div id="modal-error"
+             style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;
+                    border-radius:8px;padding:10px 14px;font-size:0.875rem;margin-bottom:1rem"></div>
+
+        
+        <button id="modal-btn-comprar"
+                onclick="confirmarCompra()"
+                class="btn-comprar w-full">
+            <?php echo e($evento->es_gratuito ? 'Reservar gratis' : 'Confirmar compra'); ?>
+
+        </button>
+
+        <p style="text-align:center;font-size:0.75rem;color:#94a3b8;margin-top:12px;margin-bottom:0">
+            🔒 Transacción segura · Recibirás tu QR al instante
+        </p>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php $__env->stopSection(); ?>
 
 
 <?php $__env->startPush('scripts'); ?>
+
+<script src="<?php echo e(asset('js/favoritos.js')); ?>"></script>
+
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -364,6 +506,88 @@ function inicializarMapa(latitud, longitud, nombreUbicacion) {
 function abrirCompra(eventoId) {
     // TODO: Integrar con el sistema de pedidos y pagos de VIBEZ
     alert('Próximamente: flujo de compra para el evento #' + eventoId);
+// Datos del evento pasados desde PHP
+const EVENTO_ID   = <?php echo e($evento->id); ?>;
+const PRECIO_BASE = <?php echo e($evento->precio_base ?? 0); ?>;
+const ES_GRATUITO = <?php echo e($evento->es_gratuito ? 'true' : 'false'); ?>;
+const AFORO_LIBRE = <?php echo e($evento->aforo_maximo ? $evento->aforo_maximo - $evento->aforo_actual : 9999); ?>;
+
+let modalCantidad = 1;
+
+function abrirCompra() {
+    <?php if(auth()->guard()->guest()): ?>
+    window.location.href = '<?php echo e(route('login')); ?>';
+    return;
+    <?php endif; ?>
+
+    modalCantidad = 1;
+    actualizarModalTotal();
+    document.getElementById('modal-error').style.display = 'none';
+    document.getElementById('modal-btn-comprar').disabled = false;
+    document.getElementById('modal-btn-comprar').textContent = ES_GRATUITO ? 'Reservar gratis' : 'Confirmar compra';
+    document.getElementById('modal-compra').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalCompra() {
+    document.getElementById('modal-compra').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function cambiarCantidad(delta) {
+    const nuevo = modalCantidad + delta;
+    if (nuevo < 1 || nuevo > 10 || nuevo > AFORO_LIBRE) return;
+    modalCantidad = nuevo;
+    actualizarModalTotal();
+}
+
+function actualizarModalTotal() {
+    document.getElementById('modal-cantidad').textContent = modalCantidad;
+    if (!ES_GRATUITO) {
+        const total = (PRECIO_BASE * modalCantidad).toFixed(2).replace('.', ',');
+        document.getElementById('modal-total').textContent = total + ' €';
+    }
+}
+
+async function confirmarCompra() {
+    const btn   = document.getElementById('modal-btn-comprar');
+    const error = document.getElementById('modal-error');
+    const csrf  = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    btn.disabled    = true;
+    btn.textContent = 'Procesando...';
+    error.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/entradas/comprar', {
+            method:  'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept':       'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+            body: JSON.stringify({ evento_id: EVENTO_ID, cantidad: modalCantidad }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            btn.textContent = '¡Redirigiendo...';
+            document.body.style.transition = 'opacity 0.3s';
+            document.body.style.opacity    = '0';
+            setTimeout(() => { window.location.href = data.redirect; }, 320);
+        } else {
+            error.textContent   = data.message || 'Error al procesar la compra.';
+            error.style.display = 'block';
+            btn.disabled        = false;
+            btn.textContent     = ES_GRATUITO ? 'Reservar gratis' : 'Confirmar compra';
+        }
+    } catch (e) {
+        error.textContent   = 'Error de conexión. Inténtalo de nuevo.';
+        error.style.display = 'block';
+        btn.disabled        = false;
+        btn.textContent     = ES_GRATUITO ? 'Reservar gratis' : 'Confirmar compra';
+    }
 }
 </script>
 <?php $__env->stopPush(); ?>

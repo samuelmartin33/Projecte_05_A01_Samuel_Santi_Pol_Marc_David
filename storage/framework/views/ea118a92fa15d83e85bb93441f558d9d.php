@@ -253,11 +253,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/register.js']); ?>
-    <?php else: ?>
-        <script src="<?php echo e(asset('js/register.js')); ?>"></script>
-    <?php endif; ?>
+    <script src="<?php echo e(asset('js/register.js')); ?>"></script>
 <script>
 /** Inicializa flatpickr en el campo de fecha de nacimiento */
 document.addEventListener('DOMContentLoaded', function () {
@@ -377,7 +373,10 @@ function mostrarAlerta(msg, tipo = 'error') {
 
 function sacudirElemento(el) {
     el.classList.add('shake');
-    el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    el.onanimationend = function() {
+        el.classList.remove('shake');
+        el.onanimationend = null;
+    };
 }
 
 /** Submit del formulario de registro */
