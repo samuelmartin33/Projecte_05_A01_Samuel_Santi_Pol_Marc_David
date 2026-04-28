@@ -1102,6 +1102,14 @@ body.auth-page {
         padding: 2rem 1.5rem;
         border-radius: 16px;
     }
+
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-panel {
+        padding: 0 var(--space-md);
+    }
 }
 
 /* ==========================================

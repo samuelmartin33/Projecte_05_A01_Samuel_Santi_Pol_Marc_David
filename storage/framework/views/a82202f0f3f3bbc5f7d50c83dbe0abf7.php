@@ -56,7 +56,7 @@
             <?php endif; ?>
 
             
-            <?php if($usuario->mood): ?>
+            <?php if($usuario->mood && !$usuario->isAdmin() && !$usuario->isEmpresa()): ?>
                 <span class="perfil-mood-hero"><?php echo e($usuario->mood); ?></span>
             <?php endif; ?>
         </div>
@@ -147,6 +147,7 @@
 
         
         
+        <?php if(!$usuario->isAdmin() && !$usuario->isEmpresa()): ?>
         <div class="perfil-card">
             <h2 class="perfil-card-titulo">Estado de ánimo</h2>
             <p class="perfil-card-sub">
@@ -202,6 +203,7 @@
                 </button>
             </form>
         </div>
+        <?php endif; ?>
 
     </div>
 
@@ -209,6 +211,7 @@
     <div class="flex flex-col gap-6">
 
         
+        <?php if(!$usuario->isAdmin()): ?>
         <div class="perfil-card" id="amigos">
             <h2 class="perfil-card-titulo">Amigos</h2>
 
@@ -304,6 +307,7 @@
             </div>
 
         </div>
+        <?php endif; ?>
 
     </div>
 
@@ -312,11 +316,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>
-    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/perfil.js']); ?>
-    <?php else: ?>
-        <script src="<?php echo e(asset('js/perfil.js')); ?>"></script>
-    <?php endif; ?>
+    <script src="<?php echo e(asset('js/perfil.js')); ?>"></script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/perfil/index.blade.php ENDPATH**/ ?>

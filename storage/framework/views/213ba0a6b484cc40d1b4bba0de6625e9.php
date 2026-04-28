@@ -89,7 +89,10 @@
         
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
              style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#c084fc;letter-spacing:0.06em;text-transform:uppercase;">
-            🔥 La plataforma de la escena joven
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+            </svg>
+            La plataforma de la escena joven
         </div>
 
         <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -100,20 +103,6 @@
         <p class="mt-5 text-white/60 text-base max-w-lg mx-auto leading-relaxed">
             Eventos, conciertos, festivales y trabajo — todo lo que vive tu escena, en un solo lugar.
         </p>
-
-        
-        <div class="flex flex-wrap justify-center gap-2 mt-7">
-            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
-                  onclick="seleccionarFiltro('categoria', '1', '🎵 Música', {stopPropagation:function(){}})">🎵 Música</span>
-            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
-                  onclick="seleccionarFiltro('categoria', '3', '⚽ Deporte', {stopPropagation:function(){}})">⚽ Deporte</span>
-            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
-                  onclick="seleccionarFiltro('categoria', '2', '🎭 Cultura', {stopPropagation:function(){}})">🎭 Cultura</span>
-            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
-                  onclick="seleccionarFiltro('categoria', '4', '🍕 Gastro', {stopPropagation:function(){}})">🍕 Gastro</span>
-            <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
-                  onclick="seleccionarFiltro('categoria', 'trabajo', '💼 Trabajo', {stopPropagation:function(){}})">💼 Trabajo</span>
-        </div>
 
     </div>
 </section>
@@ -131,7 +120,7 @@
         
         <p class="text-sm font-semibold mr-auto self-center"
            style="color:rgba(15,23,42,0.5)">
-            <span id="contador-resultados"><?php echo e($eventos->count() + $ofertas->count()); ?></span>
+            <span id="contador-resultados"><?php echo e($eventos->count()); ?></span>
             <span style="color:var(--morado)"> resultados</span>
         </p>
 
@@ -156,10 +145,6 @@
 
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <div class="custom-select-option"
-                         onclick="seleccionarFiltro('categoria','trabajo','💼 Bolsa de Trabajo',event)">
-                        💼 Bolsa de Trabajo
-                    </div>
                 </div>
             </div>
             <input type="hidden" id="filtro-categoria" value="">
@@ -230,7 +215,12 @@
 
     
     <div id="sin-resultados" class="hidden text-center py-20">
-        <p class="text-5xl mb-3">🔍</p>
+        <span class="flex justify-center mb-3" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--violet-primary);opacity:0.5;">
+                <circle cx="10.5" cy="10.5" r="6.75"/>
+                <path d="M15.75 15.75L21 21"/>
+            </svg>
+        </span>
         <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
         <p class="text-sm mt-1 mb-5" style="color:rgba(15,23,42,0.45)">Prueba a cambiar la categoría o la ciudad</p>
         <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
@@ -239,7 +229,10 @@
     
     <div id="seccion-eventos">
         <div class="seccion-vibez-titulo">
-            <span>🎉</span> Eventos
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M16.5 6v.75a3.75 3.75 0 0 1-7.5 0V6m-4.5 3h16.5m-16.5 0a2.25 2.25 0 0 0-2.25 2.25v8.25A2.25 2.25 0 0 0 4.5 21.75h15a2.25 2.25 0 0 0 2.25-2.25V11.25A2.25 2.25 0 0 0 19.5 9H4.5z"/>
+            </svg>
+            Eventos
         </div>
         <p class="seccion-vibez-sub">
             <?php echo e($eventos->count()); ?> evento<?php echo e($eventos->count() !== 1 ? 's' : ''); ?> disponible<?php echo e($eventos->count() !== 1 ? 's' : ''); ?>
@@ -320,64 +313,6 @@
     </div>
 
     
-    <?php if($ofertas->count() > 0): ?>
-        <hr class="linea-divisora">
-
-        <div id="seccion-trabajos">
-            <div class="seccion-vibez-titulo">
-                <span>💼</span> Bolsa de Trabajo
-            </div>
-            <p class="seccion-vibez-sub">
-                <?php echo e($ofertas->count()); ?> oferta<?php echo e($ofertas->count() !== 1 ? 's' : ''); ?> de empleo en la escena de eventos
-            </p>
-
-            <div id="grid-trabajos"
-                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-
-                <?php $__currentLoopData = $ofertas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oferta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <article class="card-trabajo"
-                             onclick="irADetalle('oferta', <?php echo e($oferta->id); ?>)">
-
-                        <div class="card-trabajo-header">
-                            <svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <span class="badge-trabajo">Trabajo</span>
-                        </div>
-
-                        <div class="card-cuerpo">
-                            <h3 class="card-titulo"><?php echo e($oferta->titulo); ?></h3>
-                            <?php if($oferta->organizador?->empresa): ?>
-                                <p class="card-meta font-semibold" style="color:var(--morado)">
-                                    <?php echo e($oferta->organizador->empresa->nombre_empresa); ?>
-
-                                </p>
-                            <?php endif; ?>
-                            <?php if($oferta->ubicacion): ?>
-                                <p class="card-meta">
-                                    <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    </svg>
-                                    <?php echo e($oferta->ubicacion); ?>
-
-                                </p>
-                            <?php endif; ?>
-                            <p class="card-salario"><?php echo e($oferta->salario_formateado); ?></p>
-                            <p class="card-meta" style="font-size:0.75rem">
-                                <?php echo e($oferta->vacantes); ?> vacante<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?>
-
-                            </p>
-                        </div>
-                    </article>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-            </div>
-        </div>
-    <?php endif; ?>
-
-    
     <div id="grid-resultados" class="hidden">
         <div id="grid-resultados-inner"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -397,8 +332,7 @@ window.vibezFavoritosConfig = {
 };
 
 window.vibezHomeConfig = {
-    totalEventos: <?php echo e($eventos->count()); ?>,
-    totalOfertas: <?php echo e($ofertas->count()); ?>
+    totalEventos: <?php echo e($eventos->count()); ?>
 
 };
 </script>
@@ -485,30 +419,24 @@ function aplicarFiltros() {
     document.getElementById('grid-resultados').classList.add('hidden');
     document.getElementById('sin-resultados').classList.add('hidden');
 
-    var seccionEventos  = document.getElementById('seccion-eventos');
-    var seccionTrabajos = document.getElementById('seccion-trabajos');
-    if (seccionEventos)  seccionEventos.style.display  = 'none';
-    if (seccionTrabajos) seccionTrabajos.style.display = 'none';
+    var seccionEventos = document.getElementById('seccion-eventos');
+    if (seccionEventos) seccionEventos.style.display = 'none';
 
     fetch('/api/filtrar?categoria=' + encodeURIComponent(categoria) + '&ubicacion=' + encodeURIComponent(ubicacion) + '&favoritos=' + encodeURIComponent(favoritos))
         .then(function(respuesta) { return respuesta.json(); })
         .then(function(datos) {
 
-            document.getElementById('contador-resultados').textContent = datos.total;
+            document.getElementById('contador-resultados').textContent = datos.eventos.length;
             document.getElementById('cargando').classList.add('hidden');
 
-            if (datos.total === 0) {
+            if (datos.eventos.length === 0) {
                 document.getElementById('sin-resultados').classList.remove('hidden');
                 return;
             }
 
-            // Construir HTML del grid combinado
             var htmlGrid = '';
             datos.eventos.forEach(function(evento) {
                 htmlGrid += crearTarjetaEvento(evento);
-            });
-            datos.ofertas.forEach(function(oferta) {
-                htmlGrid += crearTarjetaOferta(oferta);
             });
 
             document.getElementById('grid-resultados-inner').innerHTML = htmlGrid;
@@ -517,9 +445,7 @@ function aplicarFiltros() {
         .catch(function(error) {
             console.error('Error al filtrar:', error);
             document.getElementById('cargando').classList.add('hidden');
-            // Mostrar de nuevo las secciones estáticas
-            if (seccionEventos)  seccionEventos.style.display  = '';
-            if (seccionTrabajos) seccionTrabajos.style.display = '';
+            if (seccionEventos) seccionEventos.style.display = '';
         });
 }
 
@@ -551,15 +477,10 @@ function limpiarFiltros() {
     document.getElementById('grid-resultados').classList.add('hidden');
     document.getElementById('sin-resultados').classList.add('hidden');
 
-    var seccionEventos  = document.getElementById('seccion-eventos');
-    var seccionTrabajos = document.getElementById('seccion-trabajos');
-    if (seccionEventos)  seccionEventos.style.display  = '';
-    if (seccionTrabajos) seccionTrabajos.style.display = '';
+    var seccionEventos = document.getElementById('seccion-eventos');
+    if (seccionEventos) seccionEventos.style.display = '';
 
-    // Actualizar contador con total real
-    var totalEventos  = Number(HOME_CFG.totalEventos || 0);
-    var totalOfertas  = Number(HOME_CFG.totalOfertas || 0);
-    document.getElementById('contador-resultados').textContent = totalEventos + totalOfertas;
+    document.getElementById('contador-resultados').textContent = Number(HOME_CFG.totalEventos || 0);
 }
 
 /**
@@ -619,27 +540,6 @@ function crearTarjetaEvento(evento) {
         + '</div></article>';
 }
 
-/**
- * Genera el HTML de una tarjeta de oferta de trabajo para el grid AJAX.
- */
-function crearTarjetaOferta(oferta) {
-    var ubicacionHtml = oferta.ubicacion_nombre
-        ? '<p class="card-meta"><svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>' + oferta.ubicacion_nombre + '</p>'
-        : '';
-
-    return '<article class="card-trabajo" onclick="irADetalle(\'oferta\',' + oferta.id + ')">'
-        + '<div class="card-trabajo-header">'
-        + '<svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'
-        + '<span class="badge-trabajo">Trabajo</span>'
-        + '</div>'
-        + '<div class="card-cuerpo">'
-        + '<h3 class="card-titulo">' + oferta.titulo + '</h3>'
-        + '<p class="card-meta" style="font-weight:600;color:var(--morado)">' + oferta.organizador + '</p>'
-        + ubicacionHtml
-        + '<p class="card-salario">' + oferta.salario_formateado + '</p>'
-        + '<p class="card-meta" style="font-size:0.75rem">' + oferta.vacantes + ' vacante' + (oferta.vacantes !== 1 ? 's' : '') + '</p>'
-        + '</div></article>';
-}
 </script>
 <?php $__env->stopPush(); ?>
 

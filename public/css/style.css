@@ -1085,6 +1085,16 @@ body.auth-page {
         padding: 2rem 1.5rem;
         border-radius: 16px;
     }
+
+    /* Campos dobles se apilan en una sola columna */
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+
+    /* Reducir padding lateral del formulario */
+    .form-panel {
+        padding: 0 var(--space-md);
+    }
 }
 
 /* ==========================================
