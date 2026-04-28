@@ -13,15 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    {{-- CSS y JS compilados por Vite (cuando está corriendo npm run dev / build) --}}
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        {{-- Fallback CDN: Tailwind v4 (procesa clases utility en tiempo real) --}}
-        <script src="https://cdn.tailwindcss.com"></script>
-        {{-- Estilos personalizados VIBEZ servidos como archivo estático --}}
-        <link rel="stylesheet" href="/css/vibez.css">
-    @endif
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/app-static.css">
 
     @if (request()->routeIs('login') || request()->routeIs('register'))
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
