@@ -197,8 +197,8 @@
         <div class="filtro-grupo">
             <label class="filtro-label">Favoritos</label>
             <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                    <path d="M8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-1.066 2.08-.163 4.905 2.54 7.568L8 15l4.06-4.379c2.703-2.663 3.606-5.488 2.54-7.568-1.114-2.175-4.2-2.772-5.883-1.042L8 2.748z"/>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
                 <span id="texto-solo-favoritos">Solo favoritos</span>
             </button>
@@ -261,8 +261,8 @@
                                 aria-label="Marcar favorito"
                                 aria-pressed="<?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'true' : 'false'); ?>"
                                 onclick="toggleFavorito(event, this)">
-                            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                                <path d="M8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-1.066 2.08-.163 4.905 2.54 7.568L8 15l4.06-4.379c2.703-2.663 3.606-5.488 2.54-7.568-1.114-2.175-4.2-2.772-5.883-1.042L8 2.748z"/>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
                         </button>
 

@@ -261,11 +261,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/js/register.js'])
-    @else
-        <script src="{{ asset('js/register.js') }}"></script>
-    @endif
+    <script src="{{ asset('js/register.js') }}"></script>
 <script>
 /** Inicializa flatpickr en el campo de fecha de nacimiento */
 document.addEventListener('DOMContentLoaded', function () {

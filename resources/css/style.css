@@ -525,8 +525,8 @@ body.auth-page {
     border: none;
     border-bottom: 1.5px solid #D1D5DB;
     background: transparent;
-    padding: 0.45rem 1.5rem 0.5rem 0;
-    font-size: var(--font-sm);
+    padding: 0.5rem 1.5rem 0.35rem 0;
+    font-size: var(--font-base);
     font-family: inherit;
     color: #1F2937;
     cursor: pointer;
@@ -544,7 +544,7 @@ body.auth-page {
 .field-select label {
     top: 0;
     font-size: var(--font-xs);
-    color: #9CA3AF;
+    color: var(--violet-primary);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -574,7 +574,7 @@ body.auth-page {
 .toggle-password {
     position: absolute;
     right: 0;
-    bottom: 0.2rem;
+    bottom: 1.25rem;
     background: none;
     border: none;
     cursor: pointer;

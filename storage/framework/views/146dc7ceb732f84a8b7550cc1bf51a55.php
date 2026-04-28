@@ -149,11 +149,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>
-    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/login.js']); ?>
-    <?php else: ?>
-        <script src="<?php echo e(asset('js/login.js')); ?>"></script>
-    <?php endif; ?>
+    <script src="<?php echo e(asset('js/login.js')); ?>"></script>
 <script>
 function togglePassword(inputId, btn) {
     const input   = document.getElementById(inputId);
