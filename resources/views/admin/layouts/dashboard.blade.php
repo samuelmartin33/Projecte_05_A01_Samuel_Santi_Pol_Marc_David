@@ -29,8 +29,8 @@
             <a href="{{ route('admin.eventos.index') }}" class="menu-link {{ request()->routeIs('admin.eventos.*') ? 'active' : '' }}">Eventos</a>
             <a href="{{ route('admin.empresas.index') }}" class="menu-link {{ request()->routeIs('admin.empresas.*') ? 'active' : '' }}">Empresas</a>
             <a href="{{ route('admin.usuarios.index') }}" class="menu-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">Usuarios</a>
-            <span class="menu-link disabled">Pedidos (proximamente)</span>
-            <span class="menu-link disabled">Pagos (proximamente)</span>
+            <a href="{{ route('admin.pedidos.index') }}" class="menu-link {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}">Pedidos</a>
+            <a href="{{ route('admin.pagos.index') }}" class="menu-link {{ request()->routeIs('admin.pagos.*') ? 'active' : '' }}">Pagos</a>
         </nav>
     </aside>
 

@@ -28,6 +28,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
+use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
+use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\PerfilController;
@@ -160,6 +162,34 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.usuarios.update');
     Route::delete('/admin/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])
          ->name('admin.usuarios.destroy');
+
+    /* Rutas de gestión de pedidos */
+    Route::get('/admin/pedidos', [AdminPedidoController::class, 'index'])
+         ->name('admin.pedidos.index');
+    Route::get('/admin/pedidos/crear', [AdminPedidoController::class, 'create'])
+         ->name('admin.pedidos.create');
+    Route::post('/admin/pedidos', [AdminPedidoController::class, 'store'])
+         ->name('admin.pedidos.store');
+    Route::get('/admin/pedidos/{pedido}/editar', [AdminPedidoController::class, 'edit'])
+         ->name('admin.pedidos.edit');
+    Route::put('/admin/pedidos/{pedido}', [AdminPedidoController::class, 'update'])
+         ->name('admin.pedidos.update');
+    Route::delete('/admin/pedidos/{pedido}', [AdminPedidoController::class, 'destroy'])
+         ->name('admin.pedidos.destroy');
+
+    /* Rutas de gestión de pagos */
+    Route::get('/admin/pagos', [AdminPagoController::class, 'index'])
+         ->name('admin.pagos.index');
+    Route::get('/admin/pagos/crear', [AdminPagoController::class, 'create'])
+         ->name('admin.pagos.create');
+    Route::post('/admin/pagos', [AdminPagoController::class, 'store'])
+         ->name('admin.pagos.store');
+    Route::get('/admin/pagos/{pago}/editar', [AdminPagoController::class, 'edit'])
+         ->name('admin.pagos.edit');
+    Route::put('/admin/pagos/{pago}', [AdminPagoController::class, 'update'])
+         ->name('admin.pagos.update');
+    Route::delete('/admin/pagos/{pago}', [AdminPagoController::class, 'destroy'])
+         ->name('admin.pagos.destroy');
 });
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —

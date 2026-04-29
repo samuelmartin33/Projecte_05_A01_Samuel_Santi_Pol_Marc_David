@@ -138,26 +138,74 @@ body {
     overflow: hidden;
 }
 
+.admin-panel-section {
+    padding: 1.25rem;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    line-height: 1.1;
+    color: #1e1b4b;
+}
+
+.panel-empty {
+    padding: 1rem 1.1rem;
+    border: 1px dashed #c4b5fd;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+
+.panel-empty .text-muted {
+    margin: 0;
+}
+
 /* ─── TABLE ────────────────────────────────────────────── */
-.tabla-eventos {
+.tabla-eventos,
+.admin-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .tabla-eventos th,
-.tabla-eventos td {
+.tabla-eventos td,
+.admin-table th,
+.admin-table td {
     padding: 0.8rem;
     border-bottom: 1px solid var(--border);
     text-align: left;
     vertical-align: middle;
 }
 
-.tabla-eventos th {
-    background: #ede9fe;
-    font-size: 0.8rem;
+.tabla-eventos tbody tr:nth-child(even),
+.admin-table tbody tr:nth-child(even) {
+    background: #faf8ff;
+}
+
+.tabla-eventos tbody tr:hover,
+.admin-table tbody tr:hover {
+    background: #f5f3ff;
+}
+
+.tabla-eventos thead th,
+.admin-table thead th {
+    background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.08em;
     color: #5b21b6;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    box-shadow: inset 0 -1px 0 rgba(196, 181, 253, 0.8);
 }
 
 .acciones {
@@ -192,6 +240,77 @@ body {
 .btn-danger {
     background: var(--danger);
     color: #fff;
+}
+
+.btn-sm {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-success {
+    background: #38a169;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background: #2f855a;
+}
+
+.btn-danger:hover {
+    background: #a50f2e;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.badge,
+.badge-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge {
+    padding: 0.2rem 0.65rem;
+    font-size: 0.75rem;
+}
+
+.badge-count {
+    min-width: 1.4rem;
+    height: 1.4rem;
+    padding: 0 0.4rem;
+    margin-left: 0.45rem;
+    vertical-align: middle;
+}
+
+.badge-success {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.badge-danger {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.text-muted {
+    color: #718096;
+    font-size: 0.9rem;
 }
 
 /* ─── ESTADO BADGE ─────────────────────────────────────── */
@@ -453,13 +572,15 @@ body {
     margin-bottom: 1rem;
 }
 
-.alert.success {
+.alert.success,
+.alert-success {
     background: #ede9fe;
     color: #5b21b6;
     border: 1px solid #c4b5fd;
 }
 
-.alert.error {
+.alert.error,
+.alert-danger {
     background: #fee2e2;
     color: #7f1d1d;
     border: 1px solid #fecaca;
@@ -501,7 +622,8 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .tabla-eventos {
+    .tabla-eventos,
+    .admin-table {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
@@ -627,22 +749,27 @@ body {
     }
 
     /* --- Tabla → tarjetas en móvil --- */
-    .tabla-eventos {
+    .tabla-eventos,
+    .admin-table {
         display: block;
         white-space: normal;
         overflow: visible;
     }
 
-    .tabla-eventos thead {
+    .tabla-eventos thead,
+    .admin-table thead {
         display: none; /* Ocultamos las cabeceras */
     }
 
     .tabla-eventos tbody,
-    .tabla-eventos tr {
+    .tabla-eventos tr,
+    .admin-table tbody,
+    .admin-table tr {
         display: block;
     }
 
-    .tabla-eventos tr {
+    .tabla-eventos tr,
+    .admin-table tr {
         background: var(--paper);
         border: 1px solid var(--border);
         border-radius: 14px;
@@ -652,7 +779,8 @@ body {
     }
 
     /* Cada celda usa el atributo data-label como etiqueta */
-    .tabla-eventos td {
+    .tabla-eventos td,
+    .admin-table td {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -662,14 +790,16 @@ body {
         gap: 0.4rem;
     }
 
-    .tabla-eventos td:last-child {
+    .tabla-eventos td:last-child,
+    .admin-table td:last-child {
         border-bottom: none;
         padding-top: 0.6rem;
         flex-wrap: wrap;
         gap: 0.4rem;
     }
 
-    .tabla-eventos td::before {
+    .tabla-eventos td::before,
+    .admin-table td::before {
         content: attr(data-label);
         font-weight: 700;
         font-size: 0.75rem;
@@ -680,19 +810,22 @@ body {
     }
 
     /* Ocultar celda vacía de tabla en modo tarjeta */
-    .tabla-eventos td.empty {
+    .tabla-eventos td.empty,
+    .admin-table td.empty {
         display: block;
         text-align: center;
         padding: 1.2rem;
         border: none;
     }
 
-    .tabla-eventos td.empty::before {
+    .tabla-eventos td.empty::before,
+    .admin-table td.empty::before {
         display: none;
     }
 
     /* Acciones en cada tarjeta */
-    .acciones {
+    .acciones,
+    .actions-cell {
         flex-direction: row;
         flex-wrap: wrap;
         gap: 0.4rem;
@@ -701,7 +834,9 @@ body {
     }
 
     .acciones .btn,
-    .acciones button.btn {
+    .acciones button.btn,
+    .actions-cell .btn,
+    .actions-cell button.btn {
         flex: 1 1 auto;
         text-align: center;
         justify-content: center;
