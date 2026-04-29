@@ -169,10 +169,129 @@
                         </div>
                     </div>
                 <?php endif; ?>
+
+                
+                <button class="nav-hamburger" id="navHamburger"
+                        onclick="toggleMenuMovil()"
+                        aria-label="Abrir menú" aria-expanded="false">
+                    <svg class="icono-ham" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg class="icono-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
         </div>
     </header>
+
+    
+
+    
+    <div class="nav-movil-overlay" id="navMovilOverlay" onclick="cerrarMenuMovil()"></div>
+
+    
+    <nav class="nav-movil-panel" id="navMovilPanel" aria-label="Menú de navegación móvil">
+
+        
+        <div class="nav-movil-cabecera">
+            <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ" class="nav-movil-logo">
+            <button class="nav-movil-cerrar" onclick="cerrarMenuMovil()" aria-label="Cerrar menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        
+        <?php if(auth()->guard()->check()): ?>
+        <div class="nav-movil-usuario">
+            <div class="nav-movil-avatar-sm">
+                <?php if(Auth::user()->foto_url): ?>
+                    <img src="<?php echo e(Auth::user()->foto_url); ?>" alt="<?php echo e(Auth::user()->nombre); ?>">
+                <?php else: ?>
+                    <?php echo e(strtoupper(substr(Auth::user()->nombre, 0, 1))); ?><?php echo e(strtoupper(substr(Auth::user()->apellido1 ?? '', 0, 1))); ?>
+
+                <?php endif; ?>
+            </div>
+            <div>
+                <p class="nav-movil-usuario-nombre"><?php echo e(Auth::user()->nombre); ?> <?php echo e(Auth::user()->apellido1); ?></p>
+                <p class="nav-movil-usuario-email"><?php echo e(Auth::user()->email); ?></p>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="nav-movil-divisor"></div>
+
+        
+        <a href="<?php echo e(route('home')); ?>"
+           class="nav-movil-link <?php echo e(request()->routeIs('home') ? 'nav-movil-activo' : ''); ?>"
+           onclick="cerrarMenuMovil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            Explorar
+        </a>
+
+        
+        <a href="<?php echo e(route('trabajos.index')); ?>"
+           class="nav-movil-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-movil-activo' : ''); ?>"
+           onclick="cerrarMenuMovil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Bolsa de Trabajo
+        </a>
+
+        
+        <?php if(auth()->guard()->check()): ?>
+        <a href="<?php echo e(route('social')); ?>"
+           class="nav-movil-link <?php echo e(request()->routeIs('social') ? 'nav-movil-activo' : ''); ?>"
+           onclick="cerrarMenuMovil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            Social
+        </a>
+
+        <div class="nav-movil-divisor"></div>
+
+        
+        <a href="<?php echo e(route('perfil')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            Mi perfil
+        </a>
+
+        <button class="nav-movil-link nav-movil-logout" onclick="cerrarSesion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Cerrar sesión
+        </button>
+        <?php endif; ?>
+
+        
+        <?php if(auth()->guard()->guest()): ?>
+        <div class="nav-movil-divisor"></div>
+        <a href="<?php echo e(route('login')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            Entrar
+        </a>
+        <a href="<?php echo e(route('register')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Registro
+        </a>
+        <?php endif; ?>
+
+    </nav>
+
     <?php endif; ?>
 
     
@@ -204,6 +323,47 @@
     
     <?php echo $__env->yieldPushContent('scripts'); ?>
     <?php echo $__env->yieldContent('scripts'); ?>
+
+    
+    <script>
+    function toggleMenuMovil() {
+        var panel   = document.getElementById('navMovilPanel');
+        var overlay = document.getElementById('navMovilOverlay');
+        var btn     = document.getElementById('navHamburger');
+        if (!panel) return;
+        var abierto = panel.classList.contains('activo');
+        if (abierto) {
+            cerrarMenuMovil();
+        } else {
+            panel.classList.add('activo');
+            overlay.classList.add('activo');
+            btn.setAttribute('aria-expanded', 'true');
+            btn.querySelector('.icono-ham').style.display = 'none';
+            btn.querySelector('.icono-x').style.display   = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function cerrarMenuMovil() {
+        var panel   = document.getElementById('navMovilPanel');
+        var overlay = document.getElementById('navMovilOverlay');
+        var btn     = document.getElementById('navHamburger');
+        if (!panel) return;
+        panel.classList.remove('activo');
+        overlay.classList.remove('activo');
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.querySelector('.icono-ham').style.display = 'block';
+            btn.querySelector('.icono-x').style.display   = 'none';
+        }
+        document.body.style.overflow = '';
+    }
+
+    // Cerrar el panel al pulsar Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') cerrarMenuMovil();
+    });
+    </script>
 
     <?php if(auth()->guard()->check()): ?>
     
@@ -258,7 +418,12 @@
     }
 
     /** Cierra el dropdown si se pulsa fuera */
-    document.addEventListener('click', function(e) {
+    const anteriorClickDocumento = document.onclick;
+    document.onclick = function(e) {
+        if (typeof anteriorClickDocumento === 'function') {
+            anteriorClickDocumento(e);
+        }
+
         const wrapper = document.getElementById('navAvatarWrapper');
         if (wrapper && !wrapper.contains(e.target)) {
             const dropdown = document.getElementById('navDropdown');
@@ -266,7 +431,7 @@
             if (dropdown) dropdown.style.display = 'none';
             if (btn)      btn.setAttribute('aria-expanded', 'false');
         }
-    });
+    };
 
     /**
      * Cierra la sesión del usuario mediante AJAX.
