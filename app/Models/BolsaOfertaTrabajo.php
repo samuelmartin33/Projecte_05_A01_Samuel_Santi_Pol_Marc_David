@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Modelo para la tabla bolsa_ofertas_trabajo.
@@ -40,6 +41,12 @@ class BolsaOfertaTrabajo extends Model
     public function categoria()
     {
         return $this->belongsTo(CategoriaTrabajo::class, 'categoria_trabajo_id');
+    }
+
+    public function candidaturas(): HasMany
+    {
+        return $this->hasMany(CandidaturaTrabajo::class, 'oferta_id')
+                    ->where('candidaturas_trabajo.estado', 1);
     }
 
     /**

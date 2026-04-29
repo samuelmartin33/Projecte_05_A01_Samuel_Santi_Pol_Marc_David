@@ -14,5 +14,5 @@ class EventoImagen extends Model
     protected $table = 'eventos_imagenes';
     public $timestamps = false;
 
-    protected $fillable = ['evento_id', 'imagen_url', 'descripcion', 'es_portada', 'estado'];
+    protected $fillable = ['evento_id', 'imagen_url', 'descripcion', 'es_portada', 'estado', 'fecha_creacion'];
 }

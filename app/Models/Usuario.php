@@ -144,13 +144,19 @@ class Usuario extends Authenticatable
     }
 
     /**
-     * Devuelve true si el usuario es propietario de una empresa en la tabla empresas.
-     * Acceder a $this->empresa usa lazy loading con caché en el objeto.
+     * Devuelve true si el usuario es una empresa.
+     * Comprueba primero la relación con la tabla empresas (estado activo),
+     * y como fallback verifica el campo tipo_cuenta = 'empresa'.
      */
     public function isEmpresa(): bool
     {
-        return $this->empresa !== null
-            && (int) $this->empresa->estado === 1;
+        // Opción 1: tiene registro activo en tabla empresas
+        if ($this->empresa !== null && (int) $this->empresa->estado === 1) {
+            return true;
+        }
+
+        // Opción 2: tipo_cuenta marcado como empresa
+        return $this->tipo_cuenta === 'empresa';
     }
 
     /**

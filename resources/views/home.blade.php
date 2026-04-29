@@ -115,7 +115,7 @@
      BARRA DE FILTROS — sticky bajo el nav
      Usa custom selects (sin look nativo del navegador)
 ════════════════════════════════════════════════════ --}}
-<section class="barra-filtros sticky top-0 z-40">
+<section class="barra-filtros">
 
     {{-- Overlay transparente para cerrar dropdowns al pulsar fuera --}}
     <div id="overlay-dropdowns"

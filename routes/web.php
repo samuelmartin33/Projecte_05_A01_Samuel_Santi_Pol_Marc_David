@@ -30,12 +30,11 @@ use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\EventoController as PublicEventoController;
+use App\Http\Controllers\Empresa\CandidaturasController;
+use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventoController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +58,16 @@ Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
 Route::get('/trabajos/{id}', [PublicEventoController::class, 'detalleOferta'])
     ->where('id', '[0-9]+')
     ->name('trabajos.detalle');
+
+// --- Postulación: formulario CV ---
+Route::post('/trabajos/{id}/postular', [PublicEventoController::class, 'postular'])
+    ->where('id', '[0-9]+')
+    ->name('trabajos.postular');
+
+// --- Postulación: subir archivo CV ---
+Route::post('/trabajos/{id}/postular-archivo', [PublicEventoController::class, 'postularArchivo'])
+    ->where('id', '[0-9]+')
+    ->name('trabajos.postular-archivo');
 
 // --- API AJAX: filtrar eventos y ofertas (responde JSON) ---
 Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
@@ -87,6 +96,35 @@ Route::get('/home', [AuthController::class, 'showHome'])
 Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
      ->middleware('auth')
      ->name('empresa.home');
+
+/* — Eventos de empresa: crear y eliminar eventos (auth requerido) — */
+Route::middleware('auth')->prefix('empresa/eventos')->name('empresa.eventos.')->group(function () {
+    Route::get('/crear', [EmpresaEventosController::class, 'create'])->name('create');
+    Route::post('/',     [EmpresaEventosController::class, 'store'])->name('store');
+    Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
+});
+
+/* — Sección de candidaturas (empresa): auth requerido; el controlador verifica rol empresa — */
+Route::middleware('auth')->prefix('empresa/candidaturas')->name('empresa.candidaturas.')->group(function () {
+    // Lista de ofertas propias con conteo de candidatos
+    Route::get('/',                              [CandidaturasController::class, 'ofertas'])
+         ->name('ofertas');
+
+    // Lista de CVs recibidos para una oferta concreta
+    Route::get('/{ofertaId}',                    [CandidaturasController::class, 'candidaturas'])
+         ->where('ofertaId', '[0-9]+')
+         ->name('detalle');
+
+    // AJAX: cambiar estado de una candidatura
+    Route::patch('/{candidaturaId}/estado',      [CandidaturasController::class, 'actualizarEstado'])
+         ->where('candidaturaId', '[0-9]+')
+         ->name('estado');
+
+    // Descargar PDF/DOC del candidato
+    Route::get('/{candidaturaId}/descargar',     [CandidaturasController::class, 'descargarCv'])
+         ->where('candidaturaId', '[0-9]+')
+         ->name('descargar');
+});
 
 /* — Perfil de usuario — */
 Route::middleware('auth')->group(function () {

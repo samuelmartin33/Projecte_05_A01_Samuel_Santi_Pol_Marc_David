@@ -32,7 +32,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
             
-            <a href="<?php echo e(route('home')); ?>" class="nav-logo-link group">
+            <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
+            <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>" class="nav-logo-link group">
                 <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>"
                      alt="VIBEZ"
                      class="nav-logo-img">
@@ -40,20 +41,33 @@
 
             
             <nav class="hidden md:flex items-center gap-6">
-                <a href="<?php echo e(route('home')); ?>"
-                   class="nav-link <?php echo e(request()->routeIs('home') ? 'nav-link-activo' : ''); ?>">
-                    Explorar
-                </a>
-                <a href="<?php echo e(route('trabajos.index')); ?>"
-                   class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
-                    Bolsa de Trabajo
-                </a>
-                <?php if(auth()->guard()->check()): ?>
-                <a href="<?php echo e(route('social')); ?>"
-                   class="nav-link nav-social-link <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
-                    Social
-                    <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
-                </a>
+                <?php if($esEmpresa): ?>
+                    
+                    <a href="<?php echo e(route('empresa.home')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-link-activo' : ''); ?>">
+                        Panel
+                    </a>
+                    <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : ''); ?>">
+                        Candidaturas
+                    </a>
+                <?php else: ?>
+                    
+                    <a href="<?php echo e(route('home')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('home') ? 'nav-link-activo' : ''); ?>">
+                        Explorar
+                    </a>
+                    <a href="<?php echo e(route('trabajos.index')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
+                        Bolsa de Trabajo
+                    </a>
+                    <?php if(auth()->guard()->check()): ?>
+                    <a href="<?php echo e(route('social')); ?>"
+                       class="nav-link nav-social-link <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
+                        Social
+                        <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
+                    </a>
+                    <?php endif; ?>
                 <?php endif; ?>
             </nav>
 
@@ -117,23 +131,43 @@
                                 Mi perfil
                             </a>
 
-                            
-                            <a href="<?php echo e(route('entradas.mis-entradas')); ?>" class="nav-dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-                                </svg>
-                                Mis entradas
-                            </a>
+                            <?php if($esEmpresa): ?>
+                                
+                                <a href="<?php echo e(route('empresa.home')); ?>" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                    Panel Empresa
+                                </a>
+                                <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>" class="nav-dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Revisar Currículums
+                                </a>
+                            <?php else: ?>
+                                
+                                <?php if(!Auth::user()->isAdmin()): ?>
+                                <a href="<?php echo e(route('entradas.mis-entradas')); ?>" class="nav-dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                                    </svg>
+                                    Mis entradas
+                                </a>
+                                <?php endif; ?>
 
-                            
-                            <a href="<?php echo e(route('perfil')); ?>#amigos" class="nav-dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                Amigos
-                            </a>
+                                
+                                <a href="<?php echo e(route('perfil')); ?>#amigos" class="nav-dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Amigos
+                                </a>
+                            <?php endif; ?>
 
                             
                             <?php if(Auth::user()->es_admin): ?>
@@ -217,39 +251,57 @@
 
         <div class="nav-movil-divisor"></div>
 
-        
-        <a href="<?php echo e(route('home')); ?>"
-           class="nav-movil-link <?php echo e(request()->routeIs('home') ? 'nav-movil-activo' : ''); ?>"
-           onclick="cerrarMenuMovil()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            Explorar
-        </a>
-
-        
-        <a href="<?php echo e(route('trabajos.index')); ?>"
-           class="nav-movil-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-movil-activo' : ''); ?>"
-           onclick="cerrarMenuMovil()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-            Bolsa de Trabajo
-        </a>
-
-        
-        <?php if(auth()->guard()->check()): ?>
-        <a href="<?php echo e(route('social')); ?>"
-           class="nav-movil-link <?php echo e(request()->routeIs('social') ? 'nav-movil-activo' : ''); ?>"
-           onclick="cerrarMenuMovil()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            Social
-        </a>
+        <?php if($esEmpresa): ?>
+            
+            <a href="<?php echo e(route('empresa.home')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-movil-activo' : ''); ?>"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                Panel
+            </a>
+            <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-movil-activo' : ''); ?>"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Candidaturas
+            </a>
+        <?php else: ?>
+            
+            <a href="<?php echo e(route('home')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('home') ? 'nav-movil-activo' : ''); ?>"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Explorar
+            </a>
+            <a href="<?php echo e(route('trabajos.index')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-movil-activo' : ''); ?>"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Bolsa de Trabajo
+            </a>
+            <?php if(auth()->guard()->check()): ?>
+            <a href="<?php echo e(route('social')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('social') ? 'nav-movil-activo' : ''); ?>"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                Social
+            </a>
+            <?php endif; ?>
+        <?php endif; ?>
 
         <div class="nav-movil-divisor"></div>
 
+        <?php if(auth()->guard()->check()): ?>
         
         <a href="<?php echo e(route('perfil')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
