@@ -285,11 +285,13 @@
                         </div>
                     @endif
 
-                    {{-- Botón principal de acción --}}
+                    {{-- Botón principal de acción (oculto para admin) --}}
+                    @if(!Auth::check() || !Auth::user()->isAdmin())
                     <button class="btn-comprar w-full"
                             onclick="abrirCompra({{ $evento->id }})">
                         {{ $evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada' }}
                     </button>
+                    @endif
 
                     @auth
                         <button type="button"
@@ -365,6 +367,7 @@
      MODAL DE COMPRA DE ENTRADAS
 ════════════════════════════════════════════════════ --}}
 @auth
+@if(!Auth::user()->isAdmin())
 <div id="modal-compra"
      style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);"
      onclick="if(event.target===this)cerrarModalCompra()">
@@ -440,6 +443,7 @@
         </p>
     </div>
 </div>
+@endif
 @endauth
 
 @endsection

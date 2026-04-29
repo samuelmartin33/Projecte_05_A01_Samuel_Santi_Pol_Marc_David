@@ -297,4 +297,113 @@ class EventoController extends Controller
 
         return view('trabajos.detalle', compact('oferta'));
     }
+
+    /**
+     * Recibe el formulario de CV y guarda la candidatura.
+     */
+    public function postular(Request $request, int $id)
+    {
+        $request->validate([
+            'nombre'               => 'required|string|max:100',
+            'apellidos'            => 'required|string|max:100',
+            'email'                => 'required|email|max:200',
+            'telefono'             => 'required|string|max:30',
+            'ciudad'               => 'required|string|max:100',
+            'perfil_profesional'   => 'required|string|max:2000',
+            'carta_presentacion'   => 'required|string|max:5000',
+            'linkedin'             => 'nullable|url|max:500',
+            'habilidades'          => 'nullable|string|max:1000',
+            'idiomas'              => 'nullable|string|max:500',
+        ]);
+
+        BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
+
+        $expResumen = $this->construirExpFormacion($request);
+
+        \Illuminate\Support\Facades\DB::table('candidaturas_trabajo')->insert([
+            'oferta_id'              => $id,
+            'trabajador_id'          => Auth::id() ?? null,
+            'estado_candidatura'     => 1,
+            // Structured columns (visible to empresa)
+            'nombre_candidato'       => $request->nombre,
+            'apellidos_candidato'    => $request->apellidos,
+            'email_candidato'        => $request->email,
+            'telefono_candidato'     => $request->telefono,
+            'ciudad_candidato'       => $request->ciudad,
+            'linkedin_candidato'     => $request->linkedin,
+            'perfil_profesional'     => $request->perfil_profesional,
+            'habilidades'            => $request->habilidades,
+            'idiomas'                => $request->idiomas,
+            // Full carta + experience/education serialized
+            'carta_presentacion'     => $request->carta_presentacion . ($expResumen ? "\n\n" . $expResumen : ''),
+            'cv_url'                 => null,
+            'estado'                 => 1,
+            'fecha_creacion'         => now(),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Recibe un archivo CV y guarda la candidatura.
+     */
+    public function postularArchivo(Request $request, int $id)
+    {
+        $request->validate([
+            'cv_file'                    => 'required|file|mimes:pdf,doc,docx|max:5120',
+            'carta_presentacion_archivo' => 'nullable|string|max:3000',
+        ]);
+
+        BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
+
+        $path = $request->file('cv_file')->store('cvs', 'public');
+
+        \Illuminate\Support\Facades\DB::table('candidaturas_trabajo')->insert([
+            'oferta_id'          => $id,
+            'trabajador_id'      => Auth::id() ?? null,
+            'estado_candidatura' => 1,
+            'carta_presentacion' => $request->input('carta_presentacion_archivo'),
+            'cv_url'             => $path,
+            'estado'             => 1,
+            'fecha_creacion'     => now(),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /** Serializa experiencia laboral y formación académica del formulario. */
+    private function construirExpFormacion(Request $request): string
+    {
+        $lineas = [];
+
+        $empresas = $request->input('exp_empresa', []);
+        if (array_filter($empresas)) {
+            $lineas[] = '';
+            $lineas[] = '=== EXPERIENCIA LABORAL ===';
+            foreach ($empresas as $i => $empresa) {
+                if (empty($empresa)) continue;
+                $cargo  = $request->input('exp_cargo',       [])[$i] ?? '';
+                $desde  = $request->input('exp_desde',       [])[$i] ?? '';
+                $hasta  = $request->input('exp_hasta',       [])[$i] ?? 'Actualidad';
+                $desc   = $request->input('exp_descripcion', [])[$i] ?? '';
+                $lineas[] = "— {$empresa} | {$cargo} ({$desde} – {$hasta})";
+                if ($desc) $lineas[] = "  {$desc}";
+            }
+        }
+
+        $instituciones = $request->input('edu_institucion', []);
+        if (array_filter($instituciones)) {
+            $lineas[] = '';
+            $lineas[] = '=== FORMACIÓN ACADÉMICA ===';
+            foreach ($instituciones as $i => $inst) {
+                if (empty($inst)) continue;
+                $titulo = $request->input('edu_titulo', [])[$i] ?? '';
+                $inicio = $request->input('edu_inicio', [])[$i] ?? '';
+                $fin    = $request->input('edu_fin',    [])[$i] ?? '';
+                $lineas[] = "— {$inst} | {$titulo} ({$inicio}–{$fin})";
+            }
+        }
+
+        return implode("\n", $lineas);
+    }
 }

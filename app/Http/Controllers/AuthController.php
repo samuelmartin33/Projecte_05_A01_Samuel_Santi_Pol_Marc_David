@@ -45,18 +45,62 @@ class AuthController extends Controller
     /**
      * Home del usuario autenticado (explorar eventos, bolsa de trabajo, cupones).
      * Delega en EventoController para cargar los datos necesarios.
+     * Las empresas son redirigidas a su panel específico.
      */
     public function showHome(): mixed
     {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        // Las empresas no ven la home pública — redirigir a su panel
+        if ($usuario && $usuario->isEmpresa()) {
+            return redirect()->route('empresa.home');
+        }
+
         return (new EventoController())->index();
     }
 
     /**
-     * Home de empresa autenticada (crear eventos, subir ofertas, etc.).
+     * Home de empresa autenticada.
+     * Muestra información de la empresa: sus eventos, trabajadores y ofertas.
+     * Las empresas no ven la bolsa de trabajo pública ni pueden comprar entradas.
      */
     public function showEmpresaHome(): View
     {
-        return view('empresa.home');
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        // Cargar la empresa con sus relaciones
+        $usuario->load('empresa.organizadores.usuario');
+        $empresa = $usuario->empresa;
+
+        // Eventos de la empresa (a través de sus organizadores)
+        $eventos = $empresa
+            ? $empresa->eventos()
+                ->with(['categoria', 'portada'])
+                ->where('eventos.estado', 1)
+                ->orderBy('eventos.fecha_inicio', 'desc')
+                ->get()
+            : collect();
+
+        // Organizadores/trabajadores de la empresa
+        $trabajadores = $empresa
+            ? $empresa->organizadores()
+                ->with('usuario')
+                ->where('organizadores.estado', 1)
+                ->get()
+            : collect();
+
+        // Ofertas de trabajo publicadas por la empresa
+        $ofertas = $empresa
+            ? $empresa->ofertas()
+                ->with('categoria')
+                ->where('bolsa_ofertas_trabajo.estado', 1)
+                ->orderBy('bolsa_ofertas_trabajo.fecha_creacion', 'desc')
+                ->get()
+            : collect();
+
+        return view('empresa.home', compact('usuario', 'empresa', 'eventos', 'trabajadores', 'ofertas'));
     }
 
     /* ============================================================
