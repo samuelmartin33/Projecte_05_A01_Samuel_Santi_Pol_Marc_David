@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Explorar Eventos'); ?>
 
-@section('titulo', 'Explorar Eventos')
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <style>
     .btn-favorito-card {
         position: absolute;
@@ -72,16 +70,14 @@
         border-color: transparent;
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('contenido')
+<?php $__env->startSection('contenido'); ?>
 
-{{-- ════════════════════════════════════════════════════
-     BANNER HERO — Fondo oscuro con orbs neon animados
-════════════════════════════════════════════════════ --}}
+
 <section class="hero-home">
 
-    {{-- Partículas decorativas (estrellitas de luz) --}}
+    
     <div class="hero-particula hero-particula-1"></div>
     <div class="hero-particula hero-particula-2"></div>
     <div class="hero-particula hero-particula-3"></div>
@@ -90,7 +86,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10">
 
-        {{-- Badge de bienvenida --}}
+        
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
              style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#c084fc;letter-spacing:0.06em;text-transform:uppercase;">
             🔥 La plataforma de la escena joven
@@ -105,7 +101,7 @@
             Eventos, conciertos, festivales y trabajo — todo lo que vive tu escena, en un solo lugar.
         </p>
 
-        {{-- Pills de categorías interactivas --}}
+        
         <div class="flex flex-wrap justify-center gap-2 mt-7">
             <span class="pill text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer"
                   onclick="seleccionarFiltro('categoria', '1', '🎵 Música', {stopPropagation:function(){}})">🎵 Música</span>
@@ -122,27 +118,24 @@
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     BARRA DE FILTROS — sticky bajo el nav
-     Usa custom selects (sin look nativo del navegador)
-════════════════════════════════════════════════════ --}}
+
 <section class="barra-filtros sticky top-0 z-40">
 
-    {{-- Overlay transparente para cerrar dropdowns al pulsar fuera --}}
+    
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
          onclick="cerrarTodosDropdowns()"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
 
-        {{-- Contador de resultados --}}
+        
         <p class="text-sm font-semibold mr-auto self-center"
            style="color:rgba(15,23,42,0.5)">
-            <span id="contador-resultados">{{ $eventos->count() + $ofertas->count() }}</span>
+            <span id="contador-resultados"><?php echo e($eventos->count() + $ofertas->count()); ?></span>
             <span style="color:var(--morado)"> resultados</span>
         </p>
 
-        {{-- ── Selector de CATEGORÍA personalizado ── --}}
+        
         <div class="filtro-grupo" style="position:relative;z-index:250;">
             <label class="filtro-label">Categoría</label>
             <div class="custom-select-wrapper"
@@ -156,12 +149,13 @@
                 <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
                     <div class="custom-select-option seleccionado"
                          onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
-                    @foreach ($categorias as $categoria)
+                    <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoria): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="custom-select-option"
-                             onclick="seleccionarFiltro('categoria','{{ $categoria->id }}','{{ $categoria->nombre }}',event)">
-                            {{ $categoria->nombre }}
+                             onclick="seleccionarFiltro('categoria','<?php echo e($categoria->id); ?>','<?php echo e($categoria->nombre); ?>',event)">
+                            <?php echo e($categoria->nombre); ?>
+
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     <div class="custom-select-option"
                          onclick="seleccionarFiltro('categoria','trabajo','💼 Bolsa de Trabajo',event)">
                         💼 Bolsa de Trabajo
@@ -171,7 +165,7 @@
             <input type="hidden" id="filtro-categoria" value="">
         </div>
 
-        {{-- ── Selector de UBICACIÓN personalizado ── --}}
+        
         <div class="filtro-grupo" style="position:relative;z-index:240;">
             <label class="filtro-label">Ubicación</label>
             <div class="custom-select-wrapper"
@@ -187,18 +181,19 @@
                          onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">
                         Todas las ciudades
                     </div>
-                    @foreach ($ubicaciones as $ubicacion)
+                    <?php $__currentLoopData = $ubicaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ubicacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="custom-select-option"
-                             onclick="seleccionarFiltro('ubicacion','{{ $ubicacion }}','{{ $ubicacion }}',event)">
-                            {{ $ubicacion }}
+                             onclick="seleccionarFiltro('ubicacion','<?php echo e($ubicacion); ?>','<?php echo e($ubicacion); ?>',event)">
+                            <?php echo e($ubicacion); ?>
+
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
             <input type="hidden" id="filtro-ubicacion" value="">
         </div>
 
-        {{-- ── Toggle SOLO FAVORITOS ── --}}
+        
         <div class="filtro-grupo">
             <label class="filtro-label">Favoritos</label>
             <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
@@ -210,7 +205,7 @@
             <input type="hidden" id="filtro-favoritos" value="0">
         </div>
 
-        {{-- Botón limpiar — wrapped en filtro-grupo con label invisible para alinearlo ── --}}
+        
         <div class="filtro-grupo">
             <span class="filtro-label" style="visibility:hidden">–</span>
             <button class="btn-limpiar" onclick="limpiarFiltros()">
@@ -225,18 +220,15 @@
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     GRID DE TARJETAS (eventos + ofertas mezclados)
-     id="grid-resultados" es el target del AJAX
-════════════════════════════════════════════════════ --}}
+
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    {{-- Spinner de carga --}}
+    
     <div id="cargando" class="hidden flex justify-center py-16">
         <div class="spinner"></div>
     </div>
 
-    {{-- Mensaje sin resultados --}}
+    
     <div id="sin-resultados" class="hidden text-center py-20">
         <p class="text-5xl mb-3">🔍</p>
         <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
@@ -244,61 +236,65 @@
         <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
     </div>
 
-    {{-- ── Sección EVENTOS ── --}}
+    
     <div id="seccion-eventos">
         <div class="seccion-vibez-titulo">
             <span>🎉</span> Eventos
         </div>
         <p class="seccion-vibez-sub">
-            {{ $eventos->count() }} evento{{ $eventos->count() !== 1 ? 's' : '' }} disponible{{ $eventos->count() !== 1 ? 's' : '' }}
+            <?php echo e($eventos->count()); ?> evento<?php echo e($eventos->count() !== 1 ? 's' : ''); ?> disponible<?php echo e($eventos->count() !== 1 ? 's' : ''); ?>
+
         </p>
 
         <div id="grid-eventos"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-            @foreach ($eventos as $evento)
+            <?php $__currentLoopData = $eventos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $evento): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <article class="card-evento"
-                         onclick="irADetalle('evento', {{ $evento->id }})">
+                         onclick="irADetalle('evento', <?php echo e($evento->id); ?>)">
 
                     <div class="card-imagen-wrap">
                         <button type="button"
-                                class="btn-favorito-card {{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'activo' : '' }}"
-                                data-evento-id="{{ $evento->id }}"
-                                data-favorito="{{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? '1' : '0' }}"
+                                class="btn-favorito-card <?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'activo' : ''); ?>"
+                                data-evento-id="<?php echo e($evento->id); ?>"
+                                data-favorito="<?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? '1' : '0'); ?>"
                                 aria-label="Marcar favorito"
-                                aria-pressed="{{ in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'true' : 'false' }}"
+                                aria-pressed="<?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'true' : 'false'); ?>"
                                 onclick="toggleFavorito(event, this)">
                             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
                         </button>
 
-                        <img src="{{ $evento->url_portada }}"
-                             alt="{{ $evento->titulo }}"
+                        <img src="<?php echo e($evento->url_portada); ?>"
+                             alt="<?php echo e($evento->titulo); ?>"
                              class="card-imagen"
-                             onerror="this.src='https://picsum.photos/seed/fallback-{{ $evento->id }}/600/400'">
+                             onerror="this.src='https://picsum.photos/seed/fallback-<?php echo e($evento->id); ?>/600/400'">
 
-                        {{-- Badge con data-cat para el color CSS --}}
+                        
                         <span class="badge-categoria"
-                              data-cat="{{ $evento->categoria?->nombre ?? 'Evento' }}">
-                            {{ $evento->categoria?->nombre ?? 'Evento' }}
+                              data-cat="<?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>">
+                            <?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>
+
                         </span>
 
-                        <span class="badge-precio {{ $evento->es_gratuito ? 'badge-gratis' : '' }}">
-                            {{ $evento->precio_formateado }}
+                        <span class="badge-precio <?php echo e($evento->es_gratuito ? 'badge-gratis' : ''); ?>">
+                            <?php echo e($evento->precio_formateado); ?>
+
                         </span>
                     </div>
 
                     <div class="card-cuerpo">
-                        <h3 class="card-titulo">{{ $evento->titulo }}</h3>
+                        <h3 class="card-titulo"><?php echo e($evento->titulo); ?></h3>
                         <p class="card-meta">
                             <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY') }}
+                            <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY')); ?>
+
                         </p>
-                        @if ($evento->ubicacion_nombre)
+                        <?php if($evento->ubicacion_nombre): ?>
                             <p class="card-meta">
                                 <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -306,23 +302,25 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                                {{ $evento->ubicacion_nombre }}
+                                <?php echo e($evento->ubicacion_nombre); ?>
+
                             </p>
-                        @endif
-                        @if ($evento->organizador?->empresa)
+                        <?php endif; ?>
+                        <?php if($evento->organizador?->empresa): ?>
                             <p class="card-organizador">
-                                {{ $evento->organizador->empresa->nombre_empresa }}
+                                <?php echo e($evento->organizador->empresa->nombre_empresa); ?>
+
                             </p>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </article>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-        </div>{{-- fin #grid-eventos --}}
+        </div>
     </div>
 
-    {{-- ── Separador y sección BOLSA DE TRABAJO ── --}}
-    @if ($ofertas->count() > 0)
+    
+    <?php if($ofertas->count() > 0): ?>
         <hr class="linea-divisora">
 
         <div id="seccion-trabajos">
@@ -330,15 +328,15 @@
                 <span>💼</span> Bolsa de Trabajo
             </div>
             <p class="seccion-vibez-sub">
-                {{ $ofertas->count() }} oferta{{ $ofertas->count() !== 1 ? 's' : '' }} de empleo en la escena de eventos
+                <?php echo e($ofertas->count()); ?> oferta<?php echo e($ofertas->count() !== 1 ? 's' : ''); ?> de empleo en la escena de eventos
             </p>
 
             <div id="grid-trabajos"
                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                @foreach ($ofertas as $oferta)
+                <?php $__currentLoopData = $ofertas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oferta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <article class="card-trabajo"
-                             onclick="irADetalle('oferta', {{ $oferta->id }})">
+                             onclick="irADetalle('oferta', <?php echo e($oferta->id); ?>)">
 
                         <div class="card-trabajo-header">
                             <svg class="icono-trabajo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -349,34 +347,37 @@
                         </div>
 
                         <div class="card-cuerpo">
-                            <h3 class="card-titulo">{{ $oferta->titulo }}</h3>
-                            @if ($oferta->organizador?->empresa)
+                            <h3 class="card-titulo"><?php echo e($oferta->titulo); ?></h3>
+                            <?php if($oferta->organizador?->empresa): ?>
                                 <p class="card-meta font-semibold" style="color:var(--morado)">
-                                    {{ $oferta->organizador->empresa->nombre_empresa }}
+                                    <?php echo e($oferta->organizador->empresa->nombre_empresa); ?>
+
                                 </p>
-                            @endif
-                            @if ($oferta->ubicacion)
+                            <?php endif; ?>
+                            <?php if($oferta->ubicacion): ?>
                                 <p class="card-meta">
                                     <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                     </svg>
-                                    {{ $oferta->ubicacion }}
+                                    <?php echo e($oferta->ubicacion); ?>
+
                                 </p>
-                            @endif
-                            <p class="card-salario">{{ $oferta->salario_formateado }}</p>
+                            <?php endif; ?>
+                            <p class="card-salario"><?php echo e($oferta->salario_formateado); ?></p>
                             <p class="card-meta" style="font-size:0.75rem">
-                                {{ $oferta->vacantes }} vacante{{ $oferta->vacantes !== 1 ? 's' : '' }}
+                                <?php echo e($oferta->vacantes); ?> vacante<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?>
+
                             </p>
                         </div>
                     </article>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            </div>{{-- fin #grid-trabajos --}}
+            </div>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Grid unificado para el AJAX (target del filtrado) --}}
+    
     <div id="grid-resultados" class="hidden">
         <div id="grid-resultados-inner"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -385,24 +386,23 @@
 
 </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-{{-- ════════════════════════════════════════════════════
-     SCRIPTS — Filtrado AJAX + Custom Selects
-════════════════════════════════════════════════════ --}}
-@push('scripts')
+
+<?php $__env->startPush('scripts'); ?>
 <script>
 window.vibezFavoritosConfig = {
-    userAuthenticated: @json(Auth::check()),
-    loginUrl: @json(route('login'))
+    userAuthenticated: <?php echo json_encode(Auth::check(), 15, 512) ?>,
+    loginUrl: <?php echo json_encode(route('login'), 15, 512) ?>
 };
 
 window.vibezHomeConfig = {
-    totalEventos: {{ $eventos->count() }},
-    totalOfertas: {{ $ofertas->count() }}
+    totalEventos: <?php echo e($eventos->count()); ?>,
+    totalOfertas: <?php echo e($ofertas->count()); ?>
+
 };
 </script>
-<script src="{{ asset('js/favoritos.js') }}"></script>
+<script src="<?php echo e(asset('js/favoritos.js')); ?>"></script>
 <script>
 var HOME_CFG = window.vibezHomeConfig || {};
 
@@ -641,4 +641,6 @@ function crearTarjetaOferta(oferta) {
         + '</div></article>';
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\0616\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/home.blade.php ENDPATH**/ ?>
