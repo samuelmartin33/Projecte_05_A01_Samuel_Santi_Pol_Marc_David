@@ -1,0 +1,546 @@
+<?php $__env->startSection('titulo', 'Explorar Eventos'); ?>
+
+<?php $__env->startPush('estilos'); ?>
+<style>
+    .btn-favorito-card {
+        position: absolute;
+        bottom: 0.65rem;
+        right: 0.65rem;
+        z-index: 12;
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: 999px;
+        border: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        background: rgba(15, 23, 42, 0.48);
+        backdrop-filter: blur(5px);
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-favorito-card:hover {
+        transform: scale(1.06);
+        background: rgba(15, 23, 42, 0.62);
+    }
+
+    .btn-favorito-card svg {
+        width: 1.05rem;
+        height: 1.05rem;
+        fill: currentColor;
+        opacity: 0.78;
+    }
+
+    .btn-favorito-card.activo {
+        background: rgba(244, 63, 94, 0.92);
+    }
+
+    .btn-favorito-card.activo svg {
+        opacity: 1;
+    }
+
+    .btn-favorito-card.cargando {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .btn-favoritos-filtro {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid rgba(124, 58, 237, 0.25);
+        background: #ffffff;
+        color: #6d28d9;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0.58rem 0.78rem;
+        border-radius: 0.8rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-favoritos-filtro:hover {
+        border-color: rgba(124, 58, 237, 0.45);
+        background: #f8f5ff;
+    }
+
+    .btn-favoritos-filtro.activo {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        color: #ffffff;
+        border-color: transparent;
+    }
+</style>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startSection('contenido'); ?>
+
+
+<section class="hero-home">
+
+    
+    <div class="hero-particula hero-particula-1"></div>
+    <div class="hero-particula hero-particula-2"></div>
+    <div class="hero-particula hero-particula-3"></div>
+    <div class="hero-particula hero-particula-4"></div>
+    <div class="hero-particula hero-particula-5"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10">
+
+        
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
+             style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#c084fc;letter-spacing:0.06em;text-transform:uppercase;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+            </svg>
+            La plataforma de la escena joven
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+            Tu próxima<br>
+            <span class="text-gradient-claro">aventura empieza aquí</span>
+        </h1>
+
+        <p class="mt-5 text-white/60 text-base max-w-lg mx-auto leading-relaxed">
+            Eventos, conciertos, festivales y trabajo — todo lo que vive tu escena, en un solo lugar.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="barra-filtros">
+
+    
+    <div id="overlay-dropdowns"
+         style="display:none;position:fixed;inset:0;z-index:200;"
+         onclick="cerrarTodosDropdowns()"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
+
+        
+        <p class="text-sm font-semibold mr-auto self-center"
+           style="color:rgba(15,23,42,0.5)">
+            <span id="contador-resultados"><?php echo e($eventos->count()); ?></span>
+            <span style="color:var(--morado)"> resultados</span>
+        </p>
+
+        
+        <div class="filtro-grupo" style="position:relative;z-index:250;">
+            <label class="filtro-label">Categoría</label>
+            <div class="custom-select-wrapper"
+                 id="wrapper-categoria"
+                 onclick="toggleDropdown('categoria')">
+                <span id="categoria-display" class="custom-select-display">Todas</span>
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+                <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
+                    <div class="custom-select-option seleccionado"
+                         onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
+                    <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoria): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="custom-select-option"
+                             onclick="seleccionarFiltro('categoria','<?php echo e($categoria->id); ?>','<?php echo e($categoria->nombre); ?>',event)">
+                            <?php echo e($categoria->nombre); ?>
+
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            </div>
+            <input type="hidden" id="filtro-categoria" value="">
+        </div>
+
+        
+        <div class="filtro-grupo" style="position:relative;z-index:240;">
+            <label class="filtro-label">Ubicación</label>
+            <div class="custom-select-wrapper"
+                 id="wrapper-ubicacion"
+                 onclick="toggleDropdown('ubicacion')">
+                <span id="ubicacion-display" class="custom-select-display">Todas las ciudades</span>
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+                <div id="ubicacion-dropdown" class="custom-select-dropdown" style="display:none">
+                    <div class="custom-select-option seleccionado"
+                         onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">
+                        Todas las ciudades
+                    </div>
+                    <?php $__currentLoopData = $ubicaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ubicacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="custom-select-option"
+                             onclick="seleccionarFiltro('ubicacion','<?php echo e($ubicacion); ?>','<?php echo e($ubicacion); ?>',event)">
+                            <?php echo e($ubicacion); ?>
+
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            </div>
+            <input type="hidden" id="filtro-ubicacion" value="">
+        </div>
+
+        
+        <div class="filtro-grupo">
+            <label class="filtro-label">Favoritos</label>
+            <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span id="texto-solo-favoritos">Solo favoritos</span>
+            </button>
+            <input type="hidden" id="filtro-favoritos" value="0">
+        </div>
+
+        
+        <div class="filtro-grupo">
+            <span class="filtro-label" style="visibility:hidden">–</span>
+            <button class="btn-limpiar" onclick="limpiarFiltros()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+                Limpiar
+            </button>
+        </div>
+
+    </div>
+</section>
+
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    
+    <div id="cargando" class="hidden flex justify-center py-16">
+        <div class="spinner"></div>
+    </div>
+
+    
+    <div id="sin-resultados" class="hidden text-center py-20">
+        <span class="flex justify-center mb-3" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--violet-primary);opacity:0.5;">
+                <circle cx="10.5" cy="10.5" r="6.75"/>
+                <path d="M15.75 15.75L21 21"/>
+            </svg>
+        </span>
+        <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
+        <p class="text-sm mt-1 mb-5" style="color:rgba(15,23,42,0.45)">Prueba a cambiar la categoría o la ciudad</p>
+        <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
+    </div>
+
+    
+    <div id="seccion-eventos">
+        <div class="seccion-vibez-titulo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M16.5 6v.75a3.75 3.75 0 0 1-7.5 0V6m-4.5 3h16.5m-16.5 0a2.25 2.25 0 0 0-2.25 2.25v8.25A2.25 2.25 0 0 0 4.5 21.75h15a2.25 2.25 0 0 0 2.25-2.25V11.25A2.25 2.25 0 0 0 19.5 9H4.5z"/>
+            </svg>
+            Eventos
+        </div>
+        <p class="seccion-vibez-sub">
+            <?php echo e($eventos->count()); ?> evento<?php echo e($eventos->count() !== 1 ? 's' : ''); ?> disponible<?php echo e($eventos->count() !== 1 ? 's' : ''); ?>
+
+        </p>
+
+        <div id="grid-eventos"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+            <?php $__currentLoopData = $eventos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $evento): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <article class="card-evento"
+                         onclick="irADetalle('evento', <?php echo e($evento->id); ?>)">
+
+                    <div class="card-imagen-wrap">
+                        <button type="button"
+                                class="btn-favorito-card <?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'activo' : ''); ?>"
+                                data-evento-id="<?php echo e($evento->id); ?>"
+                                data-favorito="<?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? '1' : '0'); ?>"
+                                aria-label="Marcar favorito"
+                                aria-pressed="<?php echo e(in_array((int) $evento->id, $favoritosIds ?? [], true) ? 'true' : 'false'); ?>"
+                                onclick="toggleFavorito(event, this)">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+
+                        <img src="<?php echo e($evento->url_portada); ?>"
+                             alt="<?php echo e($evento->titulo); ?>"
+                             class="card-imagen"
+                             onerror="this.src='https://picsum.photos/seed/fallback-<?php echo e($evento->id); ?>/600/400'">
+
+                        
+                        <span class="badge-categoria"
+                              data-cat="<?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>">
+                            <?php echo e($evento->categoria?->nombre ?? 'Evento'); ?>
+
+                        </span>
+
+                        <span class="badge-precio <?php echo e($evento->es_gratuito ? 'badge-gratis' : ''); ?>">
+                            <?php echo e($evento->precio_formateado); ?>
+
+                        </span>
+                    </div>
+
+                    <div class="card-cuerpo">
+                        <h3 class="card-titulo"><?php echo e($evento->titulo); ?></h3>
+                        <p class="card-meta">
+                            <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY')); ?>
+
+                        </p>
+                        <?php if($evento->ubicacion_nombre): ?>
+                            <p class="card-meta">
+                                <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <?php echo e($evento->ubicacion_nombre); ?>
+
+                            </p>
+                        <?php endif; ?>
+                        <?php if($evento->organizador?->empresa): ?>
+                            <p class="card-organizador">
+                                <?php echo e($evento->organizador->empresa->nombre_empresa); ?>
+
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                </article>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+        </div>
+    </div>
+
+    
+    <div id="grid-resultados" class="hidden">
+        <div id="grid-resultados-inner"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        </div>
+    </div>
+
+</section>
+
+<?php $__env->stopSection(); ?>
+
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+window.vibezFavoritosConfig = {
+    userAuthenticated: <?php echo json_encode(Auth::check(), 15, 512) ?>,
+    loginUrl: <?php echo json_encode(route('login'), 15, 512) ?>
+};
+
+window.vibezHomeConfig = {
+    totalEventos: <?php echo e($eventos->count()); ?>
+
+};
+</script>
+<script src="<?php echo e(asset('js/favoritos.js')); ?>"></script>
+<script>
+var HOME_CFG = window.vibezHomeConfig || {};
+
+/**
+ * Abre o cierra el dropdown personalizado de un selector.
+ * Usa un overlay invisible para detectar clics fuera del selector.
+ */
+function toggleDropdown(id) {
+    var dropdown = document.getElementById(id + '-dropdown');
+    var wrapper  = document.getElementById('wrapper-' + id);
+    var overlay  = document.getElementById('overlay-dropdowns');
+    var estaAbierto = dropdown.style.display === 'block';
+
+    cerrarTodosDropdowns();
+
+    if (!estaAbierto) {
+        dropdown.style.display = 'block';
+        wrapper.classList.add('abierto');
+        overlay.style.display = 'block';
+    }
+}
+
+/**
+ * Cierra todos los custom selects y oculta el overlay.
+ */
+function cerrarTodosDropdowns() {
+    ['categoria', 'ubicacion'].forEach(function(id) {
+        var d = document.getElementById(id + '-dropdown');
+        var w = document.getElementById('wrapper-' + id);
+        if (d) d.style.display = 'none';
+        if (w) w.classList.remove('abierto');
+    });
+    var overlay = document.getElementById('overlay-dropdowns');
+    if (overlay) overlay.style.display = 'none';
+}
+
+/**
+ * Selecciona una opción del custom select, actualiza el input hidden
+ * y dispara el filtrado AJAX.
+ * @param {string} filtroId  - 'categoria' o 'ubicacion'
+ * @param {string} valor     - Valor a guardar en el input hidden
+ * @param {string} texto     - Texto visible en el selector
+ * @param {Event}  event     - Evento del click (para stopPropagation)
+ */
+function seleccionarFiltro(filtroId, valor, texto, event) {
+    event.stopPropagation();
+
+    // Actualizar input hidden y texto visible
+    var inputHidden = document.getElementById('filtro-' + filtroId);
+    var display = document.getElementById(filtroId + '-display');
+    if (inputHidden) inputHidden.value = valor;
+    if (display) display.textContent = texto;
+
+    // Marcar la opción como seleccionada visualmente
+    var dropdown = document.getElementById(filtroId + '-dropdown');
+    if (dropdown) {
+        dropdown.querySelectorAll('.custom-select-option').forEach(function(op) {
+            op.classList.remove('seleccionado');
+        });
+        if (event.target && event.target.classList) {
+            event.target.classList.add('seleccionado');
+        }
+    }
+
+    cerrarTodosDropdowns();
+    aplicarFiltros();
+}
+
+/**
+ * Lee los filtros activos y hace fetch AJAX al endpoint /api/filtrar.
+ * Muestra el grid unificado de AJAX ocultando las secciones estáticas.
+ */
+function aplicarFiltros() {
+    var categoria = document.getElementById('filtro-categoria').value;
+    var ubicacion = document.getElementById('filtro-ubicacion').value;
+    var favoritos = document.getElementById('filtro-favoritos').value;
+
+    // Mostrar spinner, ocultar secciones
+    document.getElementById('cargando').classList.remove('hidden');
+    document.getElementById('grid-resultados').classList.add('hidden');
+    document.getElementById('sin-resultados').classList.add('hidden');
+
+    var seccionEventos = document.getElementById('seccion-eventos');
+    if (seccionEventos) seccionEventos.style.display = 'none';
+
+    fetch('/api/filtrar?categoria=' + encodeURIComponent(categoria) + '&ubicacion=' + encodeURIComponent(ubicacion) + '&favoritos=' + encodeURIComponent(favoritos))
+        .then(function(respuesta) { return respuesta.json(); })
+        .then(function(datos) {
+
+            document.getElementById('contador-resultados').textContent = datos.eventos.length;
+            document.getElementById('cargando').classList.add('hidden');
+
+            if (datos.eventos.length === 0) {
+                document.getElementById('sin-resultados').classList.remove('hidden');
+                return;
+            }
+
+            var htmlGrid = '';
+            datos.eventos.forEach(function(evento) {
+                htmlGrid += crearTarjetaEvento(evento);
+            });
+
+            document.getElementById('grid-resultados-inner').innerHTML = htmlGrid;
+            document.getElementById('grid-resultados').classList.remove('hidden');
+        })
+        .catch(function(error) {
+            console.error('Error al filtrar:', error);
+            document.getElementById('cargando').classList.add('hidden');
+            if (seccionEventos) seccionEventos.style.display = '';
+        });
+}
+
+/**
+ * Resetea todos los filtros y vuelve a mostrar las secciones estáticas.
+ */
+function limpiarFiltros() {
+    // Resetear inputs hidden
+    document.getElementById('filtro-categoria').value = '';
+    document.getElementById('filtro-ubicacion').value = '';
+    document.getElementById('filtro-favoritos').value = '0';
+    document.getElementById('btn-solo-favoritos').classList.remove('activo');
+
+    // Resetear textos del custom select
+    document.getElementById('categoria-display').textContent = 'Todas';
+    document.getElementById('ubicacion-display').textContent = 'Todas las ciudades';
+
+    // Resetear marcas de seleccionado
+    document.querySelectorAll('.custom-select-dropdown .custom-select-option').forEach(function(op) {
+        op.classList.remove('seleccionado');
+    });
+    // Marcar primera opción de cada dropdown como seleccionada
+    ['categoria-dropdown', 'ubicacion-dropdown'].forEach(function(id) {
+        var primera = document.querySelector('#' + id + ' .custom-select-option');
+        if (primera) primera.classList.add('seleccionado');
+    });
+
+    // Ocultar el grid AJAX y mostrar las secciones estáticas
+    document.getElementById('grid-resultados').classList.add('hidden');
+    document.getElementById('sin-resultados').classList.add('hidden');
+
+    var seccionEventos = document.getElementById('seccion-eventos');
+    if (seccionEventos) seccionEventos.style.display = '';
+
+    document.getElementById('contador-resultados').textContent = Number(HOME_CFG.totalEventos || 0);
+}
+
+/**
+ * Alterna el estado del filtro de solo favoritos.
+ */
+function toggleSoloFavoritos() {
+    if (!window.vibezFavoritosConfig.userAuthenticated) {
+        window.location.href = window.vibezFavoritosConfig.loginUrl;
+        return;
+    }
+    
+    var btn = document.getElementById('btn-solo-favoritos');
+    var input = document.getElementById('filtro-favoritos');
+    
+    if (input.value === '1') {
+        input.value = '0';
+        btn.classList.remove('activo');
+    } else {
+        input.value = '1';
+        btn.classList.add('activo');
+    }
+    
+    aplicarFiltros();
+}
+
+/**
+ * Navega al detalle del evento o la oferta al hacer clic en una tarjeta.
+ */
+function irADetalle(tipo, id) {
+    window.location.href = tipo === 'evento' ? '/eventos/' + id : '/trabajos/' + id;
+}
+
+/**
+ * Genera el HTML de una tarjeta de evento para el grid AJAX.
+ */
+function crearTarjetaEvento(evento) {
+    var fecha = new Date(evento.fecha_inicio).toLocaleDateString('es-ES', {
+        day: 'numeric', month: 'short', year: 'numeric'
+    });
+    var imagen = evento.portada || ('https://picsum.photos/seed/evento-' + evento.id + '/600/400');
+    var ubicacionHtml = evento.ubicacion_nombre
+        ? '<p class="card-meta"><svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>' + evento.ubicacion_nombre + '</p>'
+        : '';
+
+    return '<article class="card-evento" onclick="irADetalle(\'evento\',' + evento.id + ')">'
+        + '<div class="card-imagen-wrap">'
+        + crearBotonFavorito(evento.id, Boolean(evento.is_favorito))
+        + '<img src="' + imagen + '" alt="' + evento.titulo + '" class="card-imagen" onerror="this.src=\'https://picsum.photos/seed/fallback-' + evento.id + '/600/400\'">'
+        + '<span class="badge-categoria" data-cat="' + evento.categoria + '">' + evento.categoria + '</span>'
+        + '<span class="badge-precio ' + (evento.es_gratuito ? 'badge-gratis' : '') + '">' + evento.precio_formateado + '</span>'
+        + '</div>'
+        + '<div class="card-cuerpo">'
+        + '<h3 class="card-titulo">' + evento.titulo + '</h3>'
+        + '<p class="card-meta"><svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' + fecha + '</p>'
+        + ubicacionHtml
+        + '<p class="card-organizador">' + evento.organizador + '</p>'
+        + '</div></article>';
+}
+
+</script>
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/home.blade.php ENDPATH**/ ?>
