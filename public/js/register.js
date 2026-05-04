@@ -153,6 +153,8 @@ function rippleBtn(evento, boton) {
  * Las empresas necesitan aprobación del admin; los clientes tienen acceso inmediato.
  */
 function cambiarTipoCuenta(selector) {
+    var campo = document.getElementById('field-tipo_cuenta');
+    if (campo) campo.classList.toggle('has-value', selector.value !== '');
     var pista = document.getElementById('hint-tipo_cuenta');
     if (!pista) return;
     if (selector.value === 'empresa') {
