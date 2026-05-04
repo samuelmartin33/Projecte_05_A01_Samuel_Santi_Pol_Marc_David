@@ -17,8 +17,8 @@
             <a class="quick-action-item" href="{{ route('admin.eventos.create') }}">Crear evento</a>
             <a class="quick-action-item" href="{{ route('admin.usuarios.create') }}">Crear usuario</a>
             <a class="quick-action-item" href="{{ route('admin.empresas.index') }}">Gestionar empresas</a>
-            <span class="quick-action-item disabled">Crear pedido (proximamente)</span>
-            <span class="quick-action-item disabled">Registrar pago (proximamente)</span>
+            <a class="quick-action-item" href="{{ route('admin.pedidos.create') }}">Crear pedido</a>
+            <a class="quick-action-item" href="{{ route('admin.pagos.create') }}">Registrar pago</a>
         </div>
     </section>
 
@@ -41,14 +41,14 @@
             @endif
         </a>
 
-        <article class="card stat-card muted">
+        <a href="{{ route('admin.pedidos.index') }}" class="card stat-card" style="text-decoration:none;color:inherit;">
             <h2>Pedidos</h2>
-            <p class="soon">Proximamente</p>
-        </article>
+            <p class="stat-number">{{ $totalPedidos }}</p>
+        </a>
 
-        <article class="card stat-card muted">
+        <a href="{{ route('admin.pagos.index') }}" class="card stat-card" style="text-decoration:none;color:inherit;">
             <h2>Pagos</h2>
-            <p class="soon">Proximamente</p>
-        </article>
+            <p class="stat-number">{{ $totalPagos }}</p>
+        </a>
     </section>
 @endsection

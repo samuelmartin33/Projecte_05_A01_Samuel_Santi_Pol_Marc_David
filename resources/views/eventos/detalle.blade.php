@@ -288,7 +288,7 @@
                     {{-- Botón principal de acción (oculto para admin) --}}
                     @if(!Auth::check() || !Auth::user()->isAdmin())
                     <button class="btn-comprar w-full"
-                            onclick="abrirCompra({{ $evento->id }})">
+                            onclick="abrirCompra()">
                         {{ $evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada' }}
                     </button>
                     @endif
@@ -519,13 +519,17 @@ inicializarMapa(
 );
 @endif
 
-/* ============================================================
-   MODAL DE COMPRA DE ENTRADAS
-   ============================================================ */
+// Datos del evento pasados desde PHP
+const EVENTO_ID   = {{ $evento->id }};
+const PRECIO_BASE = {{ $evento->precio_base ?? 0 }};
+const ES_GRATUITO = {{ $evento->es_gratuito ? 'true' : 'false' }};
+const AFORO_LIBRE = {{ $evento->aforo_maximo ? $evento->aforo_maximo - $evento->aforo_actual : 9999 }};
+
+let modalCantidad = 1;
 
 /**
- * Abre el modal de compra.
- * Si el usuario no ha iniciado sesión, lo redirige al login.
+ * Abre el modal de compra de entradas.
+ * Si el usuario no está autenticado, lo redirige al login.
  */
 function abrirCompra() {
     @guest
