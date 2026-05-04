@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', $oferta->titulo); ?>
 
-@section('titulo', $oferta->titulo)
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <style>
     .cv-label {
         display: block;
@@ -92,64 +90,63 @@
         background: rgba(139,92,246,0.04);
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('contenido')
+<?php $__env->startSection('contenido'); ?>
 
-{{-- ════════════════════════════════════════════════════
-     HERO DE LA OFERTA — sin imagen, fondo navy
-════════════════════════════════════════════════════ --}}
+
 <div class="hero-trabajo">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
-        {{-- Botón volver --}}
-        <a href="{{ route('home') }}?categoria=trabajo" class="btn-volver">
+        
+        <a href="<?php echo e(route('home')); ?>?categoria=trabajo" class="btn-volver">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
             Volver a Bolsa de Trabajo
         </a>
 
-        {{-- Badge de tipo --}}
+        
         <span class="badge-trabajo inline-block mt-6">Oferta de trabajo</span>
 
-        {{-- Título de la oferta --}}
+        
         <h1 class="text-3xl sm:text-5xl font-black text-white mt-3 leading-tight max-w-3xl">
-            {{ $oferta->titulo }}
+            <?php echo e($oferta->titulo); ?>
+
         </h1>
 
-        {{-- Datos clave: empresa, ubicación, salario --}}
+        
         <div class="flex flex-wrap gap-6 mt-6">
 
-            {{-- Empresa --}}
-            @if ($oferta->organizador?->empresa)
+            
+            <?php if($oferta->organizador?->empresa): ?>
                 <div class="dato-hero">
                     <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                    <span class="font-semibold">{{ $oferta->organizador->empresa->nombre_empresa }}</span>
+                    <span class="font-semibold"><?php echo e($oferta->organizador->empresa->nombre_empresa); ?></span>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            {{-- Ubicación --}}
-            @if ($oferta->ubicacion)
+            
+            <?php if($oferta->ubicacion): ?>
                 <div class="dato-hero">
                     <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     </svg>
-                    <span>{{ $oferta->ubicacion }}</span>
+                    <span><?php echo e($oferta->ubicacion); ?></span>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            {{-- Salario --}}
+            
             <div class="dato-hero">
                 <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="font-bold text-lg text-green-300">{{ $oferta->salario_formateado }}</span>
+                <span class="font-bold text-lg text-green-300"><?php echo e($oferta->salario_formateado); ?></span>
             </div>
 
         </div>
@@ -157,84 +154,84 @@
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     CUERPO DEL DETALLE
-════════════════════════════════════════════════════ --}}
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        {{-- ─── Columna izquierda: descripción y requisitos ─── --}}
+        
         <div class="lg:col-span-2 space-y-8">
 
-            {{-- Descripción de la oferta --}}
-            @if ($oferta->descripcion)
+            
+            <?php if($oferta->descripcion): ?>
                 <section class="seccion-detalle">
                     <h2 class="seccion-titulo">Descripción del puesto</h2>
-                    <p class="text-navy/80 leading-relaxed">{{ $oferta->descripcion }}</p>
+                    <p class="text-navy/80 leading-relaxed"><?php echo e($oferta->descripcion); ?></p>
                 </section>
-            @endif
+            <?php endif; ?>
 
-            {{-- Requisitos --}}
-            @if ($oferta->requisitos)
+            
+            <?php if($oferta->requisitos): ?>
                 <section class="seccion-detalle">
                     <h2 class="seccion-titulo">Requisitos</h2>
-                    <p class="text-navy/80 leading-relaxed">{{ $oferta->requisitos }}</p>
+                    <p class="text-navy/80 leading-relaxed"><?php echo e($oferta->requisitos); ?></p>
                 </section>
-            @endif
+            <?php endif; ?>
 
-            {{-- Datos adicionales --}}
+            
             <section class="seccion-detalle">
                 <h2 class="seccion-titulo">Detalles</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
 
                     <div class="ficha-dato">
                         <span class="ficha-dato-label">Vacantes</span>
-                        <span class="ficha-dato-valor">{{ $oferta->vacantes }}</span>
+                        <span class="ficha-dato-valor"><?php echo e($oferta->vacantes); ?></span>
                     </div>
 
-                    @if ($oferta->fecha_inicio_trabajo)
+                    <?php if($oferta->fecha_inicio_trabajo): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Inicio</span>
                             <span class="ficha-dato-valor">
-                                {{ \Carbon\Carbon::parse($oferta->fecha_inicio_trabajo)->format('d/m/Y') }}
+                                <?php echo e(\Carbon\Carbon::parse($oferta->fecha_inicio_trabajo)->format('d/m/Y')); ?>
+
                             </span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    @if ($oferta->fecha_fin_trabajo)
+                    <?php if($oferta->fecha_fin_trabajo): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Fin contrato</span>
                             <span class="ficha-dato-valor">
-                                {{ \Carbon\Carbon::parse($oferta->fecha_fin_trabajo)->format('d/m/Y') }}
+                                <?php echo e(\Carbon\Carbon::parse($oferta->fecha_fin_trabajo)->format('d/m/Y')); ?>
+
                             </span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                 </div>
             </section>
 
         </div>
 
-        {{-- ─── Columna derecha: botón de postulación ─── --}}
+        
         <div class="lg:col-span-1">
             <div class="lg:sticky lg:top-24">
                 <div class="ficha-compra">
 
-                    {{-- Salario destacado --}}
+                    
                     <div class="text-center mb-6">
                         <p class="text-navy/50 text-sm uppercase tracking-widest font-semibold mb-1">Salario</p>
-                        <p class="text-2xl font-black text-green-600">{{ $oferta->salario_formateado }}</p>
+                        <p class="text-2xl font-black text-green-600"><?php echo e($oferta->salario_formateado); ?></p>
                     </div>
 
-                    {{-- Vacantes disponibles --}}
+                    
                     <div class="bg-purple-50 rounded-xl p-4 text-center mb-6">
-                        <p class="text-3xl font-black text-navy">{{ $oferta->vacantes }}</p>
-                        <p class="text-navy/50 text-sm">vacante{{ $oferta->vacantes !== 1 ? 's' : '' }} disponible{{ $oferta->vacantes !== 1 ? 's' : '' }}</p>
+                        <p class="text-3xl font-black text-navy"><?php echo e($oferta->vacantes); ?></p>
+                        <p class="text-navy/50 text-sm">vacante<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?> disponible<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?></p>
                     </div>
 
-                    {{-- Botón de postulación --}}
+                    
                     <button class="btn-comprar w-full"
-                            onclick="abrirPostulacion({{ $oferta->id }})">
+                            onclick="abrirPostulacion(<?php echo e($oferta->id); ?>)">
                         Postularme ahora
                     </button>
 
@@ -249,12 +246,10 @@
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════════
-     MODALES DE POSTULACIÓN
-═══════════════════════════════════════════════════════════════ --}}
+
 <div id="modal-overlay" class="modal-overlay" onclick="cerrarAlClickarFuera(event)">
 
-    {{-- ── MODAL 1: Elegir método ── --}}
+    
     <div id="modal-eleccion" class="modal-box max-w-lg" style="display:none">
         <div class="p-7">
             <div class="flex items-start justify-between mb-5">
@@ -271,7 +266,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                {{-- Opción: Rellenar formulario CV --}}
+                
                 <button onclick="mostrarFormulario()"
                         class="group text-left flex flex-col p-5 border-2 border-navy/10 rounded-2xl hover:border-purple-400 hover:bg-purple-50/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400">
                     <div class="w-12 h-12 bg-purple-100 group-hover:bg-purple-200 rounded-xl flex items-center justify-center mb-4 transition-colors">
@@ -284,7 +279,7 @@
                     <p class="text-navy/50 text-sm leading-snug">Completa tu CV con tus datos, experiencia y formación</p>
                 </button>
 
-                {{-- Opción: Subir archivo --}}
+                
                 <button onclick="mostrarSubirArchivo()"
                         class="group text-left flex flex-col p-5 border-2 border-navy/10 rounded-2xl hover:border-green-400 hover:bg-green-50/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400">
                     <div class="w-12 h-12 bg-green-100 group-hover:bg-green-200 rounded-xl flex items-center justify-center mb-4 transition-colors">
@@ -300,10 +295,10 @@
         </div>
     </div>
 
-    {{-- ── MODAL 2: Formulario CV ── --}}
+    
     <div id="modal-formulario" class="modal-box max-w-2xl flex flex-col" style="display:none; max-height:92vh">
 
-        {{-- Header --}}
+        
         <div class="flex items-center justify-between px-6 py-4 border-b border-navy/10 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <button onclick="volverAEleccion()" class="text-navy/35 hover:text-navy transition-colors" title="Volver">
@@ -323,13 +318,13 @@
             </button>
         </div>
 
-        {{-- Formulario scrollable --}}
+        
         <div class="modal-scrollable">
             <form id="form-cv" class="px-6 py-5 space-y-7" novalidate>
-                @csrf
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="oferta_id" id="oferta-id-form" value="">
 
-                {{-- ── 1. Información personal ── --}}
+                
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
                         <span class="cv-section-num">1</span>
@@ -363,7 +358,7 @@
                     </div>
                 </section>
 
-                {{-- ── 2. Perfil profesional ── --}}
+                
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
                         <span class="cv-section-num">2</span>
@@ -373,7 +368,7 @@
                               placeholder="Describe brevemente quién eres, tu objetivo profesional y qué te diferencia como candidato..." required></textarea>
                 </section>
 
-                {{-- ── 3. Experiencia laboral ── --}}
+                
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-1">
                         <span class="cv-section-num">3</span>
@@ -418,7 +413,7 @@
                     </button>
                 </section>
 
-                {{-- ── 4. Formación académica ── --}}
+                
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-1">
                         <span class="cv-section-num">4</span>
@@ -458,7 +453,7 @@
                     </button>
                 </section>
 
-                {{-- ── 5. Habilidades ── --}}
+                
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
                         <span class="cv-section-num">5</span>
@@ -469,7 +464,7 @@
                     <p class="text-navy/35 text-xs mt-1.5">Separa las habilidades con comas</p>
                 </section>
 
-                {{-- ── 6. Idiomas ── --}}
+                
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
                         <span class="cv-section-num">6</span>
@@ -479,7 +474,7 @@
                            placeholder="Español (nativo), Catalán (nativo), Inglés (B2), Francés (A2)">
                 </section>
 
-                {{-- ── 7. Carta de presentación ── --}}
+                
                 <section class="pb-2">
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
                         <span class="cv-section-num">7</span>
@@ -492,7 +487,7 @@
             </form>
         </div>
 
-        {{-- Footer --}}
+        
         <div class="flex gap-3 px-6 py-4 border-t border-navy/10 flex-shrink-0">
             <button type="button" onclick="volverAEleccion()"
                     class="px-5 py-2.5 border-2 border-navy/15 text-navy/70 font-semibold rounded-xl hover:bg-navy/5 transition-colors text-sm">
@@ -505,10 +500,10 @@
         </div>
     </div>
 
-    {{-- ── MODAL 3: Subir archivo ── --}}
+    
     <div id="modal-archivo" class="modal-box max-w-md" style="display:none">
 
-        {{-- Header --}}
+        
         <div class="flex items-center justify-between px-6 py-4 border-b border-navy/10">
             <div class="flex items-center gap-3">
                 <button onclick="volverAEleccion()" class="text-navy/35 hover:text-navy transition-colors" title="Volver">
@@ -529,10 +524,10 @@
         </div>
 
         <form id="form-archivo" class="px-6 py-5 space-y-5">
-            @csrf
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="oferta_id" id="oferta-id-archivo" value="">
 
-            {{-- Dropzone --}}
+            
             <div id="dropzone"
                  class="dropzone-area"
                  onclick="document.getElementById('cv-file-input').click()"
@@ -572,7 +567,7 @@
         </div>
     </div>
 
-    {{-- ── MODAL: Éxito ── --}}
+    
     <div id="modal-exito" class="modal-box max-w-md text-center" style="display:none">
         <div class="p-8">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
@@ -591,11 +586,11 @@
         </div>
     </div>
 
-</div>{{-- /modal-overlay --}}
+</div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 let _ofertaActual = null;
 
@@ -701,7 +696,7 @@ function dropFile(e) {
 }
 
 // ── Envío formulario CV ──
-document.getElementById('form-cv').onsubmit = async function(e) {
+document.getElementById('form-cv').addEventListener('submit', async function(e) {
     e.preventDefault();
     var btn = document.getElementById('btn-enviar-cv');
     btn.disabled = true;
@@ -726,10 +721,10 @@ document.getElementById('form-cv').onsubmit = async function(e) {
         btn.disabled = false;
         btn.textContent = 'Enviar candidatura';
     }
-};
+});
 
 // ── Envío formulario archivo ──
-document.getElementById('form-archivo').onsubmit = async function(e) {
+document.getElementById('form-archivo').addEventListener('submit', async function(e) {
     e.preventDefault();
     var fileInput = document.getElementById('cv-file-input');
     if (!fileInput.files.length) {
@@ -760,6 +755,8 @@ document.getElementById('form-archivo').onsubmit = async function(e) {
         btn.disabled = false;
         btn.textContent = 'Enviar candidatura';
     }
-};
+});
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/trabajos/detalle.blade.php ENDPATH**/ ?>

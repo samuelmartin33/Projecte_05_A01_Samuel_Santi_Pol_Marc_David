@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Crear Evento — VIBEZ'); ?>
 
-@section('titulo', 'Crear Evento — VIBEZ')
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <style>
     .form-crear-evento {
         background: white;
@@ -209,11 +207,11 @@
         color: rgba(15,23,42,0.5);
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('contenido')
+<?php $__env->startSection('contenido'); ?>
 
-{{-- Hero --}}
+
 <section class="hero-home">
     <div class="hero-particula hero-particula-1"></div>
     <div class="hero-particula hero-particula-2"></div>
@@ -234,24 +232,24 @@
     </div>
 </section>
 
-{{-- Formulario --}}
+
 <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    @if ($errors->any())
+    <?php if($errors->any()): ?>
         <div class="alert-errores">
             <strong>⚠ Revisa los siguientes campos:</strong>
             <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?>
 
-    <form action="{{ route('empresa.eventos.store') }}" method="POST" class="form-crear-evento" enctype="multipart/form-data">
-        @csrf
+    <form action="<?php echo e(route('empresa.eventos.store')); ?>" method="POST" class="form-crear-evento" enctype="multipart/form-data">
+        <?php echo csrf_field(); ?>
 
-        {{-- ── INFORMACIÓN BÁSICA ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -262,14 +260,14 @@
         <div class="form-grupo">
             <label class="form-label">Título del evento <span class="form-required">*</span></label>
             <input type="text" name="titulo" class="form-input" maxlength="300"
-                   value="{{ old('titulo') }}"
+                   value="<?php echo e(old('titulo')); ?>"
                    placeholder="Ej: Festival de Verano 2026">
         </div>
 
         <div class="form-grupo">
             <label class="form-label">Descripción</label>
             <textarea name="descripcion" class="form-textarea" rows="4"
-                      placeholder="Describe tu evento: qué van a encontrar los asistentes, artistas, actividades...">{{ old('descripcion') }}</textarea>
+                      placeholder="Describe tu evento: qué van a encontrar los asistentes, artistas, actividades..."><?php echo e(old('descripcion')); ?></textarea>
         </div>
 
         <div class="form-grupo-doble">
@@ -277,25 +275,26 @@
                 <label class="form-label">Categoría <span class="form-required">*</span></label>
                 <select name="categoria_evento_id" class="form-select">
                     <option value="">Selecciona categoría</option>
-                    @foreach ($categorias as $cat)
-                        <option value="{{ $cat->id }}" @selected(old('categoria_evento_id') == $cat->id)>
-                            {{ $cat->nombre }}
+                    <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($cat->id); ?>" <?php if(old('categoria_evento_id') == $cat->id): echo 'selected'; endif; ?>>
+                            <?php echo e($cat->nombre); ?>
+
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
             <div>
                 <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
                 <select name="tipo_evento" class="form-select">
-                    <option value="1" @selected(old('tipo_evento', 1) == 1)>Presencial</option>
-                    <option value="2" @selected(old('tipo_evento') == 2)>Online</option>
+                    <option value="1" <?php if(old('tipo_evento', 1) == 1): echo 'selected'; endif; ?>>Presencial</option>
+                    <option value="2" <?php if(old('tipo_evento') == 2): echo 'selected'; endif; ?>>Online</option>
                 </select>
             </div>
         </div>
 
         <hr class="form-divider">
 
-        {{-- ── FECHA Y HORA ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -307,19 +306,19 @@
             <div>
                 <label class="form-label">Fecha de inicio <span class="form-required">*</span></label>
                 <input type="datetime-local" name="fecha_inicio" class="form-input"
-                       value="{{ old('fecha_inicio') }}">
+                       value="<?php echo e(old('fecha_inicio')); ?>">
             </div>
             <div>
                 <label class="form-label">Fecha de fin</label>
                 <input type="datetime-local" name="fecha_fin" class="form-input"
-                       value="{{ old('fecha_fin') }}">
+                       value="<?php echo e(old('fecha_fin')); ?>">
                 <p class="form-hint">Opcional. Déjalo vacío si es un evento de un solo momento.</p>
             </div>
         </div>
 
         <hr class="form-divider">
 
-        {{-- ── UBICACIÓN ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -332,13 +331,13 @@
             <div>
                 <label class="form-label">Nombre del lugar <span class="form-required">*</span></label>
                 <input type="text" name="ubicacion_nombre" class="form-input" maxlength="300"
-                       value="{{ old('ubicacion_nombre') }}" required
+                       value="<?php echo e(old('ubicacion_nombre')); ?>" required
                        placeholder="Ej: Palau Sant Jordi">
             </div>
             <div>
                 <label class="form-label">Dirección</label>
                 <input type="text" name="ubicacion_direccion" class="form-input" maxlength="500"
-                       value="{{ old('ubicacion_direccion') }}"
+                       value="<?php echo e(old('ubicacion_direccion')); ?>"
                        placeholder="Ej: Passeig Olímpic, 5-7, Barcelona">
             </div>
         </div>
@@ -347,18 +346,18 @@
             <div>
                 <label class="form-label">Latitud</label>
                 <input type="number" step="0.0000001" name="latitud" class="form-input"
-                       value="{{ old('latitud') }}" placeholder="41.3642">
+                       value="<?php echo e(old('latitud')); ?>" placeholder="41.3642">
             </div>
             <div>
                 <label class="form-label">Longitud</label>
                 <input type="number" step="0.0000001" name="longitud" class="form-input"
-                       value="{{ old('longitud') }}" placeholder="2.1527">
+                       value="<?php echo e(old('longitud')); ?>" placeholder="2.1527">
             </div>
         </div>
 
         <hr class="form-divider">
 
-        {{-- ── PRECIO Y AFORO ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
@@ -369,7 +368,7 @@
         <div class="form-grupo">
             <label class="form-checkbox-wrap" for="es_gratuito">
                 <input type="checkbox" id="es_gratuito" name="es_gratuito" value="1"
-                       @checked(old('es_gratuito'))
+                       <?php if(old('es_gratuito')): echo 'checked'; endif; ?>
                        onchange="togglePrecio()">
                 <span class="form-checkbox-label">Este evento es gratuito</span>
             </label>
@@ -380,12 +379,12 @@
                 <label class="form-label">Precio base (€) <span class="form-required">*</span></label>
                 <input type="number" min="0" step="0.01" name="precio_base" class="form-input"
                        id="precio_base_input"
-                       value="{{ old('precio_base', 0) }}" placeholder="0.00">
+                       value="<?php echo e(old('precio_base', 0)); ?>" placeholder="0.00">
             </div>
             <div>
                 <label class="form-label">Aforo máximo</label>
                 <input type="number" min="1" name="aforo_maximo" class="form-input"
-                       value="{{ old('aforo_maximo') }}" placeholder="Ej: 500">
+                       value="<?php echo e(old('aforo_maximo')); ?>" placeholder="Ej: 500">
                 <p class="form-hint">Opcional. Déjalo vacío si no hay límite.</p>
             </div>
         </div>
@@ -394,20 +393,20 @@
             <div>
                 <label class="form-label">Edad mínima</label>
                 <input type="number" min="0" max="120" name="edad_minima" class="form-input"
-                       value="{{ old('edad_minima') }}" placeholder="Ej: 16">
+                       value="<?php echo e(old('edad_minima')); ?>" placeholder="Ej: 16">
                 <p class="form-hint">Opcional. Déjalo vacío si no hay restricción.</p>
             </div>
             <div>
                 <label class="form-label">URL externa</label>
                 <input type="url" name="url_externa" class="form-input" maxlength="500"
-                       value="{{ old('url_externa') }}" placeholder="https://...">
+                       value="<?php echo e(old('url_externa')); ?>" placeholder="https://...">
                 <p class="form-hint">Enlace a la web del evento, si la tiene.</p>
             </div>
         </div>
 
         <hr class="form-divider">
 
-        {{-- ── IMAGEN DE PORTADA ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -436,7 +435,7 @@
             </div>
         </div>
 
-        {{-- ── ACCIONES ── --}}
+        
         <div class="form-actions">
             <button type="submit" class="btn-guardar">
                 <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="18" height="18">
@@ -444,14 +443,14 @@
                 </svg>
                 Publicar evento
             </button>
-            <a href="{{ route('empresa.home') }}" class="btn-cancelar">Cancelar</a>
+            <a href="<?php echo e(route('empresa.home')); ?>" class="btn-cancelar">Cancelar</a>
         </div>
     </form>
 </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function togglePrecio() {
     var checkbox = document.getElementById('es_gratuito');
@@ -467,39 +466,43 @@ function togglePrecio() {
 }
 
 // Preview de imagen subida
-togglePrecio();
+document.addEventListener('DOMContentLoaded', function() {
+    togglePrecio();
 
-var fileInput = document.getElementById('imagen_portada_input');
-var zona = document.getElementById('upload-zona');
-var preview = document.getElementById('upload-preview');
-var previewImg = document.getElementById('imagen-preview-img');
-var nombreSpan = document.getElementById('upload-nombre');
+    var fileInput = document.getElementById('imagen_portada_input');
+    var zona = document.getElementById('upload-zona');
+    var preview = document.getElementById('upload-preview');
+    var previewImg = document.getElementById('imagen-preview-img');
+    var nombreSpan = document.getElementById('upload-nombre');
 
-fileInput.onchange = function() {
-    if (this.files && this.files[0]) {
-        var file = this.files[0];
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            preview.style.display = 'block';
-            nombreSpan.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
-        };
-        reader.readAsDataURL(file);
-    } else {
-        preview.style.display = 'none';
-    }
-};
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+                nombreSpan.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    });
 
-// Drag & drop visual feedback
-zona.ondragover = function(e) {
-    e.preventDefault();
-    zona.classList.add('dragover');
-};
-zona.ondragleave = function() {
-    zona.classList.remove('dragover');
-};
-zona.ondrop = function() {
-    zona.classList.remove('dragover');
-};
+    // Drag & drop visual feedback
+    zona.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        zona.classList.add('dragover');
+    });
+    zona.addEventListener('dragleave', function() {
+        zona.classList.remove('dragover');
+    });
+    zona.addEventListener('drop', function() {
+        zona.classList.remove('dragover');
+    });
+});
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/eventos/crear.blade.php ENDPATH**/ ?>

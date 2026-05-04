@@ -9,7 +9,7 @@
    ============================================================ */
 const submitBtn = document.getElementById('submitBtn');
 
-submitBtn.addEventListener('click', function (e) {
+submitBtn.onclick = function (e) {
     const rect   = this.getBoundingClientRect();
     const size   = Math.max(rect.width, rect.height);
     const x      = e.clientX - rect.left - size / 2;
@@ -21,7 +21,7 @@ submitBtn.addEventListener('click', function (e) {
     this.appendChild(ripple);
 
     setTimeout(() => ripple.remove(), 700);
-});
+};
 
 /* ============================================================
    UTILIDADES DE VALIDACIÓN Y UI
@@ -63,15 +63,16 @@ function clearAlert() {
 
 function shakeElement(element) {
     element.classList.add('shake');
-    element.addEventListener('animationend', () => {
+    element.onanimationend = function () {
         element.classList.remove('shake');
-    }, { once: true });
+        element.onanimationend = null;
+    };
 }
 
 /* ============================================================
    LÓGICA PRINCIPAL — Validación y envío via fetch
    ============================================================ */
-document.getElementById('loginForm').addEventListener('submit', async function (e) {
+document.getElementById('loginForm').onsubmit = async function (e) {
     e.preventDefault();
 
     const email    = document.getElementById('email').value.trim();
@@ -171,4 +172,4 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
         console.error('[VIBEZ] Error en login:', err);
     }
-});
+};

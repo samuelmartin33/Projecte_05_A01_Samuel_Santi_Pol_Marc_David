@@ -32,14 +32,14 @@ var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('
    INICIALIZACIÓN
    ============================================================ */
 
-document.addEventListener('DOMContentLoaded', function () {
+window.onload = function () {
     // Cargar la lista de chats al entrar en la página
     cargarChats();
 
     // Actualizar el badge del navbar cada 30 segundos
     actualizarContadorNavbar();
     setInterval(actualizarContadorNavbar, 30000);
-});
+};
 
 /* ============================================================
    TABS — cambio de sección en el panel izquierdo

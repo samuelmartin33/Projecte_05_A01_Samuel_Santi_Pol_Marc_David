@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es" class="@yield('html-class', '')">
+<html lang="es" class="<?php echo $__env->yieldContent('html-class', ''); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@hasSection('title')@yield('title')@else @yield('titulo', 'VIBEZ') — Descubre tu próximo evento @endif</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php if (! empty(trim($__env->yieldContent('title')))): ?><?php echo $__env->yieldContent('title'); ?><?php else: ?> <?php echo $__env->yieldContent('titulo', 'VIBEZ'); ?> — Descubre tu próximo evento <?php endif; ?></title>
 
-    {{-- Fuente Inter --}}
+    
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,115 +16,114 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/app-static.css">
 
-    @if (request()->routeIs('login') || request()->routeIs('register'))
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    @endif
+    <?php if(request()->routeIs('login') || request()->routeIs('register')): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>">
+    <?php endif; ?>
 
-    {{-- Espacio para estilos específicos de cada página (ej: Leaflet en el detalle) --}}
-    @stack('estilos')
-    @yield('extra-css')
+    
+    <?php echo $__env->yieldPushContent('estilos'); ?>
+    <?php echo $__env->yieldContent('extra-css'); ?>
 </head>
-<body class="min-h-screen flex flex-col @yield('body-class', '')">
+<body class="min-h-screen flex flex-col <?php echo $__env->yieldContent('body-class', ''); ?>">
 
-    {{-- ═══════════════════════════════════════════════════════
-         CABECERA PRINCIPAL DE VIBEZ
-         Fija en la parte superior, con logo y navegación
-    ═══════════════════════════════════════════════════════ --}}
-    @if(!View::hasSection('content'))
+    
+    <?php if(!View::hasSection('content')): ?>
     <header class="nav-vibez sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
-            {{-- Logo corporativo --}}
-            @php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); @endphp
-            <a href="{{ $esEmpresa ? route('empresa.home') : route('home') }}" class="nav-logo-link group">
-                <img src="{{ asset('images/logo_vibez_white.png') }}"
+            
+            <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
+            <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>" class="nav-logo-link group">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>"
                      alt="VIBEZ"
                      class="nav-logo-img">
             </a>
 
-            {{-- Navegación central --}}
+            
             <nav class="hidden md:flex items-center gap-6">
-                @if($esEmpresa)
-                    {{-- Empresa: sus secciones propias --}}
-                    <a href="{{ route('empresa.home') }}"
-                       class="nav-link {{ request()->routeIs('empresa.home') ? 'nav-link-activo' : '' }}">
+                <?php if($esEmpresa): ?>
+                    
+                    <a href="<?php echo e(route('empresa.home')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-link-activo' : ''); ?>">
                         Panel
                     </a>
-                    <a href="{{ route('empresa.candidaturas.ofertas') }}"
-                       class="nav-link {{ request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : '' }}">
+                    <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : ''); ?>">
                         Candidaturas
                     </a>
-                @else
-                    {{-- Usuarios y visitantes: explorar y bolsa --}}
-                    <a href="{{ route('home') }}"
-                       class="nav-link {{ request()->routeIs('home') ? 'nav-link-activo' : '' }}">
+                <?php else: ?>
+                    
+                    <a href="<?php echo e(route('home')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('home') ? 'nav-link-activo' : ''); ?>">
                         Explorar
                     </a>
-                    <a href="{{ route('trabajos.index') }}"
-                       class="nav-link {{ request()->routeIs('trabajos.index') ? 'nav-link-activo' : '' }}">
+                    <a href="<?php echo e(route('trabajos.index')); ?>"
+                       class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
                         Bolsa de Trabajo
                     </a>
-                    @auth
-                    <a href="{{ route('social') }}"
-                       class="nav-link nav-social-link {{ request()->routeIs('social') ? 'nav-link-activo' : '' }}">
+                    <?php if(auth()->guard()->check()): ?>
+                    <a href="<?php echo e(route('social')); ?>"
+                       class="nav-link nav-social-link <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
                         Social
                         <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                     </a>
-                    @endauth
-                @endif
+                    <?php endif; ?>
+                <?php endif; ?>
             </nav>
 
-            {{-- Botones de acción: guest → login/registro | auth → avatar --}}
+            
             <div class="flex items-center gap-3">
-                @guest
-                    <a href="{{ route('login') }}" class="btn-nav-ghost">Entrar</a>
-                    <a href="{{ route('register') }}" class="btn-nav-solido">Registro</a>
-                @else
-                    {{-- Avatar con dropdown de perfil --}}
+                <?php if(auth()->guard()->guest()): ?>
+                    <a href="<?php echo e(route('login')); ?>" class="btn-nav-ghost">Entrar</a>
+                    <a href="<?php echo e(route('register')); ?>" class="btn-nav-solido">Registro</a>
+                <?php else: ?>
+                    
                     <div class="nav-avatar-wrapper" id="navAvatarWrapper">
 
-                        {{-- Botón circular con foto o iniciales --}}
-                        {{-- position:relative para poder colocar el badge de mood encima --}}
+                        
+                        
                         <div style="position:relative;display:inline-block">
                             <button class="nav-avatar" id="navAvatarBtn"
                                     onclick="toggleNavDropdown()"
                                     aria-haspopup="true" aria-expanded="false">
-                                @if(Auth::user()->foto_url)
-                                    <img src="{{ Auth::user()->foto_url }}"
-                                         alt="{{ Auth::user()->nombre }}"
+                                <?php if(Auth::user()->foto_url): ?>
+                                    <img src="<?php echo e(Auth::user()->foto_url); ?>"
+                                         alt="<?php echo e(Auth::user()->nombre); ?>"
                                          class="nav-avatar-img">
-                                @else
+                                <?php else: ?>
                                     <span class="nav-avatar-iniciales">
-                                        {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}{{ strtoupper(substr(Auth::user()->apellido1 ?? '', 0, 1)) }}
+                                        <?php echo e(strtoupper(substr(Auth::user()->nombre, 0, 1))); ?><?php echo e(strtoupper(substr(Auth::user()->apellido1 ?? '', 0, 1))); ?>
+
                                     </span>
-                                @endif
+                                <?php endif; ?>
                             </button>
 
-                            {{-- Badge de mood: solo el emoji, flotante en la esquina del avatar --}}
-                            @if(Auth::user()->mood)
-                                <span class="nav-mood-badge" title="{{ Auth::user()->mood }}">
-                                    {{-- Extraemos solo el emoji (primera palabra antes del espacio) --}}
-                                    {{ explode(' ', Auth::user()->mood, 2)[0] }}
+                            
+                            <?php if(Auth::user()->mood): ?>
+                                <span class="nav-mood-badge" title="<?php echo e(Auth::user()->mood); ?>">
+                                    
+                                    <?php echo e(explode(' ', Auth::user()->mood, 2)[0]); ?>
+
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
-                        {{-- Dropdown --}}
+                        
                         <div class="nav-dropdown" id="navDropdown" style="display:none">
 
-                            {{-- Cabecera: nombre y mood completo si lo tiene --}}
+                            
                             <div class="nav-dropdown-header">
-                                <p class="nav-dropdown-nombre">{{ Auth::user()->nombre }} {{ Auth::user()->apellido1 }}</p>
-                                <p class="nav-dropdown-email">{{ Auth::user()->email }}</p>
-                                @if(Auth::user()->mood)
-                                    <p class="nav-dropdown-mood">{{ Auth::user()->mood }}</p>
-                                @endif
+                                <p class="nav-dropdown-nombre"><?php echo e(Auth::user()->nombre); ?> <?php echo e(Auth::user()->apellido1); ?></p>
+                                <p class="nav-dropdown-email"><?php echo e(Auth::user()->email); ?></p>
+                                <?php if(Auth::user()->mood): ?>
+                                    <p class="nav-dropdown-mood"><?php echo e(Auth::user()->mood); ?></p>
+                                <?php endif; ?>
                             </div>
 
                             <div class="nav-dropdown-divider"></div>
 
-                            {{-- Perfil --}}
-                            <a href="{{ route('perfil') }}" class="nav-dropdown-item">
+                            
+                            <a href="<?php echo e(route('perfil')); ?>" class="nav-dropdown-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -132,47 +131,47 @@
                                 Mi perfil
                             </a>
 
-                            @if($esEmpresa)
-                                {{-- Panel empresa --}}
-                                <a href="{{ route('empresa.home') }}" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                            <?php if($esEmpresa): ?>
+                                
+                                <a href="<?php echo e(route('empresa.home')); ?>" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
                                     Panel Empresa
                                 </a>
-                                <a href="{{ route('empresa.candidaturas.ofertas') }}" class="nav-dropdown-item">
+                                <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>" class="nav-dropdown-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                     Revisar Currículums
                                 </a>
-                            @else
-                                {{-- Mis entradas (solo usuarios normales) --}}
-                                @if(!Auth::user()->isAdmin())
-                                <a href="{{ route('entradas.mis-entradas') }}" class="nav-dropdown-item">
+                            <?php else: ?>
+                                
+                                <?php if(!Auth::user()->isAdmin()): ?>
+                                <a href="<?php echo e(route('entradas.mis-entradas')); ?>" class="nav-dropdown-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
                                     </svg>
                                     Mis entradas
                                 </a>
-                                @endif
+                                <?php endif; ?>
 
-                                {{-- Amigos --}}
-                                <a href="{{ route('perfil') }}#amigos" class="nav-dropdown-item">
+                                
+                                <a href="<?php echo e(route('perfil')); ?>#amigos" class="nav-dropdown-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
                                     Amigos
                                 </a>
-                            @endif
+                            <?php endif; ?>
 
-                            {{-- Panel de administración: solo visible para admins --}}
-                            @if(Auth::user()->es_admin)
-                                <a href="{{ route('admin.dashboard') }}" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                            
+                            <?php if(Auth::user()->es_admin): ?>
+                                <a href="<?php echo e(route('admin.dashboard')); ?>" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -180,11 +179,11 @@
                                     </svg>
                                     Panel Admin
                                 </a>
-                            @endif
+                            <?php endif; ?>
 
                             <div class="nav-dropdown-divider"></div>
 
-                            {{-- Cerrar sesión --}}
+                            
                             <button class="nav-dropdown-item nav-dropdown-logout"
                                     onclick="cerrarSesion()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -196,9 +195,9 @@
 
                         </div>
                     </div>
-                @endguest
+                <?php endif; ?>
 
-                {{-- Botón hamburguesa: solo visible en móvil (CSS controla visibilidad) --}}
+                
                 <button class="nav-hamburger" id="navHamburger"
                         onclick="toggleMenuMovil()"
                         aria-label="Abrir menú" aria-expanded="false">
@@ -214,19 +213,17 @@
         </div>
     </header>
 
-    {{-- ═══════════════════════════════════════════════════════
-         MENÚ MÓVIL — panel lateral deslizable
-    ═══════════════════════════════════════════════════════ --}}
+    
 
-    {{-- Fondo oscuro que aparece detrás del panel --}}
+    
     <div class="nav-movil-overlay" id="navMovilOverlay" onclick="cerrarMenuMovil()"></div>
 
-    {{-- Panel lateral que entra desde la izquierda --}}
+    
     <nav class="nav-movil-panel" id="navMovilPanel" aria-label="Menú de navegación móvil">
 
-        {{-- Cabecera del panel --}}
+        
         <div class="nav-movil-cabecera">
-            <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ" class="nav-movil-logo">
+            <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ" class="nav-movil-logo">
             <button class="nav-movil-cerrar" onclick="cerrarMenuMovil()" aria-label="Cerrar menú">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -234,78 +231,79 @@
             </button>
         </div>
 
-        {{-- Info del usuario autenticado --}}
-        @auth
+        
+        <?php if(auth()->guard()->check()): ?>
         <div class="nav-movil-usuario">
             <div class="nav-movil-avatar-sm">
-                @if(Auth::user()->foto_url)
-                    <img src="{{ Auth::user()->foto_url }}" alt="{{ Auth::user()->nombre }}">
-                @else
-                    {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}{{ strtoupper(substr(Auth::user()->apellido1 ?? '', 0, 1)) }}
-                @endif
+                <?php if(Auth::user()->foto_url): ?>
+                    <img src="<?php echo e(Auth::user()->foto_url); ?>" alt="<?php echo e(Auth::user()->nombre); ?>">
+                <?php else: ?>
+                    <?php echo e(strtoupper(substr(Auth::user()->nombre, 0, 1))); ?><?php echo e(strtoupper(substr(Auth::user()->apellido1 ?? '', 0, 1))); ?>
+
+                <?php endif; ?>
             </div>
             <div>
-                <p class="nav-movil-usuario-nombre">{{ Auth::user()->nombre }} {{ Auth::user()->apellido1 }}</p>
-                <p class="nav-movil-usuario-email">{{ Auth::user()->email }}</p>
+                <p class="nav-movil-usuario-nombre"><?php echo e(Auth::user()->nombre); ?> <?php echo e(Auth::user()->apellido1); ?></p>
+                <p class="nav-movil-usuario-email"><?php echo e(Auth::user()->email); ?></p>
             </div>
         </div>
-        @endauth
+        <?php endif; ?>
 
         <div class="nav-movil-divisor"></div>
 
-        @if($esEmpresa)
-            {{-- Empresa: enlaces propios --}}
-            <a href="{{ route('empresa.home') }}"
-               class="nav-movil-link {{ request()->routeIs('empresa.home') ? 'nav-movil-activo' : '' }}"
+        <?php if($esEmpresa): ?>
+            
+            <a href="<?php echo e(route('empresa.home')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-movil-activo' : ''); ?>"
                onclick="cerrarMenuMovil()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
                 Panel
             </a>
-            <a href="{{ route('empresa.candidaturas.ofertas') }}"
-               class="nav-movil-link {{ request()->routeIs('empresa.candidaturas.*') ? 'nav-movil-activo' : '' }}"
+            <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-movil-activo' : ''); ?>"
                onclick="cerrarMenuMovil()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 Candidaturas
             </a>
-        @else
-            {{-- Usuarios y visitantes: explorar, bolsa y social --}}
-            <a href="{{ route('home') }}"
-               class="nav-movil-link {{ request()->routeIs('home') ? 'nav-movil-activo' : '' }}"
+        <?php else: ?>
+            
+            <a href="<?php echo e(route('home')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('home') ? 'nav-movil-activo' : ''); ?>"
                onclick="cerrarMenuMovil()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 Explorar
             </a>
-            <a href="{{ route('trabajos.index') }}"
-               class="nav-movil-link {{ request()->routeIs('trabajos.index') ? 'nav-movil-activo' : '' }}"
+            <a href="<?php echo e(route('trabajos.index')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-movil-activo' : ''); ?>"
                onclick="cerrarMenuMovil()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 Bolsa de Trabajo
             </a>
-            @auth
-            <a href="{{ route('social') }}"
-               class="nav-movil-link {{ request()->routeIs('social') ? 'nav-movil-activo' : '' }}"
+            <?php if(auth()->guard()->check()): ?>
+            <a href="<?php echo e(route('social')); ?>"
+               class="nav-movil-link <?php echo e(request()->routeIs('social') ? 'nav-movil-activo' : ''); ?>"
                onclick="cerrarMenuMovil()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
                 Social
             </a>
-            @endauth
-        @endif
+            <?php endif; ?>
+        <?php endif; ?>
 
         <div class="nav-movil-divisor"></div>
 
-        @auth
-        {{-- Perfil y cerrar sesión --}}
-        <a href="{{ route('perfil') }}" class="nav-movil-link" onclick="cerrarMenuMovil()">
+        <?php if(auth()->guard()->check()): ?>
+        
+        <a href="<?php echo e(route('perfil')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
@@ -318,50 +316,46 @@
             </svg>
             Cerrar sesión
         </button>
-        @endauth
+        <?php endif; ?>
 
-        {{-- Acceso para invitados --}}
-        @guest
+        
+        <?php if(auth()->guard()->guest()): ?>
         <div class="nav-movil-divisor"></div>
-        <a href="{{ route('login') }}" class="nav-movil-link" onclick="cerrarMenuMovil()">
+        <a href="<?php echo e(route('login')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
             </svg>
             Entrar
         </a>
-        <a href="{{ route('register') }}" class="nav-movil-link" onclick="cerrarMenuMovil()">
+        <a href="<?php echo e(route('register')); ?>" class="nav-movil-link" onclick="cerrarMenuMovil()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
             </svg>
             Registro
         </a>
-        @endguest
+        <?php endif; ?>
 
     </nav>
 
-    @endif
+    <?php endif; ?>
 
-    {{-- ═══════════════════════════════════════════════════════
-         CONTENIDO PRINCIPAL — cada vista rellena este bloque
-    ═══════════════════════════════════════════════════════ --}}
+    
     <main class="flex-1">
-        @yield('contenido')
-        @yield('content')
+        <?php echo $__env->yieldContent('contenido'); ?>
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 
-    {{-- ═══════════════════════════════════════════════════════
-         PIE DE PÁGINA
-    ═══════════════════════════════════════════════════════ --}}
-    @if(!View::hasSection('content'))
+    
+    <?php if(!View::hasSection('content')): ?>
     <footer class="footer-vibez">
         <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center">
-                <img src="{{ asset('images/logo_vibez.png') }}"
+                <img src="<?php echo e(asset('images/logo_vibez.png')); ?>"
                      alt="VIBEZ"
                      class="footer-logo-img">
             </div>
             <p class="text-white/50 text-sm">
-                &copy; {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes
+                &copy; <?php echo e(date('Y')); ?> VIBEZ — Plataforma de eventos para jóvenes
             </p>
             <div class="flex gap-5 text-white/60 text-sm">
                 <a href="#" class="hover:text-white transition-colors">Privacidad</a>
@@ -369,13 +363,13 @@
             </div>
         </div>
     </footer>
-    @endif
+    <?php endif; ?>
 
-    {{-- Espacio para scripts específicos de cada página (ej: Leaflet, AJAX) --}}
-    @stack('scripts')
-    @yield('scripts')
+    
+    <?php echo $__env->yieldPushContent('scripts'); ?>
+    <?php echo $__env->yieldContent('scripts'); ?>
 
-    {{-- ── Menú móvil: funciones de apertura y cierre del panel ── --}}
+    
     <script>
     function toggleMenuMovil() {
         var panel   = document.getElementById('navMovilPanel');
@@ -411,13 +405,13 @@
     }
 
     // Cerrar el panel al pulsar Escape
-    document.onkeydown = function (e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') cerrarMenuMovil();
-    };
+    });
     </script>
 
-    @auth
-    {{-- ── Badge Social en el navbar: se actualiza en todas las páginas ── --}}
+    <?php if(auth()->guard()->check()): ?>
+    
     <script>
     (function () {
         // Consulta el contador cada 30 segundos y actualiza el badge del navbar
@@ -446,7 +440,7 @@
     })();
     </script>
 
-    {{-- ── Scripts globales de navegación (navbar avatar, logout) ── --}}
+    
     <script>
     /**
      * Abre/cierra el dropdown del avatar de usuario en la navbar.
@@ -503,6 +497,7 @@
         .catch(() => { window.location.href = '/'; });
     }
     </script>
-    @endauth
+    <?php endif; ?>
 </body>
 </html>
+<?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/layouts/app.blade.php ENDPATH**/ ?>
