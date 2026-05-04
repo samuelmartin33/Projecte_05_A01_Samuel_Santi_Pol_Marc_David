@@ -138,21 +138,80 @@ body {
     overflow: hidden;
 }
 
-/* ─── TABLE ────────────────────────────────────────────── */
-.tabla-eventos {
+/* ─── ADMIN SECTIONS / TABLES ─────────────────────────── */
+.admin-panel-section {
+    margin-bottom: 1.5rem;
+}
+
+.panel-header {
+    padding: 1rem 1rem 0;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.08rem;
+    color: #7c3aed;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-empty {
+    padding: 1rem;
+}
+
+.badge-count,
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.25rem 0.6rem;
+    white-space: nowrap;
+}
+
+.badge-count {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabla-eventos,
+.admin-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .tabla-eventos th,
-.tabla-eventos td {
+.tabla-eventos td,
+.admin-table th,
+.admin-table td {
     padding: 0.8rem;
     border-bottom: 1px solid var(--border);
     text-align: left;
     vertical-align: middle;
 }
 
-.tabla-eventos th {
+.tabla-eventos th,
+.admin-table th {
     background: #ede9fe;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -160,10 +219,20 @@ body {
     color: #5b21b6;
 }
 
+.actions-cell,
 .acciones {
     display: flex;
     gap: 0.4rem;
     flex-wrap: wrap;
+}
+
+.actions-cell .btn,
+.acciones .btn {
+    white-space: nowrap;
+}
+
+.delete-form {
+    display: inline;
 }
 
 /* ─── BUTTONS ──────────────────────────────────────────── */
@@ -437,13 +506,15 @@ body {
     margin-bottom: 1rem;
 }
 
-.alert.success {
+.alert.success,
+.alert-success {
     background: #ede9fe;
     color: #5b21b6;
     border: 1px solid #c4b5fd;
 }
 
-.alert.error {
+.alert.error,
+.alert-danger {
     background: #fee2e2;
     color: #7f1d1d;
     border: 1px solid #fecaca;
@@ -485,7 +556,8 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .tabla-eventos {
+    .tabla-eventos,
+    .admin-table {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
@@ -611,22 +683,27 @@ body {
     }
 
     /* --- Tabla → tarjetas en móvil --- */
-    .tabla-eventos {
+    .tabla-eventos,
+    .admin-table {
         display: block;
         white-space: normal;
         overflow: visible;
     }
 
-    .tabla-eventos thead {
+    .tabla-eventos thead,
+    .admin-table thead {
         display: none; /* Ocultamos las cabeceras */
     }
 
     .tabla-eventos tbody,
-    .tabla-eventos tr {
+    .tabla-eventos tr,
+    .admin-table tbody,
+    .admin-table tr {
         display: block;
     }
 
-    .tabla-eventos tr {
+    .tabla-eventos tr,
+    .admin-table tr {
         background: var(--paper);
         border: 1px solid var(--border);
         border-radius: 14px;
@@ -636,7 +713,8 @@ body {
     }
 
     /* Cada celda usa el atributo data-label como etiqueta */
-    .tabla-eventos td {
+    .tabla-eventos td,
+    .admin-table td {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -646,14 +724,16 @@ body {
         gap: 0.4rem;
     }
 
-    .tabla-eventos td:last-child {
+    .tabla-eventos td:last-child,
+    .admin-table td:last-child {
         border-bottom: none;
         padding-top: 0.6rem;
         flex-wrap: wrap;
         gap: 0.4rem;
     }
 
-    .tabla-eventos td::before {
+    .tabla-eventos td::before,
+    .admin-table td::before {
         content: attr(data-label);
         font-weight: 700;
         font-size: 0.75rem;
@@ -664,19 +744,22 @@ body {
     }
 
     /* Ocultar celda vacía de tabla en modo tarjeta */
-    .tabla-eventos td.empty {
+    .tabla-eventos td.empty,
+    .admin-table td.empty {
         display: block;
         text-align: center;
         padding: 1.2rem;
         border: none;
     }
 
-    .tabla-eventos td.empty::before {
+    .tabla-eventos td.empty::before,
+    .admin-table td.empty::before {
         display: none;
     }
 
     /* Acciones en cada tarjeta */
-    .acciones {
+    .acciones,
+    .actions-cell {
         flex-direction: row;
         flex-wrap: wrap;
         gap: 0.4rem;
@@ -685,7 +768,9 @@ body {
     }
 
     .acciones .btn,
-    .acciones button.btn {
+    .acciones button.btn,
+    .actions-cell .btn,
+    .actions-cell button.btn {
         flex: 1 1 auto;
         text-align: center;
         justify-content: center;
