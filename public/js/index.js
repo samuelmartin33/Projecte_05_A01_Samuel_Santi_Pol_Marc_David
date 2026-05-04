@@ -7,7 +7,7 @@
 /* ============================================================
    LOGOUT
    ============================================================ */
-document.getElementById('logoutBtn').addEventListener('click', async function () {
+document.getElementById('logoutBtn').onclick = async function () {
     this.classList.add('loading');
     this.textContent = 'Cerrando sesión...';
 
@@ -42,7 +42,7 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
         this.textContent = 'Cerrar sesión';
         console.error('[VIBEZ] Error de conexión en logout:', err);
     }
-});
+};
 
 
 /* ============================================================
@@ -55,8 +55,8 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
     const tabBtns  = adminPanel.querySelectorAll('.admin-tab');
     const tabPanels = adminPanel.querySelectorAll('.admin-tab-panel');
 
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+    tabBtns.forEach(function (btn) {
+        btn.onclick = function () {
             const target = btn.getAttribute('data-tab');
 
             tabBtns.forEach(b => b.classList.remove('active'));
@@ -64,7 +64,7 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
 
             btn.classList.add('active');
             document.getElementById('panel-' + target).classList.add('active');
-        });
+        };
     });
 
     // Auto-scroll al panel admin si hay un flash message

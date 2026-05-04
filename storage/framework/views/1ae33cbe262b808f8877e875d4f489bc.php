@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $__env->yieldContent('title', 'Admin Dashboard'); ?></title>
-    <?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-        <?php echo app('Illuminate\Foundation\Vite')(['resources/css/admin-eventos.css']); ?>
-    <?php else: ?>
-        <link rel="stylesheet" href="<?php echo e(asset('css/admin-eventos.css')); ?>">
-    <?php endif; ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/admin-eventos.css')); ?>">
 </head>
 <body>
 <div class="dashboard-wrap">
@@ -42,11 +38,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))): ?>
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/js/admin-eventos.js']); ?>
-<?php else: ?>
-    <script src="<?php echo e(asset('js/admin-eventos.js')); ?>"></script>
-<?php endif; ?>
+<script src="<?php echo e(asset('js/admin-eventos.js')); ?>"></script>
 
 
 </body>

@@ -73,7 +73,7 @@ window.handleGoogleCredential = async function (response) {
    ============================================================ */
 const submitBtn = document.getElementById('submitBtn');
 
-submitBtn.addEventListener('click', function (e) {
+submitBtn.onclick = function (e) {
     const rect   = this.getBoundingClientRect();
     const size   = Math.max(rect.width, rect.height);
     const x      = e.clientX - rect.left - size / 2;
@@ -84,7 +84,7 @@ submitBtn.addEventListener('click', function (e) {
     ripple.style.cssText = `width:${size}px; height:${size}px; left:${x}px; top:${y}px`;
     this.appendChild(ripple);
     setTimeout(() => ripple.remove(), 700);
-});
+};
 
 /* ============================================================
    UTILIDADES
@@ -124,15 +124,16 @@ function clearAlert() {
 
 function shakeElement(element) {
     element.classList.add('shake');
-    element.addEventListener('animationend', () => {
+    element.onanimationend = function () {
         element.classList.remove('shake');
-    }, { once: true });
+        element.onanimationend = null;
+    };
 }
 
 /* ============================================================
    HINT DEL TIPO DE CUENTA
    ============================================================ */
-document.getElementById('tipo_cuenta').addEventListener('change', function () {
+document.getElementById('tipo_cuenta').onchange = function () {
     const hint = document.getElementById('hint-tipo_cuenta');
     if (this.value === 'empresa') {
         hint.textContent = 'Requiere aprobación del administrador.';
@@ -143,12 +144,12 @@ document.getElementById('tipo_cuenta').addEventListener('change', function () {
     } else {
         hint.textContent = '';
     }
-});
+};
 
 /* ============================================================
    SUBMIT
    ============================================================ */
-document.getElementById('registerForm').addEventListener('submit', async function (e) {
+document.getElementById('registerForm').onsubmit = async function (e) {
     e.preventDefault();
 
     const nombre               = document.getElementById('nombre').value.trim();
@@ -335,4 +336,4 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         showAlert('Error de conexión. Verifica tu red e inténtalo de nuevo.');
         console.error('[VIBEZ] Error en register:', err);
     }
-});
+};

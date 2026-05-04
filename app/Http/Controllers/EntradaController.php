@@ -16,6 +16,12 @@ class EntradaController extends Controller
 {
     public function comprar(Request $request): JsonResponse
     {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+        if ($usuario && $usuario->isAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Los administradores no pueden comprar entradas.'], 403);
+        }
+
         $request->validate([
             'evento_id' => ['required', 'integer', 'exists:eventos,id'],
             'cantidad'  => ['required', 'integer', 'min:1', 'max:10'],
@@ -86,6 +92,12 @@ class EntradaController extends Controller
 
     public function misEntradas(): View
     {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+        if ($usuario && $usuario->isAdmin()) {
+            abort(403, 'Los administradores no tienen entradas.');
+        }
+
         $pedidos = Pedido::where('usuario_id', Auth::id())
             ->with(['entradas.evento'])
             ->orderByDesc('fecha_creacion')
@@ -96,6 +108,12 @@ class EntradaController extends Controller
 
     public function confirmacion(Pedido $pedido): View
     {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+        if ($usuario && $usuario->isAdmin()) {
+            abort(403, 'Los administradores no tienen entradas.');
+        }
+
         if ($pedido->usuario_id !== Auth::id()) {
             abort(403);
         }

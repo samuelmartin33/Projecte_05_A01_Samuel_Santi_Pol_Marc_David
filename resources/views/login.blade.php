@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('estilos')
+<link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
+@endpush
+
 @section('title', 'Iniciar sesión — VIBEZ')
 @section('html-class', 'auth-page')
 @section('body-class', 'auth-page')
@@ -110,6 +114,7 @@
                         placeholder=" "
                         autocomplete="email"
                         inputmode="email"
+                        onblur="validarEmail()"
                     >
                     <label for="email">Correo electrónico</label>
                     <span class="field-error" id="error-email" role="alert"></span>
@@ -123,6 +128,7 @@
                         name="password"
                         placeholder=" "
                         autocomplete="current-password"
+                        onblur="validarContrasena()"
                     >
                     <label for="password">Contraseña</label>
                     <button type="button" class="toggle-password" onclick="togglePassword('password', this)" aria-label="Mostrar contraseña" tabindex="-1">
@@ -155,112 +161,5 @@
 @endsection
 
 @section('scripts')
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/js/login.js'])
-    @else
-        <script src="{{ asset('js/login.js') }}"></script>
-    @endif
-<script>
-function togglePassword(inputId, btn) {
-    const input   = document.getElementById(inputId);
-    const showing = input.type === 'text';
-    input.type    = showing ? 'password' : 'text';
-    btn.querySelector('.eye-open').style.display   = showing ? ''     : 'none';
-    btn.querySelector('.eye-closed').style.display = showing ? 'none' : '';
-    btn.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
-}
-
-/** Efecto ripple desde el punto del click */
-function rippleBtn(e, btn) {
-    const rect   = btn.getBoundingClientRect();
-    const size   = Math.max(rect.width, rect.height);
-    const ripple = document.createElement('span');
-    ripple.classList.add('ripple');
-    ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
-    btn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 700);
-}
-
-function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
-
-function mostrarErrorCampo(fieldId, errorId, msg) {
-    document.getElementById(fieldId)?.classList.add('has-error');
-    const el = document.getElementById(errorId);
-    if (el) { el.textContent = msg; el.classList.add('visible'); }
-}
-
-function limpiarErrorCampo(fieldId, errorId) {
-    document.getElementById(fieldId)?.classList.remove('has-error');
-    const el = document.getElementById(errorId);
-    if (el) { el.textContent = ''; el.classList.remove('visible'); }
-}
-
-function mostrarAlerta(msg, tipo = 'error') {
-    const el = document.getElementById('alert-global');
-    el.textContent = msg;
-    el.className   = `alert alert-${tipo} visible`;
-}
-
-function sacudirElemento(el) {
-    el.classList.add('shake');
-    el.onanimationend = function() {
-        el.classList.remove('shake');
-        el.onanimationend = null;
-    };
-}
-
-/** Submit del formulario de login */
-async function iniciarSesion(e) {
-    e.preventDefault();
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const btn      = document.getElementById('submitBtn');
-    const form     = document.getElementById('loginForm');
-    let valid      = true;
-
-    limpiarErrorCampo('field-email', 'error-email');
-    limpiarErrorCampo('field-password', 'error-password');
-    document.getElementById('alert-global').className = 'alert alert-error';
-
-    if (!email)                  { mostrarErrorCampo('field-email', 'error-email', 'El email es obligatorio');        valid = false; }
-    else if (!isValidEmail(email)) { mostrarErrorCampo('field-email', 'error-email', 'Introduce un email válido');  valid = false; }
-
-    if (!password)               { mostrarErrorCampo('field-password', 'error-password', 'La contraseña es obligatoria'); valid = false; }
-    else if (password.length < 8){ mostrarErrorCampo('field-password', 'error-password', 'Mínimo 8 caracteres');    valid = false; }
-
-    if (!valid) { sacudirElemento(form); return; }
-
-    btn.classList.add('loading');
-    try {
-        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const res  = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
-            body: JSON.stringify({ email, password }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            btn.innerHTML = `<span class="btn-text success-check"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>¡Sesión iniciada!</span>`;
-            btn.classList.remove('loading');
-            btn.style.background = 'linear-gradient(135deg,#22C55E,#16A34A)';
-            setTimeout(() => {
-                document.body.style.transition = 'opacity 0.35s ease';
-                document.body.style.opacity    = '0';
-                setTimeout(() => { window.location.href = '/home'; }, 360);
-            }, 750);
-        } else {
-            btn.classList.remove('loading');
-            if (data.unverified) { mostrarAlerta(data.message, 'warning'); return; }
-            if (data.errors) Object.entries(data.errors).forEach(([f, m]) => mostrarErrorCampo(`field-${f}`, `error-${f}`, m[0]));
-            mostrarAlerta(data.message || 'Credenciales incorrectas. Inténtalo de nuevo.');
-            sacudirElemento(form);
-        }
-    } catch (err) {
-        btn.classList.remove('loading');
-        mostrarAlerta('Error de conexión. Verifica tu red e inténtalo de nuevo.');
-        console.error('[VIBEZ] Error en login:', err);
-    }
-}
-</script>
+    <script src="{{ asset('js/login.js') }}"></script>
 @endsection

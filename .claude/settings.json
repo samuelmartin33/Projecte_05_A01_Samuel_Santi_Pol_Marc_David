@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Read(//c/Users/pcasa/AppData/Local/Temp/claude/c--wamp64-www-Projecte-05-A01-Samuel-Santi_Pol_Marc_David/f1f7bb84-50a2-439b-adca-ffdc0195c070/tasks/**)"
     ]
   }
 }

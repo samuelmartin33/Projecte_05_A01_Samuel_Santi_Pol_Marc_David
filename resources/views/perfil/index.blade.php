@@ -58,10 +58,6 @@
                 <p class="perfil-bio-hero">{{ $usuario->biografia }}</p>
             @endif
 
-            {{-- Mood actual (visible para todos) --}}
-            @if($usuario->mood)
-                <span class="perfil-mood-hero">{{ $usuario->mood }}</span>
-            @endif
         </div>
 
     </div>
@@ -152,70 +148,14 @@
             </form>
         </div>
 
-        {{-- ══ TARJETA: Estado de ánimo (Mood) ══ --}}
-        {{-- El mood es público: lo puede ver CUALQUIER persona, no solo amigos --}}
-        <div class="perfil-card">
-            <h2 class="perfil-card-titulo">Estado de ánimo</h2>
-            <p class="perfil-card-sub">
-                Visible para <strong>todos</strong> (amigos o no) y aparece en la barra de navegación
-            </p>
-
-            <form action="{{ route('perfil.mood') }}" method="POST">
-                @csrf
-
-                <div class="perfil-mood-grid">
-                    {{-- Lista de opciones de mood --}}
-                    @php
-                        $moods = [
-                            ''                    => '— Sin estado —',
-                            '🤕 De resaca'        => '🤕 De resaca',
-                            '🥳 De fiesta'        => '🥳 De fiesta',
-                            '🍺 Bebiendo cerveza' => '🍺 Bebiendo cerveza',
-                            '🍷 Bebiendo vino'    => '🍷 Bebiendo vino',
-                            '❤️ Enamorado/a'      => '❤️ Enamorado/a',
-                            '💃 Bailando'         => '💃 Bailando',
-                            '🎵 Escuchando música'=> '🎵 Escuchando música',
-                            '😎 Modo casual'      => '😎 Modo casual',
-                            '💪 En el gym'        => '💪 En el gym',
-                            '😴 Durmiendo'        => '😴 Durmiendo',
-                            '🍕 Comiendo'         => '🍕 Comiendo',
-                            '✈️ De viaje'         => '✈️ De viaje',
-                            '🎮 Gaming'           => '🎮 Gaming',
-                            '☀️ Tomando el sol'   => '☀️ Tomando el sol',
-                            '🤙 Con los amigos'   => '🤙 Con los amigos',
-                        ];
-                    @endphp
-
-                    @foreach($moods as $valor => $etiqueta)
-                        @if($valor === '')
-                            {{-- Opción "Sin estado" siempre va primero --}}
-                            <label class="perfil-mood-opcion {{ $usuario->mood === null ? 'perfil-mood-activo' : '' }}">
-                                <input type="radio" name="mood" value=""
-                                       {{ $usuario->mood === null ? 'checked' : '' }}>
-                                <span>{{ $etiqueta }}</span>
-                            </label>
-                        @else
-                            <label class="perfil-mood-opcion {{ $usuario->mood === $valor ? 'perfil-mood-activo' : '' }}">
-                                <input type="radio" name="mood" value="{{ $valor }}"
-                                       {{ $usuario->mood === $valor ? 'checked' : '' }}>
-                                <span>{{ $etiqueta }}</span>
-                            </label>
-                        @endif
-                    @endforeach
-                </div>
-
-                <button type="submit" class="btn-perfil-guardar" style="margin-top:16px">
-                    Guardar estado
-                </button>
-            </form>
-        </div>
 
     </div>
 
     {{-- ── COLUMNA DERECHA (1/3) ── --}}
     <div class="flex flex-col gap-6">
 
-        {{-- ══ TARJETA: Amigos ══ --}}
+        {{-- ══ TARJETA: Amigos (oculta para admin) ══ --}}
+        @if(!$usuario->isAdmin())
         <div class="perfil-card" id="amigos">
             <h2 class="perfil-card-titulo">Amigos</h2>
 
@@ -292,10 +232,6 @@
                                 <p class="font-semibold text-sm truncate" style="color:#0f172a">
                                     {{ $amigo->nombre }} {{ $amigo->apellido1 }}
                                 </p>
-                                {{-- Mostrar mood del amigo si lo tiene --}}
-                                @if($amigo->mood)
-                                    <p class="text-xs" style="color:rgba(15,23,42,0.45)">{{ $amigo->mood }}</p>
-                                @endif
                             </div>
                         </div>
                     @endforeach
@@ -307,6 +243,7 @@
             </div>
 
         </div>
+        @endif
 
     </div>
 
@@ -315,9 +252,5 @@
 @endsection
 
 @section('scripts')
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/js/perfil.js'])
-    @else
-        <script src="{{ asset('js/perfil.js') }}"></script>
-    @endif
+    <script src="{{ asset('js/perfil.js') }}"></script>
 @endsection
