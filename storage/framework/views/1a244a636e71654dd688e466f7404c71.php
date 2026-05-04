@@ -1,17 +1,15 @@
-@extends('layouts.app')
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
-@endpush
+<link rel="stylesheet" href="<?php echo e(asset('css/formularios.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@section('title', 'Crear cuenta — VIBEZ')
-@section('html-class', 'auth-page')
-@section('body-class', 'auth-page')
+<?php $__env->startSection('title', 'Crear cuenta — VIBEZ'); ?>
+<?php $__env->startSection('html-class', 'auth-page'); ?>
+<?php $__env->startSection('body-class', 'auth-page'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-{{-- Aurora mesh gradient: mismos blobs que login para coherencia visual --}}
+
 <div class="auth-bg">
     <div class="aurora-blob"></div>
     <div class="aurora-blob"></div>
@@ -21,16 +19,13 @@
 
 <div class="auth-wrapper page-transition">
 
-    {{-- ============================================================
-         PANEL IZQUIERDO: idéntico al login — misma familia visual
-         Solo cambia el texto del tagline
-         ============================================================ --}}
+    
     <div class="art-panel">
         <div class="art-content">
             <div class="brand-name">VIBEZ</div>
             <div class="brand-tagline">Tu viaje empieza aquí</div>
 
-            {{-- Misma ilustración SVG que login — coherencia de sistema --}}
+            
             <svg class="art-svg" viewBox="0 0 440 440" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 
                 <g class="blob-1">
@@ -81,10 +76,7 @@
         </div>
     </div>
 
-    {{-- ============================================================
-         PANEL DERECHO: Formulario de registro
-         Misma estructura que login — solo cambian los campos
-         ============================================================ --}}
+    
     <div class="form-panel">
 
         <div class="form-header" id="formHeader">
@@ -98,7 +90,7 @@
 
             <div class="field-group">
 
-                {{-- Campo nombre --}}
+                
                 <div class="field" id="field-nombre">
                     <input
                         type="text"
@@ -107,13 +99,12 @@
                         placeholder=" "
                         autocomplete="given-name"
                         inputmode="text"
-                        onblur="validarNombre()"
                     >
                     <label for="nombre">Nombre</label>
                     <span class="field-error" id="error-nombre" role="alert"></span>
                 </div>
 
-                {{-- Dos apellidos en una fila --}}
+                
                 <div class="field-row">
                     <div class="field" id="field-apellido1">
                         <input
@@ -142,7 +133,7 @@
                     </div>
                 </div>
 
-                {{-- Campo email --}}
+                
                 <div class="field" id="field-email">
                     <input
                         type="email"
@@ -156,7 +147,7 @@
                     <span class="field-error" id="error-email" role="alert"></span>
                 </div>
 
-                {{-- Contraseñas en una fila --}}
+                
                 <div class="field-row">
                     <div class="field" id="field-password">
                         <input
@@ -191,7 +182,7 @@
                     </div>
                 </div>
 
-                {{-- Tipo de cuenta --}}
+                
                 <div class="field field-select" id="field-tipo_cuenta">
                     <select id="tipo_cuenta" name="tipo_cuenta" onchange="cambiarTipoCuenta(this)">
                         <option value="" disabled selected hidden></option>
@@ -203,7 +194,7 @@
                     <span id="hint-tipo_cuenta" style="font-size:0.75rem;margin-top:2px;display:block"></span>
                 </div>
 
-                {{-- Fecha de nacimiento y teléfono en una fila --}}
+                
                 <div class="field-row">
                     <div class="field" id="field-fecha_nacimiento">
                         <input
@@ -233,7 +224,7 @@
 
             </div>
 
-            {{-- Fila de botones: submit + Google en paralelo --}}
+            
             <div class="btn-row" id="btnRow">
                 <button type="submit" class="btn-primary" id="submitBtn" onclick="rippleBtn(event, this)">
                     <span class="btn-text">Crear cuenta</span>
@@ -243,25 +234,27 @@
                 </button>
 
                 <div class="google-btn-wrapper">
-                    <div id="google-signin-btn" data-client-id="{{ config('services.google.client_id') }}"></div>
+                    <div id="google-signin-btn" data-client-id="<?php echo e(config('services.google.client_id')); ?>"></div>
                 </div>
             </div>
 
         </form>
 
-        {{-- Enlace hacia login --}}
+        
         <p class="form-switch">
-            ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
+            ¿Ya tienes cuenta? <a href="<?php echo e(route('login')); ?>">Inicia sesión</a>
         </p>
 
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <script src="{{ asset('js/register.js') }}"></script>
-@endsection
+    <script src="<?php echo e(asset('js/register.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/register.blade.php ENDPATH**/ ?>
