@@ -1,0 +1,25 @@
+/* ============================================================
+   formularios.css — VIBEZ
+   Estilos específicos de validación para los formularios de
+   autenticación (login y registro).
+   Los estilos base de .field, .alert y .shake viven en style.css.
+   Este archivo añade los casos que faltan:
+     - select con error (style.css solo cubre input)
+     - field-select con error
+   ============================================================ */
+
+/* Estado de error en campos <select> */
+.field.has-error select {
+    border-bottom-color: #FCA5A5;
+}
+
+.field.has-error select ~ label,
+.field-select.has-error select ~ label {
+    color: #DC2626;
+}
+
+/* Línea roja bajo el select al tener error */
+.field-select.has-error::after {
+    background: #EF4444;
+    width: 100%;
+}

@@ -139,9 +139,11 @@ class AuthController extends Controller
             'email'    => $validated['email'],
             'password' => $validated['password'],
         ])) {
-            return back()
-                ->withInput($request->only('email'))
-                ->with('error', 'Credenciales incorrectas. Revisa tu email y contraseña.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Credenciales incorrectas. Revisa tu email y contraseña.',
+                'data'    => null,
+            ], 401);
         }
 
         /** @var Usuario $usuario */
