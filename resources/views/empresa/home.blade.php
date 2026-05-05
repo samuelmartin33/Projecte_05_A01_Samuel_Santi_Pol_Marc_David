@@ -3,218 +3,7 @@
 @section('titulo', 'Mi Empresa — VIBEZ')
 
 @push('estilos')
-<style>
-    /* ── Stats ── */
-    .empresa-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1.25rem;
-        margin-bottom: 2.5rem;
-    }
-    .empresa-stat-card {
-        background: white;
-        border: 1px solid #ede9fe;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .empresa-stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(124,58,237,0.12);
-    }
-    .empresa-stat-numero {
-        font-size: 2.2rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, #a855f7, #7c3aed);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        line-height: 1.1;
-    }
-    .empresa-stat-label {
-        color: rgba(15,23,42,0.45);
-        font-size: 0.82rem;
-        font-weight: 600;
-        margin-top: 0.35rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    /* ── Info Card ── */
-    .empresa-info-card {
-        background: white;
-        border: 1px solid #ede9fe;
-        border-radius: 1.25rem;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .empresa-info-row {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        padding: 0.6rem 0;
-        border-bottom: 1px solid #f0eeff;
-        font-size: 0.9rem;
-    }
-    .empresa-info-row:last-child { border-bottom: none; }
-    .empresa-info-label {
-        color: rgba(15,23,42,0.4);
-        min-width: 130px;
-        font-weight: 600;
-        flex-shrink: 0;
-    }
-    .empresa-info-value { color: var(--navy); }
-
-    /* ── Section Titles ── */
-    .seccion-empresa-titulo {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: var(--navy);
-        margin-bottom: 0.4rem;
-    }
-    .seccion-empresa-titulo svg { color: var(--morado); flex-shrink: 0; }
-    .seccion-empresa-sub {
-        color: rgba(15,23,42,0.45);
-        font-size: 0.85rem;
-        margin-bottom: 1.25rem;
-    }
-
-    /* ── Evento Mini Cards ── */
-    .evento-mini-card {
-        background: white;
-        border: 1px solid #ede9fe;
-        border-radius: 1.25rem;
-        overflow: hidden;
-        transition: transform 0.2s, box-shadow 0.2s;
-        cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .evento-mini-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 32px rgba(124,58,237,0.12);
-    }
-    .evento-mini-img { width: 100%; height: 140px; object-fit: cover; }
-    .evento-mini-body { padding: 1rem 1.15rem; }
-    .evento-mini-titulo {
-        color: var(--navy);
-        font-weight: 700;
-        font-size: 0.95rem;
-        margin-bottom: 0.3rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .evento-mini-meta {
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        color: rgba(15,23,42,0.45);
-        font-size: 0.8rem;
-        margin-bottom: 0.2rem;
-    }
-    .evento-mini-meta svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--morado); }
-
-    /* ── Trabajador Cards ── */
-    .trabajador-card {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        background: white;
-        border: 1px solid #ede9fe;
-        border-radius: 1rem;
-        padding: 1rem 1.25rem;
-        transition: box-shadow 0.2s;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .trabajador-card:hover { box-shadow: 0 6px 24px rgba(124,58,237,0.1); }
-    .trabajador-avatar {
-        width: 44px; height: 44px; border-radius: 50%;
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
-        display: flex; align-items: center; justify-content: center;
-        color: #fff; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; overflow: hidden;
-    }
-    .trabajador-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .trabajador-nombre { color: var(--navy); font-weight: 700; font-size: 0.92rem; }
-    .trabajador-email { color: rgba(15,23,42,0.4); font-size: 0.8rem; }
-
-    /* ── Action Cards ── */
-    .accion-card {
-        display: block;
-        background: white;
-        border: 1.5px solid #ede9fe;
-        border-radius: 1.25rem;
-        padding: 1.5rem;
-        text-decoration: none;
-        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .accion-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 32px rgba(124,58,237,0.12);
-        border-color: var(--morado-claro);
-    }
-    .accion-icono {
-        width: 48px; height: 48px; border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        margin-bottom: 1rem;
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
-    }
-    .accion-icono svg { width: 24px; height: 24px; color: white; }
-    .accion-titulo { color: var(--navy); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem; }
-    .accion-desc { color: rgba(15,23,42,0.5); font-size: 0.85rem; }
-
-    /* ── Botón Crear Evento ── */
-    .btn-crear-evento {
-        display: inline-flex; align-items: center; gap: 0.5rem;
-        padding: 0.85rem 1.8rem;
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
-        color: #fff; font-weight: 800; font-size: 0.95rem;
-        border: none; border-radius: 0.85rem; cursor: pointer;
-        text-decoration: none;
-        transition: transform 0.15s, box-shadow 0.2s;
-        box-shadow: 0 4px 20px rgba(124,58,237,0.35);
-    }
-    .btn-crear-evento:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 28px rgba(124,58,237,0.5);
-    }
-    .btn-crear-evento svg { width: 20px; height: 20px; }
-
-    /* ── Empty State ── */
-    .empty-state {
-        text-align: center; padding: 2.5rem 1rem;
-    }
-    .empty-state svg { width: 48px; height: 48px; margin: 0 auto 0.75rem; opacity: 0.35; color: var(--morado); }
-    .empty-state .empty-titulo { font-weight: 700; color: rgba(15,23,42,0.5); margin-bottom: 0.3rem; }
-    .empty-state .empty-desc { color: rgba(15,23,42,0.35); font-size: 0.9rem; }
-
-    /* ── Botón eliminar evento ── */
-    .btn-eliminar-evento {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        width: 100%;
-        justify-content: center;
-        padding: 0.5rem 0.75rem;
-        background: transparent;
-        border: 1.5px solid #fecaca;
-        color: #dc2626;
-        font-size: 0.78rem;
-        font-weight: 700;
-        border-radius: 0.6rem;
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-    }
-    .btn-eliminar-evento:hover {
-        background: #fef2f2;
-        border-color: #dc2626;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
 @endpush
 
 @section('contenido')
@@ -245,12 +34,18 @@
             Gestiona tus eventos, revisa tu equipo y haz crecer tu presencia en VIBEZ.
         </p>
 
-        <div class="mt-8">
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
             <a href="{{ route('empresa.eventos.create') }}" class="btn-crear-evento">
                 <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                 </svg>
                 Crear evento
+            </a>
+            <a href="{{ route('empresa.ofertas.create') }}" class="btn-crear-evento" style="background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 4px 20px rgba(16,185,129,0.35);">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Publicar oferta
             </a>
         </div>
 
@@ -477,6 +272,16 @@
             </div>
             <h3 class="accion-titulo">Crear evento</h3>
             <p class="accion-desc">Publica un nuevo evento y llega a tu público objetivo.</p>
+        </a>
+
+        <a href="{{ route('empresa.ofertas.create') }}" class="accion-card">
+            <div class="accion-icono" style="background:linear-gradient(135deg,#059669,#10b981);">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h3 class="accion-titulo">Publicar oferta de trabajo</h3>
+            <p class="accion-desc">Añade un nuevo puesto a la bolsa de trabajo de VIBEZ.</p>
         </a>
 
         @if($empresa)

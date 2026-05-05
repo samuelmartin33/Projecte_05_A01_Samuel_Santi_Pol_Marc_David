@@ -19,7 +19,7 @@ class BolsaOfertaTrabajo extends Model
         'organizador_id', 'evento_id', 'categoria_trabajo_id',
         'titulo', 'descripcion', 'requisitos', 'ubicacion',
         'salario_min', 'salario_max', 'vacantes',
-        'fecha_inicio_trabajo', 'fecha_fin_trabajo', 'estado'
+        'fecha_inicio_trabajo', 'fecha_fin_trabajo', 'estado', 'fecha_creacion'
     ];
 
     protected $casts = [
