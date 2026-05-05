@@ -157,22 +157,5 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-document.querySelectorAll('[data-codigo]').forEach(function(el) {
-    new QRCode(el, {
-        text: el.dataset.codigo,
-        width: 200,
-        height: 200,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-    });
-});
-function toggleQr(qrId, btnId) {
-    const panel   = document.getElementById(qrId);
-    const btn     = document.getElementById(btnId);
-    const visible = panel.style.display !== 'none';
-    panel.style.display = visible ? 'none' : 'block';
-    btn.textContent     = visible ? 'Ver QR' : 'Ocultar QR';
-}
-</script>
+<script src="{{ asset('js/entradas-mis-entradas.js') }}"></script>
 @endpush

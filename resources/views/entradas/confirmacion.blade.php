@@ -126,15 +126,5 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-document.querySelectorAll('[data-codigo]').forEach(function(el) {
-    new QRCode(el, {
-        text: el.dataset.codigo,
-        width: parseInt(el.style.width) || 220,
-        height: parseInt(el.style.height) || 220,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-    });
-});
-</script>
+<script src="{{ asset('js/entradas-confirmacion.js') }}"></script>
 @endpush

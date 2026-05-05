@@ -58,10 +58,6 @@
                 <p class="perfil-bio-hero">{{ $usuario->biografia }}</p>
             @endif
 
-            {{-- Mood actual (visible para todos, excepto admin y empresa) --}}
-            @if($usuario->mood && !$usuario->isAdmin() && !$usuario->isEmpresa())
-                <span class="perfil-mood-hero">{{ $usuario->mood }}</span>
-            @endif
         </div>
 
     </div>
@@ -152,65 +148,6 @@
             </form>
         </div>
 
-        {{-- ══ TARJETA: Estado de ánimo (Mood) ══ --}}
-        {{-- Solo para usuarios estándar y organizadores, no admin ni empresa --}}
-        @if(!$usuario->isAdmin() && !$usuario->isEmpresa())
-        <div class="perfil-card">
-            <h2 class="perfil-card-titulo">Estado de ánimo</h2>
-            <p class="perfil-card-sub">
-                Visible para <strong>todos</strong> (amigos o no) y aparece en la barra de navegación
-            </p>
-
-            <form action="{{ route('perfil.mood') }}" method="POST">
-                @csrf
-
-                <div class="perfil-mood-grid">
-                    {{-- Lista de opciones de mood --}}
-                    @php
-                        $moods = [
-                            ''                    => '— Sin estado —',
-                            '🤕 De resaca'        => '🤕 De resaca',
-                            '🥳 De fiesta'        => '🥳 De fiesta',
-                            '🍺 Bebiendo cerveza' => '🍺 Bebiendo cerveza',
-                            '🍷 Bebiendo vino'    => '🍷 Bebiendo vino',
-                            '❤️ Enamorado/a'      => '❤️ Enamorado/a',
-                            '💃 Bailando'         => '💃 Bailando',
-                            '🎵 Escuchando música'=> '🎵 Escuchando música',
-                            '😎 Modo casual'      => '😎 Modo casual',
-                            '💪 En el gym'        => '💪 En el gym',
-                            '😴 Durmiendo'        => '😴 Durmiendo',
-                            '🍕 Comiendo'         => '🍕 Comiendo',
-                            '✈️ De viaje'         => '✈️ De viaje',
-                            '🎮 Gaming'           => '🎮 Gaming',
-                            '☀️ Tomando el sol'   => '☀️ Tomando el sol',
-                            '🤙 Con los amigos'   => '🤙 Con los amigos',
-                        ];
-                    @endphp
-
-                    @foreach($moods as $valor => $etiqueta)
-                        @if($valor === '')
-                            {{-- Opción "Sin estado" siempre va primero --}}
-                            <label class="perfil-mood-opcion {{ $usuario->mood === null ? 'perfil-mood-activo' : '' }}">
-                                <input type="radio" name="mood" value=""
-                                       {{ $usuario->mood === null ? 'checked' : '' }}>
-                                <span>{{ $etiqueta }}</span>
-                            </label>
-                        @else
-                            <label class="perfil-mood-opcion {{ $usuario->mood === $valor ? 'perfil-mood-activo' : '' }}">
-                                <input type="radio" name="mood" value="{{ $valor }}"
-                                       {{ $usuario->mood === $valor ? 'checked' : '' }}>
-                                <span>{{ $etiqueta }}</span>
-                            </label>
-                        @endif
-                    @endforeach
-                </div>
-
-                <button type="submit" class="btn-perfil-guardar" style="margin-top:16px">
-                    Guardar estado
-                </button>
-            </form>
-        </div>
-        @endif
 
     </div>
 
@@ -295,10 +232,6 @@
                                 <p class="font-semibold text-sm truncate" style="color:#0f172a">
                                     {{ $amigo->nombre }} {{ $amigo->apellido1 }}
                                 </p>
-                                {{-- Mostrar mood del amigo si lo tiene --}}
-                                @if($amigo->mood)
-                                    <p class="text-xs" style="color:rgba(15,23,42,0.45)">{{ $amigo->mood }}</p>
-                                @endif
                             </div>
                         </div>
                     @endforeach
