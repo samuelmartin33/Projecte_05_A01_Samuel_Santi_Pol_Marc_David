@@ -405,9 +405,9 @@
     }
 
     // Cerrar el panel al pulsar Escape
-    document.addEventListener('keydown', function (e) {
+    document.onkeydown = function (e) {
         if (e.key === 'Escape') cerrarMenuMovil();
-    });
+    };
     </script>
 
     <?php if(auth()->guard()->check()): ?>
