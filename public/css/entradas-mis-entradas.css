@@ -1,0 +1,317 @@
+/*
+ * entradas-mis-entradas.css
+ * Estilos para la página "Mis Entradas" (wallet de tickets del usuario).
+ *
+ * Este archivo es cargado únicamente en la vista mis-entradas.blade.php.
+ * Sustituye todos los atributos style="" que tenía el HTML.
+ *
+ * El diseño imita el aspecto de un talonario de entradas físico:
+ *   - Cabecera oscura (fondo degradado navy)
+ *   - Separador con línea discontinua y círculos en los bordes (efecto "perforación")
+ *   - Cuerpo claro con el código QR plegable
+ */
+
+
+/* ══════════════════════════════════════════
+   ESTADO VACÍO — sin entradas compradas
+══════════════════════════════════════════ */
+
+/* Contenedor del estado vacío (centrado con padding generoso) */
+.mis-entradas-vacio {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+/*
+ * Círculo con icono de ticket para el estado vacío.
+ * border:2px solid #ddd6fe añade un anillo lila exterior.
+ */
+.mis-entradas-vacio-icono {
+    width: 64px;
+    height: 64px;
+    background: #f0ecff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    border: 2px solid #ddd6fe;
+}
+
+/* Icono SVG dentro del círculo */
+.mis-entradas-vacio-icono svg {
+    width: 32px;
+    height: 32px;
+    color: #7c3aed;
+}
+
+/* Título "Aún no tienes entradas" */
+.mis-entradas-vacio-titulo {
+    font-weight: 800;
+    color: var(--navy, #0f172a);
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Texto descriptivo bajo el título */
+.mis-entradas-vacio-texto {
+    color: #64748b;
+    margin: 0 0 1.75rem;
+    font-size: 0.9rem;
+}
+
+/* Ajuste del botón "Explorar eventos" en el estado vacío */
+.mis-entradas-vacio-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    width: auto;
+}
+
+
+/* ══════════════════════════════════════════
+   TARJETA DE PEDIDO
+   Cada pedido (orden de compra) se muestra como
+   una tarjeta estilo talonario de entradas.
+══════════════════════════════════════════ */
+
+/*
+ * La tarjeta base usa la clase .seccion-detalle para el fondo/borde.
+ * Aquí añadimos padding:0 (para que la cabecera oscura llegue al borde)
+ * y overflow:hidden (para que el border-radius recorte el gradiente).
+ */
+.mis-entradas-pedido {
+    margin-bottom: 1.5rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+/*
+ * Cabecera oscura de cada pedido con información del evento.
+ * background con degradado navy-morado profundo (estética "noche de festival").
+ */
+.mis-entradas-pedido-header {
+    padding: 18px 28px;
+    background: linear-gradient(135deg, #05000f, #1e1035);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Columna izquierda: título del evento, fecha y ID de pedido */
+.mis-entradas-pedido-info {
+    min-width: 0; /* permite que text-overflow:ellipsis funcione */
+    flex: 1;
+}
+
+/* Nombre del evento (truncado con ellipsis si es largo) */
+.mis-entradas-pedido-titulo {
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fecha y ciudad del evento (en tono lila claro) */
+.mis-entradas-pedido-fecha {
+    color: rgba(192, 132, 252, 0.85);
+    font-size: 0.78rem;
+    margin: 3px 0 0;
+}
+
+/* ID del pedido y timestamp (muy tenue, secundario) */
+.mis-entradas-pedido-meta {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.7rem;
+    margin: 3px 0 0;
+}
+
+/* Columna derecha: badge de cantidad y precio total */
+.mis-entradas-pedido-precio-col {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/*
+ * Badge con el número de entradas del pedido.
+ * background semi-transparente morado para mantener consistencia visual
+ * con el degradado de la cabecera.
+ */
+.mis-entradas-badge-entradas {
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: #c084fc;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+/* Fila del precio total del pedido */
+.mis-entradas-precio-total {
+    margin: 5px 0 0;
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+/* Color verde para cuando el precio es 0€ (entrada gratuita) */
+.precio-gratis {
+    color: #34d399;
+}
+
+/* Lista de entradas dentro del pedido (con padding lateral) */
+.mis-entradas-entradas-lista {
+    padding: 0 28px;
+}
+
+
+/* ══════════════════════════════════════════
+   SEPARADOR DE TALONARIO
+   Simula el borde perforado de un ticket físico.
+   La línea discontinua va de borde a borde.
+   Los círculos en los extremos simulan los agujeros de punzonado.
+══════════════════════════════════════════ */
+
+/*
+ * Contenedor relativo para poder posicionar los círculos con position:absolute.
+ * margin:0 -28px compensa el padding del contenedor padre (.mis-entradas-entradas-lista)
+ * para que la línea llegue de borde a borde.
+ */
+.mis-entradas-talonario-sep {
+    position: relative;
+    margin: 0 -28px;
+    border-top: 2px dashed #ede9fe;
+}
+
+/*
+ * Círculos en cada extremo del separador.
+ * Se posicionan con valores negativos (left/right:-11px, top:-11px)
+ * para que queden centrados sobre la línea discontinua,
+ * dando la ilusión de que la tarjeta está perforada.
+ */
+.mis-entradas-talonario-circulo-izq {
+    position: absolute;
+    left: -11px;
+    top: -11px;
+    width: 22px;
+    height: 22px;
+    background: #f0ecff; /* mismo color que el fondo de la página */
+    border-radius: 50%;
+    border: 2px solid #ede9fe;
+}
+
+.mis-entradas-talonario-circulo-der {
+    position: absolute;
+    right: -11px;
+    top: -11px;
+    width: 22px;
+    height: 22px;
+    background: #f0ecff;
+    border-radius: 50%;
+    border: 2px solid #ede9fe;
+}
+
+
+/* ══════════════════════════════════════════
+   FILA DE ENTRADA INDIVIDUAL
+══════════════════════════════════════════ */
+
+/* Área de cada entrada dentro del pedido */
+.mis-entradas-entrada-fila {
+    padding: 16px 0;
+}
+
+/* Cabecera de la entrada: número (izquierda) + botón QR (derecha) */
+.mis-entradas-entrada-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Columna de información de la entrada */
+.mis-entradas-entrada-info {
+    min-width: 0; /* necesario para truncar el UUID con ellipsis */
+}
+
+/* "Entrada #N" */
+.mis-entradas-entrada-num {
+    font-weight: 700;
+    color: var(--navy, #0f172a);
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/*
+ * UUID del código QR en tipografía monoespaciada.
+ * max-width:200px + text-overflow evita que el UUID largo
+ * desborde la tarjeta en pantallas pequeñas.
+ */
+.mis-entradas-entrada-codigo {
+    font-family: monospace;
+    font-size: 0.62rem;
+    color: #94a3b8;
+    margin: 3px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+/* Ajuste del botón "Ver QR" para que sea compacto */
+.mis-entradas-btn-qr {
+    padding: 7px 18px;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: auto;
+}
+
+
+/* ══════════════════════════════════════════
+   PANEL DE CÓDIGO QR (plegable)
+   toggleQr() en mis-entradas.js gestiona display:block/none.
+   El display:none inicial va como style="" en el HTML para que
+   el JS pueda detectarlo con panel.style.display !== 'none'.
+══════════════════════════════════════════ */
+
+/* Estilos del panel QR cuando está visible (solo los que no son display) */
+.mis-entradas-qr-panel {
+    text-align: center;
+    padding-top: 14px;
+}
+
+/*
+ * Marco blanco decorativo alrededor del QR.
+ * display:inline-block permite que el fondo se ajuste al tamaño del canvas.
+ */
+.mis-entradas-qr-marco {
+    display: inline-block;
+    padding: 10px;
+    background: #fff;
+    border: 2px solid #ede9fe;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
+}
+
+/*
+ * Div donde la librería QRCode.js dibuja el canvas del QR.
+ * El tamaño debe coincidir con los parámetros en entradas-mis-entradas.js.
+ */
+.mis-entradas-qr-canvas {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+/* Texto de instrucción bajo el QR */
+.mis-entradas-qr-texto {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin: 8px 0 0;
+}

@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión administrativa de pedidos.
+ */
 class PedidoController extends Controller
 {
     public function index(): View

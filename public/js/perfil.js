@@ -1,5 +1,5 @@
 /**
- * VIBEZ — perfil.js
+ * perfil.js — VIBEZ
  *
  * Solo contiene lógica que NO se puede hacer con formularios HTML simples:
  *   1. previsualizarFoto()   → muestra preview local antes de subir la foto
@@ -8,9 +8,27 @@
  *
  * Todo lo demás (guardar datos, guardar mood, aceptar/rechazar amigos)
  * usa formularios HTML normales con action + method + @csrf.
+ *
+ * Dependencias:
+ *   - Un meta tag <meta name="csrf-token"> con el token CSRF de Laravel.
+ *   - Los endpoints GET /api/amigos/buscar?q=... y POST /api/amigos/solicitud.
+ *   - Los elementos del DOM con IDs: avatarPreview, btnGuardarFoto,
+ *     resultadosBusqueda, btn-sol-{id}.
+ *
+ * Funciones públicas (llamadas desde atributos oninput/onclick en el HTML):
+ *   previsualizarFoto(input)          — previsualiza foto antes de subirla
+ *   buscarAmigos(valor)               — lanza búsqueda con debounce de 350 ms
+ *   enviarSolicitud(receptorId, btn)  — POST de solicitud de amistad
  */
 
 /* ─── Helper: leer el token CSRF del meta tag ─── */
+/**
+ * Obtiene el token CSRF que Laravel inyecta en el meta tag de la plantilla.
+ * Este token es obligatorio en todas las peticiones POST/PUT/DELETE para que
+ * el servidor pueda verificar que la petición proviene del propio sitio.
+ *
+ * @returns {string} El valor del token CSRF
+ */
 function getCsrf() {
     return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
@@ -29,23 +47,29 @@ function previsualizarFoto(input) {
     const archivo = input.files[0];
     if (!archivo) return;
 
-    // Validación de tamaño en el cliente (5 MB) para feedback inmediato
+    // Validación de tamaño en el cliente (5 MB) para feedback inmediato.
+    // El servidor también valida, pero hacerlo aquí evita una petición innecesaria
+    // y da al usuario una respuesta instantánea sin esperar la subida.
     if (archivo.size > 5 * 1024 * 1024) {
         alert('La imagen no puede superar 5 MB.');
         input.value = '';
         return;
     }
 
-    // FileReader lee el archivo localmente y genera una URL temporal (base64)
+    // FileReader es una API del navegador que permite leer archivos locales
+    // sin necesidad de subirlos al servidor. Genera una URL en formato base64
+    // (Data URL) que podemos usar directamente como src de una imagen.
     const reader = new FileReader();
     reader.onload = function (e) {
-        // Reemplazamos el contenido del avatar con la imagen en base64
+        // Reemplazamos el contenido del avatar con la imagen en base64.
+        // e.target.result contiene la cadena "data:image/jpeg;base64,/9j/4AA..."
         const avatar = document.getElementById('avatarPreview');
         avatar.innerHTML = '<img src="' + e.target.result + '" alt="foto" style="width:100%;height:100%;object-fit:cover;">';
     };
     reader.readAsDataURL(archivo);
 
-    // Mostramos el botón "Guardar foto" para que el usuario confirme la subida
+    // Mostramos el botón "Guardar foto" para que el usuario confirme la subida.
+    // Está oculto por defecto para evitar que el usuario lo pulse sin haber seleccionado foto.
     const btnGuardar = document.getElementById('btnGuardarFoto');
     if (btnGuardar) {
         btnGuardar.style.display = 'block';
@@ -57,30 +81,40 @@ function previsualizarFoto(input) {
    Necesita AJAX porque los resultados aparecen sin recargar la página.
    ============================================================ */
 
-let _buscarTimeout = null;  // guardamos el temporizador para cancelarlo si el usuario sigue escribiendo
+// Variable en el scope del módulo que guarda el ID del último temporizador de búsqueda.
+// Al cancelarla con clearTimeout antes de crear una nueva, implementamos el patrón debounce.
+let _buscarTimeout = null;
 
 /**
  * Busca usuarios con un retraso de 350 ms (debounce) para no llamar al servidor
  * en cada tecla pulsada, sino solo cuando el usuario deja de escribir.
  *
+ * Sin debounce, si el usuario escribe "Maria" (5 teclas) se harían 5 peticiones
+ * al servidor: "M", "Ma", "Mar", "Mari", "Maria". Con debounce solo se hace 1.
+ *
  * @param {string} valor - Texto escrito en el campo de búsqueda
  */
 function buscarAmigos(valor) {
-    // Cancelar la búsqueda anterior si el usuario sigue escribiendo
+    // Cancelar el temporizador anterior: si el usuario sigue escribiendo,
+    // el setTimeout anterior no se habrá ejecutado todavía y lo descartamos
     clearTimeout(_buscarTimeout);
 
     const contenedor = document.getElementById('resultadosBusqueda');
 
-    // Si hay menos de 2 caracteres no buscamos (evita resultados masivos)
+    // Con menos de 2 caracteres no buscamos para evitar devolver casi todos los usuarios
+    // y reducir la carga innecesaria en el servidor
     if (valor.length < 2) {
         contenedor.style.display = 'none';
         contenedor.innerHTML = '';
         return;
     }
 
-    // Esperamos 350 ms antes de lanzar la petición
+    // Creamos un nuevo temporizador: si el usuario no escribe nada más en 350 ms,
+    // se ejecutará la función de búsqueda
     _buscarTimeout = setTimeout(function () {
-        // encodeURIComponent convierte caracteres especiales para la URL (ej: ñ → %C3%B1)
+        // encodeURIComponent convierte caracteres especiales para que sean seguros en una URL.
+        // Ejemplo: "ñ" → "%C3%B1", "á" → "%C3%A1", "&" → "%26".
+        // Sin esto, un nombre como "José & Ana" rompería la URL del servidor.
         fetch('/api/amigos/buscar?q=' + encodeURIComponent(valor), {
             headers: { 'Accept': 'application/json' },
         })
@@ -88,18 +122,19 @@ function buscarAmigos(valor) {
         .then(function (data) {
             contenedor.innerHTML = '';
 
-            // Si no hay resultados mostramos un mensaje
             if (!data.data || data.data.length === 0) {
                 contenedor.innerHTML = '<div class="perfil-busqueda-item" style="color:rgba(15,23,42,0.4);justify-content:center">Sin resultados</div>';
                 contenedor.style.display = 'block';
                 return;
             }
 
-            // Por cada usuario encontrado creamos un elemento con botón para añadir
+            // Por cada usuario encontrado creamos dinámicamente un elemento con botón para añadir.
+            // Usamos createElement en lugar de innerHTML para evitar XSS si los datos
+            // del servidor contuviesen HTML malicioso.
             data.data.forEach(function (usuario) {
+                // Generamos las iniciales como alternativa visual si el usuario no tiene foto
                 const iniciales = (usuario.nombre?.[0] ?? '').toUpperCase() + (usuario.apellido1?.[0] ?? '').toUpperCase();
 
-                // Si tiene foto mostramos la imagen, si no mostramos las iniciales
                 const avatarHTML = usuario.foto_url
                     ? '<div class="perfil-solicitud-avatar"><img src="' + usuario.foto_url + '" alt=""></div>'
                     : '<div class="perfil-solicitud-avatar">' + iniciales + '</div>';
@@ -112,6 +147,8 @@ function buscarAmigos(valor) {
                             usuario.nombre + ' ' + (usuario.apellido1 ?? '') +
                         '</p>' +
                     '</div>' +
+                    // El ID único del botón (`btn-sol-{id}`) nos permite localizarlo
+                    // desde enviarSolicitud para actualizarlo tras la respuesta del servidor
                     '<button class="btn-enviar-solicitud" id="btn-sol-' + usuario.id + '" ' +
                             'onclick="enviarSolicitud(' + usuario.id + ', this)">' +
                         '+ Añadir' +
@@ -123,7 +160,8 @@ function buscarAmigos(valor) {
             contenedor.style.display = 'block';
         })
         .catch(function () {
-            // En caso de error de red no hacemos nada (la búsqueda simplemente no aparece)
+            // Si la búsqueda falla (sin conexión, error 500...) simplemente
+            // no mostramos resultados; no es necesario alertar al usuario por esto
         });
     }, 350);
 }
@@ -135,14 +173,18 @@ function buscarAmigos(valor) {
    ============================================================ */
 
 /**
- * Envía la solicitud de amistad al servidor y actualiza el botón.
+ * Envía la solicitud de amistad al servidor y actualiza el botón para indicar
+ * que ya fue enviada, impidiendo que el usuario la envíe una segunda vez.
  *
- * @param {number}      receptorId - ID del usuario al que queremos añadir
- * @param {HTMLElement} btn        - Referencia al botón pulsado (para desactivarlo)
+ * @param {number}      receptorId - ID del usuario al que queremos añadir como amigo
+ * @param {HTMLElement} btn        - Referencia al botón pulsado (para desactivarlo tras el envío)
  */
 function enviarSolicitud(receptorId, btn) {
+    // Deshabilitamos el botón inmediatamente para prevenir el doble envío:
+    // si el usuario hace doble clic rápido, la segunda pulsación no tendrá efecto
+    // porque el botón ya estará deshabilitado desde la primera
     btn.disabled    = true;
-    btn.textContent = '...';
+    btn.textContent = '...';  // indicador visual de que la petición está en curso
 
     fetch('/api/amigos/solicitud', {
         method: 'POST',
@@ -155,12 +197,17 @@ function enviarSolicitud(receptorId, btn) {
     })
     .then(function (r) { return r.json(); })
     .then(function (data) {
-        // Actualizamos el texto del botón según la respuesta del servidor
+        // Actualizamos el texto del botón según la respuesta del servidor:
+        // éxito → muestra un tick y queda deshabilitado; error → muestra el mensaje
         btn.textContent = data.success ? '✓ Enviado' : '⚠ ' + (data.message ?? 'Error');
         btn.classList.add('btn-enviado');
+        // Mantenemos el botón deshabilitado tras el éxito para que el usuario
+        // no pueda enviar la misma solicitud de amistad dos veces
         btn.disabled = true;
     })
     .catch(function () {
+        // Si hay error de red, volvemos a habilitar el botón para que el usuario
+        // pueda intentarlo de nuevo
         btn.textContent = 'Error';
         btn.disabled    = false;
     });

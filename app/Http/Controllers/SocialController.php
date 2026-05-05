@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * Controlador de funcionalidades sociales de la plataforma.
+ */
 class SocialController extends Controller
 {
     /* ============================================================

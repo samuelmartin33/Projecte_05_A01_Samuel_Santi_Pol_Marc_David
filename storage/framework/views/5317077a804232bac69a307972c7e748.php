@@ -1,88 +1,7 @@
 <?php $__env->startSection('titulo', 'Revisar Currículums — ' . $empresa->nombre_empresa); ?>
 
 <?php $__env->startPush('estilos'); ?>
-<style>
-    .cand-hero {
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1040 60%, #0f0f23 100%);
-        border-bottom: 1px solid rgba(139,92,246,0.2);
-    }
-    .oferta-card {
-        background: #fff;
-        border: 1.5px solid rgba(26,26,46,0.08);
-        border-radius: 1.125rem;
-        padding: 1.4rem 1.5rem;
-        transition: border-color .18s, box-shadow .18s, transform .18s;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    .oferta-card:hover {
-        border-color: rgba(139,92,246,0.4);
-        box-shadow: 0 8px 28px rgba(139,92,246,0.1);
-        transform: translateY(-2px);
-    }
-    .badge-estado {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        padding: 0.2rem 0.65rem;
-        border-radius: 999px;
-    }
-    .badge-activa   { background: #dcfce7; color: #15803d; }
-    .badge-cerrada  { background: #f1f5f9; color: #64748b; }
-    .badge-cands {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        font-size: 0.8rem;
-        font-weight: 700;
-        padding: 0.25rem 0.7rem;
-        border-radius: 999px;
-    }
-    .badge-cands-ok   { background: #ede9fe; color: #7c3aed; }
-    .badge-cands-none { background: #f1f5f9; color: #94a3b8; }
-    .filtro-btn {
-        padding: 0.45rem 1rem;
-        border-radius: 0.65rem;
-        font-size: 0.82rem;
-        font-weight: 600;
-        border: 1.5px solid rgba(26,26,46,0.12);
-        background: #fff;
-        color: #1a1a2e;
-        cursor: pointer;
-        transition: border-color .15s, background .15s;
-    }
-    .filtro-btn:hover  { border-color: #8b5cf6; background: #f5f3ff; }
-    .filtro-btn.activo { border-color: #8b5cf6; background: #ede9fe; color: #6d28d9; }
-    .filtro-select {
-        padding: 0.45rem 0.85rem;
-        border-radius: 0.65rem;
-        font-size: 0.82rem;
-        font-weight: 600;
-        border: 1.5px solid rgba(26,26,46,0.12);
-        background: #fff;
-        color: #1a1a2e;
-        outline: none;
-        cursor: pointer;
-    }
-    .filtro-select:focus { border-color: #8b5cf6; }
-    .empty-state {
-        text-align: center;
-        padding: 4rem 1rem;
-        color: rgba(26,26,46,0.4);
-    }
-    .stat-box {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 0.875rem;
-        padding: 1rem 1.5rem;
-        text-align: center;
-    }
-</style>
+<link rel="stylesheet" href="<?php echo e(asset('css/empresa-candidaturas-ofertas.css')); ?>">
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('contenido'); ?>
@@ -128,48 +47,45 @@
 </section>
 
 
+<?php
+    $baseOfertas   = route('empresa.candidaturas.ofertas');
+    $ordenOfAct    = request('orden', 'reciente');
+    $estadoOfAct   = request('estado', null);
+    $estadoPrefix  = $estadoOfAct !== null ? 'estado=' . $estadoOfAct . '&' : '';
+    $mkUrl = fn($est, $ord) => $baseOfertas . '?' . http_build_query(array_filter(
+        ['estado' => $est, 'orden' => $ord],
+        fn($v) => $v !== null && $v !== ''
+    ));
+?>
 <div class="sticky top-16 z-30 bg-white border-b border-navy/8 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-3">
 
-        <form method="GET" action="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
-              class="flex flex-wrap items-center gap-3 w-full" id="form-filtros">
+        
+        <div class="flex items-center gap-1.5">
+            <a href="<?php echo e($mkUrl(null, $ordenOfAct)); ?>"
+               class="filtro-btn <?php echo e($estadoOfAct === null ? 'activo' : ''); ?>">Todas</a>
+            <a href="<?php echo e($mkUrl('1', $ordenOfAct)); ?>"
+               class="filtro-btn <?php echo e($estadoOfAct === '1' ? 'activo' : ''); ?>">Activas</a>
+            <a href="<?php echo e($mkUrl('0', $ordenOfAct)); ?>"
+               class="filtro-btn <?php echo e($estadoOfAct === '0' ? 'activo' : ''); ?>">Cerradas</a>
+        </div>
 
-            
-            <div class="flex items-center gap-1.5">
-                <button type="submit" name="estado" value=""
-                        class="filtro-btn <?php echo e(!request('estado') ? 'activo' : ''); ?>">
-                    Todas
-                </button>
-                <button type="submit" name="estado" value="1"
-                        class="filtro-btn <?php echo e(request('estado') === '1' ? 'activo' : ''); ?>">
-                    Activas
-                </button>
-                <button type="submit" name="estado" value="0"
-                        class="filtro-btn <?php echo e(request('estado') === '0' ? 'activo' : ''); ?>">
-                    Cerradas
-                </button>
-            </div>
-
-            <div class="ml-auto flex items-center gap-2">
-                <label class="text-navy/50 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
-                <select name="orden" class="filtro-select" onchange="this.form.submit()">
-                    <option value="reciente"   <?php echo e(request('orden','reciente') === 'reciente'   ? 'selected' : ''); ?>>Más reciente</option>
-                    <option value="candidatos" <?php echo e(request('orden') === 'candidatos' ? 'selected' : ''); ?>>Más candidatos</option>
-                    <option value="titulo"     <?php echo e(request('orden') === 'titulo'     ? 'selected' : ''); ?>>Alfabético</option>
-                </select>
-                <?php if(request('estado') !== null || request('orden')): ?>
-                    <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
-                       class="text-navy/40 hover:text-navy text-xs font-semibold transition-colors">
-                        Limpiar
-                    </a>
-                <?php endif; ?>
-            </div>
-
-            
-            <?php if(request('estado') !== null): ?>
-                <input type="hidden" name="estado" value="<?php echo e(request('estado')); ?>">
+        <div class="ml-auto flex items-center gap-2">
+            <label class="text-navy/50 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
+            <select class="filtro-select"
+                    onchange="window.location.href='<?php echo e($baseOfertas); ?>?<?php echo e($estadoPrefix); ?>orden='+this.value">
+                <option value="reciente"   <?php echo e($ordenOfAct === 'reciente'   ? 'selected' : ''); ?>>Más reciente</option>
+                <option value="candidatos" <?php echo e($ordenOfAct === 'candidatos' ? 'selected' : ''); ?>>Más candidatos</option>
+                <option value="titulo"     <?php echo e($ordenOfAct === 'titulo'     ? 'selected' : ''); ?>>Alfabético</option>
+            </select>
+            <?php if($estadoOfAct !== null || request('orden')): ?>
+                <a href="<?php echo e($baseOfertas); ?>"
+                   class="text-navy/40 hover:text-navy text-xs font-semibold transition-colors">
+                    Limpiar
+                </a>
             <?php endif; ?>
-        </form>
+        </div>
+
     </div>
 </div>
 

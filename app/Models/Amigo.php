@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Modelo para la tabla `amigos`.
+ */
 class Amigo extends Model
 {
     protected $table      = 'amigos';

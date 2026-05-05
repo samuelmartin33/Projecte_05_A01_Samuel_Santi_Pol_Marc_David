@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modelo para la tabla `candidaturas_trabajo`.
+ */
 class CandidaturaTrabajo extends Model
 {
     protected $table = 'candidaturas_trabajo';

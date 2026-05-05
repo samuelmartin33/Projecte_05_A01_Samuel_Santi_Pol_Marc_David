@@ -1,3 +1,4 @@
+// Interacciones de administración de eventos en VIBEZ.
 var AdminEventos = {
     iniciar: function () {
         AdminEventos.configurarConfirmacionBorrado();

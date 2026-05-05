@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión de eventos de empresa.
+ */
 class EventosController extends Controller
 {
     /**
