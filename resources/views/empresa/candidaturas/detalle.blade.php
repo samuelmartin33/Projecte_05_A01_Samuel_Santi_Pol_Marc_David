@@ -3,112 +3,7 @@
 @section('titulo', 'Candidatos — ' . $oferta->titulo)
 
 @push('estilos')
-<style>
-    .cand-hero { background: linear-gradient(135deg,#0f0f23 0%,#1a1040 60%,#0f0f23 100%);
-                 border-bottom: 1px solid rgba(139,92,246,0.2); }
-
-    /* Tabla / lista de candidatos */
-    .cand-row {
-        display: grid;
-        grid-template-columns: 2.5rem 1fr auto;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid rgba(26,26,46,0.06);
-        transition: background .15s;
-    }
-    .cand-row:hover { background: #fafafa; }
-    .cand-avatar {
-        width: 2.5rem; height: 2.5rem;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 0.8rem; color: #fff;
-        flex-shrink: 0;
-        background: linear-gradient(135deg,#7c3aed,#a855f7);
-    }
-
-    /* Estado badge */
-    .estado-badge {
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        font-size: 0.7rem; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.06em;
-        padding: 0.2rem 0.65rem; border-radius: 999px;
-    }
-
-    /* Dropdown estado inline */
-    .estado-select {
-        font-size: 0.72rem; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.05em;
-        border: none; border-radius: 999px;
-        padding: 0.2rem 0.5rem; cursor: pointer;
-        outline: none; appearance: none;
-        -webkit-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7280' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 0.4rem center;
-        padding-right: 1.4rem;
-    }
-    .estado-1 { background:#dbeafe; color:#1d4ed8; }
-    .estado-2 { background:#fef3c7; color:#b45309; }
-    .estado-3 { background:#dcfce7; color:#15803d; }
-    .estado-4 { background:#fee2e2; color:#b91c1c; }
-
-    /* Filtros */
-    .tab-estado {
-        padding: 0.4rem 1rem; border-radius: 0.6rem;
-        font-size: 0.8rem; font-weight: 600;
-        border: 1.5px solid rgba(26,26,46,0.1);
-        background: #fff; color: #64748b;
-        cursor: pointer; transition: all .15s; white-space: nowrap;
-    }
-    .tab-estado:hover  { border-color: #8b5cf6; color: #7c3aed; }
-    .tab-estado.activo { border-color: #8b5cf6; background: #ede9fe; color: #6d28d9; font-weight: 700; }
-
-    /* Modal CV */
-    .cv-modal-overlay {
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,0.55);
-        backdrop-filter: blur(4px);
-        z-index: 200; display: none;
-        align-items: center; justify-content: center;
-        padding: 1rem;
-    }
-    .cv-modal-overlay.abierto { display: flex; }
-    .cv-modal {
-        background: #fff; border-radius: 1.25rem;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-        width: 100%; max-width: 680px;
-        max-height: 90vh;
-        display: flex; flex-direction: column;
-        animation: cvModalIn .2s ease;
-    }
-    @keyframes cvModalIn {
-        from { opacity:0; transform:translateY(14px) scale(0.98); }
-        to   { opacity:1; transform:translateY(0) scale(1); }
-    }
-    .cv-modal-body { overflow-y: auto; flex: 1; }
-    .cv-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(26,26,46,0.07); }
-    .cv-section:last-child { border-bottom: none; }
-    .cv-section-title {
-        font-size: 0.7rem; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.08em;
-        color: rgba(26,26,46,0.4);
-        margin-bottom: 0.5rem;
-    }
-    .cv-section-body {
-        font-size: 0.9rem; color: #1a1a2e;
-        line-height: 1.65;
-        white-space: pre-wrap;
-    }
-    .chip {
-        display: inline-block;
-        background: #f1f5f9; color: #475569;
-        border-radius: 0.5rem;
-        padding: 0.2rem 0.6rem;
-        font-size: 0.75rem; font-weight: 600;
-        margin: 0.2rem 0.15rem;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/empresa-candidaturas-detalle.css') }}">
 @endpush
 
 @section('contenido')
@@ -146,67 +41,109 @@
                         </span>
                     @endif
                     <span class="text-green-400 font-semibold">{{ $oferta->salario_formateado }}</span>
-                    <span class="{{ $oferta->estado ? 'text-green-400' : 'text-slate-500' }} font-semibold">
+                    <span id="oferta-estado-badge" class="{{ $oferta->estado ? 'text-green-400' : 'text-slate-500' }} font-semibold">
                         {{ $oferta->estado ? '● Activa' : '○ Cerrada' }}
                     </span>
                 </div>
             </div>
 
-            {{-- Contador total --}}
-            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:.875rem;padding:1rem 1.5rem;text-align:center;min-width:130px">
-                <p class="text-3xl font-black text-purple-300">{{ $candidaturas->total() }}</p>
-                <p class="text-slate-400 text-xs mt-0.5">candidatura{{ $candidaturas->total() !== 1 ? 's' : '' }}</p>
+            {{-- Acciones oferta --}}
+            <div class="flex flex-col items-end gap-3">
+                {{-- Contador total --}}
+                <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:.875rem;padding:1rem 1.5rem;text-align:center;min-width:130px">
+                    <p class="text-3xl font-black text-purple-300">{{ $candidaturas->total() }}</p>
+                    <p class="text-slate-400 text-xs mt-0.5">candidatura{{ $candidaturas->total() !== 1 ? 's' : '' }}</p>
+                </div>
+                {{-- Botón cerrar / reabrir --}}
+                <button id="btn-cerrar-oferta"
+                        onclick="toggleOferta()"
+                        data-estado="{{ $oferta->estado }}"
+                        data-url="{{ route('empresa.candidaturas.cerrar-oferta', $oferta->id) }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all
+                               {{ $oferta->estado
+                                    ? 'bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30'
+                                    : 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30' }}">
+                    @if($oferta->estado)
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Cerrar oferta
+                    @else
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Reabrir oferta
+                    @endif
+                </button>
             </div>
         </div>
     </div>
 </section>
 
 {{-- ══ Filtros de estado ══ --}}
+@php
+    $baseUrl   = route('empresa.candidaturas.detalle', $oferta->id);
+    $ordenAct  = request('orden', 'reciente');
+    $estadoAct = request('estado', '');
+    $estados   = [
+        ''  => ['label' => 'Todos',           'color' => ''],
+        '1' => ['label' => 'Nuevos',          'color' => 'text-blue-600'],
+        '2' => ['label' => 'Revisados',       'color' => 'text-amber-600'],
+        '3' => ['label' => 'Preseleccionados','color' => 'text-green-600'],
+        '4' => ['label' => 'Rechazados',      'color' => 'text-red-500'],
+    ];
+@endphp
 <div class="sticky top-16 z-30 bg-white border-b border-navy/8 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <form method="GET" action="{{ route('empresa.candidaturas.detalle', $oferta->id) }}"
-              class="flex flex-wrap items-center gap-2">
-
-            @php
-                $estados = [
-                    ''  => ['label' => 'Todos',          'color' => ''],
-                    '1' => ['label' => 'Nuevos',         'color' => 'text-blue-600'],
-                    '2' => ['label' => 'Revisados',      'color' => 'text-amber-600'],
-                    '3' => ['label' => 'Preseleccionados','color' => 'text-green-600'],
-                    '4' => ['label' => 'Rechazados',     'color' => 'text-red-500'],
-                ];
-            @endphp
+        <div class="flex flex-wrap items-center gap-2">
 
             @foreach($estados as $val => $info)
-                @php $count = $val === '' ? $candidaturas->total() : ($conteos[$val] ?? 0); @endphp
-                <button type="submit" name="estado" value="{{ $val }}"
-                        class="tab-estado {{ request('estado', '') == $val ? 'activo' : '' }}">
+                <button type="button"
+                        data-estado="{{ $val }}"
+                        onclick="cargarCandidaturas('{{ $val }}', _ordenActual)"
+                        class="tab-estado {{ $estadoAct == $val ? 'activo' : '' }}">
                     {{ $info['label'] }}
-                    @if($count > 0)
-                        <span class="ml-1 text-xs font-black {{ $info['color'] }}">{{ $count }}</span>
-                    @endif
                 </button>
             @endforeach
 
             <div class="ml-auto flex items-center gap-2">
                 <label class="text-navy/40 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
-                <select name="orden" class="filtro-select text-xs border border-navy/10 rounded-lg px-2 py-1.5 outline-none"
-                        onchange="this.form.submit()">
-                    <option value="reciente" {{ request('orden','reciente') === 'reciente' ? 'selected':'' }}>Más reciente</option>
-                    <option value="nombre"   {{ request('orden') === 'nombre'   ? 'selected':'' }}>Nombre A–Z</option>
-                    <option value="estado"   {{ request('orden') === 'estado'   ? 'selected':'' }}>Por estado</option>
+                <select class="filtro-select text-xs border border-navy/10 rounded-lg px-2 py-1.5 outline-none"
+                        onchange="cargarCandidaturas(_estadoActual, this.value)">
+                    <option value="reciente" {{ $ordenAct === 'reciente' ? 'selected':'' }}>Más reciente</option>
+                    <option value="nombre"   {{ $ordenAct === 'nombre'   ? 'selected':'' }}>Nombre A–Z</option>
+                    <option value="estado"   {{ $ordenAct === 'estado'   ? 'selected':'' }}>Por estado</option>
                 </select>
             </div>
 
-            @if(request('estado') !== null)
-                <input type="hidden" name="estado" value="{{ request('estado') }}">
-            @endif
-        </form>
+        </div>
     </div>
 </div>
 
 {{-- ══ Lista de candidaturas ══ --}}
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+@php
+$candidaturasJson = $candidaturas->map(function($c) {
+    return [
+        'id'            => $c->id,
+        'nombre'        => $c->nombreCompleto(),
+        'email'         => $c->email_candidato ?? '',
+        'telefono'      => $c->telefono_candidato ?? '',
+        'ciudad'        => $c->ciudad_candidato ?? '',
+        'linkedin'      => $c->linkedin_candidato ?? '',
+        'perfil'        => $c->perfil_profesional ?? '',
+        'habilidades'   => $c->habilidades ?? '',
+        'idiomas'       => $c->idiomas ?? '',
+        'carta'         => $c->carta_presentacion ?? '',
+        'tiene_archivo' => $c->tieneArchivo(),
+        'descargar_url' => route('empresa.candidaturas.descargar', $c->id),
+        'fecha'         => \Carbon\Carbon::parse($c->fecha_creacion)->format('d/m/Y H:i'),
+    ];
+});
+@endphp
+<main id="candidaturas-lista" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<script type="application/json" id="candidaturas-json">@json($candidaturasJson)</script>
 
     @if($candidaturas->isEmpty())
         <div class="text-center py-20">
@@ -324,18 +261,6 @@
                             </svg>
                         </a>
                     @endif
-
-                    {{-- Contactar --}}
-                    @if($cand->email_candidato)
-                        <a href="mailto:{{ $cand->email_candidato }}?subject=Tu candidatura para {{ urlencode($oferta->titulo) }}"
-                           title="Contactar por email"
-                           class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                        </a>
-                    @endif
                 </div>
             </div>
             @endforeach
@@ -380,9 +305,6 @@
             <a id="cv-download-btn" href="#" class="hidden btn-comprar text-sm px-4 py-2 rounded-lg font-semibold">
                 Descargar PDF
             </a>
-            <a id="cv-email-btn" href="#" class="text-sm px-4 py-2 rounded-lg border border-navy/15 text-navy/60 hover:bg-navy/5 font-semibold transition-colors">
-                Contactar
-            </a>
             <button onclick="cerrarCvModalBtn()" class="ml-auto text-sm px-4 py-2 text-navy/40 hover:text-navy transition-colors font-medium">
                 Cerrar
             </button>
@@ -394,153 +316,12 @@
 
 @push('scripts')
 <script>
-// ── Datos de candidaturas (para modal CV) ────────────────────────────────────
-const candidaturasData = @json($candidaturas->map(function($c) {
-    return [
-        'id'               => $c->id,
-        'nombre'           => $c->nombreCompleto(),
-        'email'            => $c->email_candidato ?? '',
-        'telefono'         => $c->telefono_candidato ?? '',
-        'ciudad'           => $c->ciudad_candidato ?? '',
-        'linkedin'         => $c->linkedin_candidato ?? '',
-        'perfil'           => $c->perfil_profesional ?? '',
-        'habilidades'      => $c->habilidades ?? '',
-        'idiomas'          => $c->idiomas ?? '',
-        'carta'            => $c->carta_presentacion ?? '',
-        'tiene_archivo'    => $c->tieneArchivo(),
-        'descargar_url'    => route('empresa.candidaturas.descargar', $c->id),
-        'fecha'            => \Carbon\Carbon::parse($c->fecha_creacion)->format('d/m/Y H:i'),
-    ];
-}));
-
-const estadoUrl = "{{ rtrim(route('empresa.candidaturas.ofertas'), '/') }}";
-const csrf = document.querySelector('meta[name="csrf-token"]').content;
-
-// ── Cambiar estado via AJAX ──────────────────────────────────────────────────
-async function cambiarEstado(id, estado, selectEl) {
-    const badge = document.getElementById('badge-' + id);
-    const url   = '/empresa/candidaturas/' + id + '/estado';
-
-    try {
-        const res  = await fetch(url, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrf,
-            },
-            body: JSON.stringify({ estado }),
-        });
-        const data = await res.json();
-        if (data.success) {
-            // Update badge
-            badge.textContent = data.label;
-            badge.className   = 'estado-badge ' + data.clases;
-            // Update select color
-            selectEl.className = 'estado-select estado-' + estado;
-        }
-    } catch(e) {
-        console.error('Error al actualizar estado', e);
-    }
-}
-
-// ── Modal CV ─────────────────────────────────────────────────────────────────
-function verCv(id) {
-    const cand = candidaturasData.find(c => c.id === id);
-    if (!cand) return;
-
-    document.getElementById('cv-overlay').classList.add('abierto');
-    document.getElementById('cv-spinner').classList.remove('hidden');
-    document.getElementById('cv-content').classList.add('hidden');
-    document.getElementById('cv-modal-nombre').textContent = cand.nombre;
-    document.getElementById('cv-modal-sub').textContent    = cand.fecha
-        ? 'Postulado el ' + cand.fecha
-        : '';
-
-    const downloadBtn = document.getElementById('cv-download-btn');
-    if (cand.tiene_archivo) {
-        downloadBtn.href = cand.descargar_url;
-        downloadBtn.classList.remove('hidden');
-    } else {
-        downloadBtn.classList.add('hidden');
-    }
-
-    const emailBtn = document.getElementById('cv-email-btn');
-    emailBtn.href = cand.email
-        ? 'mailto:' + cand.email + '?subject=Tu candidatura'
-        : '#';
-
-    // Render content
-    setTimeout(function() {
-        document.getElementById('cv-spinner').classList.add('hidden');
-        const content = document.getElementById('cv-content');
-        content.innerHTML = buildCvHtml(cand);
-        content.classList.remove('hidden');
-    }, 250);
-}
-
-function buildCvHtml(cand) {
-    let html = '';
-
-    // Personal info
-    html += section('Información Personal', `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem">
-            ${field('Email',    cand.email,    'text')}
-            ${field('Teléfono', cand.telefono, 'text')}
-            ${field('Ciudad',   cand.ciudad,   'text')}
-            ${cand.linkedin ? field('LinkedIn', '<a href="' + cand.linkedin + '" target="_blank" class="text-purple-600 hover:underline">' + cand.linkedin + '</a>', 'html') : ''}
-        </div>
-    `);
-
-    if (cand.perfil) {
-        html += section('Perfil Profesional', `<p class="cv-section-body">${esc(cand.perfil)}</p>`);
-    }
-
-    if (cand.carta) {
-        html += section('Carta de Presentación', `<p class="cv-section-body">${esc(cand.carta)}</p>`);
-    }
-
-    if (cand.habilidades) {
-        const chips = cand.habilidades.split(',').map(h => `<span class="chip">${esc(h.trim())}</span>`).join('');
-        html += section('Habilidades', `<div>${chips}</div>`);
-    }
-
-    if (cand.idiomas) {
-        const chips = cand.idiomas.split(',').map(i => `<span class="chip">${esc(i.trim())}</span>`).join('');
-        html += section('Idiomas', `<div>${chips}</div>`);
-    }
-
-    if (!cand.perfil && !cand.carta && !cand.habilidades && !cand.idiomas && !cand.email) {
-        html += `<div class="cv-section"><p class="text-navy/40 text-sm text-center py-6">Este candidato subió su CV como archivo adjunto.</p></div>`;
-    }
-
-    return html;
-}
-
-function section(title, body) {
-    return `<div class="cv-section"><p class="cv-section-title">${title}</p>${body}</div>`;
-}
-
-function field(label, value, type) {
-    if (!value) return '';
-    const val = type === 'html' ? value : `<span>${esc(value)}</span>`;
-    return `<div><p style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(26,26,46,.4);margin-bottom:.2rem">${label}</p>${val}</div>`;
-}
-
-function esc(str) {
-    return String(str)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;');
-}
-
-function cerrarCvModal(e) {
-    if (e.target === document.getElementById('cv-overlay')) {
-        document.getElementById('cv-overlay').classList.remove('abierto');
-    }
-}
-function cerrarCvModalBtn() {
-    document.getElementById('cv-overlay').classList.remove('abierto');
-}
+window.candidaturasPageData = {
+    estadoAct: '{{ $estadoAct }}',
+    ordenAct:  '{{ $ordenAct }}',
+    baseUrl:   '{{ $baseUrl }}',
+    estadoUrl: '{{ rtrim(route('empresa.candidaturas.ofertas'), '/') }}'
+};
 </script>
+<script src="{{ asset('js/empresa-candidaturas-detalle.js') }}"></script>
 @endpush

@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * Controlador de perfil y ajustes del usuario autenticado.
+ */
 class PerfilController extends Controller
 {
     /* ============================================================

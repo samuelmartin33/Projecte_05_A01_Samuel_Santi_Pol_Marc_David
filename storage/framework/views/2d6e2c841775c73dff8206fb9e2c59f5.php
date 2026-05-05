@@ -3,57 +3,7 @@
 
 <?php $__env->startPush('estilos'); ?>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        /* Altura fija para el mapa de Leaflet */
-        #mapa-evento {
-            height: 320px;
-            border-radius: 16px;
-            z-index: 1;
-        }
-
-        .btn-favorito-detalle {
-            width: 100%;
-            margin-top: 0.75rem;
-            border-radius: 999px;
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            background: #ffffff;
-            color: #4c1d95;
-            padding: 0.75rem 1rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-favorito-detalle:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.12);
-        }
-
-        .btn-favorito-detalle svg {
-            width: 1rem;
-            height: 1rem;
-            fill: currentColor;
-            opacity: 0.82;
-        }
-
-        .btn-favorito-detalle.activo {
-            background: #f43f5e;
-            border-color: #f43f5e;
-            color: #ffffff;
-        }
-
-        .btn-favorito-detalle.activo svg {
-            opacity: 1;
-        }
-
-        .btn-favorito-detalle.cargando {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-    </style>
+    <link rel="stylesheet" href="<?php echo e(asset('css/eventos-detalle.css')); ?>">
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('contenido'); ?>
@@ -452,169 +402,23 @@
 
 
 <?php $__env->startPush('scripts'); ?>
-
 <script src="<?php echo e(asset('js/favoritos.js')); ?>"></script>
-
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-/* ============================================================
-   DATOS DEL EVENTO — puente PHP → JavaScript
-   Se definen aquí porque PHP (Blade) es el único que conoce
-   estos valores en tiempo de servidor.
-   ============================================================ */
-/* ============================================================
-   MAPA LEAFLET
-   ============================================================ */
+window.eventoData = {
+    id:             <?php echo e($evento->id); ?>,
+    precioBase:     <?php echo e($evento->precio_base ?? 0); ?>,
+    esGratuito:     <?php echo e($evento->es_gratuito ? 'true' : 'false'); ?>,
+    aforoLibre:     <?php echo e($evento->aforo_maximo ? $evento->aforo_maximo - $evento->aforo_actual : 9999); ?>,
+    latitud:        <?php echo e($evento->latitud ?? 'null'); ?>,
+    longitud:       <?php echo e($evento->longitud ?? 'null'); ?>,
+    nombreUbicacion:'<?php echo e(addslashes($evento->ubicacion_nombre ?? 'Ubicación del evento')); ?>',
+    loginUrl:       '<?php echo e(route('login')); ?>',
+    guestRedirect:  <?php echo e(Auth::check() ? 'false' : 'true'); ?>
 
-/**
- * Inicializa el mapa de Leaflet centrado en la ubicación del evento.
- * Añade un marcador con el icono de VIBEZ y un popup con el nombre del lugar.
- *
- * @param {number} latitud         - Latitud del evento (de la base de datos)
- * @param {number} longitud        - Longitud del evento (de la base de datos)
- * @param {string} nombreUbicacion - Nombre del lugar que aparece en el popup
- */
-function inicializarMapa(latitud, longitud, nombreUbicacion) {
-    /* Zoom 15 corresponde al nivel de calle */
-    var mapa = L.map('mapa-evento').setView([latitud, longitud], 15);
-
-    /* Capa de tiles: OpenStreetMap — gratuito, sin necesidad de API key */
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom:     19,
-        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
-    }).addTo(mapa);
-
-    /* Icono personalizado con degradado morado de VIBEZ */
-    var iconoVibez = L.divIcon({
-        html:        '<div style="background:linear-gradient(135deg,#7c3aed,#a855f7);width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
-        iconSize:    [32, 32],
-        iconAnchor:  [16, 32],
-        popupAnchor: [0, -35],
-        className:   ''
-    });
-
-    /* Marcador en la ubicación + popup con nombre del sitio */
-    L.marker([latitud, longitud], { icon: iconoVibez })
-        .addTo(mapa)
-        .bindPopup('<strong>' + nombreUbicacion + '</strong>')
-        .openPopup();
-}
-
-/* Llamada directa al cargar el script — el DOM ya está listo porque el script va al final del body */
-<?php if($evento->latitud && $evento->longitud): ?>
-inicializarMapa(
-    <?php echo e($evento->latitud); ?>,
-    <?php echo e($evento->longitud); ?>,
-    '<?php echo e(addslashes($evento->ubicacion_nombre ?? 'Ubicación del evento')); ?>'
-);
-<?php endif; ?>
-
-// Datos del evento pasados desde PHP
-const EVENTO_ID   = <?php echo e($evento->id); ?>;
-const PRECIO_BASE = <?php echo e($evento->precio_base ?? 0); ?>;
-const ES_GRATUITO = <?php echo e($evento->es_gratuito ? 'true' : 'false'); ?>;
-const AFORO_LIBRE = <?php echo e($evento->aforo_maximo ? $evento->aforo_maximo - $evento->aforo_actual : 9999); ?>;
-
-let cantidadModal = 1;
-
-/**
- * Abre el modal de compra de entradas.
- * Si el usuario no está autenticado, lo redirige al login.
- */
-function abrirCompra() {
-    <?php if(auth()->guard()->guest()): ?>
-    window.location.href = '<?php echo e(route('login')); ?>';
-    return;
-    <?php endif; ?>
-
-    /* Reiniciar estado del modal antes de mostrarlo */
-    cantidadModal = 1;
-    actualizarModalTotal();
-    document.getElementById('modal-error').style.display        = 'none';
-    document.getElementById('modal-btn-comprar').disabled       = false;
-    document.getElementById('modal-btn-comprar').textContent    = ES_GRATUITO ? 'Reservar gratis' : 'Confirmar compra';
-    document.getElementById('modal-compra').style.display       = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-/**
- * Cierra el modal de compra y restaura el scroll de la página.
- */
-function cerrarModalCompra() {
-    document.getElementById('modal-compra').style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-/**
- * Aumenta o reduce la cantidad de entradas.
- * Límite: entre 1 y 10, sin superar el aforo disponible.
- *
- * @param {number} cambio - +1 para aumentar, -1 para reducir
- */
-function cambiarCantidad(cambio) {
-    var nuevaCantidad = cantidadModal + cambio;
-    if (nuevaCantidad < 1 || nuevaCantidad > 10 || nuevaCantidad > AFORO_LIBRE) return;
-    cantidadModal = nuevaCantidad;
-    actualizarModalTotal();
-}
-
-/**
- * Actualiza el número de entradas y el precio total en el modal.
- */
-function actualizarModalTotal() {
-    document.getElementById('modal-cantidad').textContent = cantidadModal;
-    if (!ES_GRATUITO) {
-        var total = (PRECIO_BASE * cantidadModal).toFixed(2).replace('.', ',');
-        document.getElementById('modal-total').textContent = total + ' €';
-    }
-}
-
-/**
- * Envía la petición de compra al servidor mediante fetch y gestiona la respuesta.
- * En caso de éxito redirige a la confirmación; si falla muestra el error en el modal.
- */
-function confirmarCompra() {
-    var botonComprar = document.getElementById('modal-btn-comprar');
-    var zonaError    = document.getElementById('modal-error');
-    var csrf         = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    botonComprar.disabled    = true;
-    botonComprar.textContent = 'Procesando...';
-    zonaError.style.display  = 'none';
-
-    fetch('/api/entradas/comprar', {
-        method:  'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept':       'application/json',
-            'X-CSRF-TOKEN': csrf,
-        },
-        body: JSON.stringify({ evento_id: EVENTO_ID, cantidad: cantidadModal }),
-    })
-    .then(function (respuesta) { return respuesta.json(); })
-    .then(function (datos) {
-        if (datos.success) {
-            botonComprar.textContent       = '¡Redirigiendo...';
-            document.body.style.transition = 'opacity 0.3s';
-            document.body.style.opacity    = '0';
-            setTimeout(function () { window.location.href = datos.redirect; }, 320);
-        } else {
-            zonaError.textContent    = datos.message || 'Error al procesar la compra.';
-            zonaError.style.display  = 'block';
-            botonComprar.disabled    = false;
-            botonComprar.textContent = ES_GRATUITO ? 'Reservar gratis' : 'Confirmar compra';
-        }
-    })
-    .catch(function () {
-        zonaError.textContent    = 'Error de conexión. Inténtalo de nuevo.';
-        zonaError.style.display  = 'block';
-        botonComprar.disabled    = false;
-        botonComprar.textContent = ES_GRATUITO ? 'Reservar gratis' : 'Confirmar compra';
-    });
-}
+};
 </script>
+<script src="<?php echo e(asset('js/eventos-detalle.js')); ?>"></script>
 <?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/eventos/detalle.blade.php ENDPATH**/ ?>

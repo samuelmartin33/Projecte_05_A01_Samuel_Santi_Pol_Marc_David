@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
+use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -106,6 +107,12 @@ Route::middleware('auth')->prefix('empresa/eventos')->name('empresa.eventos.')->
     Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
 });
 
+/* — Ofertas de trabajo (empresa): crear y publicar ofertas — */
+Route::middleware('auth')->prefix('empresa/ofertas')->name('empresa.ofertas.')->group(function () {
+    Route::get('/crear', [EmpresaOfertasController::class, 'create'])->name('create');
+    Route::post('/',     [EmpresaOfertasController::class, 'store'])->name('store');
+});
+
 /* — Sección de candidaturas (empresa): auth requerido; el controlador verifica rol empresa — */
 Route::middleware('auth')->prefix('empresa/candidaturas')->name('empresa.candidaturas.')->group(function () {
     // Lista de ofertas propias con conteo de candidatos
@@ -126,6 +133,11 @@ Route::middleware('auth')->prefix('empresa/candidaturas')->name('empresa.candida
     Route::get('/{candidaturaId}/descargar',     [CandidaturasController::class, 'descargarCv'])
          ->where('candidaturaId', '[0-9]+')
          ->name('descargar');
+
+    // Cerrar / reabrir una oferta
+    Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])
+         ->where('ofertaId', '[0-9]+')
+         ->name('cerrar-oferta');
 });
 
 /* — Perfil de usuario — */

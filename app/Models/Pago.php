@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Modelo para la tabla `pagos`.
+ */
 class Pago extends Model
 {
     protected $table = 'pagos';

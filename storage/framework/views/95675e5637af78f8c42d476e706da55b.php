@@ -466,42 +466,40 @@ function togglePrecio() {
 }
 
 // Preview de imagen subida
-document.addEventListener('DOMContentLoaded', function() {
-    togglePrecio();
+togglePrecio();
 
-    var fileInput = document.getElementById('imagen_portada_input');
-    var zona = document.getElementById('upload-zona');
-    var preview = document.getElementById('upload-preview');
-    var previewImg = document.getElementById('imagen-preview-img');
-    var nombreSpan = document.getElementById('upload-nombre');
+var fileInput = document.getElementById('imagen_portada_input');
+var zona = document.getElementById('upload-zona');
+var preview = document.getElementById('upload-preview');
+var previewImg = document.getElementById('imagen-preview-img');
+var nombreSpan = document.getElementById('upload-nombre');
 
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            var file = this.files[0];
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                preview.style.display = 'block';
-                nombreSpan.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.style.display = 'none';
-        }
-    });
+fileInput.onchange = function() {
+    if (this.files && this.files[0]) {
+        var file = this.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+            nombreSpan.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+    }
+};
 
-    // Drag & drop visual feedback
-    zona.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        zona.classList.add('dragover');
-    });
-    zona.addEventListener('dragleave', function() {
-        zona.classList.remove('dragover');
-    });
-    zona.addEventListener('drop', function() {
-        zona.classList.remove('dragover');
-    });
-});
+// Drag & drop visual feedback
+zona.ondragover = function(e) {
+    e.preventDefault();
+    zona.classList.add('dragover');
+};
+zona.ondragleave = function() {
+    zona.classList.remove('dragover');
+};
+zona.ondrop = function() {
+    zona.classList.remove('dragover');
+};
 </script>
 <?php $__env->stopPush(); ?>
 

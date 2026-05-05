@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión administrativa de usuarios.
+ */
 class UsuarioController extends Controller
 {
     public function index(): View
