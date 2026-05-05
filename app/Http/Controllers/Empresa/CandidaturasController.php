@@ -140,6 +140,32 @@ class CandidaturasController extends Controller
     }
 
     /**
+     * Toggle estado (1=activa / 0=cerrada) of an offer.
+     * PATCH /empresa/candidaturas/oferta/{ofertaId}/cerrar
+     */
+    public function cerrarOferta(int $ofertaId)
+    {
+        $empresa = $this->empresa();
+
+        $oferta = $empresa->ofertas()
+            ->where('bolsa_ofertas_trabajo.id', $ofertaId)
+            ->firstOrFail();
+
+        $nuevoEstado = $oferta->estado ? 0 : 1;
+
+        $oferta->update([
+            'estado'               => $nuevoEstado,
+            'fecha_actualizacion'  => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'estado'  => $nuevoEstado,
+            'label'   => $nuevoEstado ? 'Activa' : 'Cerrada',
+        ]);
+    }
+
+    /**
      * Serve the uploaded CV file for download (with permission check).
      * GET /empresa/candidaturas/{candidaturaId}/descargar
      */

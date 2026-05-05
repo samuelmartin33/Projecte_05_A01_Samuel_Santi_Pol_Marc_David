@@ -311,18 +311,22 @@ class EventoController extends Controller
             'ciudad'               => 'required|string|max:100',
             'perfil_profesional'   => 'required|string|max:2000',
             'carta_presentacion'   => 'required|string|max:5000',
-            'linkedin'             => 'nullable|url|max:500',
+            'linkedin'             => 'nullable|string|max:500',
             'habilidades'          => 'nullable|string|max:1000',
             'idiomas'              => 'nullable|string|max:500',
         ]);
 
         BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
 
+        $trabajadorId = Auth::check()
+            ? \Illuminate\Support\Facades\DB::table('trabajadores')->where('usuario_id', Auth::id())->value('id')
+            : null;
+
         $expResumen = $this->construirExpFormacion($request);
 
         \Illuminate\Support\Facades\DB::table('candidaturas_trabajo')->insert([
             'oferta_id'              => $id,
-            'trabajador_id'          => Auth::id() ?? null,
+            'trabajador_id'          => $trabajadorId,
             'estado_candidatura'     => 1,
             // Structured columns (visible to empresa)
             'nombre_candidato'       => $request->nombre,
@@ -356,11 +360,15 @@ class EventoController extends Controller
 
         BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
 
+        $trabajadorId = Auth::check()
+            ? \Illuminate\Support\Facades\DB::table('trabajadores')->where('usuario_id', Auth::id())->value('id')
+            : null;
+
         $path = $request->file('cv_file')->store('cvs', 'public');
 
         \Illuminate\Support\Facades\DB::table('candidaturas_trabajo')->insert([
             'oferta_id'          => $id,
-            'trabajador_id'      => Auth::id() ?? null,
+            'trabajador_id'      => $trabajadorId,
             'estado_candidatura' => 1,
             'carta_presentacion' => $request->input('carta_presentacion_archivo'),
             'cv_url'             => $path,
