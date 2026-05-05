@@ -1,0 +1,237 @@
+/*
+ * trabajos-index.css
+ * Estilos para la página de la Bolsa de Trabajo (listado de ofertas).
+ *
+ * Este archivo es cargado únicamente en la vista trabajos/index.blade.php.
+ * Sustituye el bloque <style> que estaba inline en el HTML.
+ *
+ * Las clases siguen el prefijo "ctg-" (card-trabajo-grande) para
+ * agrupar semánticamente los estilos de las tarjetas de oferta.
+ */
+
+
+/* ══════════════════════════════════════════
+   TARJETA DE OFERTA DE TRABAJO
+   Cada oferta se muestra en una tarjeta blanca
+   con efecto de elevación al hacer hover.
+══════════════════════════════════════════ */
+
+/*
+ * Contenedor principal de la tarjeta.
+ * display:flex + flex-direction:column permite que el footer
+ * (.ctg-footer con margin-top:auto) siempre quede pegado al fondo
+ * independientemente del contenido del cuerpo.
+ */
+.card-trabajo-grande {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    cursor: pointer;
+    border: 1.5px solid #ede9fe;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 4px 20px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Al hacer hover: la tarjeta sube 6px y aparece sombra morada */
+.card-trabajo-grande:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.18);
+    border-color: var(--morado);
+}
+
+
+/* ══════════════════════════════════════════
+   CABECERA DE LA TARJETA
+   Icono oscuro + badge de categoría + nombre de empresa
+══════════════════════════════════════════ */
+
+/* Fila con icono y textos alineados verticalmente */
+.ctg-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/*
+ * Cuadrado oscuro con el icono de la categoría.
+ * box-shadow con color morado da un efecto "glow" sutil.
+ */
+.ctg-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #05000f, #1e1035);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(196, 132, 252, 0.85);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+}
+
+.ctg-icono svg {
+    width: 22px;
+    height: 22px;
+}
+
+/*
+ * Badge pill con el nombre de la categoría.
+ * text-transform:uppercase + letter-spacing dan aspecto de etiqueta formal.
+ */
+.ctg-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-bottom: 3px;
+}
+
+/* Nombre de la empresa organizadora */
+.ctg-empresa {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--morado);
+    margin: 0;
+}
+
+
+/* ══════════════════════════════════════════
+   CUERPO DE LA TARJETA
+══════════════════════════════════════════ */
+
+/*
+ * Título de la oferta.
+ * -webkit-line-clamp:2 limita a 2 líneas con ellipsis al desbordarse.
+ * Requiere display:-webkit-box + -webkit-box-orient:vertical.
+ */
+.ctg-titulo {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* propiedad estándar (compatibilidad futura) */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Descripción corta (máximo 3 líneas con ellipsis) */
+.ctg-desc {
+    font-size: 0.82rem;
+    color: rgba(15, 23, 42, 0.5);
+    line-height: 1.55;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3; /* propiedad estándar (compatibilidad futura) */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Contenedor de chips de datos clave (ubicación, vacantes, fecha) */
+.ctg-datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Cada chip de dato */
+.ctg-dato {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f7f4ff;
+    border: 1px solid #ede9fe;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: rgba(15, 23, 42, 0.6);
+}
+
+/* Los iconos dentro de los chips en color morado */
+.ctg-dato svg {
+    color: var(--morado);
+    flex-shrink: 0;
+}
+
+
+/* ══════════════════════════════════════════
+   FOOTER DE LA TARJETA
+   Salario (izquierda) + botón "Ver oferta" (derecha)
+══════════════════════════════════════════ */
+
+/*
+ * margin-top:auto junto con flex-direction:column del padre
+ * hace que el footer siempre quede al fondo, sin importar
+ * cuánto texto haya en el cuerpo.
+ */
+.ctg-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid #f0eeff;
+}
+
+/* Etiqueta "Salario" encima del importe */
+.ctg-salario-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(15, 23, 42, 0.35);
+    margin: 0 0 2px;
+}
+
+/*
+ * Importe del salario con gradiente verde.
+ * El verde asocia visualmente el salario con dinero.
+ * -webkit-background-clip:text + -webkit-text-fill-color:transparent
+ * son necesarios para que el gradiente se aplique al texto (no solo al fondo).
+ */
+.ctg-salario {
+    font-size: 0.9rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #059669, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+/* Botón "Ver oferta" con gradiente morado y sombra */
+.ctg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+    color: white;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 3px 12px rgba(124, 58, 237, 0.35);
+}
+
+/* Efecto sutil de escala al hacer hover */
+.ctg-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.04);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+}

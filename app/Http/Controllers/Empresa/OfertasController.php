@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión de ofertas de trabajo de empresa.
+ */
 class OfertasController extends Controller
 {
     private function obtenerOrganizador(): Organizador
@@ -118,7 +121,7 @@ class OfertasController extends Controller
             'ubicacion'            => $validated['ubicacion'] ?? null,
             'salario_min'          => $validated['salario_min'] ?? null,
             'salario_max'          => $validated['salario_max'] ?? null,
-            'vacantes'             => $validated['vacantes'] ?? null,
+            'vacantes'             => $validated['vacantes'] ?? 1,
             'fecha_inicio_trabajo' => $validated['fecha_inicio_trabajo'] ?? null,
             'fecha_fin_trabajo'    => $validated['fecha_fin_trabajo'] ?? null,
             'estado'               => 1,

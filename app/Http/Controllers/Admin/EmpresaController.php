@@ -7,6 +7,9 @@ use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión administrativa de empresas.
+ */
 class EmpresaController extends Controller
 {
     public function index(): View

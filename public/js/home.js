@@ -1,3 +1,4 @@
+// Comportamiento dinámico de la página principal de VIBEZ.
 var HOME_CFG = window.vibezHomeConfig || {};
 
 function toggleDropdown(id) {

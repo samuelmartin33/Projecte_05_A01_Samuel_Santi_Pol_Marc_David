@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Empresa;
 use App\Http\Controllers\Controller;
 use App\Models\BolsaOfertaTrabajo;
 use App\Models\CandidaturaTrabajo;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Controlador para la gestión de candidaturas de empresa.
+ */
 class CandidaturasController extends Controller
 {
     // ── Guard helper ─────────────────────────────────────────────────────────
@@ -127,15 +132,57 @@ class CandidaturasController extends Controller
 
         $request->validate(['estado' => 'required|in:1,2,3,4']);
 
-        $candidatura->update([
-            'estado_candidatura'  => $request->estado,
-            'fecha_actualizacion' => now(),
-        ]);
+        DB::transaction(function () use ($candidatura, $request) {
+            if ((int) $request->estado === CandidaturaTrabajo::ESTADO_PRESELECCIONADO) {
+                $candidatura->trabajador_id = $this->crearTrabajadorSiNoExiste($candidatura);
+            }
+
+            $candidatura->estado_candidatura = (int) $request->estado;
+            $candidatura->fecha_actualizacion = now();
+            $candidatura->save();
+        });
 
         return response()->json([
             'success' => true,
             'label'   => $candidatura->estadoLabel(),
             'clases'  => $candidatura->estadoClases(),
+        ]);
+    }
+
+    /**
+     * Crea el perfil de trabajador asociado a la candidatura si todavía no existe.
+     *
+     * Busca primero un usuario registrado con el mismo email de la candidatura.
+     * Si ya tiene perfil de trabajador, reutiliza ese registro.
+     */
+    private function crearTrabajadorSiNoExiste(CandidaturaTrabajo $candidatura): int
+    {
+        if (!empty($candidatura->trabajador_id)) {
+            return (int) $candidatura->trabajador_id;
+        }
+
+        $usuario = Usuario::where('email', $candidatura->email_candidato)->first();
+
+        if (!$usuario) {
+            abort(409, 'No se puede crear el perfil de trabajador porque no existe un usuario registrado con ese email.');
+        }
+
+        $trabajadorId = DB::table('trabajadores')
+            ->where('usuario_id', $usuario->id)
+            ->value('id');
+
+        if ($trabajadorId) {
+            return (int) $trabajadorId;
+        }
+
+        return (int) DB::table('trabajadores')->insertGetId([
+            'usuario_id'          => $usuario->id,
+            'cv_url'              => $candidatura->cv_url,
+            'disponibilidad'      => 1,
+            'localidad'           => $candidatura->ciudad_candidato,
+            'estado'              => 1,
+            'fecha_creacion'      => now(),
+            'fecha_actualizacion' => now(),
         ]);
     }
 
@@ -188,8 +235,8 @@ class CandidaturasController extends Controller
         $nombre = $candidatura->nombreCompleto();
         $ext    = pathinfo($candidatura->cv_url, PATHINFO_EXTENSION);
 
-        return Storage::disk('public')->download(
-            $candidatura->cv_url,
+        return response()->download(
+            Storage::disk('public')->path($candidatura->cv_url),
             "CV_{$nombre}.{$ext}"
         );
     }

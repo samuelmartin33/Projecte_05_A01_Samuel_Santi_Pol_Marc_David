@@ -1,3 +1,4 @@
+// Detalle y filtrado de candidaturas de empresa en VIBEZ.
 var _cfg          = window.candidaturasPageData || {};
 var _estadoActual = _cfg.estadoAct || '';
 var _ordenActual  = _cfg.ordenAct  || 'reciente';

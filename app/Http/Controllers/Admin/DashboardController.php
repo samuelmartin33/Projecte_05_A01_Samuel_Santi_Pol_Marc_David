@@ -9,6 +9,9 @@ use App\Models\Pedido;
 use App\Models\Usuario;
 use Illuminate\View\View;
 
+/**
+ * Controlador del panel de administración.
+ */
 class DashboardController extends Controller
 {
     public function index(): View

@@ -10,6 +10,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión administrativa de eventos.
+ */
 class EventoController extends Controller
 {
     public function index(): View

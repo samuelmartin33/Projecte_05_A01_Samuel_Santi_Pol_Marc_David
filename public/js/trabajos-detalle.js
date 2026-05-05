@@ -1,3 +1,4 @@
+// Interacciones del detalle de una oferta de trabajo.
 var _ofertaActual = null;
 
 function abrirPostulacion(ofertaId) {

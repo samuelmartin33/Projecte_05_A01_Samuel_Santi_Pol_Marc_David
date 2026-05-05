@@ -1,3 +1,4 @@
+// Interacciones de la ficha de evento y compra de entradas.
 var _ed = window.eventoData || {};
 
 var EVENTO_ID   = _ed.id        || 0;

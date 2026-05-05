@@ -1,0 +1,264 @@
+/*
+ * entradas-confirmacion.css
+ * Estilos para la página de confirmación de compra de entradas.
+ *
+ * Este archivo es cargado únicamente en la vista confirmacion.blade.php.
+ * Sustituye todos los atributos style="" inline que tenía el HTML,
+ * mejorando la separación entre presentación (CSS) y estructura (HTML).
+ *
+ * Paleta utilizada:
+ *   Verde éxito  : #059669 / #10b981  (Tailwind emerald-600/500)
+ *   Morado marca : #7c3aed / #a855f7  (Tailwind violet-700/500)
+ *   Texto oscuro : var(--navy, #0f172a)
+ *   Gris suave   : #64748b / #94a3b8
+ *   Borde lila   : #ede9fe
+ */
+
+
+/* ══════════════════════════════════════════
+   HERO — Cabecera verde de éxito
+══════════════════════════════════════════ */
+
+/*
+ * Fondo con gradiente verde que indica que la compra fue exitosa.
+ * El gradiente va de un verde más oscuro (izquierda) a uno más claro (derecha).
+ */
+.confirmacion-hero {
+    background: linear-gradient(135deg, #059669, #10b981);
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+/*
+ * Círculo semitransparente blanco que enmarca el icono de check.
+ * margin:0 auto lo centra horizontalmente dentro del bloque.
+ */
+.confirmacion-hero-icono {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+/* Icono SVG de check dentro del círculo */
+.confirmacion-hero-icono svg {
+    width: 36px;
+    height: 36px;
+    color: #fff;
+}
+
+/* Título principal "¡Compra realizada!" */
+.confirmacion-hero-titulo {
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem;
+}
+
+/* Subtítulo con número de pedido y fecha */
+.confirmacion-hero-subtitulo {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    margin: 0;
+}
+
+
+/* ══════════════════════════════════════════
+   RESUMEN DEL EVENTO
+══════════════════════════════════════════ */
+
+/*
+ * Fila horizontal con icono + datos del evento.
+ * gap:12px separa el icono de los textos.
+ */
+.confirmacion-evento-fila {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+/*
+ * Cuadrado morado con icono de ticket.
+ * flex-shrink:0 impide que se reduzca si el texto es largo.
+ */
+.confirmacion-evento-icono {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Icono SVG del evento */
+.confirmacion-evento-icono svg {
+    width: 24px;
+    height: 24px;
+    color: #fff;
+}
+
+/* Nombre del evento */
+.confirmacion-evento-titulo {
+    font-weight: 700;
+    color: var(--navy, #0f172a);
+    margin: 0;
+}
+
+/* Fecha del evento en morado */
+.confirmacion-evento-fecha {
+    color: #7c3aed;
+    font-size: 0.875rem;
+    margin: 2px 0 0;
+}
+
+/* Ubicación del evento en gris */
+.confirmacion-evento-lugar {
+    color: #64748b;
+    font-size: 0.8rem;
+    margin: 2px 0 0;
+}
+
+/*
+ * Fila inferior del resumen: cantidad de entradas (izquierda) + total (derecha).
+ * border-top separa visualmente del contenido anterior.
+ */
+.confirmacion-resumen-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #ede9fe;
+    padding-top: 1rem;
+}
+
+/* Texto "N entrada(s)" */
+.confirmacion-entrada-count {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+/* Etiqueta "Total" encima del importe */
+.confirmacion-total-label {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: right;
+}
+
+
+/* ══════════════════════════════════════════
+   TARJETAS DE ENTRADA INDIVIDUAL
+══════════════════════════════════════════ */
+
+/*
+ * Cabecera de cada entrada: número y precio en la misma fila.
+ * margin-bottom separa de la zona del QR.
+ */
+.confirmacion-entrada-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* "Entrada #N" en negrita */
+.confirmacion-entrada-num {
+    font-weight: 800;
+    color: var(--navy, #0f172a);
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* UUID del QR en tipografía monoespaciada para facilitar la lectura */
+.confirmacion-entrada-codigo {
+    font-family: monospace;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin: 4px 0 0;
+    word-break: break-all; /* el UUID es largo; rompe la línea si es necesario */
+}
+
+/* Columna del precio, alineada a la derecha */
+.confirmacion-entrada-precio-col {
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+/*
+ * Línea de separación con estilo "talonario" (borde discontinuo).
+ * margin:0 -2rem rompe el padding del contenedor padre para que
+ * la línea llegue de borde a borde (efecto corte de ticket).
+ */
+.confirmacion-entrada-divisor {
+    border-top: 2px dashed #ede9fe;
+    margin: 0 -2rem 1.25rem;
+}
+
+/* Centra el bloque del código QR */
+.confirmacion-qr-centrado {
+    text-align: center;
+}
+
+/*
+ * Marco decorativo alrededor del QR.
+ * display:inline-block permite que el fondo blanco se ajuste al contenido.
+ * box-shadow sutil para dar profundidad sin destacar demasiado.
+ */
+.confirmacion-qr-marco {
+    display: inline-block;
+    padding: 12px;
+    background: #fff;
+    border: 3px solid #ede9fe;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
+}
+
+/*
+ * Contenedor donde la librería QRCode.js dibuja el código QR.
+ * El tamaño debe coincidir con los parámetros pasados a new QRCode().
+ */
+.confirmacion-qr-canvas {
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+}
+
+/* Texto de instrucción bajo el QR */
+.confirmacion-qr-texto {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin: 10px 0 0;
+}
+
+
+/* ══════════════════════════════════════════
+   SECCIÓN DE ACCIONES FINALES
+══════════════════════════════════════════ */
+
+/*
+ * Bloque de botones al final de la página.
+ * flex-direction:column apila los botones verticalmente.
+ * align-items:center los centra horizontalmente.
+ */
+.confirmacion-acciones {
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Ajuste de padding para el botón principal en este contexto */
+.confirmacion-acciones .btn-comprar {
+    display: inline-block;
+    padding: 0.85rem 2.5rem;
+}
