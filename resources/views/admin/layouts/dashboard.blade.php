@@ -13,84 +13,73 @@
 
 {{-- ═══════════════════════════════════════════════════════
      CABECERA PRINCIPAL DE VIBEZ
-     Misma cabecera que en el home
+     Misma estética que en el home, con accesos de admin
 ═══════════════════════════════════════════════════════ --}}
-<header class="sticky top-0 z-50 bg-paper border-b border-ink/15">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
+<header class="nav-vibez sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
         @php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); @endphp
 
-        {{-- Wordmark --}}
+        {{-- Logo corporativo --}}
         <a href="{{ $esEmpresa ? route('empresa.home') : route('home') }}"
-           class="font-display font-black text-2xl tracking-brutal text-ink
-                  hover:text-lilac transition-colors duration-100 select-none">
-            VIBEZ
+           class="nav-logo-link group">
+            <img src="{{ asset('images/logo_vibez_white.png') }}"
+                 alt="VIBEZ"
+                 class="nav-logo-img">
         </a>
 
         {{-- Navegación central (desktop) --}}
         <nav class="hidden md:flex items-center gap-8">
             @if($esEmpresa)
                 <a href="{{ route('empresa.home') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('empresa.home') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('empresa.home') ? 'nav-link-activo' : '' }}">
                     Panel
                 </a>
                 <a href="{{ route('empresa.candidaturas.ofertas') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('empresa.candidaturas.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : '' }}">
                     Candidaturas
                 </a>
             @elseif(Auth::check() && Auth::user()->es_admin)
                 <a href="{{ route('admin.dashboard') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.dashboard') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.dashboard') ? 'nav-link-activo' : '' }}">
                     Inicio
                 </a>
                 <a href="{{ route('admin.eventos.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.eventos.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.eventos.*') ? 'nav-link-activo' : '' }}">
                     Eventos
                 </a>
                 <a href="{{ route('admin.empresas.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.empresas.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.empresas.*') ? 'nav-link-activo' : '' }}">
                     Empresas
                 </a>
                 <a href="{{ route('admin.usuarios.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.usuarios.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.usuarios.*') ? 'nav-link-activo' : '' }}">
                     Usuarios
                 </a>
                 <a href="{{ route('admin.categorias.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.categorias.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.categorias.*') ? 'nav-link-activo' : '' }}">
                     Categorías
                 </a>
                 <a href="{{ route('admin.pedidos.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.pedidos.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'nav-link-activo' : '' }}">
                     Pedidos
                 </a>
                 <a href="{{ route('admin.pagos.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('admin.pagos.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('admin.pagos.*') ? 'nav-link-activo' : '' }}">
                     Pagos
                 </a>
             @else
                 <a href="{{ route('home') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('home') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('home') ? 'nav-link-activo' : '' }}">
                     Explorar
                 </a>
                 <a href="{{ route('trabajos.index') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          {{ request()->routeIs('trabajos.index') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link {{ request()->routeIs('trabajos.index') ? 'nav-link-activo' : '' }}">
                     Trabajo
                 </a>
                 @auth
                 <a href="{{ route('social') }}"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
-                          {{ request()->routeIs('social') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                   class="nav-link relative {{ request()->routeIs('social') ? 'nav-link-activo' : '' }}">
                     Social
                     <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                 </a>
@@ -102,12 +91,11 @@
         <div class="flex items-center gap-3">
             @guest
                 <a href="{{ route('login') }}"
-                   class="hidden sm:block font-mono text-xs uppercase tracking-widest
-                          text-ink/55 hover:text-ink transition-colors duration-100">
+                   class="hidden sm:block btn-nav-ghost">
                     Entrar
                 </a>
                 <a href="{{ route('register') }}"
-                   class="btn-ink font-mono text-xs uppercase tracking-widest px-5 py-2.5">
+                   class="btn-nav-solido">
                     <span>Registro &nbsp;→</span>
                 </a>
             @else

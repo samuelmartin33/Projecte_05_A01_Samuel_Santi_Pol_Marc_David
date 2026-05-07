@@ -352,24 +352,22 @@ body {
 ══════════════════════════════════════════ */
 
 .card-trabajo-grande {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(124,58,237,0.25);
-    border-radius: 20px;
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    border-radius: 0;
     padding: 24px;
     cursor: pointer;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s, background 0.25s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    overflow: hidden;
 }
 
 .card-trabajo-grande:hover {
-    transform: translateY(-5px);
-    border-color: rgba(124,58,237,0.65);
-    background: rgba(255,255,255,0.09);
-    box-shadow: 0 16px 40px rgba(124,58,237,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,85,247,0.3);
+    border-color: rgba(168,85,247,0.3);
 }
 
 .ctg-header {

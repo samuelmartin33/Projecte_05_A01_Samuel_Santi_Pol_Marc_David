@@ -148,11 +148,10 @@ body {
    NAVBAR DE LA APP (layouts/app.blade.php)
    ============================================================ */
 
-/* Cabecera con azul marino oscuro */
+/* Cabecera con gradiente lila atractivo */
 .nav-vibez {
-    background: linear-gradient(90deg, #05000f 0%, #0f172a 40%, #05000f 100%);
-    border-bottom: 1px solid rgba(168, 85, 247, 0.12);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(124, 58, 237, 0.06);
+    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 55%, #a855f7 100%);
+    box-shadow: 0 4px 24px rgba(124,58,237,0.45), 0 1px 0 rgba(255,255,255,0.08);
 }
 
 /* Isotipo circular con degradado morado — muestra "V" */
@@ -422,7 +421,7 @@ body {
 
 .card-evento {
     background: white;
-    border-radius: 20px;
+    border-radius: 0;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -458,15 +457,14 @@ body {
     position: absolute;
     top: 10px;
     left: 10px;
-    background: rgba(15, 23, 42, 0.75);
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
     color: white;
     font-size: 0.65rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     padding: 3px 10px;
     border-radius: 999px;
-    backdrop-filter: blur(4px);
 }
 
 /* Badge de precio — esquina superior derecha */
@@ -959,16 +957,12 @@ body {
 }
 
 /* ============================================================
-   Colores de badge por categoría
+   Colores de badge por categoría — todos unificados al morado de la app
    ============================================================ */
-.badge-categoria[data-cat="Música"]      { background: linear-gradient(135deg, #db2777, #f43f5e); }
-.badge-categoria[data-cat="Cultura"]     { background: linear-gradient(135deg, #d97706, #f59e0b); }
-.badge-categoria[data-cat="Deporte"]     { background: linear-gradient(135deg, #1d4ed8, #0ea5e9); }
-.badge-categoria[data-cat="Gastronomía"] { background: linear-gradient(135deg, #059669, #22c55e); }
-.badge-categoria[data-cat="Networking"]  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
-.badge-categoria[data-cat="Tecnología"]  { background: linear-gradient(135deg, #0284c7, #06b6d4); }
-.badge-categoria[data-cat="Moda"]        { background: linear-gradient(135deg, #9d174d, #a855f7); }
-.badge-categoria[data-cat="Infantil"]    { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.badge-categoria[data-cat] {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+}
 
 /* ============================================================
    Salario con texto en gradiente
@@ -1021,9 +1015,9 @@ body {
     position: absolute; right: 0; top: calc(100% + 10px);
     width: 230px;
     background: #0d0a18;
-    border-radius: 0;
-    border: 1px solid rgba(245,241,234,0.1);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,85,247,0.2);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15);
     overflow: hidden;
     z-index: 999;
     animation: dropdownEntrar 0.18s ease;
@@ -1034,44 +1028,43 @@ body {
 }
 .nav-dropdown-header {
     padding: 14px 16px 12px;
-    background: rgba(13, 10, 24, 0.6);
-    border-bottom: 1px solid rgba(245,241,234,0.1);
+    background: linear-gradient(135deg, #4c1d95, #7c3aed);
 }
 .nav-dropdown-nombre {
     color: #f5f1ea; font-weight: 800; font-size: 0.875rem; margin: 0;
 }
 .nav-dropdown-email {
-    color: rgba(245,241,234,0.45); font-size: 0.72rem; margin: 2px 0 0;
+    color: rgba(255,255,255,0.55); font-size: 0.72rem; margin: 2px 0 0;
 }
 .nav-dropdown-mood {
     margin-top: 5px;
     display: inline-block;
-    background: rgba(168,85,247,0.2);
-    border: 1px solid rgba(168,85,247,0.3);
-    color: #c084fc;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
     font-size: 0.72rem; font-weight: 700;
     padding: 2px 10px; border-radius: 999px;
 }
 .nav-dropdown-divider {
-    height: 1px; background: rgba(245,241,234,0.1); margin: 0;
+    height: 1px; background: rgba(124,58,237,0.2); margin: 0;
 }
 .nav-dropdown-item {
     display: flex; align-items: center; gap: 10px;
     padding: 11px 16px;
-    color: rgba(245,241,234,0.75); font-size: 0.875rem; font-weight: 600;
+    color: rgba(245,241,234,0.85); font-size: 0.875rem; font-weight: 600;
     text-decoration: none; cursor: pointer;
-    transition: background 0.12s;
+    transition: background 0.12s, color 0.12s;
     background: none; border: none; width: 100%; text-align: left;
 }
 .nav-dropdown-item svg {
     width: 17px; height: 17px; flex-shrink: 0; color: #a855f7; stroke-width: 2;
 }
-.nav-dropdown-item:hover { background: rgba(168,85,247,0.1); }
+.nav-dropdown-item:hover { background: rgba(124,58,237,0.18); color: #fff; }
 .nav-dropdown-logout {
-    color: #f87171 !important;
+    color: rgba(248,113,113,0.85) !important;
 }
-.nav-dropdown-logout svg { color: #f87171 !important; }
-.nav-dropdown-logout:hover { background: rgba(239,68,68,0.1) !important; }
+.nav-dropdown-logout svg { color: rgba(248,113,113,0.85) !important; }
+.nav-dropdown-logout:hover { background: rgba(220,38,38,0.12) !important; color: #f87171 !important; }
 
 /* ============================================================
    NAVBAR — Badge de mood flotante sobre el avatar
@@ -1332,10 +1325,10 @@ body {
 
 /* Botón hamburguesa: oculto en escritorio, visible en móvil */
 .nav-hamburger {
-    display: none;          /* ocultamos por defecto */
+    display: none;
     background: none;
     border: none;
-    color: rgba(15,23,42,0.65);
+    color: rgba(255,255,255,0.75);
     cursor: pointer;
     padding: 6px;
     border-radius: 8px;
@@ -1344,7 +1337,7 @@ body {
     transition: background 0.15s, color 0.15s;
     flex-shrink: 0;
 }
-.nav-hamburger:hover { background: rgba(15,23,42,0.06); color: #0f172a; }
+.nav-hamburger:hover { background: rgba(255,255,255,0.12); color: white; }
 .nav-hamburger svg  { width: 22px; height: 22px; display: block; }
 
 /* En móvil (< 768px): mostrar hamburguesa y ocultar botones de invitado */
@@ -1373,8 +1366,8 @@ body {
     width: 80%;
     max-width: 300px;
     height: 100%;
-    background: var(--navy);
-    border-right: 1px solid rgba(255,255,255,0.07);
+    background: linear-gradient(160deg, #4c1d95 0%, #0d0a18 40%);
+    border-right: 1px solid rgba(124,58,237,0.3);
     z-index: 50;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);

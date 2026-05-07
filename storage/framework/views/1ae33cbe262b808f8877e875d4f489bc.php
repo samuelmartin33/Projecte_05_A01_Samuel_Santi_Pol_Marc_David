@@ -12,82 +12,71 @@
 <body>
 
 
-<header class="sticky top-0 z-50 bg-paper border-b border-ink/15">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
+<header class="nav-vibez sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
         <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
 
         
         <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>"
-           class="font-display font-black text-2xl tracking-brutal text-ink
-                  hover:text-lilac transition-colors duration-100 select-none">
-            VIBEZ
+           class="nav-logo-link group">
+            <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>"
+                 alt="VIBEZ"
+                 class="nav-logo-img">
         </a>
 
         
         <nav class="hidden md:flex items-center gap-8">
             <?php if($esEmpresa): ?>
                 <a href="<?php echo e(route('empresa.home')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('empresa.home') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-link-activo' : ''); ?>">
                     Panel
                 </a>
                 <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : ''); ?>">
                     Candidaturas
                 </a>
             <?php elseif(Auth::check() && Auth::user()->es_admin): ?>
                 <a href="<?php echo e(route('admin.dashboard')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.dashboard') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.dashboard') ? 'nav-link-activo' : ''); ?>">
                     Inicio
                 </a>
                 <a href="<?php echo e(route('admin.eventos.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.eventos.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.eventos.*') ? 'nav-link-activo' : ''); ?>">
                     Eventos
                 </a>
                 <a href="<?php echo e(route('admin.empresas.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.empresas.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.empresas.*') ? 'nav-link-activo' : ''); ?>">
                     Empresas
                 </a>
                 <a href="<?php echo e(route('admin.usuarios.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.usuarios.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.usuarios.*') ? 'nav-link-activo' : ''); ?>">
                     Usuarios
                 </a>
                 <a href="<?php echo e(route('admin.categorias.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.categorias.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.categorias.*') ? 'nav-link-activo' : ''); ?>">
                     Categorías
                 </a>
                 <a href="<?php echo e(route('admin.pedidos.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.pedidos.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.pedidos.*') ? 'nav-link-activo' : ''); ?>">
                     Pedidos
                 </a>
                 <a href="<?php echo e(route('admin.pagos.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('admin.pagos.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('admin.pagos.*') ? 'nav-link-activo' : ''); ?>">
                     Pagos
                 </a>
             <?php else: ?>
                 <a href="<?php echo e(route('home')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('home') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('home') ? 'nav-link-activo' : ''); ?>">
                     Explorar
                 </a>
                 <a href="<?php echo e(route('trabajos.index')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                          <?php echo e(request()->routeIs('trabajos.index') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
                     Trabajo
                 </a>
                 <?php if(auth()->guard()->check()): ?>
                 <a href="<?php echo e(route('social')); ?>"
-                   class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
-                          <?php echo e(request()->routeIs('social') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                   class="nav-link relative <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
                     Social
                     <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                 </a>
@@ -99,12 +88,11 @@
         <div class="flex items-center gap-3">
             <?php if(auth()->guard()->guest()): ?>
                 <a href="<?php echo e(route('login')); ?>"
-                   class="hidden sm:block font-mono text-xs uppercase tracking-widest
-                          text-ink/55 hover:text-ink transition-colors duration-100">
+                   class="hidden sm:block btn-nav-ghost">
                     Entrar
                 </a>
                 <a href="<?php echo e(route('register')); ?>"
-                   class="btn-ink font-mono text-xs uppercase tracking-widest px-5 py-2.5">
+                   class="btn-nav-solido">
                     <span>Registro &nbsp;→</span>
                 </a>
             <?php else: ?>
