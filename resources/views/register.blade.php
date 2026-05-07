@@ -10,7 +10,7 @@
 
 @section('content')
 
-<div class="auth-shell">
+<div class="auth-shell auth-shell-3col">
 
     {{-- ════════════════════════════════════════════════════
          PANEL IZQUIERDO — foto editorial + branding
@@ -69,6 +69,15 @@
     ════════════════════════════════════════════════════ --}}
     <div class="auth-main">
 
+        {{-- Barra superior: volver + logo --}}
+        <div class="auth-main-topbar">
+            <a href="{{ route('welcome') }}" class="auth-back-home">← Inicio</a>
+            <a href="{{ route('welcome') }}" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ">
+                <span>VIBEZ</span>
+            </a>
+        </div>
+
         <div class="deco-sticker deco-2">★ Nueva cuenta</div>
         <div class="deco-numbers">07<br>01</div>
 
@@ -118,23 +127,22 @@
             <form id="registerForm" novalidate autocomplete="off" onsubmit="registrar(event)">
                 <div class="auth-form">
 
-                    {{-- Nombre --}}
-                    <div class="auth-field" id="field-nombre">
-                        <label class="auth-label" for="nombre">Nombre</label>
-                        <input
-                            type="text"
-                            id="nombre"
-                            name="nombre"
-                            placeholder="Tu nombre"
-                            autocomplete="given-name"
-                            inputmode="text"
-                            onblur="validarNombre()"
-                        >
-                        <span class="field-error" id="error-nombre" role="alert"></span>
-                    </div>
+                    {{-- Fila 1 (3 col): Nombre + Apellidos --}}
+                    <div class="auth-grid-3">
+                        <div class="auth-field" id="field-nombre">
+                            <label class="auth-label" for="nombre">Nombre</label>
+                            <input
+                                type="text"
+                                id="nombre"
+                                name="nombre"
+                                placeholder="Tu nombre"
+                                autocomplete="given-name"
+                                inputmode="text"
+                                onblur="validarNombre()"
+                            >
+                            <span class="field-error" id="error-nombre" role="alert"></span>
+                        </div>
 
-                    {{-- Apellidos en grid 2 columnas --}}
-                    <div class="auth-grid-2">
                         <div class="auth-field" id="field-apellido1">
                             <label class="auth-label" for="apellido1">Primer apellido</label>
                             <input
@@ -164,22 +172,50 @@
                         </div>
                     </div>
 
-                    {{-- Email --}}
-                    <div class="auth-field" id="field-email">
-                        <label class="auth-label" for="email">Correo electrónico</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="tu@email.com"
-                            autocomplete="email"
-                            inputmode="email"
-                            onblur="validarEmail()"
-                        >
-                        <span class="field-error" id="error-email" role="alert"></span>
+                    {{-- Fila 2 (3 col): Email + Fecha nacimiento + Teléfono --}}
+                    <div class="auth-grid-3">
+                        <div class="auth-field" id="field-email">
+                            <label class="auth-label" for="email">Correo electrónico</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="tu@email.com"
+                                autocomplete="email"
+                                inputmode="email"
+                                onblur="validarEmail()"
+                            >
+                            <span class="field-error" id="error-email" role="alert"></span>
+                        </div>
+
+                        <div class="auth-field" id="field-fecha_nacimiento">
+                            <label class="auth-label" for="fecha_nacimiento">Fecha de nacimiento</label>
+                            <input
+                                type="text"
+                                id="fecha_nacimiento"
+                                name="fecha_nacimiento"
+                                placeholder="DD/MM/AAAA"
+                                readonly
+                            >
+                            <span class="field-error" id="error-fecha_nacimiento" role="alert"></span>
+                        </div>
+
+                        <div class="auth-field" id="field-telefono">
+                            <label class="auth-label" for="telefono">Teléfono</label>
+                            <input
+                                type="tel"
+                                id="telefono"
+                                name="telefono"
+                                placeholder="+34 600 000 000"
+                                autocomplete="tel"
+                                inputmode="tel"
+                                onblur="validarTelefono()"
+                            >
+                            <span class="field-error" id="error-telefono" role="alert"></span>
+                        </div>
                     </div>
 
-                    {{-- Contraseñas en grid 2 columnas --}}
+                    {{-- Fila 3 (2 col): Contraseñas --}}
                     <div class="auth-grid-2">
                         <div class="auth-field" id="field-password">
                             <label class="auth-label" for="password">Contraseña</label>
@@ -251,7 +287,6 @@
                     </div>
 
                     {{-- Tipo de cuenta: select oculto sincronizado con los tabs --}}
-                    {{-- El div existe para el classList.toggle('has-value') del JS, aunque esté oculto --}}
                     <div id="field-tipo_cuenta" style="display:none" aria-hidden="true">
                         <select
                             id="tipo_cuenta"
@@ -264,38 +299,8 @@
                             <option value="empresa">Empresa</option>
                         </select>
                     </div>
-                    {{-- Error e hint de tipo de cuenta fuera del div oculto para ser visibles --}}
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
                     <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px"></p>
-
-                    {{-- Fecha de nacimiento y teléfono --}}
-                    <div class="auth-grid-2">
-                        <div class="auth-field" id="field-fecha_nacimiento">
-                            <label class="auth-label" for="fecha_nacimiento">Fecha de nacimiento</label>
-                            <input
-                                type="text"
-                                id="fecha_nacimiento"
-                                name="fecha_nacimiento"
-                                placeholder="DD/MM/AAAA"
-                                readonly
-                            >
-                            <span class="field-error" id="error-fecha_nacimiento" role="alert"></span>
-                        </div>
-
-                        <div class="auth-field" id="field-telefono">
-                            <label class="auth-label" for="telefono">Teléfono</label>
-                            <input
-                                type="tel"
-                                id="telefono"
-                                name="telefono"
-                                placeholder="+34 600 000 000"
-                                autocomplete="tel"
-                                inputmode="tel"
-                                onblur="validarTelefono()"
-                            >
-                            <span class="field-error" id="error-telefono" role="alert"></span>
-                        </div>
-                    </div>
 
                     {{-- Fila de botones: submit + Google (id="btnRow" eliminado por JS en estado pendiente) --}}
                     <div id="btnRow">

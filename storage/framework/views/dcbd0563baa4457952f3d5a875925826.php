@@ -52,6 +52,15 @@
     
     <div class="auth-main">
 
+        
+        <div class="auth-main-topbar">
+            <a href="<?php echo e(route('welcome')); ?>" class="auth-back-home">← Inicio</a>
+            <a href="<?php echo e(route('welcome')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
+                <span>VIBEZ</span>
+            </a>
+        </div>
+
         <div class="deco-sticker deco-1">↯ Bienvenido</div>
         <div class="deco-numbers">06<br>25</div>
 

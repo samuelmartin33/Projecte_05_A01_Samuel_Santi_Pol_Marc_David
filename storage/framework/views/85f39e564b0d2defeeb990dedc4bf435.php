@@ -8,7 +8,7 @@
 
 <?php $__env->startSection('content'); ?>
 
-<div class="auth-shell">
+<div class="auth-shell auth-shell-3col">
 
     
     <div class="auth-side">
@@ -63,6 +63,15 @@
     
     <div class="auth-main">
 
+        
+        <div class="auth-main-topbar">
+            <a href="<?php echo e(route('welcome')); ?>" class="auth-back-home">← Inicio</a>
+            <a href="<?php echo e(route('welcome')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
+                <span>VIBEZ</span>
+            </a>
+        </div>
+
         <div class="deco-sticker deco-2">★ Nueva cuenta</div>
         <div class="deco-numbers">07<br>01</div>
 
@@ -113,22 +122,21 @@
                 <div class="auth-form">
 
                     
-                    <div class="auth-field" id="field-nombre">
-                        <label class="auth-label" for="nombre">Nombre</label>
-                        <input
-                            type="text"
-                            id="nombre"
-                            name="nombre"
-                            placeholder="Tu nombre"
-                            autocomplete="given-name"
-                            inputmode="text"
-                            onblur="validarNombre()"
-                        >
-                        <span class="field-error" id="error-nombre" role="alert"></span>
-                    </div>
+                    <div class="auth-grid-3">
+                        <div class="auth-field" id="field-nombre">
+                            <label class="auth-label" for="nombre">Nombre</label>
+                            <input
+                                type="text"
+                                id="nombre"
+                                name="nombre"
+                                placeholder="Tu nombre"
+                                autocomplete="given-name"
+                                inputmode="text"
+                                onblur="validarNombre()"
+                            >
+                            <span class="field-error" id="error-nombre" role="alert"></span>
+                        </div>
 
-                    
-                    <div class="auth-grid-2">
                         <div class="auth-field" id="field-apellido1">
                             <label class="auth-label" for="apellido1">Primer apellido</label>
                             <input
@@ -159,18 +167,46 @@
                     </div>
 
                     
-                    <div class="auth-field" id="field-email">
-                        <label class="auth-label" for="email">Correo electrónico</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="tu@email.com"
-                            autocomplete="email"
-                            inputmode="email"
-                            onblur="validarEmail()"
-                        >
-                        <span class="field-error" id="error-email" role="alert"></span>
+                    <div class="auth-grid-3">
+                        <div class="auth-field" id="field-email">
+                            <label class="auth-label" for="email">Correo electrónico</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="tu@email.com"
+                                autocomplete="email"
+                                inputmode="email"
+                                onblur="validarEmail()"
+                            >
+                            <span class="field-error" id="error-email" role="alert"></span>
+                        </div>
+
+                        <div class="auth-field" id="field-fecha_nacimiento">
+                            <label class="auth-label" for="fecha_nacimiento">Fecha de nacimiento</label>
+                            <input
+                                type="text"
+                                id="fecha_nacimiento"
+                                name="fecha_nacimiento"
+                                placeholder="DD/MM/AAAA"
+                                readonly
+                            >
+                            <span class="field-error" id="error-fecha_nacimiento" role="alert"></span>
+                        </div>
+
+                        <div class="auth-field" id="field-telefono">
+                            <label class="auth-label" for="telefono">Teléfono</label>
+                            <input
+                                type="tel"
+                                id="telefono"
+                                name="telefono"
+                                placeholder="+34 600 000 000"
+                                autocomplete="tel"
+                                inputmode="tel"
+                                onblur="validarTelefono()"
+                            >
+                            <span class="field-error" id="error-telefono" role="alert"></span>
+                        </div>
                     </div>
 
                     
@@ -245,7 +281,6 @@
                     </div>
 
                     
-                    
                     <div id="field-tipo_cuenta" style="display:none" aria-hidden="true">
                         <select
                             id="tipo_cuenta"
@@ -258,38 +293,8 @@
                             <option value="empresa">Empresa</option>
                         </select>
                     </div>
-                    
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
                     <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px"></p>
-
-                    
-                    <div class="auth-grid-2">
-                        <div class="auth-field" id="field-fecha_nacimiento">
-                            <label class="auth-label" for="fecha_nacimiento">Fecha de nacimiento</label>
-                            <input
-                                type="text"
-                                id="fecha_nacimiento"
-                                name="fecha_nacimiento"
-                                placeholder="DD/MM/AAAA"
-                                readonly
-                            >
-                            <span class="field-error" id="error-fecha_nacimiento" role="alert"></span>
-                        </div>
-
-                        <div class="auth-field" id="field-telefono">
-                            <label class="auth-label" for="telefono">Teléfono</label>
-                            <input
-                                type="tel"
-                                id="telefono"
-                                name="telefono"
-                                placeholder="+34 600 000 000"
-                                autocomplete="tel"
-                                inputmode="tel"
-                                onblur="validarTelefono()"
-                            >
-                            <span class="field-error" id="error-telefono" role="alert"></span>
-                        </div>
-                    </div>
 
                     
                     <div id="btnRow">
