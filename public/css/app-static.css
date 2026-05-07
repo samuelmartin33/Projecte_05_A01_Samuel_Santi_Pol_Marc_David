@@ -1031,7 +1031,7 @@ body {
     background: linear-gradient(135deg, #4c1d95, #7c3aed);
 }
 .nav-dropdown-nombre {
-    color: #fff; font-weight: 800; font-size: 0.875rem; margin: 0;
+    color: #f5f1ea; font-weight: 800; font-size: 0.875rem; margin: 0;
 }
 .nav-dropdown-email {
     color: rgba(255,255,255,0.55); font-size: 0.72rem; margin: 2px 0 0;
@@ -1073,13 +1073,15 @@ body {
     position: absolute;
     bottom: -3px; right: -3px;
     width: 22px; height: 22px;
-    background: white;
+    background: #0d0a18;
     border-radius: 50%;
-    border: 2px solid rgba(124,58,237,0.35);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    border: 2px solid #a855f7;
+    box-shadow: 0 0 8px rgba(168,85,247,0.35);
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; line-height: 1;
     cursor: default; pointer-events: none;
+    color: #a855f7;
+    font-weight: 700;
 }
 
 /* ============================================================

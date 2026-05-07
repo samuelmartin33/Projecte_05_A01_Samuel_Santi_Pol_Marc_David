@@ -28,6 +28,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
+use App\Http\Controllers\Admin\CategoriaEventoController as AdminCategoriaController;
 use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
 use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
@@ -240,19 +241,23 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])
          ->name('admin.usuarios.destroy');
 
-    /* Rutas de gestión de pedidos */
+    /* Rutas de gestión de categorías de eventos */
+    Route::get('/admin/categorias', [AdminCategoriaController::class, 'index'])
+         ->name('admin.categorias.index');
+    Route::get('/admin/categorias/crear', [AdminCategoriaController::class, 'create'])
+         ->name('admin.categorias.create');
+    Route::post('/admin/categorias', [AdminCategoriaController::class, 'store'])
+         ->name('admin.categorias.store');
+    Route::get('/admin/categorias/{categoria}/editar', [AdminCategoriaController::class, 'edit'])
+         ->name('admin.categorias.edit');
+    Route::put('/admin/categorias/{categoria}', [AdminCategoriaController::class, 'update'])
+         ->name('admin.categorias.update');
+    Route::delete('/admin/categorias/{categoria}', [AdminCategoriaController::class, 'destroy'])
+         ->name('admin.categorias.destroy');
+
+    /* Rutas de pedidos (solo lectura) */
     Route::get('/admin/pedidos', [AdminPedidoController::class, 'index'])
          ->name('admin.pedidos.index');
-    Route::get('/admin/pedidos/crear', [AdminPedidoController::class, 'create'])
-         ->name('admin.pedidos.create');
-    Route::post('/admin/pedidos', [AdminPedidoController::class, 'store'])
-         ->name('admin.pedidos.store');
-    Route::get('/admin/pedidos/{pedido}/editar', [AdminPedidoController::class, 'edit'])
-         ->name('admin.pedidos.edit');
-    Route::put('/admin/pedidos/{pedido}', [AdminPedidoController::class, 'update'])
-         ->name('admin.pedidos.update');
-    Route::delete('/admin/pedidos/{pedido}', [AdminPedidoController::class, 'destroy'])
-         ->name('admin.pedidos.destroy');
 
     /* Rutas de gestión de pagos */
     Route::get('/admin/pagos', [AdminPagoController::class, 'index'])
