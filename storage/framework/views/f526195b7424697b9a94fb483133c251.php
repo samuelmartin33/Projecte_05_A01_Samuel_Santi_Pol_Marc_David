@@ -44,29 +44,19 @@
 
     
     <?php if(!View::hasSection('content')): ?>
-<<<<<<< HEAD
-    <header class="sticky top-0 z-50 bg-paper border-b border-ink/15">
-=======
     <header class="nav-vibez sticky top-0 z-50">
->>>>>>> feature/middleware
         <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
 
             <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
 
             
             <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>"
-<<<<<<< HEAD
-               class="font-display font-black text-2xl tracking-brutal text-ink
-                      hover:text-lilac transition-colors duration-100 select-none">
-                VIBEZ
-=======
                class="flex items-center flex-shrink-0 select-none"
                style="opacity:1;transition:opacity 0.15s">
                 <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ"
                      style="height:38px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(255,255,255,0.25));transition:filter 0.2s,transform 0.2s"
                      onmouseover="this.style.filter='drop-shadow(0 0 14px rgba(255,255,255,0.55))';this.style.transform='scale(1.04)'"
                      onmouseout="this.style.filter='drop-shadow(0 0 8px rgba(255,255,255,0.25))';this.style.transform='scale(1)'">
->>>>>>> feature/middleware
             </a>
 
             
@@ -74,49 +64,29 @@
                 <?php if($esEmpresa): ?>
                     <a href="<?php echo e(route('empresa.home')); ?>"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-<<<<<<< HEAD
-                              <?php echo e(request()->routeIs('empresa.home') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
-=======
                               <?php echo e(request()->routeIs('empresa.home') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
->>>>>>> feature/middleware
                         Panel
                     </a>
                     <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-<<<<<<< HEAD
-                              <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
-=======
                               <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
->>>>>>> feature/middleware
                         Candidaturas
                     </a>
                 <?php else: ?>
                     <a href="<?php echo e(route('home')); ?>"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-<<<<<<< HEAD
-                              <?php echo e(request()->routeIs('home') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
-=======
                               <?php echo e(request()->routeIs('home') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
->>>>>>> feature/middleware
                         Explorar
                     </a>
                     <a href="<?php echo e(route('trabajos.index')); ?>"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-<<<<<<< HEAD
-                              <?php echo e(request()->routeIs('trabajos.index') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
-=======
                               <?php echo e(request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
->>>>>>> feature/middleware
                         Trabajo
                     </a>
                     <?php if(auth()->guard()->check()): ?>
                     <a href="<?php echo e(route('social')); ?>"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
-<<<<<<< HEAD
-                              <?php echo e(request()->routeIs('social') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
-=======
                               <?php echo e(request()->routeIs('social') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
->>>>>>> feature/middleware
                         Social
                         <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                     </a>
@@ -129,13 +99,6 @@
                 <?php if(auth()->guard()->guest()): ?>
                     <a href="<?php echo e(route('login')); ?>"
                        class="hidden sm:block font-mono text-xs uppercase tracking-widest
-<<<<<<< HEAD
-                              text-ink/55 hover:text-ink transition-colors duration-100">
-                        Entrar
-                    </a>
-                    <a href="<?php echo e(route('register')); ?>"
-                       class="btn-ink font-mono text-xs uppercase tracking-widest px-5 py-2.5">
-=======
                               text-white/65 hover:text-white transition-colors duration-100">
                         Entrar
                     </a>
@@ -144,7 +107,6 @@
                        style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:white;border-radius:999px;transition:background 0.15s,border-color 0.15s"
                        onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.borderColor='rgba(255,255,255,0.65)'"
                        onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.borderColor='rgba(255,255,255,0.4)'">
->>>>>>> feature/middleware
                         <span>Registro &nbsp;→</span>
                     </a>
                 <?php else: ?>

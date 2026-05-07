@@ -42,4 +42,9 @@ class EventoPost extends Model
     {
         return $this->hasMany(EventoPostComentario::class, 'evento_post_id')->orderBy('fecha_creacion');
     }
+
+    public function likes()
+    {
+        return $this->hasMany(EventoPostLike::class, 'evento_post_id');
+    }
 }

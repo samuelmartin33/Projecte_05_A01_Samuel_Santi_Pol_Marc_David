@@ -465,6 +465,44 @@
 }
 .post-btn-comentar:hover { color: var(--soc-text); transform: scale(1.08); }
 
+/* Likes */
+.post-likes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px 2px;
+}
+
+.post-like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--soc-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.15s, transform 0.15s;
+    flex-shrink: 0;
+}
+.post-like-btn:hover { color: #ec4899; transform: scale(1.15); }
+.post-like-btn.liked { color: #ec4899; }
+.post-like-btn svg   { width: 22px; height: 22px; }
+
+.post-like-btn .like-icon-filled  { display: none; }
+.post-like-btn .like-icon-outline { display: block; }
+.post-like-btn.liked .like-icon-filled  { display: block; }
+.post-like-btn.liked .like-icon-outline { display: none; }
+
+.post-like-btn.cargando { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+.post-like-count {
+    font-size: 0.82rem;
+    color: var(--soc-text-muted);
+    font-weight: 600;
+}
+
 /* ============================================================
    CHATS
    ============================================================ */

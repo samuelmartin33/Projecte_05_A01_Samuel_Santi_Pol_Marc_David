@@ -20,7 +20,9 @@
       "Bash(Select-Object -First 30)",
       "Bash(Get-Content \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\public\\\\css\\\\social.css\")",
       "Bash(Measure-Object -Line)",
-      "Bash(Get-ChildItem \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\database\\\\seeders\\\\\" -Name)"
+      "Bash(Get-ChildItem \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\database\\\\seeders\\\\\" -Name)",
+      "Bash(Get-ChildItem -Path . -Recurse -Filter \"*.php\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\" -Recurse -Directory -Name)"
     ]
   }
 }

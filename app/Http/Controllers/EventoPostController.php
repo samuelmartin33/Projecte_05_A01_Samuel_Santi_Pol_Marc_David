@@ -6,6 +6,7 @@ use App\Models\Entrada;
 use App\Models\EventoPost;
 use App\Models\EventoPostComentario;
 use App\Models\EventoPostImagen;
+use App\Models\EventoPostLike;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -215,6 +216,49 @@ class EventoPostController extends Controller
     }
 
     /* ============================================================
+       LIKES
+       ============================================================ */
+
+    public function toggleLike(Request $request, int $postId): JsonResponse
+    {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        $post = EventoPost::where('id', $postId)->where('estado', 1)->firstOrFail();
+
+        $ahora = now();
+
+        $like = EventoPostLike::where('evento_post_id', $postId)
+            ->where('usuario_id', $usuario->id)
+            ->first();
+
+        if ($like && (int) $like->estado === 1) {
+            $like->update(['estado' => 0, 'fecha_actualizacion' => $ahora]);
+            $liked = false;
+        } elseif ($like) {
+            $like->update(['estado' => 1, 'fecha_actualizacion' => $ahora]);
+            $liked = true;
+        } else {
+            EventoPostLike::create([
+                'evento_post_id'      => $postId,
+                'usuario_id'          => $usuario->id,
+                'estado'              => 1,
+                'fecha_creacion'      => $ahora,
+                'fecha_actualizacion' => $ahora,
+            ]);
+            $liked = true;
+        }
+
+        $totalLikes = EventoPostLike::where('evento_post_id', $postId)->where('estado', 1)->count();
+
+        return response()->json([
+            'exito'       => true,
+            'liked'       => $liked,
+            'total_likes' => $totalLikes,
+        ]);
+    }
+
+    /* ============================================================
        HELPER PRIVADO
        ============================================================ */
 
@@ -257,6 +301,8 @@ class EventoPostController extends Controller
             'comentarios_preview' => $comentariosPreview,
             'total_comentarios'   => $post->comentarios()->where('estado', 1)->count(),
             'es_mio'              => $post->usuario_id === $miId,
+            'total_likes'         => $post->likes()->where('estado', 1)->count(),
+            'yo_di_like'          => $post->likes()->where('usuario_id', $miId)->where('estado', 1)->exists(),
         ];
     }
 }

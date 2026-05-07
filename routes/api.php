@@ -75,5 +75,6 @@ Route::middleware('auth')->prefix('social')->group(function () {
     Route::post('/posts',                        [EventoPostController::class, 'store']);
     Route::get('/posts/{id}/comentarios',        [EventoPostController::class, 'comentariosPaginados'])->where('id', '[0-9]+');
     Route::post('/posts/{id}/comentarios',       [EventoPostController::class, 'comentar'])->where('id', '[0-9]+');
+    Route::post('/posts/{id}/like',              [EventoPostController::class, 'toggleLike'])->where('id', '[0-9]+');
     Route::get('/mis-eventos-asistidos',         [EventoPostController::class, 'misEventosAsistidos']);
 });

@@ -19,6 +19,7 @@ var pubCargando         = false;
 var pubEventosAsistidos = [];
 
 var carouselState = {}; // { postId: currentIndex }
+var likeEnProceso = {};
 
 var temporizadorBusqueda = null;
 
@@ -195,6 +196,18 @@ function renderizarPost(post) {
     // Input mi avatar + comentario
     var miAvatar = construirAvatar(null, 'Yo', '', 'sm');
 
+    // Likes
+    var likeClass   = post.yo_di_like ? ' liked' : '';
+    var likeCountTx = post.total_likes > 0 ? post.total_likes + (post.total_likes === 1 ? ' Me gusta' : ' Me gusta') : '';
+    var svgOutline  = '<svg class="like-icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>';
+    var svgFilled   = '<svg class="like-icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/></svg>';
+    var likesHtml   = '<div class="post-likes">'
+                    +   '<button class="post-like-btn' + likeClass + '" id="like-btn-' + post.id + '" onclick="toggleLike(' + post.id + ')" aria-label="Me gusta">'
+                    +     svgOutline + svgFilled
+                    +   '</button>'
+                    +   '<span class="post-like-count" id="like-count-' + post.id + '">' + likeCountTx + '</span>'
+                    + '</div>';
+
     return '<article class="post-card" id="pub-post-' + post.id + '" data-post-id="' + post.id + '">'
          +   '<div class="post-head">'
          +     '<div class="post-head-left">'
@@ -206,6 +219,7 @@ function renderizarPost(post) {
          +     '</div>'
          +   '</div>'
          +   imagenesHtml
+         +   likesHtml
          +   '<div class="post-body">'
          +     capcionHtml
          +     '<div class="post-comments" id="pub-comentarios-' + post.id + '">'
@@ -335,6 +349,38 @@ function inicializarTouchCarrusel(postId) {
     carousel.addEventListener('mousedown',  function (e) { onStart(e.clientX); });
     carousel.addEventListener('mouseup',    function (e) { onEnd(e.clientX); });
     carousel.addEventListener('mouseleave', function ()  { activo = false; });
+}
+
+function toggleLike(postId) {
+    if (likeEnProceso[postId]) return;
+    likeEnProceso[postId] = true;
+
+    var btn = document.getElementById('like-btn-' + postId);
+    if (btn) btn.classList.add('cargando');
+
+    fetch('/api/social/posts/' + postId + '/like', {
+        method:  'POST',
+        headers: {
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (!respuesta.exito) return;
+        var boton  = document.getElementById('like-btn-' + postId);
+        var cuenta = document.getElementById('like-count-' + postId);
+        if (boton)  boton.classList.toggle('liked', respuesta.liked);
+        if (cuenta) cuenta.textContent = respuesta.total_likes > 0
+            ? respuesta.total_likes + ' Me gusta'
+            : '';
+    })
+    .catch(function () {})
+    .finally(function () {
+        var boton = document.getElementById('like-btn-' + postId);
+        if (boton) boton.classList.remove('cargando');
+        delete likeEnProceso[postId];
+    });
 }
 
 function renderizarComentario(c) {

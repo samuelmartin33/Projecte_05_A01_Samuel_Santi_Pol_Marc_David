@@ -105,28 +105,6 @@
 </div>
 
 
-<<<<<<< HEAD
-<div class="mood-strip">
-    <div class="mood-strip-inner">
-        <span class="mood-label">Elige tu vibe</span>
-
-        
-        <button type="button" class="mood-chip activo" id="mood-chip-todos"
-                onclick="seleccionarMood(this, '', 'Todas')">
-             Todos
-        </button>
-
-        <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoria): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <button type="button" class="mood-chip"
-                    onclick="seleccionarMood(this, '<?php echo e($categoria->id); ?>', '<?php echo e($categoria->nombre); ?>')">
-                <?php echo e($categoria->nombre); ?>
-
-            </button>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-    </div>
-</div>
-=======
->>>>>>> feature/middleware
 
 
 <section class="barra-filtros sticky top-14 z-40">
