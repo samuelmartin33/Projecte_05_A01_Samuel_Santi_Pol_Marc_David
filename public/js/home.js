@@ -46,6 +46,19 @@ function seleccionarFiltro(filtroId, valor, texto, event) {
     }
 
     cerrarTodosDropdowns();
+
+    /* Sincronizar mood chips si el filtro cambiado es de categoría */
+    if (filtroId === 'categoria') {
+        document.querySelectorAll('.mood-chip').forEach(function(c) {
+            c.classList.remove('activo');
+        });
+        /* Activar el chip que coincida con el valor seleccionado */
+        var chipActivo = valor === ''
+            ? document.getElementById('mood-chip-todos')
+            : document.querySelector('.mood-chip[onclick*="' + valor + '"]');
+        if (chipActivo) chipActivo.classList.add('activo');
+    }
+
     aplicarFiltros();
 }
 
@@ -112,6 +125,13 @@ function limpiarFiltros() {
     if (seccionEventos) seccionEventos.style.display = '';
 
     document.getElementById('contador-resultados').textContent = Number(HOME_CFG.totalEventos || 0);
+
+    /* Resetear también los mood chips */
+    document.querySelectorAll('.mood-chip').forEach(function(c) {
+        c.classList.remove('activo');
+    });
+    var chipTodos = document.getElementById('mood-chip-todos');
+    if (chipTodos) chipTodos.classList.add('activo');
 }
 
 function toggleSoloFavoritos() {

@@ -39,6 +39,8 @@ use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Evento;
+use App\Models\CategoriaEvento;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +52,32 @@ use Illuminate\Support\Facades\Route;
 
 // --- Landing de bienvenida: primera página que ve el usuario ---
 Route::get('/', function () {
-    return view('welcome');
+    $eventos = Evento::with(['categoria', 'portada'])
+        ->where('estado', 1)
+        ->orderBy('fecha_inicio', 'asc')
+        ->get();
+
+    $categorias = CategoriaEvento::where('estado', 1)
+        ->orderBy('nombre')
+        ->get();
+
+    /* Eventos con coordenadas para el mapa Leaflet */
+    $eventosMapa = $eventos
+        ->filter(fn ($e) => $e->latitud && $e->longitud)
+        ->map(fn ($e) => [
+            'id'        => $e->id,
+            'titulo'    => $e->titulo,
+            'lat'       => $e->latitud,
+            'lng'       => $e->longitud,
+            'portada'   => $e->url_portada,
+            'categoria' => $e->categoria?->nombre ?? 'Evento',
+            'precio'    => $e->precio_formateado,
+            'fecha'     => $e->fecha_inicio->locale('es')->isoFormat('D MMM'),
+            'url'       => route('eventos.detalle', $e->id),
+        ])
+        ->values();
+
+    return view('welcome', compact('eventos', 'categorias', 'eventosMapa'));
 })->name('welcome');
 
 // --- Detalle de un evento específico ---

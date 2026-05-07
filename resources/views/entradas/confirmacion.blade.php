@@ -26,6 +26,7 @@
 </div>
 
 {{-- ════════ CONTENIDO PRINCIPAL ════════ --}}
+<div class="confirmacion-page-wrap">
 <div class="max-w-2xl mx-auto px-4 py-8">
 
     {{-- Resumen del pedido: evento + importe total --}}
@@ -126,6 +127,7 @@
         </a>
     </div>
 
+</div>
 </div>
 
 @endsection
