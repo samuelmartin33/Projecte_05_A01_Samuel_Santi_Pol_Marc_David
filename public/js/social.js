@@ -1,31 +1,27 @@
 /**
- * VIBEZ Social — lógica de la página social
- * Gestiona: chats en tiempo real (polling), amigos y búsqueda de personas.
+ * VIBEZ Social — lógica principal
+ * Layout tipo Instagram: feed por defecto, bottom nav, chats y amigos como paneles.
  */
 
 /* ============================================================
    VARIABLES DE ESTADO
    ============================================================ */
 
-// ID del chat que está abierto en este momento (null si ninguno)
-var chatActualId = null;
-
-// ID del amigo cuyo chat está abierto (para evitar reabrir el mismo chat)
-var amigoActualId = null;
-
-// ID del último mensaje cargado (para pedir solo los nuevos en el polling)
+var chatActualId    = null;
+var amigoActualId   = null;
 var ultimoMensajeId = 0;
-
-// Intervalo del polling de mensajes nuevos
 var intervaloPolling = null;
+var panelActual     = 'feed';
 
-// Tab activa actualmente
-var tabActual = 'mensajes';
+var pubPagina           = 1;
+var pubHayMas           = false;
+var pubCargando         = false;
+var pubEventosAsistidos = [];
 
-// Temporizador para el debounce del buscador
+var carouselState = {}; // { postId: currentIndex }
+
 var temporizadorBusqueda = null;
 
-// CSRF token necesario para los POST
 var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 /* ============================================================
@@ -33,53 +29,471 @@ var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('
    ============================================================ */
 
 window.onload = function () {
-    // Cargar la lista de chats al entrar en la página
-    cargarChats();
-
-    // Actualizar el badge del navbar cada 30 segundos
+    irA('feed');
     actualizarContadorNavbar();
     setInterval(actualizarContadorNavbar, 30000);
 };
 
 /* ============================================================
-   TABS — cambio de sección en el panel izquierdo
+   NAVEGACIÓN — bottom nav
    ============================================================ */
 
-/**
- * Cambia la tab activa del panel izquierdo.
- * Carga los datos de la tab si es necesario.
- */
-function cambiarTab(nombreTab) {
-    // Quitar clase activo de todos los botones y paneles
-    document.querySelectorAll('.social-tab-btn').forEach(function (btn) {
-        btn.classList.remove('activo');
+function irA(panel) {
+    // Detener polling si salimos de chats
+    if (panelActual === 'chats' && panel !== 'chats') {
+        detenerPolling();
+    }
+
+    // Desactivar todos los paneles y botones
+    document.querySelectorAll('.soc-panel').forEach(function (el) {
+        el.classList.remove('activo');
     });
-    document.querySelectorAll('.social-tab-panel').forEach(function (panel) {
-        panel.classList.remove('activo');
+    document.querySelectorAll('.soc-nav-btn').forEach(function (el) {
+        el.classList.remove('activo');
     });
 
-    // Activar la tab seleccionada
-    document.getElementById('tab-btn-' + nombreTab).classList.add('activo');
-    document.getElementById('tab-' + nombreTab).classList.add('activo');
+    // Activar el panel y botón correspondiente
+    document.getElementById('panel-' + panel).classList.add('activo');
+    document.getElementById('nav-btn-' + panel).classList.add('activo');
 
-    tabActual = nombreTab;
+    panelActual = panel;
 
-    // Cargar datos según la tab
-    if (nombreTab === 'mensajes') {
+    // Cargar datos del panel
+    if (panel === 'chats') {
         cargarChats();
-    } else if (nombreTab === 'amigos') {
+    } else if (panel === 'amigos') {
         cargarAmigos();
         cargarSolicitudes();
+    } else if (panel === 'feed') {
+        iniciarFeed();
     }
 }
 
 /* ============================================================
-   CHATS — lista de conversaciones
+   FEED DE PUBLICACIONES
    ============================================================ */
 
-/**
- * Carga la lista de conversaciones del usuario y la renderiza.
- */
+function iniciarFeed() {
+    pubPagina   = 1;
+    pubHayMas   = false;
+    pubCargando = false;
+    document.getElementById('feed-lista').innerHTML           = '';
+    document.getElementById('feed-cargar-mas').style.display = 'none';
+    document.getElementById('feed-vacio').style.display      = 'none';
+
+    cargarEventosAsistidos();
+    cargarFeedPosts(1);
+}
+
+function cargarEventosAsistidos() {
+    fetch('/api/social/mis-eventos-asistidos', {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        pubEventosAsistidos = respuesta.datos || [];
+
+        var btnNuevaPub  = document.getElementById('btn-nueva-pub');
+        var selectModal  = document.getElementById('pub-select-evento');
+
+        if (pubEventosAsistidos.length > 0) {
+            if (btnNuevaPub)  btnNuevaPub.style.display = 'flex';
+
+            var opcionesHtml = '<option value="">Selecciona un evento…</option>';
+            pubEventosAsistidos.forEach(function (ev) {
+                opcionesHtml += '<option value="' + ev.id + '">' + escaparHtml(ev.titulo) + '</option>';
+            });
+            if (selectModal) selectModal.innerHTML = opcionesHtml;
+        } else {
+            if (btnNuevaPub) btnNuevaPub.style.display = 'none';
+        }
+    })
+    .catch(function () {});
+}
+
+function cargarFeedPosts(pagina) {
+    if (pubCargando) return;
+    pubCargando = true;
+
+    var cargandoEl = document.getElementById('feed-cargando');
+    cargandoEl.style.display = 'flex';
+    document.getElementById('feed-vacio').style.display = 'none';
+
+    fetch('/api/social/posts?pagina=' + pagina, {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        cargandoEl.style.display = 'none';
+        pubCargando = false;
+
+        if (!respuesta.exito || respuesta.datos.length === 0) {
+            if (pagina === 1) {
+                document.getElementById('feed-vacio').style.display = 'block';
+            }
+            document.getElementById('feed-cargar-mas').style.display = 'none';
+            return;
+        }
+
+        var lista = document.getElementById('feed-lista');
+        respuesta.datos.forEach(function (post) {
+            lista.insertAdjacentHTML('beforeend', renderizarPost(post));
+            if (post.imagenes && post.imagenes.length > 1) {
+                inicializarTouchCarrusel(post.id);
+            }
+        });
+
+        pubPagina = pagina;
+        pubHayMas = respuesta.meta.hay_mas;
+        document.getElementById('feed-cargar-mas').style.display = pubHayMas ? 'block' : 'none';
+    })
+    .catch(function () {
+        document.getElementById('feed-cargando').style.display = 'none';
+        pubCargando = false;
+    });
+}
+
+function cargarMasPosts() {
+    if (!pubHayMas || pubCargando) return;
+    cargarFeedPosts(pubPagina + 1);
+}
+
+/* ── Renderizado de posts (estilo Instagram) ── */
+
+function renderizarPost(post) {
+    var avatarHtml  = construirAvatar(post.autor.foto_url, post.autor.nombre, post.autor.apellido1, 'sm');
+    var autorNombre = escaparHtml(post.autor.nombre + ' ' + post.autor.apellido1);
+    var eventoLabel = escaparHtml(post.evento.titulo);
+    var fechaLabel  = formatearFechaRelativa(post.fecha);
+
+    // Imágenes (imagen única o carrusel)
+    var imagenesHtml = renderizarImagenes(post);
+
+    // Descripción (con nombre del autor en negrita, como Instagram)
+    var capcionHtml = '';
+    if (post.descripcion) {
+        capcionHtml = '<p class="post-caption"><strong>' + autorNombre + '</strong>'
+                    + escaparHtml(post.descripcion).replace(/\n/g, '<br>') + '</p>';
+    }
+
+    // Comentarios preview
+    var comentariosHtml = '';
+    if (post.comentarios_preview && post.comentarios_preview.length > 0) {
+        post.comentarios_preview.forEach(function (c) {
+            comentariosHtml += renderizarComentario(c);
+        });
+    }
+
+    // "Ver todos"
+    var verMasHtml = '';
+    if (post.total_comentarios > post.comentarios_preview.length) {
+        verMasHtml = '<button class="post-ver-mas-comentarios" onclick="cargarTodosComentarios(' + post.id + ')">'
+                   + 'Ver los ' + post.total_comentarios + ' comentarios'
+                   + '</button>';
+    }
+
+    // Input mi avatar + comentario
+    var miAvatar = construirAvatar(null, 'Yo', '', 'sm');
+
+    return '<article class="post-card" id="pub-post-' + post.id + '" data-post-id="' + post.id + '">'
+         +   '<div class="post-head">'
+         +     '<div class="post-head-left">'
+         +       '<div class="post-avatar">' + avatarHtml + '</div>'
+         +       '<div class="post-head-meta">'
+         +         '<span class="post-autor">' + autorNombre + '</span>'
+         +         '<span class="post-evento-tag">' + eventoLabel + '</span>'
+         +       '</div>'
+         +     '</div>'
+         +   '</div>'
+         +   imagenesHtml
+         +   '<div class="post-body">'
+         +     capcionHtml
+         +     '<div class="post-comments" id="pub-comentarios-' + post.id + '">'
+         +       comentariosHtml
+         +     '</div>'
+         +     verMasHtml
+         +     '<div class="post-add-comment">'
+         +       '<div>' + miAvatar + '</div>'
+         +       '<input type="text" class="post-comment-input" id="pub-com-input-' + post.id + '"'
+         +         ' placeholder="Añade un comentario…" maxlength="500"'
+         +         ' onkeydown="manejarTeclaComentario(event,' + post.id + ')">'
+         +       '<button class="post-btn-comentar" onclick="enviarComentario(' + post.id + ')">Publicar</button>'
+         +     '</div>'
+         +   '</div>'
+         + '</article>';
+}
+
+/* ── Renderizado de imágenes: imagen única o carrusel ── */
+
+function renderizarImagenes(post) {
+    if (!post.imagenes || post.imagenes.length === 0) return '';
+
+    if (post.imagenes.length === 1) {
+        return '<div class="post-img-single">'
+             + '<div class="post-img-wrap" onclick="abrirLightbox(\'' + escaparTexto(post.imagenes[0].url) + '\')">'
+             + '<img src="' + escaparHtml(post.imagenes[0].url) + '" alt="Foto del evento" loading="lazy">'
+             + '</div></div>';
+    }
+
+    // Carrusel para 2+ imágenes
+    carouselState[post.id] = 0;
+
+    var svgPrev = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">'
+                + '<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>';
+    var svgNext = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">'
+                + '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>';
+
+    var slides = '';
+    var dots   = '';
+    post.imagenes.forEach(function (img, idx) {
+        slides += '<div class="post-carousel-slide">'
+               + '<img src="' + escaparHtml(img.url) + '" alt="Foto del evento" loading="lazy"'
+               + ' onclick="abrirLightbox(\'' + escaparTexto(img.url) + '\')">'
+               + '</div>';
+        dots += '<span class="post-carousel-dot' + (idx === 0 ? ' activo' : '') + '"'
+              + ' onclick="irASlide(' + post.id + ',' + idx + ')"></span>';
+    });
+
+    return '<div class="post-carousel" id="carousel-' + post.id + '">'
+         + '<div class="post-carousel-track" id="carousel-track-' + post.id + '">' + slides + '</div>'
+         + '<button class="post-carousel-btn post-carousel-prev" style="display:none"'
+         +   ' onclick="carouselPrev(' + post.id + ')" aria-label="Anterior">' + svgPrev + '</button>'
+         + '<button class="post-carousel-btn post-carousel-next"'
+         +   ' onclick="carouselNext(' + post.id + ')" aria-label="Siguiente">' + svgNext + '</button>'
+         + '<div class="post-carousel-dots" id="carousel-dots-' + post.id + '">' + dots + '</div>'
+         + '</div>';
+}
+
+/* ── Navegación del carrusel ── */
+
+function irASlide(postId, idx) {
+    var track = document.getElementById('carousel-track-' + postId);
+    if (!track) return;
+    var total = track.children.length;
+    idx = Math.max(0, Math.min(idx, total - 1));
+
+    track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+    carouselState[postId] = idx;
+
+    // Actualizar dots
+    var dotsEl = document.getElementById('carousel-dots-' + postId);
+    if (dotsEl) {
+        dotsEl.querySelectorAll('.post-carousel-dot').forEach(function (d, i) {
+            d.classList.toggle('activo', i === idx);
+        });
+    }
+
+    // Mostrar/ocultar botones
+    var carousel = document.getElementById('carousel-' + postId);
+    if (carousel) {
+        var btnPrev = carousel.querySelector('.post-carousel-prev');
+        var btnNext = carousel.querySelector('.post-carousel-next');
+        if (btnPrev) btnPrev.style.display = idx === 0         ? 'none' : 'flex';
+        if (btnNext) btnNext.style.display = idx === total - 1 ? 'none' : 'flex';
+    }
+}
+
+function carouselPrev(postId) {
+    var idx = carouselState[postId];
+    if (idx === undefined || idx === 0) return;
+    irASlide(postId, idx - 1);
+}
+
+function carouselNext(postId) {
+    var track = document.getElementById('carousel-track-' + postId);
+    if (!track) return;
+    var idx = carouselState[postId] || 0;
+    if (idx >= track.children.length - 1) return;
+    irASlide(postId, idx + 1);
+}
+
+/* ── Touch / drag en el carrusel ── */
+
+function inicializarTouchCarrusel(postId) {
+    var carousel = document.getElementById('carousel-' + postId);
+    if (!carousel) return;
+
+    var startX   = 0;
+    var activo   = false;
+
+    function onStart(x) { startX = x; activo = true; }
+    function onEnd(x) {
+        if (!activo) return;
+        activo = false;
+        var diff = startX - x;
+        if (Math.abs(diff) > 45) {
+            if (diff > 0) carouselNext(postId);
+            else          carouselPrev(postId);
+        }
+    }
+
+    // Touch (móvil)
+    carousel.addEventListener('touchstart', function (e) { onStart(e.touches[0].clientX); },           { passive: true });
+    carousel.addEventListener('touchend',   function (e) { onEnd(e.changedTouches[0].clientX); },      { passive: true });
+
+    // Mouse drag (desktop)
+    carousel.addEventListener('mousedown',  function (e) { onStart(e.clientX); });
+    carousel.addEventListener('mouseup',    function (e) { onEnd(e.clientX); });
+    carousel.addEventListener('mouseleave', function ()  { activo = false; });
+}
+
+function renderizarComentario(c) {
+    var autor = escaparHtml(c.autor.nombre + ' ' + c.autor.apellido1);
+    var hora  = formatearHora(c.fecha);
+    return '<div class="post-comment" id="pub-com-' + c.id + '">'
+         +   '<div class="post-comment-body">'
+         +     '<p><strong>' + autor + '</strong>' + escaparHtml(c.contenido) + '</p>'
+         +     '<p class="post-comment-time">' + hora + '</p>'
+         +   '</div>'
+         + '</div>';
+}
+
+function enviarComentario(postId) {
+    var inputEl   = document.getElementById('pub-com-input-' + postId);
+    var contenido = inputEl.value.trim();
+    if (!contenido) return;
+
+    inputEl.disabled = true;
+
+    fetch('/api/social/posts/' + postId + '/comentarios', {
+        method:  'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+        body: JSON.stringify({ contenido: contenido }),
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        inputEl.disabled = false;
+        inputEl.value    = '';
+        if (respuesta.exito) {
+            var seccion = document.getElementById('pub-comentarios-' + postId);
+            seccion.insertAdjacentHTML('beforeend', renderizarComentario(respuesta.datos));
+        }
+    })
+    .catch(function () { inputEl.disabled = false; });
+}
+
+function manejarTeclaComentario(event, postId) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        enviarComentario(postId);
+    }
+}
+
+function cargarTodosComentarios(postId) {
+    var btn = document.querySelector('#pub-post-' + postId + ' .post-ver-mas-comentarios');
+    if (btn) btn.style.display = 'none';
+
+    fetch('/api/social/posts/' + postId + '/comentarios', {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (!respuesta.exito) return;
+        var seccion = document.getElementById('pub-comentarios-' + postId);
+        seccion.innerHTML = '';
+        respuesta.datos.forEach(function (c) {
+            seccion.insertAdjacentHTML('beforeend', renderizarComentario(c));
+        });
+    });
+}
+
+/* ── Modal: nueva publicación ── */
+
+function abrirModalPublicacion() {
+    document.getElementById('pub-modal-overlay').style.display = 'flex';
+    document.getElementById('pub-select-evento').value         = '';
+    document.getElementById('pub-textarea-desc').value         = '';
+    document.getElementById('pub-input-fotos').value           = '';
+    document.getElementById('pub-preview-grid').innerHTML      = '';
+    var btn = document.getElementById('pub-btn-publicar');
+    btn.disabled    = false;
+    btn.textContent = 'Publicar';
+}
+
+function cerrarModalPublicacion() {
+    document.getElementById('pub-modal-overlay').style.display = 'none';
+}
+
+function previsualizarFotos(input) {
+    var grid     = document.getElementById('pub-preview-grid');
+    grid.innerHTML = '';
+    Array.from(input.files).slice(0, 10).forEach(function (file) {
+        var reader   = new FileReader();
+        reader.onload = function (e) {
+            grid.insertAdjacentHTML('beforeend',
+                '<div class="soc-preview-thumb"><img src="' + e.target.result + '" alt="preview"></div>'
+            );
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function publicarPost() {
+    var eventoId    = document.getElementById('pub-select-evento').value;
+    var descripcion = document.getElementById('pub-textarea-desc').value.trim();
+    var inputFotos  = document.getElementById('pub-input-fotos');
+
+    if (!eventoId) { alert('Selecciona un evento.'); return; }
+    if (!inputFotos.files || inputFotos.files.length === 0) {
+        alert('Añade al menos una foto.');
+        return;
+    }
+
+    var btn         = document.getElementById('pub-btn-publicar');
+    btn.disabled    = true;
+    btn.textContent = 'Publicando…';
+
+    var formData = new FormData();
+    formData.append('evento_id', eventoId);
+    if (descripcion) formData.append('descripcion', descripcion);
+    Array.from(inputFotos.files).slice(0, 10).forEach(function (file, i) {
+        formData.append('imagenes[' + i + ']', file);
+    });
+
+    fetch('/api/social/posts', {
+        method:  'POST',
+        headers: {
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+        body: formData,
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        btn.disabled    = false;
+        btn.textContent = 'Publicar';
+        if (respuesta.exito) {
+            cerrarModalPublicacion();
+            var lista   = document.getElementById('feed-lista');
+            var nuevoPst = respuesta.datos;
+            lista.insertAdjacentHTML('afterbegin', renderizarPost(nuevoPst));
+            if (nuevoPst.imagenes && nuevoPst.imagenes.length > 1) {
+                inicializarTouchCarrusel(nuevoPst.id);
+            }
+            document.getElementById('feed-vacio').style.display = 'none';
+        } else {
+            alert(respuesta.mensaje || 'No se pudo publicar.');
+        }
+    })
+    .catch(function () {
+        btn.disabled    = false;
+        btn.textContent = 'Publicar';
+        alert('Error al publicar. Comprueba tu conexión.');
+    });
+}
+
+function abrirLightbox(url) {
+    window.open(url, '_blank');
+}
+
+/* ============================================================
+   CHATS
+   ============================================================ */
+
 function cargarChats() {
     fetch('/api/social/chats', {
         headers: { 'Accept': 'application/json' }
@@ -87,51 +501,40 @@ function cargarChats() {
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
         var contenedor = document.getElementById('lista-chats');
-
-        // Ocultar skeletons
-        var skeleton = document.getElementById('skeleton-chats');
+        var skeleton   = document.getElementById('skeleton-chats');
         if (skeleton) skeleton.style.display = 'none';
 
         if (!respuesta.exito || respuesta.datos.length === 0) {
-            contenedor.innerHTML = '<p class="social-vacio-texto">Aún no tienes conversaciones.<br>¡Habla con tus amigos!</p>';
+            contenedor.innerHTML = '<p class="soc-vacio">Aún no tienes conversaciones.<br>Habla con tus amigos desde la sección Amigos.</p>';
             return;
         }
 
         var html = '';
         respuesta.datos.forEach(function (chat) {
-            var amigo        = chat.amigo;
-            var ultimoMsj    = chat.ultimo_mensaje;
-            var noLeidos     = chat.no_leidos;
-            var nombreAmigo  = amigo.nombre + ' ' + amigo.apellido1;
-            var avatarHtml   = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
+            var amigo       = chat.amigo;
+            var ultimoMsj   = chat.ultimo_mensaje;
+            var noLeidos    = chat.no_leidos;
+            var nombre      = amigo.nombre + ' ' + amigo.apellido1;
+            var avatarHtml  = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
 
-            // Vista previa del último mensaje
-            var vistaPrevia = '';
-            if (ultimoMsj) {
-                var prefijo  = ultimoMsj.es_mio ? 'Tú: ' : '';
-                var texto    = ultimoMsj.contenido.length > 38
+            var vistaPrevia = ultimoMsj
+                ? (ultimoMsj.es_mio ? 'Tú: ' : '') + (ultimoMsj.contenido.length > 38
                     ? ultimoMsj.contenido.substring(0, 38) + '…'
-                    : ultimoMsj.contenido;
-                vistaPrevia  = prefijo + texto;
-            } else {
-                vistaPrevia  = 'Sin mensajes aún';
-            }
+                    : ultimoMsj.contenido)
+                : 'Sin mensajes aún';
 
-            // Badge de no leídos
             var badgeHtml = noLeidos > 0
                 ? '<span class="chat-item-badge">' + noLeidos + '</span>'
                 : '';
-
-            // Hora del último mensaje
             var horaHtml = ultimoMsj
                 ? '<span class="chat-item-hora">' + formatearHora(ultimoMsj.fecha) + '</span>'
                 : '';
 
-            html += '<div class="chat-item" onclick="abrirChat(' + amigo.id + ', \'' + escaparTexto(nombreAmigo) + '\', \'' + escaparTexto(amigo.foto_url || '') + '\')" data-chat-id="' + chat.chat_id + '">'
+            html += '<div class="chat-item" onclick="abrirChat(' + amigo.id + ',\'' + escaparTexto(nombre) + '\',\'' + escaparTexto(amigo.foto_url || '') + '\')" data-chat-id="' + chat.chat_id + '">'
                   +   '<div class="chat-item-avatar">' + avatarHtml + '</div>'
                   +   '<div class="chat-item-info">'
                   +     '<div class="chat-item-fila-top">'
-                  +       '<span class="chat-item-nombre' + (noLeidos > 0 ? ' negrita' : '') + '">' + escaparHtml(nombreAmigo) + '</span>'
+                  +       '<span class="chat-item-nombre' + (noLeidos > 0 ? ' negrita' : '') + '">' + escaparHtml(nombre) + '</span>'
                   +       horaHtml
                   +     '</div>'
                   +     '<div class="chat-item-fila-bot">'
@@ -146,24 +549,21 @@ function cargarChats() {
     })
     .catch(function () {
         document.getElementById('lista-chats').innerHTML =
-            '<p class="social-error-texto">No se pudo cargar los chats.</p>';
+            '<p class="soc-vacio">No se pudo cargar los chats.</p>';
     });
 }
 
-/* ============================================================
-   CHAT ABIERTO — mensajes en tiempo real
-   ============================================================ */
-
-/**
- * Abre (o crea) el chat con un amigo.
- * Llama al servidor para obtener el chat_id y luego carga los mensajes.
- */
 function abrirChat(amigoId, nombreAmigo, fotoUrl) {
-    // Si ya estamos en el chat con este amigo, no hacer nada
-    if (amigoId === amigoActualId) return;
+    // Si ya estamos en el chat con este amigo no recargar
+    if (amigoId === amigoActualId) {
+        mostrarVentanaChat();
+        return;
+    }
 
-    // Detener polling anterior si había uno
     detenerPolling();
+
+    // Asegurar que estamos en el panel de chats
+    if (panelActual !== 'chats') irA('chats');
 
     fetch('/api/social/chats/abrir', {
         method: 'POST',
@@ -188,33 +588,22 @@ function abrirChat(amigoId, nombreAmigo, fotoUrl) {
         amigoActualId   = amigoId;
         ultimoMensajeId = 0;
 
-        // Mostrar la ventana de chat y ocultar el estado vacío
-        document.getElementById('chat-vacio').style.display    = 'none';
-        document.getElementById('chat-ventana').style.display  = 'flex';
-
-        // En móvil: ocultar el sidebar y mostrar el chat
-        document.getElementById('social-sidebar').classList.add('oculto-movil');
-        document.getElementById('area-chat').classList.add('activo-movil');
-
-        // Rellenar la cabecera del chat con los datos del amigo
-        var cabecera = document.getElementById('chat-amigo-info');
-        var avatarCabecera = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'sm');
-        cabecera.innerHTML =
-              '<div class="chat-cab-avatar">' + avatarCabecera + '</div>'
+        // Rellenar cabecera
+        var avatarCab = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'sm');
+        document.getElementById('chat-amigo-info').innerHTML =
+              '<div class="chat-cab-avatar">' + avatarCab + '</div>'
             + '<div class="chat-cab-datos">'
             +   '<p class="chat-cab-nombre">' + escaparHtml(amigo.nombre + ' ' + amigo.apellido1) + '</p>'
             +   (amigo.mood ? '<p class="chat-cab-mood">' + escaparHtml(amigo.mood) + '</p>' : '')
             + '</div>';
 
-        // Cargar los mensajes del chat
+        mostrarVentanaChat();
         cargarMensajes(chatId);
-
-        // Iniciar polling cada 3 segundos para recibir mensajes nuevos
         iniciarPolling(chatId);
 
-        // Enfocar el textarea
         setTimeout(function () {
-            document.getElementById('chat-textarea').focus();
+            var ta = document.getElementById('chat-textarea');
+            if (ta) ta.focus();
         }, 150);
     })
     .catch(function () {
@@ -222,20 +611,30 @@ function abrirChat(amigoId, nombreAmigo, fotoUrl) {
     });
 }
 
-/**
- * Carga todos los mensajes de un chat y los renderiza.
- * Hace scroll automático hasta el último mensaje.
- */
+function esDesktop() {
+    return window.innerWidth >= 900;
+}
+
+function mostrarVentanaChat() {
+    var emptyState = document.getElementById('chat-vacio-desktop');
+    if (emptyState) emptyState.classList.add('oculto');
+
+    if (!esDesktop()) {
+        document.getElementById('chats-lista-view').classList.remove('activo');
+        document.getElementById('chats-ventana-view').classList.add('activo');
+    }
+}
+
 function cargarMensajes(chatId) {
-    document.getElementById('cargando-mensajes').style.display = 'flex';
+    var cargandoEl = document.getElementById('cargando-mensajes');
+    cargandoEl.style.display = 'flex';
 
     fetch('/api/social/chats/' + chatId + '/mensajes', {
         headers: { 'Accept': 'application/json' }
     })
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
-        document.getElementById('cargando-mensajes').style.display = 'none';
-
+        cargandoEl.style.display = 'none';
         if (!respuesta.exito) return;
 
         var area = document.getElementById('chat-mensajes');
@@ -247,24 +646,16 @@ function cargarMensajes(chatId) {
         }
 
         var fechaAnterior = null;
-
         respuesta.datos.forEach(function (msg) {
-            // Separador de fecha cuando cambia el día
             var fechaMensaje = msg.fecha ? msg.fecha.substring(0, 10) : null;
             if (fechaMensaje && fechaMensaje !== fechaAnterior) {
                 area.appendChild(crearSeparadorFecha(msg.fecha));
                 fechaAnterior = fechaMensaje;
             }
-
             area.appendChild(crearBurbujaMensaje(msg));
-
-            // Guardar el ID más alto para el polling
-            if (msg.id > ultimoMensajeId) {
-                ultimoMensajeId = msg.id;
-            }
+            if (msg.id > ultimoMensajeId) ultimoMensajeId = msg.id;
         });
 
-        // Scroll al final
         scrollAlFinal(area);
     })
     .catch(function () {
@@ -272,17 +663,11 @@ function cargarMensajes(chatId) {
     });
 }
 
-/**
- * Envía el mensaje escrito en el textarea.
- * Añade la burbuja al instante (optimistic update) sin esperar respuesta.
- */
 function enviarMensaje() {
     var textarea  = document.getElementById('chat-textarea');
     var contenido = textarea.value.trim();
-
     if (!contenido || !chatActualId) return;
 
-    // Deshabilitar el botón mientras se envía
     var btnEnviar = document.getElementById('btn-enviar-mensaje');
     btnEnviar.disabled = true;
 
@@ -298,49 +683,29 @@ function enviarMensaje() {
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
         btnEnviar.disabled = false;
+        if (!respuesta.exito) { alert('No se pudo enviar el mensaje.'); return; }
 
-        if (!respuesta.exito) {
-            alert('No se pudo enviar el mensaje.');
-            return;
-        }
-
-        // Limpiar el textarea y restaurar altura
-        textarea.value = '';
+        textarea.value        = '';
         textarea.style.height = 'auto';
 
-        var area = document.getElementById('chat-mensajes');
-
-        // Quitar el mensaje de "sin mensajes" si existía
+        var area       = document.getElementById('chat-mensajes');
         var sinMensajes = area.querySelector('.chat-sin-mensajes');
         if (sinMensajes) sinMensajes.remove();
 
-        // Añadir la burbuja del mensaje enviado
         area.appendChild(crearBurbujaMensaje(respuesta.datos));
-
-        // Actualizar el último ID conocido
-        if (respuesta.datos.id > ultimoMensajeId) {
-            ultimoMensajeId = respuesta.datos.id;
-        }
-
+        if (respuesta.datos.id > ultimoMensajeId) ultimoMensajeId = respuesta.datos.id;
         scrollAlFinal(area);
     })
     .catch(function () {
         btnEnviar.disabled = false;
-        alert('Error al enviar el mensaje. Comprueba tu conexión.');
+        alert('Error al enviar el mensaje.');
     });
 }
 
-/**
- * Inicia el polling: comprueba mensajes nuevos cada 3 segundos.
- */
 function iniciarPolling(chatId) {
     detenerPolling();
-
     intervaloPolling = setInterval(function () {
-        if (!chatActualId) {
-            detenerPolling();
-            return;
-        }
+        if (!chatActualId) { detenerPolling(); return; }
 
         fetch('/api/social/chats/' + chatId + '/nuevos?desde=' + ultimoMensajeId, {
             headers: { 'Accept': 'application/json' }
@@ -349,39 +714,29 @@ function iniciarPolling(chatId) {
         .then(function (respuesta) {
             if (!respuesta.exito || respuesta.datos.length === 0) return;
 
-            var area = document.getElementById('chat-mensajes');
-
-            // Quitar el mensaje de "sin mensajes" si existía
+            var area      = document.getElementById('chat-mensajes');
             var sinMensajes = area.querySelector('.chat-sin-mensajes');
             if (sinMensajes) sinMensajes.remove();
 
-            var eraFinal = estaEnElFinal(area);
+            var eraFinal      = estaEnElFinal(area);
             var fechaAnterior = obtenerUltimaFechaEnArea(area);
 
             respuesta.datos.forEach(function (msg) {
-                // Separador si cambia el día
                 var fechaMensaje = msg.fecha ? msg.fecha.substring(0, 10) : null;
                 if (fechaMensaje && fechaMensaje !== fechaAnterior) {
                     area.appendChild(crearSeparadorFecha(msg.fecha));
                     fechaAnterior = fechaMensaje;
                 }
-
                 area.appendChild(crearBurbujaMensaje(msg));
-
-                if (msg.id > ultimoMensajeId) {
-                    ultimoMensajeId = msg.id;
-                }
+                if (msg.id > ultimoMensajeId) ultimoMensajeId = msg.id;
             });
 
-            // Solo hacer scroll automático si el usuario ya estaba al final
             if (eraFinal) scrollAlFinal(area);
         })
-        .catch(function () { /* silencioso: reintentará en el siguiente ciclo */ });
-
+        .catch(function () {});
     }, 3000);
 }
 
-/** Detiene el polling de mensajes. */
 function detenerPolling() {
     if (intervaloPolling) {
         clearInterval(intervaloPolling);
@@ -389,27 +744,24 @@ function detenerPolling() {
     }
 }
 
-/** Cierra el chat abierto y vuelve al panel lateral (especialmente en móvil). */
 function cerrarChat() {
     detenerPolling();
     chatActualId  = null;
     amigoActualId = null;
 
-    document.getElementById('chat-vacio').style.display   = 'flex';
-    document.getElementById('chat-ventana').style.display = 'none';
+    var emptyState = document.getElementById('chat-vacio-desktop');
+    if (emptyState) emptyState.classList.remove('oculto');
 
-    // En móvil: volver a mostrar el sidebar
-    document.getElementById('social-sidebar').classList.remove('oculto-movil');
-    document.getElementById('area-chat').classList.remove('activo-movil');
+    if (!esDesktop()) {
+        document.getElementById('chats-ventana-view').classList.remove('activo');
+        document.getElementById('chats-lista-view').classList.add('activo');
+    }
 }
 
 /* ============================================================
-   AMIGOS — lista y solicitudes
+   AMIGOS
    ============================================================ */
 
-/**
- * Carga la lista de amigos aceptados y la renderiza.
- */
 function cargarAmigos() {
     fetch('/api/social/amigos', {
         headers: { 'Accept': 'application/json' }
@@ -417,19 +769,18 @@ function cargarAmigos() {
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
         var contenedor = document.getElementById('lista-amigos');
-
-        var skeleton = document.getElementById('skeleton-amigos');
+        var skeleton   = document.getElementById('skeleton-amigos');
         if (skeleton) skeleton.style.display = 'none';
 
         if (!respuesta.exito || respuesta.datos.length === 0) {
-            contenedor.innerHTML = '<p class="social-vacio-texto">Aún no tienes amigos.<br>¡Usa "Descubrir" para encontrar gente!</p>';
+            contenedor.innerHTML = '<p class="soc-vacio">Aún no tienes amigos.<br>Usa el botón + para encontrar gente.</p>';
             return;
         }
 
         var html = '';
         respuesta.datos.forEach(function (amigo) {
             var nombre = amigo.nombre + ' ' + amigo.apellido1;
-            var avatar = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'sm');
+            var avatar = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
 
             html += '<div class="amigo-item">'
                   +   '<div class="amigo-item-avatar">' + avatar + '</div>'
@@ -437,7 +788,7 @@ function cargarAmigos() {
                   +     '<p class="amigo-item-nombre">' + escaparHtml(nombre) + '</p>'
                   +     (amigo.mood ? '<p class="amigo-item-mood">' + escaparHtml(amigo.mood) + '</p>' : '')
                   +   '</div>'
-                  +   '<button class="btn-chat-amigo" onclick="abrirChat(' + amigo.id + ', \'' + escaparTexto(nombre) + '\', \'' + escaparTexto(amigo.foto_url || '') + '\')" title="Enviar mensaje">'
+                  +   '<button class="btn-chat-amigo" onclick="abrirChatDesdeAmigos(' + amigo.id + ',\'' + escaparTexto(nombre) + '\',\'' + escaparTexto(amigo.foto_url || '') + '\')" title="Enviar mensaje">'
                   +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>'
                   +   '</button>'
                   + '</div>';
@@ -447,14 +798,16 @@ function cargarAmigos() {
     })
     .catch(function () {
         document.getElementById('lista-amigos').innerHTML =
-            '<p class="social-error-texto">No se pudo cargar los amigos.</p>';
+            '<p class="soc-vacio">No se pudo cargar los amigos.</p>';
     });
 }
 
-/**
- * Carga las solicitudes de amistad pendientes recibidas.
- * Muestra u oculta la sección según haya o no solicitudes.
- */
+function abrirChatDesdeAmigos(amigoId, nombre, foto) {
+    irA('chats');
+    // Pequeño delay para que el panel cambie antes de abrir el chat
+    setTimeout(function () { abrirChat(amigoId, nombre, foto); }, 50);
+}
+
 function cargarSolicitudes() {
     fetch('/api/social/solicitudes', {
         headers: { 'Accept': 'application/json' }
@@ -474,7 +827,7 @@ function cargarSolicitudes() {
         var html = '';
         respuesta.datos.forEach(function (sol) {
             var nombre = sol.nombre + ' ' + sol.apellido1;
-            var avatar = construirAvatar(sol.foto_url, sol.nombre, sol.apellido1, 'sm');
+            var avatar = construirAvatar(sol.foto_url, sol.nombre, sol.apellido1, 'md');
 
             html += '<div class="solicitud-item" id="solicitud-' + sol.id + '">'
                   +   '<div class="solicitud-avatar">' + avatar + '</div>'
@@ -491,93 +844,78 @@ function cargarSolicitudes() {
 
         contenedor.innerHTML = html;
     })
-    .catch(function () { /* silencioso */ });
+    .catch(function () {});
 }
 
-/**
- * Acepta una solicitud de amistad.
- * Elimina el elemento del DOM y recarga la lista de amigos.
- */
 function aceptarSolicitud(solicitudId) {
     fetch('/api/social/solicitudes/' + solicitudId + '/aceptar', {
         method: 'POST',
-        headers: {
-            'Accept':       'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-        },
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
     })
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
-        if (!respuesta.exito) {
-            alert(respuesta.mensaje);
-            return;
-        }
-
-        // Eliminar la solicitud del DOM con animación
-        var elementoSolicitud = document.getElementById('solicitud-' + solicitudId);
-        if (elementoSolicitud) {
-            elementoSolicitud.classList.add('fadeOut');
+        if (!respuesta.exito) { alert(respuesta.mensaje); return; }
+        var el = document.getElementById('solicitud-' + solicitudId);
+        if (el) {
+            el.classList.add('fadeOut');
             setTimeout(function () {
-                elementoSolicitud.remove();
-                // Recargar la lista de amigos para incluir al nuevo
+                el.remove();
                 cargarAmigos();
                 cargarSolicitudes();
                 actualizarContadorNavbar();
             }, 300);
         }
     })
-    .catch(function () {
-        alert('No se pudo aceptar la solicitud. Inténtalo de nuevo.');
-    });
+    .catch(function () { alert('No se pudo aceptar la solicitud.'); });
 }
 
-/**
- * Rechaza una solicitud de amistad.
- */
 function rechazarSolicitud(solicitudId) {
     fetch('/api/social/solicitudes/' + solicitudId + '/rechazar', {
         method: 'POST',
-        headers: {
-            'Accept':       'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-        },
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
     })
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
-        var elementoSolicitud = document.getElementById('solicitud-' + solicitudId);
-        if (elementoSolicitud) {
-            elementoSolicitud.classList.add('fadeOut');
+        var el = document.getElementById('solicitud-' + solicitudId);
+        if (el) {
+            el.classList.add('fadeOut');
             setTimeout(function () {
-                elementoSolicitud.remove();
+                el.remove();
                 cargarSolicitudes();
                 actualizarContadorNavbar();
             }, 300);
         }
     })
-    .catch(function () {
-        alert('No se pudo rechazar la solicitud.');
-    });
+    .catch(function () { alert('No se pudo rechazar la solicitud.'); });
 }
 
-/* ============================================================
-   DESCUBRIR — buscar personas nuevas
-   ============================================================ */
+/* ── Modal: añadir amigo ── */
 
-/**
- * Busca personas por nombre o email con debounce de 350ms.
- */
-function buscarPersonas(query) {
+function abrirModalAnadirAmigo() {
+    document.getElementById('modal-amigo-overlay').style.display = 'flex';
+    document.getElementById('input-anadir-amigo').value          = '';
+    document.getElementById('resultados-anadir-amigo').innerHTML =
+        '<p class="soc-vacio-small">Escribe al menos 2 caracteres para buscar</p>';
+    setTimeout(function () {
+        document.getElementById('input-anadir-amigo').focus();
+    }, 200);
+}
+
+function cerrarModalAnadirAmigo() {
+    document.getElementById('modal-amigo-overlay').style.display = 'none';
+}
+
+function buscarParaAnadir(query) {
     clearTimeout(temporizadorBusqueda);
 
-    var contenedor = document.getElementById('resultados-descubrir');
+    var contenedor = document.getElementById('resultados-anadir-amigo');
 
     if (query.length < 2) {
-        contenedor.innerHTML = '<p class="social-vacio-texto" style="padding:20px 16px">Escribe al menos 2 caracteres para buscar</p>';
+        contenedor.innerHTML = '<p class="soc-vacio-small">Escribe al menos 2 caracteres para buscar</p>';
         return;
     }
 
-    // Mostrar indicador de búsqueda
-    contenedor.innerHTML = '<p class="social-vacio-texto" style="padding:16px">Buscando…</p>';
+    contenedor.innerHTML = '<p class="soc-vacio-small">Buscando…</p>';
 
     temporizadorBusqueda = setTimeout(function () {
         fetch('/api/social/usuarios/buscar?q=' + encodeURIComponent(query), {
@@ -586,39 +924,33 @@ function buscarPersonas(query) {
         .then(function (res) { return res.json(); })
         .then(function (respuesta) {
             if (!respuesta.exito || respuesta.datos.length === 0) {
-                contenedor.innerHTML = '<p class="social-vacio-texto" style="padding:16px">No se encontraron usuarios con "' + escaparHtml(query) + '"</p>';
+                contenedor.innerHTML = '<p class="soc-vacio-small">No se encontraron usuarios.</p>';
                 return;
             }
 
-            var html = '';
+            var html = '<div style="padding:0 0 4px">';
             respuesta.datos.forEach(function (persona) {
                 var nombre = persona.nombre + ' ' + persona.apellido1;
                 var avatar = construirAvatar(persona.foto_url, persona.nombre, persona.apellido1, 'sm');
 
                 html += '<div class="descubrir-item" id="descubrir-' + persona.id + '">'
-                      +   '<div class="descubrir-avatar">' + avatar + '</div>'
+                      +   '<div>' + avatar + '</div>'
                       +   '<div class="descubrir-info">'
                       +     '<p class="descubrir-nombre">' + escaparHtml(nombre) + '</p>'
                       +   '</div>'
-                      +   '<button class="btn-enviar-solicitud" id="btn-sol-' + persona.id + '" onclick="enviarSolicitudDescubrir(' + persona.id + ', this)">'
-                      +     'Añadir'
-                      +   '</button>'
+                      +   '<button class="btn-enviar-solicitud" id="btn-sol-' + persona.id + '" onclick="enviarSolicitudAnadir(' + persona.id + ', this)">Añadir</button>'
                       + '</div>';
             });
-
+            html += '</div>';
             contenedor.innerHTML = html;
         })
         .catch(function () {
-            contenedor.innerHTML = '<p class="social-error-texto">Error al buscar. Inténtalo de nuevo.</p>';
+            contenedor.innerHTML = '<p class="soc-vacio-small">Error al buscar. Inténtalo de nuevo.</p>';
         });
     }, 350);
 }
 
-/**
- * Envía solicitud de amistad desde la sección Descubrir.
- * Cambia el estado del botón para evitar doble envío.
- */
-function enviarSolicitudDescubrir(receptorId, boton) {
+function enviarSolicitudAnadir(receptorId, boton) {
     boton.disabled    = true;
     boton.textContent = 'Enviando…';
 
@@ -634,11 +966,11 @@ function enviarSolicitudDescubrir(receptorId, boton) {
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
         if (respuesta.exito) {
-            boton.textContent  = 'Enviado ✓';
+            boton.textContent = 'Enviado ✓';
             boton.classList.add('enviado');
         } else {
-            boton.disabled     = false;
-            boton.textContent  = 'Añadir';
+            boton.disabled    = false;
+            boton.textContent = 'Añadir';
             alert(respuesta.mensaje);
         }
     })
@@ -653,10 +985,6 @@ function enviarSolicitudDescubrir(receptorId, boton) {
    BADGE DEL NAVBAR
    ============================================================ */
 
-/**
- * Consulta el contador de no leídos y solicitudes pendientes.
- * Actualiza el badge del enlace Social en el navbar.
- */
 function actualizarContadorNavbar() {
     fetch('/api/social/contador', {
         headers: { 'Accept': 'application/json' }
@@ -665,45 +993,28 @@ function actualizarContadorNavbar() {
     .then(function (respuesta) {
         if (!respuesta.exito) return;
 
-        var total  = respuesta.datos.total;
-        var badge  = document.getElementById('nav-badge-social');
-        if (!badge) return;
-
-        if (total > 0) {
-            badge.textContent    = total > 99 ? '99+' : total;
-            badge.style.display  = 'inline-flex';
-        } else {
-            badge.style.display  = 'none';
+        var total = respuesta.datos.total;
+        var badge = document.getElementById('nav-badge-social');
+        if (badge) {
+            badge.textContent   = total > 99 ? '99+' : total;
+            badge.style.display = total > 0 ? 'inline-flex' : 'none';
         }
 
-        // Actualizar también los badges internos de las tabs
         actualizarBadgesInternos(respuesta.datos);
     })
-    .catch(function () { /* silencioso */ });
+    .catch(function () {});
 }
 
-/**
- * Actualiza los badges de las tabs (Mensajes y Amigos) con los contadores.
- */
 function actualizarBadgesInternos(datos) {
-    var badgeMensajes = document.getElementById('badge-mensajes');
-    if (badgeMensajes) {
-        if (datos.mensajes > 0) {
-            badgeMensajes.textContent   = datos.mensajes;
-            badgeMensajes.style.display = 'inline-flex';
-        } else {
-            badgeMensajes.style.display = 'none';
-        }
+    var bMensajes = document.getElementById('badge-mensajes');
+    if (bMensajes) {
+        bMensajes.textContent   = datos.mensajes;
+        bMensajes.style.display = datos.mensajes > 0 ? 'inline-flex' : 'none';
     }
-
-    var badgeSolicitudes = document.getElementById('badge-solicitudes');
-    if (badgeSolicitudes) {
-        if (datos.solicitudes > 0) {
-            badgeSolicitudes.textContent   = datos.solicitudes;
-            badgeSolicitudes.style.display = 'inline-flex';
-        } else {
-            badgeSolicitudes.style.display = 'none';
-        }
+    var bSolicitudes = document.getElementById('badge-solicitudes');
+    if (bSolicitudes) {
+        bSolicitudes.textContent   = datos.solicitudes;
+        bSolicitudes.style.display = datos.solicitudes > 0 ? 'inline-flex' : 'none';
     }
 }
 
@@ -711,96 +1022,77 @@ function actualizarBadgesInternos(datos) {
    HELPERS DE INTERFAZ
    ============================================================ */
 
-/**
- * Construye el HTML de un elemento de mensaje (burbuja).
- * Distingue entre mensajes propios (derecha) y del otro (izquierda).
- */
 function crearBurbujaMensaje(msg) {
     var div = document.createElement('div');
-    div.className = 'mensaje-fila ' + (msg.es_mio ? 'mio' : 'suyo');
+    div.className  = 'mensaje-fila ' + (msg.es_mio ? 'mio' : 'suyo');
     div.dataset.id = msg.id;
-
     var hora = msg.fecha ? formatearHora(msg.fecha) : '';
-
     div.innerHTML = '<div class="mensaje-burbuja">'
                   +   '<p class="mensaje-texto">' + escaparHtml(msg.contenido).replace(/\n/g, '<br>') + '</p>'
                   +   '<span class="mensaje-hora">' + hora + '</span>'
                   + '</div>';
-
     return div;
 }
 
-/**
- * Crea un separador visual de fecha entre mensajes de días distintos.
- */
 function crearSeparadorFecha(fechaStr) {
-    var div  = document.createElement('div');
+    var div       = document.createElement('div');
     div.className = 'chat-separador-fecha';
-    div.textContent = formatearFechaCompleta(fechaStr);
+    div.dataset.fecha = fechaStr ? fechaStr.substring(0, 10) : '';
+    div.textContent   = formatearFechaCompleta(fechaStr);
     return div;
 }
 
-/**
- * Construye el HTML de un avatar de usuario.
- * Si tiene foto usa la imagen; si no, muestra las iniciales sobre gradiente morado.
- * tamaño: 'sm' (32px) | 'md' (40px)
- */
 function construirAvatar(fotoUrl, nombre, apellido, tamaño) {
     var clase  = 'avatar-' + (tamaño || 'sm');
     var inicia = obtenerIniciales(nombre, apellido);
-
     if (fotoUrl) {
-        return '<img src="' + escaparHtml(fotoUrl) + '" alt="' + escaparHtml(nombre) + '" class="' + clase + ' avatar-img">';
+        return '<img src="' + escaparHtml(fotoUrl) + '" alt="' + escaparHtml(nombre || '') + '" class="' + clase + ' avatar-img">';
     }
-
     return '<div class="' + clase + ' avatar-iniciales">' + inicia + '</div>';
 }
 
-/** Devuelve las iniciales de un nombre y apellido. */
 function obtenerIniciales(nombre, apellido) {
-    var ini1 = nombre  ? nombre.charAt(0).toUpperCase()  : '';
-    var ini2 = apellido ? apellido.charAt(0).toUpperCase() : '';
-    return ini1 + ini2;
+    return ((nombre  ? nombre.charAt(0).toUpperCase()  : '')
+          + (apellido ? apellido.charAt(0).toUpperCase() : ''));
 }
 
-/**
- * Formatea una fecha ISO a hora (HH:MM).
- */
 function formatearHora(fechaStr) {
     if (!fechaStr) return '';
     try {
-        var fecha = new Date(fechaStr.replace(' ', 'T'));
-        return fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    } catch (e) {
-        return '';
-    }
+        return new Date(fechaStr.replace(' ', 'T'))
+            .toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return ''; }
 }
 
-/**
- * Formatea una fecha ISO a texto legible: "Hoy", "Ayer" o "dd/mm/yyyy".
- */
 function formatearFechaCompleta(fechaStr) {
     if (!fechaStr) return '';
     try {
         var fecha = new Date(fechaStr.replace(' ', 'T'));
         var hoy   = new Date();
-
-        // Comparar solo la parte de fecha
-        var eraHoy  = fecha.toDateString() === hoy.toDateString();
-        var ayer    = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-        var eraAyer = fecha.toDateString() === ayer.toDateString();
-
-        if (eraHoy)  return 'Hoy';
-        if (eraAyer) return 'Ayer';
+        var ayer  = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+        if (fecha.toDateString() === hoy.toDateString())  return 'Hoy';
+        if (fecha.toDateString() === ayer.toDateString()) return 'Ayer';
         return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    } catch (e) {
-        return '';
-    }
+    } catch (e) { return ''; }
 }
 
-/**
- * Escapa caracteres HTML para prevenir XSS.
- */
+function formatearFechaRelativa(fechaStr) {
+    if (!fechaStr) return '';
+    try {
+        var fecha   = new Date(fechaStr.replace(' ', 'T'));
+        var diffMs  = Date.now() - fecha.getTime();
+        var diffMin = Math.floor(diffMs / 60000);
+        var diffH   = Math.floor(diffMin / 60);
+        var diffD   = Math.floor(diffH / 24);
+
+        if (diffMin < 1)  return 'ahora';
+        if (diffMin < 60) return 'hace ' + diffMin + 'm';
+        if (diffH   < 24) return 'hace ' + diffH + 'h';
+        if (diffD   < 7)  return 'hace ' + diffD + 'd';
+        return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    } catch (e) { return ''; }
+}
+
 function escaparHtml(texto) {
     if (!texto) return '';
     return String(texto)
@@ -811,52 +1103,30 @@ function escaparHtml(texto) {
         .replace(/'/g, '&#039;');
 }
 
-/**
- * Escapa un texto para usarlo dentro de un atributo onclick entre comillas simples.
- */
 function escaparTexto(texto) {
     if (!texto) return '';
     return String(texto).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
-/**
- * Comprueba si el área de mensajes está desplazada hasta el final (±50px).
- */
 function estaEnElFinal(area) {
     return area.scrollHeight - area.scrollTop - area.clientHeight < 50;
 }
 
-/**
- * Hace scroll hasta el último mensaje del área.
- */
 function scrollAlFinal(area) {
     area.scrollTop = area.scrollHeight;
 }
 
-/**
- * Obtiene la fecha del último separador de fecha presente en el área,
- * para no duplicar separadores en el polling.
- */
 function obtenerUltimaFechaEnArea(area) {
     var separadores = area.querySelectorAll('.chat-separador-fecha');
-    if (separadores.length === 0) return null;
-    // Devolvemos el atributo data-fecha del último separador si existe
-    var ultimo = separadores[separadores.length - 1];
-    return ultimo.dataset.fecha || null;
+    if (!separadores.length) return null;
+    return separadores[separadores.length - 1].dataset.fecha || null;
 }
 
-/**
- * Ajusta la altura del textarea al contenido (máximo 120px).
- */
 function ajustarAlturaTextarea(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
 }
 
-/**
- * Envía el mensaje al pulsar Enter (sin Shift).
- * Shift+Enter inserta salto de línea.
- */
 function manejarTeclaEnvio(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
