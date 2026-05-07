@@ -6,18 +6,34 @@
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title><?php if (! empty(trim($__env->yieldContent('title')))): ?><?php echo $__env->yieldContent('title'); ?><?php else: ?> <?php echo $__env->yieldContent('titulo', 'VIBEZ'); ?> — Descubre tu próximo evento <?php endif; ?></title>
 
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/logo_vibez.png')); ?>">
+
     
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/css/app-static.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper:  #f5f1ea;
+            --color-ink:    #0f172a;
+            --color-lilac:  #7c3aed;
+            --color-plum:   #4e3a96;
+            --color-dusk:   #1e1035;
+            --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+            --font-sans:    'Syne', ui-sans-serif, system-ui, sans-serif;
+            --tracking-brutal:   0.04em;
+            --tracking-tightest: -0.02em;
+        }
+    </style>
+
+    <link rel="stylesheet" href="<?php echo e(asset('css/app-static.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/vibez.css')); ?>">
 
     <?php if(request()->routeIs('login') || request()->routeIs('register')): ?>
-        <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('css/auth-vibez.css')); ?>">
     <?php endif; ?>
 
     
@@ -29,41 +45,48 @@
     
     <?php if(!View::hasSection('content')): ?>
     <header class="nav-vibez sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
+
+            <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
 
             
-            <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
-            <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>" class="nav-logo-link group">
-                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>"
-                     alt="VIBEZ"
-                     class="nav-logo-img">
+            <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>"
+               class="flex items-center flex-shrink-0 select-none"
+               style="opacity:1;transition:opacity 0.15s">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ"
+                     style="height:38px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(255,255,255,0.25));transition:filter 0.2s,transform 0.2s"
+                     onmouseover="this.style.filter='drop-shadow(0 0 14px rgba(255,255,255,0.55))';this.style.transform='scale(1.04)'"
+                     onmouseout="this.style.filter='drop-shadow(0 0 8px rgba(255,255,255,0.25))';this.style.transform='scale(1)'">
             </a>
 
             
-            <nav class="hidden md:flex items-center gap-6">
+            <nav class="hidden md:flex items-center gap-8">
                 <?php if($esEmpresa): ?>
-                    
                     <a href="<?php echo e(route('empresa.home')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('empresa.home') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
                         Panel
                     </a>
                     <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
                         Candidaturas
                     </a>
                 <?php else: ?>
-                    
                     <a href="<?php echo e(route('home')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('home') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('home') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
                         Explorar
                     </a>
                     <a href="<?php echo e(route('trabajos.index')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
-                        Bolsa de Trabajo
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
+                        Trabajo
                     </a>
                     <?php if(auth()->guard()->check()): ?>
                     <a href="<?php echo e(route('social')); ?>"
-                       class="nav-link nav-social-link <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
+                              <?php echo e(request()->routeIs('social') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
                         Social
                         <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                     </a>
@@ -74,8 +97,18 @@
             
             <div class="flex items-center gap-3">
                 <?php if(auth()->guard()->guest()): ?>
-                    <a href="<?php echo e(route('login')); ?>" class="btn-nav-ghost">Entrar</a>
-                    <a href="<?php echo e(route('register')); ?>" class="btn-nav-solido">Registro</a>
+                    <a href="<?php echo e(route('login')); ?>"
+                       class="hidden sm:block font-mono text-xs uppercase tracking-widest
+                              text-white/65 hover:text-white transition-colors duration-100">
+                        Entrar
+                    </a>
+                    <a href="<?php echo e(route('register')); ?>"
+                       class="font-mono text-xs uppercase tracking-widest px-5 py-2.5"
+                       style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:white;border-radius:999px;transition:background 0.15s,border-color 0.15s"
+                       onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.borderColor='rgba(255,255,255,0.65)'"
+                       onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.borderColor='rgba(255,255,255,0.4)'">
+                        <span>Registro &nbsp;→</span>
+                    </a>
                 <?php else: ?>
                     
                     <div class="nav-avatar-wrapper" id="navAvatarWrapper">
@@ -101,8 +134,7 @@
                             
                             <?php if(Auth::user()->mood): ?>
                                 <span class="nav-mood-badge" title="<?php echo e(Auth::user()->mood); ?>">
-                                    
-                                    <?php echo e(explode(' ', Auth::user()->mood, 2)[0]); ?>
+                                    <?php echo e(mb_substr(Auth::user()->mood, 0, 1)); ?>
 
                                 </span>
                             <?php endif; ?>
@@ -116,7 +148,7 @@
                                 <p class="nav-dropdown-nombre"><?php echo e(Auth::user()->nombre); ?> <?php echo e(Auth::user()->apellido1); ?></p>
                                 <p class="nav-dropdown-email"><?php echo e(Auth::user()->email); ?></p>
                                 <?php if(Auth::user()->mood): ?>
-                                    <p class="nav-dropdown-mood"><?php echo e(Auth::user()->mood); ?></p>
+                                    <p class="nav-dropdown-mood"><?php echo e(explode(' ', Auth::user()->mood, 2)[0]); ?></p>
                                 <?php endif; ?>
                             </div>
 
@@ -133,7 +165,7 @@
 
                             <?php if($esEmpresa): ?>
                                 
-                                <a href="<?php echo e(route('empresa.home')); ?>" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                                <a href="<?php echo e(route('empresa.home')); ?>" class="nav-dropdown-item" style="color:#c084fc;font-weight:700">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -171,7 +203,7 @@
 
                             
                             <?php if(Auth::user()->es_admin): ?>
-                                <a href="<?php echo e(route('admin.dashboard')); ?>" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                                <a href="<?php echo e(route('admin.dashboard')); ?>" class="nav-dropdown-item" style="color:#c084fc;font-weight:700">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -347,19 +379,23 @@
 
     
     <?php if(!View::hasSection('content')): ?>
-    <footer class="footer-vibez">
-        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center">
-                <img src="<?php echo e(asset('images/logo_vibez.png')); ?>"
-                     alt="VIBEZ"
-                     class="footer-logo-img">
+    <footer class="bg-ink text-paper border-t border-ink">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-8 border-b border-paper/10">
+                <div>
+                    <span class="font-display font-black text-2xl tracking-brutal select-none">VIBEZ</span>
+                    <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">La plataforma de tu escena</p>
+                </div>
+                <nav class="flex flex-wrap gap-6 sm:gap-8 font-mono text-xs uppercase tracking-widest text-paper/35">
+                    <a href="<?php echo e(route('home')); ?>" class="hover:text-paper transition-colors duration-100">Explorar</a>
+                    <a href="<?php echo e(route('trabajos.index')); ?>" class="hover:text-paper transition-colors duration-100">Trabajo</a>
+                    <a href="#" class="hover:text-paper transition-colors duration-100">Privacidad</a>
+                    <a href="#" class="hover:text-paper transition-colors duration-100">Contacto</a>
+                </nav>
             </div>
-            <p class="text-white/50 text-sm">
-                &copy; <?php echo e(date('Y')); ?> VIBEZ — Plataforma de eventos para jóvenes
-            </p>
-            <div class="flex gap-5 text-white/60 text-sm">
-                <a href="#" class="hover:text-white transition-colors">Privacidad</a>
-                <a href="#" class="hover:text-white transition-colors">Contacto</a>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 py-5">
+                <p class="font-mono text-xs text-paper/25">&copy; <?php echo e(date('Y')); ?> VIBEZ — Todos los derechos reservados.</p>
+                <p class="font-mono text-xs text-paper/20"><?php echo e(now()->format('d.m.y — H:i')); ?></p>
             </div>
         </div>
     </footer>

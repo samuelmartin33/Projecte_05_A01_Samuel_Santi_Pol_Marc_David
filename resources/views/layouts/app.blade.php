@@ -136,8 +136,7 @@
                             {{-- Badge de mood: solo el emoji, flotante en la esquina del avatar --}}
                             @if(Auth::user()->mood)
                                 <span class="nav-mood-badge" title="{{ Auth::user()->mood }}">
-                                    {{-- Extraemos solo el emoji (primera palabra antes del espacio) --}}
-                                    {{ explode(' ', Auth::user()->mood, 2)[0] }}
+                                    {{ mb_substr(Auth::user()->mood, 0, 1) }}
                                 </span>
                             @endif
                         </div>
@@ -150,7 +149,7 @@
                                 <p class="nav-dropdown-nombre">{{ Auth::user()->nombre }} {{ Auth::user()->apellido1 }}</p>
                                 <p class="nav-dropdown-email">{{ Auth::user()->email }}</p>
                                 @if(Auth::user()->mood)
-                                    <p class="nav-dropdown-mood">{{ Auth::user()->mood }}</p>
+                                    <p class="nav-dropdown-mood">{{ explode(' ', Auth::user()->mood, 2)[0] }}</p>
                                 @endif
                             </div>
 
