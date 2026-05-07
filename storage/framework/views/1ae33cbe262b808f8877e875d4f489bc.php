@@ -40,6 +40,10 @@
                class="nav-link <?php echo e(request()->routeIs('admin.usuarios.*') ? 'nav-link-activo' : ''); ?>">
                 Usuarios
             </a>
+            <a href="<?php echo e(route('admin.categorias.index')); ?>"
+               class="nav-link <?php echo e(request()->routeIs('admin.categorias.*') ? 'nav-link-activo' : ''); ?>">
+                Categorías
+            </a>
             <a href="<?php echo e(route('admin.pedidos.index')); ?>"
                class="nav-link <?php echo e(request()->routeIs('admin.pedidos.*') ? 'nav-link-activo' : ''); ?>">
                 Pedidos

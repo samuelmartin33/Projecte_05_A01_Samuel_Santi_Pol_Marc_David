@@ -42,6 +42,10 @@
                class="nav-link {{ request()->routeIs('admin.usuarios.*') ? 'nav-link-activo' : '' }}">
                 Usuarios
             </a>
+            <a href="{{ route('admin.categorias.index') }}"
+               class="nav-link {{ request()->routeIs('admin.categorias.*') ? 'nav-link-activo' : '' }}">
+                Categorías
+            </a>
             <a href="{{ route('admin.pedidos.index') }}"
                class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'nav-link-activo' : '' }}">
                 Pedidos

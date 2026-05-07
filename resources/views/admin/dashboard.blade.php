@@ -14,8 +14,8 @@
                     <input
                         type="text"
                         class="dashboard-search-input"
-                        placeholder="Buscar eventos, usuarios, pedidos..."
-                        aria-label="Buscar eventos, usuarios, pedidos"
+                        placeholder="Buscar eventos, usuarios..."
+                        aria-label="Buscar eventos, usuarios"
                     >
                 </div>
             </div>
@@ -35,10 +35,7 @@
                     <span class="dashboard-metric-label">Empresas pendientes</span>
                     <span class="dashboard-metric-value dashboard-metric-value--danger">{{ $empresasPendientes }}</span>
                 </article>
-                <article class="dashboard-metric-item">
-                    <span class="dashboard-metric-label">Pedidos</span>
-                    <span class="dashboard-metric-value">{{ $totalPedidos }}</span>
-                </article>
+                
                 <article class="dashboard-metric-item">
                     <span class="dashboard-metric-label">Pagos</span>
                     <span class="dashboard-metric-value">{{ $totalPagos }}</span>
@@ -57,8 +54,8 @@
                 <a class="dashboard-action-item" href="{{ route('admin.empresas.index') }}">
                     <span>Gestionar empresas</span>
                 </a>
-                <a class="dashboard-action-item" href="{{ route('admin.pagos.create') }}">
-                    <span>Registrar pago</span>
+                <a class="dashboard-action-item" href="{{ route('admin.categorias.index') }}">
+                    <span>Gestionar categorías</span>
                 </a>
             </div>
         </section>
