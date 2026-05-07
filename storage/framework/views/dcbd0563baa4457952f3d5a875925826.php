@@ -17,15 +17,6 @@
         <div class="auth-side-overlay"></div>
 
         
-        <div class="auth-side-top">
-            <a href="<?php echo e(route('home')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
-                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
-                <span>VIBEZ</span>
-            </a>
-            <a href="<?php echo e(route('home')); ?>" class="auth-back">← Explorar</a>
-        </div>
-
-        
         <div class="auth-side-content">
             <p class="auth-kicker mono">
                 <span class="kicker-line"></span>
@@ -52,7 +43,15 @@
     
     <div class="auth-main">
 
-        <div class="deco-sticker deco-1">↯ Bienvenido</div>
+        
+        <div class="auth-main-topbar">
+            <a href="<?php echo e(route('welcome')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
+                <span>VIBEZ</span>
+            </a>
+        </div>
+
+        <div class="deco-sticker deco-1">VIP · ACCESS</div>
         <div class="deco-numbers">06<br>25</div>
 
         <div class="auth-form-wrap">
@@ -122,13 +121,23 @@
                     </div>
 
                     
+                    <div class="auth-row-between">
+                        <label class="auth-check">
+                            <input type="checkbox" name="remember" checked>
+                            <span class="auth-check-box"></span>
+                            <span>Recuérdame 30 días</span>
+                        </label>
+                        <a href="#" class="auth-link-small">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    
                     <button
                         type="submit"
                         class="btn-primary auth-btn-main"
                         id="submitBtn"
                         onclick="rippleBtn(event, this)"
                     >
-                        <span class="btn-text">Entrar</span>
+                        <span class="btn-text">Entrar a VIBEZ →</span>
                         <span class="btn-spinner" aria-hidden="true">
                             <span class="spinner-ring"></span>
                         </span>
@@ -137,8 +146,24 @@
                 </div>
             </form>
 
-            <p class="auth-fineprint">
-                Al entrar aceptas nuestros <a href="#">Términos</a> y <a href="#">Política de privacidad</a>
+            
+            <div class="auth-divider"><span class="mono">o continúa con</span></div>
+            <div class="auth-socials">
+                <div class="google-btn-wrapper" id="google-btn-wrapper">
+                    <div id="google-signin-btn" data-client-id="<?php echo e(config('services.google.client_id')); ?>"></div>
+                </div>
+                <button type="button" class="auth-social" onclick="alert('Apple Sign-In próximamente')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 1.5c.1 1.2-.4 2.4-1.2 3.3-.9 1-2.2 1.7-3.4 1.6-.1-1.2.5-2.4 1.2-3.2.9-1 2.3-1.7 3.4-1.7zm3.6 16.4c-.7 1.6-1 2.3-1.9 3.7-1.2 1.9-2.9 4.3-5 4.3-1.9 0-2.4-1.2-5-1.2-2.5 0-3.1 1.2-5 1.2-2.1 0-3.7-2.2-4.9-4.1C-1 18.3-1.4 13.5.7 10.6c1.4-2 3.7-3.2 5.8-3.2 2.2 0 3.6 1.2 5.4 1.2 1.8 0 2.9-1.2 5.4-1.2 1.9 0 3.9 1 5.3 2.8-4.7 2.6-3.9 9.3-2.6 7.7z"/></svg>
+                    Apple
+                </button>
+                <button type="button" class="auth-social" onclick="alert('Facebook Sign-In próximamente')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.6 9.9V14.9H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v6.9A10 10 0 0 0 22 12z"/></svg>
+                    Facebook
+                </button>
+            </div>
+
+            <p class="auth-fineprint mono">
+                Al entrar aceptas nuestros <a href="#">Términos</a> y la <a href="#">Política de privacidad</a>
             </p>
 
         </div>
@@ -149,6 +174,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="<?php echo e(asset('js/login.js')); ?>"></script>
 <?php $__env->stopSection(); ?>
 
