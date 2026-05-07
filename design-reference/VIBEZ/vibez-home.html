@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Esta noche se rompe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  :root {
+    --bg: #07060c;
+    --bg-2: #0d0a18;
+    --ink: #f5f1ea;
+    --ink-dim: rgba(245,241,234,0.55);
+    --ink-faint: rgba(245,241,234,0.18);
+    --navy: #0f172a;
+    --morado: #7c3aed;
+    --morado-2: #a855f7;
+    --magenta: #a855f7;
+    --magenta-2: #c084fc;
+    --cream: #f5f1ea;
+    --line: rgba(245,241,234,0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Archivo', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display {
+    font-family: 'Anton', 'Archivo Narrow', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+  }
+  .mono {
+    font-family: 'Archivo Narrow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .grain::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  /* Hero scroll snap behavior */
+  .scroll-x { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+  .scroll-x::-webkit-scrollbar { display: none; }
+
+  /* Marquee */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    display: inline-flex;
+    gap: 2rem;
+    animation: marquee 38s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-track.fast { animation-duration: 22s; }
+  .marquee-track.reverse { animation-direction: reverse; }
+
+  /* Pulse */
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+  .pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+
+  /* Sparkle */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  }
+  .twinkle { animation: twinkle 3s ease-in-out infinite; }
+
+  /* Card hover */
+  .vibe-card { transition: transform 0.5s cubic-bezier(.2,.8,.2,1), filter 0.5s ease; }
+  .vibe-card:hover { transform: translateY(-6px) rotate(-0.4deg); }
+  .vibe-card .img-wrap { overflow: hidden; }
+  .vibe-card .img-wrap img { transition: transform 1.2s cubic-bezier(.2,.8,.2,1), filter 0.6s ease; }
+  .vibe-card:hover .img-wrap img { transform: scale(1.08); filter: contrast(1.05) saturate(1.1); }
+
+  /* Leaflet dark */
+  .leaflet-container { background: #0a0814; font-family: 'Archivo', sans-serif; }
+  .leaflet-tile { filter: invert(1) hue-rotate(200deg) brightness(0.85) contrast(1.1) saturate(0.6); }
+  .leaflet-control-attribution, .leaflet-control-zoom { display: none; }
+  .vibez-pin {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--magenta), var(--morado));
+    border: 2px solid var(--cream);
+    box-shadow: 0 0 0 4px rgba(168,85,247,0.25), 0 8px 28px rgba(168,85,247,0.45);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-family: 'Anton', sans-serif; font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+  }
+  .vibez-pin:hover { transform: scale(1.18) rotate(-6deg); }
+  .vibez-pin.featured {
+    width: 54px; height: 54px;
+    font-size: 22px;
+    box-shadow: 0 0 0 6px rgba(168,85,247,0.2), 0 0 40px rgba(168,85,247,0.7);
+    animation: pulse-glow 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 6px rgba(168,85,247,0.2), 0 0 30px rgba(168,85,247,0.5); }
+    50% { box-shadow: 0 0 0 14px rgba(168,85,247,0.05), 0 0 60px rgba(168,85,247,0.85); }
+  }
+
+  /* Hero parallax */
+  .parallax-img { will-change: transform; transition: transform 0.1s linear; }
+
+  /* Glow text */
+  .glow-magenta { text-shadow: 0 0 30px rgba(168,85,247,0.55), 0 0 60px rgba(168,85,247,0.25); }
+
+  /* Sparkle deco */
+  .star-deco {
+    position: absolute;
+    pointer-events: none;
+    color: var(--magenta);
+  }
+
+  /* Scrollbar hide */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--magenta);
+    color: var(--cream);
+    border: none;
+    cursor: pointer;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary:hover { background: var(--cream); color: var(--bg); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--cream);
+    border: 1.5px solid var(--ink-faint);
+    cursor: pointer;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.2s ease;
+  }
+  .btn-ghost:hover { border-color: var(--cream); background: var(--cream); color: var(--bg); }
+
+  /* Chip filter */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--ink-faint);
+    border-radius: 999px;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--ink-dim);
+    white-space: nowrap;
+  }
+  .chip:hover { color: var(--ink); border-color: var(--cream); }
+  .chip.active {
+    background: var(--magenta);
+    color: var(--cream);
+    border-color: var(--magenta);
+  }
+
+  /* Mood card */
+  .mood-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid var(--line);
+  }
+  .mood-card:hover {
+    border-color: var(--magenta);
+    transform: translateY(-3px);
+  }
+  .mood-card.selected {
+    border-color: var(--magenta);
+    background: rgba(168,85,247,0.08);
+  }
+
+  /* Aesthetic variants applied by tweak `aesthetic` */
+  body[data-aesthetic="editorial"] { /* default — magenta + cream + navy */ }
+  body[data-aesthetic="electric"] {
+    --magenta: #00ffd1;
+    --magenta-2: #6effdb;
+    --bg: #04040a;
+    --bg-2: #0a0a18;
+  }
+  body[data-aesthetic="acid"] {
+    --magenta: #d4ff00;
+    --magenta-2: #eaff66;
+    --bg: #0a0612;
+    --bg-2: #14092a;
+  }
+  body[data-aesthetic="italo"] {
+    --magenta: #a855f7;
+    --magenta-2: #c084fc;
+  }
+  body[data-aesthetic="lila"] {
+    --magenta: #a855f7;
+    --magenta-2: #c084fc;
+  }
+
+  /* Hero variants */
+  body[data-hero="poster"] .hero-poster { display: flex; }
+  body[data-hero="poster"] .hero-split { display: none; }
+  body[data-hero="split"] .hero-poster { display: none; }
+  body[data-hero="split"] .hero-split { display: grid; }
+
+  .hero-split { display: none; }
+
+  /* Loading state */
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg-2) 25%, rgba(255,255,255,0.03) 50%, var(--bg-2) 75%);
+    background-size: 200% 100%;
+    animation: skeleton 1.4s linear infinite;
+  }
+  @keyframes skeleton {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  /* Detail modal */
+  .modal-back {
+    position: fixed; inset: 0;
+    background: rgba(7,6,12,0.85);
+    backdrop-filter: blur(20px);
+    z-index: 200;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-card { animation: slideUp 0.3s cubic-bezier(.2,.8,.2,1); }
+
+  /* Toast */
+  @keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, 12px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .toast {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--cream);
+    color: var(--bg);
+    padding: 14px 22px;
+    border-radius: 999px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    z-index: 500;
+    animation: toastIn 0.3s ease;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+
+  /* Featured poster diagonal text */
+  .vertical-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-orientation: mixed;
+  }
+
+  /* Image placeholders styled as gradient mesh */
+  .img-placeholder {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 40%, var(--morado-2), transparent 50%),
+                radial-gradient(circle at 70% 60%, var(--magenta), transparent 55%),
+                linear-gradient(135deg, var(--navy), #1a0a2e);
+  }
+
+  /* Index ticker numbers */
+  .num-big {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(56px, 9vw, 120px);
+    line-height: 0.85;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--ink-faint);
+  }
+
+  /* Sticker / badge with rotation */
+  .sticker {
+    display: inline-block;
+    background: var(--magenta);
+    color: var(--cream);
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    transform: rotate(-3deg);
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     RESPONSIVE — Mobile (≤780px) y Tablet (≤1100px)
+     ════════════════════════════════════════════════════════════ */
+  @media (max-width: 1100px) {
+    /* Hero menos alto y padding reducido */
+    .hero-poster, .hero-split { min-height: 80vh !important; }
+  }
+
+  @media (max-width: 780px) {
+    /* Header / Nav: ocultar links, dejar logo + CTA */
+    header > div > nav { display: none !important; }
+    header > div { padding: 14px 18px !important; }
+
+    /* Hero: padding y tipografía mobile */
+    .hero-poster > div, .hero-split > div {
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+    }
+    .hero-poster h1, .hero-split h1 {
+      font-size: clamp(48px, 14vw, 80px) !important;
+      line-height: 0.92 !important;
+    }
+    /* Hero poster: bloque inferior se apila */
+    .hero-poster > div > div > div { gap: 24px !important; }
+
+    /* Secciones con padding lateral grande → reducir */
+    section, footer {
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+    }
+
+    /* Títulos de sección más pequeños */
+    section h2.display, section h3.display {
+      font-size: clamp(40px, 10vw, 64px) !important;
+    }
+
+    /* Grids / scrollers de cards: mobile horizontal scroll */
+    .cards-row, .cards-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Mood grid: 2 columnas en mobile */
+    .mood-grid { grid-template-columns: 1fr 1fr !important; }
+
+    /* Mapa: altura menor */
+    .map-section > div:last-child { height: 380px !important; }
+
+    /* Modal detalle: stack vertical */
+    .detail-modal {
+      grid-template-columns: 1fr !important;
+      inset: 0 !important;
+      border-radius: 0 !important;
+    }
+    .detail-modal > div:first-child { min-height: 320px !important; }
+    .detail-modal h2.display {
+      font-size: clamp(36px, 9vw, 56px) !important;
+    }
+
+    /* Footer big text */
+    footer .display { font-size: clamp(56px, 18vw, 120px) !important; }
+
+    /* Marquee texto un poco más pequeño */
+    .marquee-track .display { font-size: clamp(28px, 7vw, 48px) !important; }
+
+    /* Cards: imagen menos alta */
+    .vibe-card .img-wrap { aspect-ratio: 4/5 !important; }
+
+    /* Tweaks panel: full width ajustado */
+    .tweaks-panel { width: calc(100vw - 32px) !important; right: 16px !important; left: 16px !important; }
+
+    /* Chips wrap */
+    .chips-row { flex-wrap: wrap !important; }
+  }
+
+  @media (max-width: 480px) {
+    .mood-grid { grid-template-columns: 1fr !important; }
+    .hero-poster .pills, .hero-split .pills { flex-wrap: wrap !important; gap: 8px !important; }
+    section h2.display, section h3.display {
+      font-size: clamp(34px, 11vw, 52px) !important;
+    }
+  }
+</style>
+</head>
+<body class="grain" data-aesthetic="italo" data-hero="poster">
+
+<div id="app"></div>
+
+<!-- ========== TWEAKS DEFAULTS ========== -->
+<script>
+window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "aesthetic": "italo",
+  "heroLayout": "poster",
+  "showMarquee": true,
+  "showMap": true,
+  "loggedIn": true,
+  "intensity": "medium"
+}/*EDITMODE-END*/;
+</script>
+
+<!-- ========== EVENT DATA ========== -->
+<script type="text/babel">
+window.EVENTOS_DATA = [
+  {
+    id: 1,
+    titulo: "AMNESIA × FELICIDAD",
+    artista: "Charlotte de Witte",
+    fecha: "2026-05-09T23:00:00",
+    fechaFmt: "Sáb 9 May",
+    hora: "23:00 — 06:00",
+    lugar: "Razzmatazz, Sala 1",
+    ciudad: "Barcelona",
+    coords: [41.3966, 2.1903],
+    categoria: "Techno",
+    precio: "32 €",
+    cupos: 87,
+    img: "https://images.unsplash.com/photo-1571266028243-d220bc31a8e3?w=1400&q=80",
+    color: "#ff1f7a",
+    tagline: "Esta noche se rompe",
+    featured: true
+  },
+  {
+    id: 2,
+    titulo: "PRIMAVERA SOUND",
+    artista: "Charli XCX · FKA twigs · Anohni",
+    fecha: "2026-06-04T18:00:00",
+    fechaFmt: "Jue 4 Jun",
+    hora: "18:00 — 04:00",
+    lugar: "Parc del Fòrum",
+    ciudad: "Barcelona",
+    coords: [41.4109, 2.2206],
+    categoria: "Festival",
+    precio: "320 €",
+    cupos: 12,
+    img: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1400&q=80",
+    color: "#a855f7",
+    tagline: "El templo del verano"
+  },
+  {
+    id: 3,
+    titulo: "DISCOTECA ITALO",
+    artista: "Dj Tennis · Italoconnection",
+    fecha: "2026-05-15T22:00:00",
+    fechaFmt: "Vie 15 May",
+    hora: "22:00 — 05:00",
+    lugar: "Sala Apolo",
+    ciudad: "Barcelona",
+    coords: [41.3741, 2.1611],
+    categoria: "Disco",
+    precio: "18 €",
+    cupos: 240,
+    img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1400&q=80",
+    color: "#ff6dba",
+    tagline: "Año 1983, espejos rotos"
+  },
+  {
+    id: 4,
+    titulo: "BOILER ROOM BCN",
+    artista: "Surusinghe · Nia Archives",
+    fecha: "2026-05-22T23:30:00",
+    fechaFmt: "Sáb 22 May",
+    hora: "23:30 — 07:00",
+    lugar: "Nitsa Club",
+    ciudad: "Barcelona",
+    coords: [41.3741, 2.1611],
+    categoria: "Bass",
+    precio: "25 €",
+    cupos: 0,
+    soldOut: true,
+    img: "https://images.unsplash.com/photo-1574391884720-bbc049ec09ad?w=1400&q=80",
+    color: "#7c3aed",
+    tagline: "Sold out — lista de espera"
+  },
+  {
+    id: 5,
+    titulo: "FIESTA REMEMBER 90s",
+    artista: "Dj Sergi & Rebels",
+    fecha: "2026-05-10T22:00:00",
+    fechaFmt: "Dom 10 May",
+    hora: "22:00 — 04:00",
+    lugar: "La [2] de Apolo",
+    ciudad: "Barcelona",
+    coords: [41.3741, 2.1611],
+    categoria: "Remember",
+    precio: "12 €",
+    cupos: 156,
+    img: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1400&q=80",
+    color: "#ff1f7a",
+    tagline: "Cintas de cassette y bakalao"
+  },
+  {
+    id: 6,
+    titulo: "ROSALÍA — MOTOMAMI TOUR",
+    artista: "Rosalía",
+    fecha: "2026-07-12T21:00:00",
+    fechaFmt: "Dom 12 Jul",
+    hora: "21:00",
+    lugar: "Palau Sant Jordi",
+    ciudad: "Barcelona",
+    coords: [41.3637, 2.1517],
+    categoria: "Concierto",
+    precio: "65 €",
+    cupos: 1200,
+    img: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=1400&q=80",
+    color: "#ff6dba",
+    tagline: "Una sola fecha"
+  },
+  {
+    id: 7,
+    titulo: "BAD BUNNY × MIAMI VIBES",
+    artista: "Bad Bunny + invitados",
+    fecha: "2026-06-21T22:00:00",
+    fechaFmt: "Dom 21 Jun",
+    hora: "22:00 — 03:00",
+    lugar: "Pacha BCN",
+    ciudad: "Barcelona",
+    coords: [41.3922, 2.1969],
+    categoria: "Reggaeton",
+    precio: "45 €",
+    cupos: 320,
+    img: "https://images.unsplash.com/photo-1493676304819-0d7a8d026dcf?w=1400&q=80",
+    color: "#a855f7",
+    tagline: "Perreo intenso, dosis triple"
+  },
+  {
+    id: 8,
+    titulo: "JAZZ EN LA AZOTEA",
+    artista: "Quartet Jordi Pegenaute",
+    fecha: "2026-05-17T20:30:00",
+    fechaFmt: "Dom 17 May",
+    hora: "20:30 — 23:30",
+    lugar: "Hotel Casa Fuster",
+    ciudad: "Barcelona",
+    coords: [41.4015, 2.1591],
+    categoria: "Jazz",
+    precio: "22 €",
+    cupos: 48,
+    img: "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=1400&q=80",
+    color: "#7c3aed",
+    tagline: "Sunset con saxo y vermut"
+  }
+];
+
+window.CATEGORIAS = ["Todo", "Techno", "Festival", "Disco", "Bass", "Concierto", "Reggaeton", "Jazz", "Remember"];
+window.MOODS = [
+  { id: "rave", emoji: "🌀", label: "Rave hasta el amanecer" },
+  { id: "indie", emoji: "🎸", label: "Indie & cervezas" },
+  { id: "perreo", emoji: "🔥", label: "Perreo y reggaeton" },
+  { id: "chill", emoji: "🌅", label: "Chill, terraza, sunset" },
+  { id: "discoteca", emoji: "💋", label: "Discoteca pura" },
+  { id: "concierto", emoji: "🎤", label: "Concierto en pie" }
+];
+</script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+</body>
+</html>

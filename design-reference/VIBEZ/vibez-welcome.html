@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Bienvenido</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07060c; --bg-2:#0d0a18; --ink:#f5f1ea;
+  --ink-dim:rgba(245,241,234,0.6); --ink-faint:rgba(245,241,234,0.16);
+  --morado:#7c3aed; --morado-2:#a855f7; --morado-3:#c084fc;
+  --cream:#f5f1ea; --line:rgba(245,241,234,0.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Archivo',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.display{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:-0.01em;line-height:0.88;font-weight:400}
+.mono{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.14em;font-weight:500}
+.italic-display{font-family:'Bebas Neue',sans-serif;font-style:italic}
+
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.05;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+.amb{position:fixed;border-radius:50%;filter:blur(120px);opacity:0.5;pointer-events:none;z-index:0;animation:float 18s ease-in-out infinite alternate}
+.amb-1{width:600px;height:600px;background:var(--morado);top:-150px;left:-150px}
+.amb-2{width:500px;height:500px;background:var(--morado-2);bottom:-100px;right:-100px;animation-delay:3s;opacity:0.3}
+.amb-3{width:400px;height:400px;background:var(--morado-3);top:40%;left:50%;opacity:0.18;animation-delay:6s}
+@keyframes float{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,40px) scale(1.15)}}
+
+/* ═══ NAV ═══ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 40px;
+  background:rgba(7,6,12,0.6);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+}
+.logo{
+  display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+  padding:6px 14px 6px 6px;
+  background:linear-gradient(135deg,rgba(168,85,247,0.22),rgba(124,58,237,0.06));
+  border:1px solid rgba(168,85,247,0.45);
+  border-radius:999px;
+  box-shadow:0 0 24px rgba(168,85,247,0.35), inset 0 0 12px rgba(168,85,247,0.12);
+}
+.logo img{height:38px;width:38px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.7))}
+.logo span{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:0.04em;text-shadow:0 0 18px rgba(168,85,247,0.6)}
+.nav-links{display:flex;gap:30px}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);text-decoration:none;letter-spacing:0.14em;text-transform:uppercase;transition:color 0.2s}
+.nav-links a:hover{color:var(--morado-2)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--ink-faint);padding:9px 20px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:all 0.2s}
+.btn-ghost:hover{border-color:var(--morado-2);color:var(--morado-3)}
+.btn-pri{background:linear-gradient(135deg,var(--morado),var(--morado-2));color:var(--cream);border:none;padding:11px 22px;border-radius:999px;font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:0.04em;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 22px rgba(168,85,247,0.45);transition:all 0.2s}
+.btn-pri:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(168,85,247,0.65)}
+.burger{display:none;background:transparent;border:0;color:var(--ink);width:40px;height:40px;cursor:pointer}
+
+/* ═══ HERO ═══ */
+.hero{
+  position:relative;z-index:1;
+  padding:80px 40px 100px;
+  display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:center;
+  max-width:1480px;margin:0 auto;
+}
+.hero-kicker{display:flex;align-items:center;gap:10px;color:var(--morado-3);font-size:11px;margin-bottom:24px}
+.hero-kicker::before{content:'';width:36px;height:1px;background:var(--morado-2)}
+.hero h1{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(64px,10vw,160px);
+  margin:0;line-height:0.9;text-transform:uppercase;
+  text-shadow:0 0 60px rgba(168,85,247,0.4);
+}
+.hero h1 em{font-style:italic;font-family:'Bebas Neue',sans-serif;color:var(--morado-2)}
+.hero-sub{font-size:18px;color:rgba(245,241,234,0.78);max-width:560px;margin:28px 0 36px;line-height:1.55}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.btn-pri.big{padding:18px 32px;font-size:18px}
+.hero-stat{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-dim)}
+.hero-stat .num{font-family:'Anton',sans-serif;font-size:28px;color:var(--morado-2);line-height:1}
+
+/* Hero visual right column */
+.hero-vis{position:relative;height:560px}
+.hero-card{
+  position:absolute;
+  border-radius:18px;overflow:hidden;
+  border:1px solid rgba(168,85,247,0.3);
+  background:#1a0f2e;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(168,85,247,0.2);
+  transition:transform 0.5s cubic-bezier(.2,.8,.2,1);
+}
+.hero-card img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-card-1{width:300px;height:380px;top:0;right:80px;transform:rotate(4deg);z-index:2}
+.hero-card-1:hover{transform:rotate(0) translateY(-8px)}
+.hero-card-2{width:240px;height:300px;bottom:40px;right:0;transform:rotate(-6deg);z-index:1}
+.hero-card-2:hover{transform:rotate(-2deg) translateY(-8px)}
+.hero-card-3{width:180px;height:220px;bottom:0;left:40px;transform:rotate(8deg);z-index:3}
+.hero-card-3:hover{transform:rotate(2deg) translateY(-8px)}
+.hero-card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(7,6,12,0.9) 100%);padding:14px;display:flex;align-items:flex-end;justify-content:flex-start}
+.hero-card-overlay span{font-family:'Anton',sans-serif;font-size:14px;text-transform:uppercase;line-height:1}
+
+.hero-vis-sticker{
+  position:absolute;top:30px;left:0;
+  background:var(--cream);color:var(--bg);
+  padding:8px 16px;border-radius:999px;
+  font-family:'Anton',sans-serif;font-size:14px;
+  text-transform:uppercase;letter-spacing:0.08em;
+  transform:rotate(-6deg);
+  box-shadow:0 10px 24px rgba(245,241,234,0.2);
+  z-index:5;
+}
+
+/* ═══ MARQUEE ═══ */
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee{
+  position:relative;z-index:1;
+  overflow:hidden;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:28px 0;
+  background:rgba(13,10,24,0.4);
+}
+.marquee-track{display:inline-flex;gap:40px;animation:marquee 38s linear infinite;white-space:nowrap}
+.marquee-track span{font-family:'Anton',sans-serif;font-size:clamp(40px,6vw,84px);text-transform:uppercase;display:inline-flex;align-items:center;gap:32px}
+.marquee-track .alt{color:transparent;-webkit-text-stroke:1.5px var(--morado-2)}
+.marquee-track .star{color:var(--morado-2);font-size:0.6em}
+
+/* ═══ FEATURES ═══ */
+.features{position:relative;z-index:1;padding:100px 40px;max-width:1480px;margin:0 auto}
+.section-head{text-align:center;margin-bottom:60px}
+.section-head .mono{color:var(--morado-3);font-size:11px;margin-bottom:12px;display:inline-block}
+.section-head h2{font-family:'Anton',sans-serif;font-size:clamp(48px,7vw,96px);margin:0;text-transform:uppercase;line-height:0.95}
+.section-head h2 em{font-style:italic;font-family:'Bebas Neue',sans-serif;color:var(--morado-2)}
+
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{
+  background:linear-gradient(135deg,rgba(13,10,24,0.7),rgba(168,85,247,0.04));
+  backdrop-filter:blur(10px);
+  border:1px solid var(--line);
+  border-radius:20px;padding:32px 28px;
+  position:relative;overflow:hidden;
+  transition:all 0.3s ease;
+}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--morado-2),transparent);opacity:0;transition:opacity 0.3s}
+.feat-card:hover{border-color:rgba(168,85,247,0.5);transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 30px rgba(168,85,247,0.15)}
+.feat-card:hover::before{opacity:1}
+.feat-num{font-family:'Anton',sans-serif;font-size:48px;color:transparent;-webkit-text-stroke:1.5px var(--morado-2);line-height:1;margin-bottom:18px}
+.feat-card h3{font-family:'Anton',sans-serif;font-size:28px;margin:0 0 10px;text-transform:uppercase;line-height:1.05}
+.feat-card p{font-size:14px;color:var(--ink-dim);line-height:1.55;margin:0}
+
+/* ═══ SHOWCASE ═══ */
+.showcase{position:relative;z-index:1;padding:80px 40px;max-width:1480px;margin:0 auto}
+.show-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.show-card{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--line);cursor:pointer;transition:all 0.3s}
+.show-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,6,12,0.9) 100%);pointer-events:none}
+.show-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s}
+.show-card:hover img{transform:scale(1.06)}
+.show-card:hover{border-color:var(--morado-2);box-shadow:0 0 30px rgba(168,85,247,0.3)}
+.show-info{position:absolute;bottom:14px;left:14px;right:14px;z-index:2}
+.show-info .city{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--morado-3);letter-spacing:0.14em;text-transform:uppercase}
+.show-info .name{font-family:'Anton',sans-serif;font-size:18px;text-transform:uppercase;line-height:1.05;margin-top:4px}
+
+/* ═══ CTA SOCIAL PROOF ═══ */
+.proof{position:relative;z-index:1;padding:100px 40px;max-width:1480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.proof-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:30px}
+.stat-card{
+  padding:28px 24px;
+  background:rgba(13,10,24,0.6);border:1px solid var(--line);
+  border-radius:18px;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--morado-2);box-shadow:0 0 14px var(--morado-2)}
+.stat-num{font-family:'Anton',sans-serif;font-size:64px;line-height:1;color:var(--morado-2);text-shadow:0 0 30px rgba(168,85,247,0.5)}
+.stat-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;color:var(--ink-dim);text-transform:uppercase;margin-top:6px}
+.proof-text h2{font-family:'Anton',sans-serif;font-size:clamp(40px,6vw,72px);margin:0;text-transform:uppercase;line-height:0.95}
+.proof-text h2 em{font-style:italic;font-family:'Bebas Neue',sans-serif;color:var(--morado-2)}
+.proof-text p{font-size:16px;color:var(--ink-dim);line-height:1.55;margin:24px 0 32px;max-width:480px}
+
+/* ═══ FINAL CTA ═══ */
+.final{position:relative;z-index:1;padding:120px 40px;text-align:center;border-top:1px solid var(--line);overflow:hidden}
+.final::before{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,0.4),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);z-index:-1}
+.final h2{font-family:'Anton',sans-serif;font-size:clamp(64px,12vw,200px);margin:0;text-transform:uppercase;line-height:0.85;text-shadow:0 0 60px rgba(168,85,247,0.5)}
+.final h2 em{font-style:italic;font-family:'Bebas Neue',sans-serif;color:var(--morado-2)}
+.final p{font-size:18px;color:rgba(245,241,234,0.75);margin:30px auto 40px;max-width:560px}
+.final-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ═══ FOOTER ═══ */
+footer{position:relative;z-index:1;padding:60px 40px 30px;border-top:1px solid var(--line);max-width:1480px;margin:0 auto}
+.foot-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.foot-row h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;color:var(--morado-3);text-transform:uppercase;margin:0 0 14px}
+.foot-row a{display:block;color:var(--ink-dim);text-decoration:none;font-size:13px;padding:4px 0;transition:color 0.2s}
+.foot-row a:hover{color:var(--ink)}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:30px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;flex-wrap:wrap;gap:14px}
+
+/* ═══════════════════════════════════════════════
+   MOBILE
+   ═══════════════════════════════════════════════ */
+@media (max-width: 880px){
+  .nav{padding:14px 18px}
+  .nav-links{display:none}
+  .nav-cta .btn-ghost{display:none}
+  .burger{display:flex;align-items:center;justify-content:center}
+  .logo span{font-size:18px}
+  .logo img{height:30px;width:30px}
+
+  .hero{grid-template-columns:1fr;padding:40px 18px 60px;gap:40px}
+  .hero h1{font-size:clamp(56px,16vw,96px)}
+  .hero-sub{font-size:16px}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .btn-pri.big{justify-content:center;text-align:center}
+  .hero-actions .btn-ghost{justify-content:center}
+  .hero-stat{justify-content:center;border-top:1px solid var(--line);padding-top:18px;margin-top:6px}
+
+  .hero-vis{height:380px;max-width:340px;margin:0 auto;width:100%}
+  .hero-card-1{width:60%;height:70%;right:10%}
+  .hero-card-2{width:50%;height:55%;right:0;bottom:8%}
+  .hero-card-3{width:40%;height:42%;left:5%}
+  .hero-vis-sticker{font-size:12px;padding:6px 12px}
+
+  .marquee{padding:18px 0}
+  .marquee-track{gap:24px}
+
+  .features{padding:60px 18px}
+  .features-grid{grid-template-columns:1fr;gap:14px}
+  .feat-card{padding:24px 22px}
+
+  .showcase{padding:40px 18px}
+  .show-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+
+  .proof{grid-template-columns:1fr;padding:60px 18px;gap:40px}
+  .proof-stats{grid-template-columns:1fr 1fr;gap:14px}
+  .stat-card{padding:18px 14px}
+  .stat-num{font-size:44px}
+
+  .final{padding:80px 18px}
+
+  footer{padding:40px 18px 24px}
+  .foot-row{grid-template-columns:1fr 1fr;gap:24px}
+  .foot-bottom{flex-direction:column;align-items:flex-start;gap:8px;font-size:10px}
+}
+
+/* Mobile menu */
+.mobile-menu{position:fixed;inset:0;background:rgba(7,6,12,0.97);z-index:100;backdrop-filter:blur(20px);display:none;flex-direction:column;padding:80px 24px 24px}
+.mobile-menu.open{display:flex}
+.mobile-menu .close{position:absolute;top:18px;right:18px;background:transparent;border:0;color:var(--ink);width:40px;height:40px;cursor:pointer}
+.mobile-menu a{font-family:'Anton',sans-serif;font-size:32px;text-transform:uppercase;color:var(--ink);text-decoration:none;padding:14px 0;border-bottom:1px solid var(--line);display:block}
+.mobile-menu a:hover{color:var(--morado-2)}
+.mobile-menu .actions{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.mobile-menu .actions .btn-ghost,.mobile-menu .actions .btn-pri{justify-content:center;padding:16px 22px}
+</style>
+</head>
+<body>
+
+<div class="amb amb-1"></div>
+<div class="amb amb-2"></div>
+<div class="amb amb-3"></div>
+
+<header class="nav">
+  <a href="vibez-welcome.html" class="logo">
+    <img src="assets/logo_vibez.png" alt="VIBEZ">
+    <span>VIBEZ</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#features">Cómo funciona</a>
+    <a href="#showcase">Eventos</a>
+    <a href="#">Promotores</a>
+    <a href="#">Bolsa de trabajo</a>
+  </nav>
+  <div class="nav-cta">
+    <a href="vibez-login.html" class="btn-ghost">Entrar</a>
+    <a href="vibez-register.html" class="btn-pri">Crear cuenta</a>
+    <button class="burger" onclick="document.getElementById('mm').classList.add('open')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mm">
+  <button class="close" onclick="document.getElementById('mm').classList.remove('open')">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <a href="#features" onclick="document.getElementById('mm').classList.remove('open')">Cómo funciona</a>
+  <a href="#showcase" onclick="document.getElementById('mm').classList.remove('open')">Eventos</a>
+  <a href="#">Promotores</a>
+  <a href="#">Bolsa de trabajo</a>
+  <div class="actions">
+    <a href="vibez-login.html" class="btn-ghost">Entrar</a>
+    <a href="vibez-register.html" class="btn-pri">Crear cuenta</a>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div>
+    <div class="mono hero-kicker">▸ Edición #428 · Mayo 2026</div>
+    <h1>Esta noche<br><em>se rompe</em>.</h1>
+    <p class="hero-sub">Eventos, fiestas, conciertos y festivales — todo lo que vive tu escena en un solo sitio. Compra entradas, descubre tu próxima noche y entra a la lista VIP.</p>
+    <div class="hero-actions">
+      <a href="vibez-register.html" class="btn-pri big">
+        Crear cuenta
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="vibez-login.html" class="btn-ghost">Ya tengo cuenta</a>
+      <div class="hero-stat">
+        <div class="num">12k+</div>
+        <div>ravers ya<br>en la lista</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-vis">
+    <div class="hero-vis-sticker">★ NEW · 2026</div>
+    <div class="hero-card hero-card-1">
+      <img src="https://picsum.photos/seed/welcome-1/600/760" alt="">
+      <div class="hero-card-overlay"><span>Charlotte de Witte</span></div>
+    </div>
+    <div class="hero-card hero-card-2">
+      <img src="https://picsum.photos/seed/welcome-2/500/620" alt="">
+      <div class="hero-card-overlay"><span>Primavera Sound</span></div>
+    </div>
+    <div class="hero-card hero-card-3">
+      <img src="https://picsum.photos/seed/welcome-3/360/440" alt="">
+      <div class="hero-card-overlay"><span>Pacha · BCN</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>Esta noche se rompe<span class="star">✦</span></span>
+    <span class="alt">BCN never sleeps<span class="star">✦</span></span>
+    <span>Sound system on<span class="star">✦</span></span>
+    <span class="alt">All night long<span class="star">✦</span></span>
+    <span>Esta noche se rompe<span class="star">✦</span></span>
+    <span class="alt">BCN never sleeps<span class="star">✦</span></span>
+    <span>Sound system on<span class="star">✦</span></span>
+    <span class="alt">All night long<span class="star">✦</span></span>
+  </div>
+</div>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="features" id="features">
+  <div class="section-head">
+    <div class="mono">▸ Cómo funciona</div>
+    <h2>Tu pase a la <em>noche</em></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-num">01</div>
+      <h3>Descubre</h3>
+      <p>Más de 1.200 eventos por mes en BCN, Madrid, Valencia, Lisboa e Ibiza. Filtra por mood, género y aforo en tiempo real.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">02</div>
+      <h3>Compra rápido</h3>
+      <p>QR digital al instante. Sin colas, sin imprimir. Pago con tarjeta, Apple Pay y Bizum. Devolución hasta 24h antes.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">03</div>
+      <h3>Pre-venta VIP</h3>
+      <p>48h de acceso anticipado a sold-outs. Cupones exclusivos. Eventos solo para miembros y after-parties privadas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SHOWCASE ═══ -->
+<section class="showcase" id="showcase">
+  <div class="section-head">
+    <div class="mono">▸ Esta semana</div>
+    <h2>Lo que <em>todos</em> escuchan</h2>
+  </div>
+  <div class="show-grid">
+    <a href="vibez-register.html" class="show-card">
+      <img src="https://picsum.photos/seed/show-1/400/520" alt="">
+      <div class="show-info">
+        <div class="city">BCN · 09 May</div>
+        <div class="name">Charlotte de Witte</div>
+      </div>
+    </a>
+    <a href="vibez-register.html" class="show-card">
+      <img src="https://picsum.photos/seed/show-2/400/520" alt="">
+      <div class="show-info">
+        <div class="city">BCN · 28 May</div>
+        <div class="name">Primavera Sound</div>
+      </div>
+    </a>
+    <a href="vibez-register.html" class="show-card">
+      <img src="https://picsum.photos/seed/show-3/400/520" alt="">
+      <div class="show-info">
+        <div class="city">IBZ · 15 Jun</div>
+        <div class="name">Bad Bunny</div>
+      </div>
+    </a>
+    <a href="vibez-register.html" class="show-card">
+      <img src="https://picsum.photos/seed/show-4/400/520" alt="">
+      <div class="show-info">
+        <div class="city">BCN · 22 May</div>
+        <div class="name">Dixon · Apolo</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ PROOF ═══ -->
+<section class="proof">
+  <div class="proof-text">
+    <div class="mono" style="color:var(--morado-3);font-size:11px;margin-bottom:14px;display:inline-block">▸ Únete a la lista</div>
+    <h2>La <em>escena</em> ya está dentro.</h2>
+    <p>Más de 12.000 ravers, 42 promotores y 1.200 eventos al mes. VIBEZ es la plataforma que mueve la noche de Iberia.</p>
+    <a href="vibez-register.html" class="btn-pri big">
+      Quiero entrar
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+  <div class="proof-stats">
+    <div class="stat-card">
+      <div class="stat-num">12k+</div>
+      <div class="stat-lbl">Ravers activos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1.2k</div>
+      <div class="stat-lbl">Eventos / mes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">42</div>
+      <div class="stat-lbl">Promotores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">98%</div>
+      <div class="stat-lbl">Devolución 24h</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINAL CTA ═══ -->
+<section class="final">
+  <h2>La noche<br>te <em>espera</em>.</h2>
+  <p>Crea tu pase VIBEZ en 30 segundos. Sin spam, sin compromisos. Solo música.</p>
+  <div class="final-actions">
+    <a href="vibez-register.html" class="btn-pri big">
+      Crear mi pase
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+    <a href="vibez-login.html" class="btn-ghost">Ya tengo cuenta</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-row">
+    <div>
+      <div class="logo" style="display:inline-flex;margin-bottom:14px">
+        <img src="assets/logo_vibez.png" alt="VIBEZ">
+        <span>VIBEZ</span>
+      </div>
+      <p style="color:var(--ink-dim);font-size:13px;line-height:1.5;max-width:320px">La plataforma de la escena. Eventos, conciertos, festivales y bolsa de trabajo en BCN, Madrid, Valencia, Ibiza y Lisboa.</p>
+    </div>
+    <div>
+      <h4>Plataforma</h4>
+      <a href="#">Explorar</a>
+      <a href="#">Promotores</a>
+      <a href="#">Cupones</a>
+      <a href="#">App</a>
+    </div>
+    <div>
+      <h4>Empresa</h4>
+      <a href="#">Sobre VIBEZ</a>
+      <a href="#">Trabajo</a>
+      <a href="#">Prensa</a>
+      <a href="#">Contacto</a>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <a href="#">Términos</a>
+      <a href="#">Privacidad</a>
+      <a href="#">Cookies</a>
+      <a href="#">Devoluciones</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 VIBEZ · BCN</span>
+    <span>Edición 428 · Made for ravers</span>
+  </div>
+</footer>
+
+</body>
+</html>
