@@ -1,5 +1,9 @@
 <?php $__env->startSection('titulo', 'Mi Perfil — VIBEZ'); ?>
 
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/perfil.css')); ?>">
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('contenido'); ?>
 
 
@@ -61,6 +65,7 @@
 </section>
 
 
+<div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <?php if(session('exito')): ?>
         <div class="perfil-alerta perfil-alerta-ok">
@@ -244,6 +249,7 @@
 
     </div>
 
+</div>
 </div>
 
 <?php $__env->stopSection(); ?>

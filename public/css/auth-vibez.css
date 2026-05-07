@@ -28,7 +28,7 @@ html, body {
 body {
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Archivo', system-ui, sans-serif;
+    font-family: 'Syne', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -45,14 +45,14 @@ body.grain::after {
 
 /* ── Helpers tipográficos ── */
 .display {
-    font-family: 'Anton', 'Archivo Narrow', sans-serif;
-    font-weight: 400;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: -0.01em;
-    line-height: 0.88;
+    line-height: 0.92;
 }
 .mono {
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.18em;
     font-weight: 500;
@@ -125,13 +125,13 @@ body.grain::after {
     filter: drop-shadow(0 0 10px rgba(168,85,247,0.8));
 }
 .auth-logo span {
-    font-family: 'Anton', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 18px;
     letter-spacing: 0.04em;
     text-shadow: 0 0 16px rgba(168,85,247,0.6);
 }
 .auth-back {
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 10px;
     color: var(--ink-dim);
     text-decoration: none;
@@ -168,10 +168,10 @@ body.grain::after {
 .auth-side-title em {
     font-style: italic;
     color: var(--morado-2);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'DM Sans', sans-serif;
 }
 .auth-side-sub {
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 13px;
     color: rgba(245,241,234,0.72);
     margin: 10px 0 0;
@@ -189,7 +189,7 @@ body.grain::after {
     border: 1px solid rgba(168,85,247,0.35);
     backdrop-filter: blur(10px);
     border-radius: 999px;
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -214,14 +214,14 @@ body.grain::after {
 }
 .auth-side-bullets li {
     display: flex; align-items: baseline; gap: 10px;
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 13px;
     color: rgba(245,241,234,0.82);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
 .bullet-num {
-    font-family: 'Anton', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     color: var(--morado-2);
     font-size: 18px;
     min-width: 28px;
@@ -280,7 +280,7 @@ body.grain::after {
 .auth-title em {
     font-style: italic;
     color: var(--morado-2);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'DM Sans', sans-serif;
 }
 .auth-sub {
     font-family: 'Archivo', sans-serif;
@@ -319,7 +319,7 @@ body.grain::after {
     font-size: 10px;
     color: var(--ink-dim);
     display: block;
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.12em;
 }
@@ -442,7 +442,7 @@ body.grain::after {
     background: linear-gradient(135deg, var(--morado), var(--morado-2));
     color: var(--cream);
     border: none; cursor: pointer;
-    font-family: 'Anton', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     text-transform: uppercase; letter-spacing: 0.04em;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 6px 24px rgba(168,85,247,0.4);
@@ -508,7 +508,7 @@ body.grain::after {
 }
 .auth-divider span {
     font-size: 10px; color: var(--ink-dim);
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     text-transform: uppercase; letter-spacing: 0.14em;
 }
 
@@ -520,7 +520,7 @@ body.grain::after {
     font-size: 10px; color: var(--ink-dim);
     margin: 10px 0 0; text-align: center;
     letter-spacing: 0.1em;
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     text-transform: uppercase;
 }
 .auth-fineprint a { color: var(--morado-3); text-decoration: none; border-bottom: 1px solid currentColor; }
@@ -547,9 +547,9 @@ body.grain::after {
     color: var(--ink);
     box-shadow: 0 0 20px rgba(168,85,247,0.2), inset 0 0 16px rgba(168,85,247,0.05);
 }
-.auth-tab-num   { font-family: 'Anton', sans-serif; font-size: 11px; color: var(--morado-2); letter-spacing: 0.15em; }
-.auth-tab-label { font-family: 'Anton', sans-serif; font-size: 18px; text-transform: uppercase; color: inherit; }
-.auth-tab-sub   { font-family: 'Archivo Narrow', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: var(--ink-dim); }
+.auth-tab-num   { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--morado-2); letter-spacing: 0.15em; }
+.auth-tab-label { font-family: 'DM Sans', sans-serif; font-size: 18px; text-transform: uppercase; color: inherit; }
+.auth-tab-sub   { font-family: 'Syne', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: var(--ink-dim); }
 
 /* ── Barra de fortaleza de contraseña ── */
 .auth-strength { display: flex; align-items: center; gap: 10px; margin-top: -2px; }
@@ -567,7 +567,7 @@ body.grain::after {
 .auth-strength-label {
     font-size: 9px; color: var(--morado-3);
     min-width: 54px; text-align: right;
-    font-family: 'Archivo Narrow', sans-serif;
+    font-family: 'Syne', sans-serif;
     text-transform: uppercase; letter-spacing: 0.08em;
 }
 
@@ -589,7 +589,7 @@ body.grain::after {
     box-shadow: 0 0 24px rgba(168,85,247,0.5);
 }
 .pending-inline-title {
-    font-family: 'Anton', sans-serif; font-size: 26px;
+    font-family: 'DM Sans', sans-serif; font-size: 26px;
     margin: 0 0 10px; text-transform: uppercase; color: var(--ink);
 }
 .pending-inline-text {
@@ -597,7 +597,7 @@ body.grain::after {
     color: var(--ink-dim); margin: 0 0 16px; line-height: 1.6;
 }
 .pending-back-link {
-    font-family: 'Archivo Narrow', sans-serif; font-size: 11px;
+    font-family: 'Syne', sans-serif; font-size: 11px;
     text-transform: uppercase; letter-spacing: 0.12em;
     color: var(--morado-3); text-decoration: none;
 }
@@ -607,7 +607,7 @@ body.grain::after {
    ════════════════════════════════════════════════════════════ */
 .deco-sticker {
     position: absolute;
-    font-family: 'Anton', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     text-transform: uppercase; letter-spacing: 0.08em;
     background: var(--morado-2); color: var(--cream);
     padding: 5px 12px; border-radius: 999px;
@@ -623,7 +623,7 @@ body.grain::after {
 }
 .deco-numbers {
     position: absolute; bottom: 20px; right: 24px;
-    font-family: 'Anton', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 60px; line-height: 0.85;
     color: transparent; -webkit-text-stroke: 1.5px var(--ink-faint);
     text-align: right; pointer-events: none; z-index: 2;

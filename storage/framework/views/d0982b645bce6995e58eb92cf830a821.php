@@ -11,64 +11,29 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;900&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
 
+    
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
     <style type="text/tailwindcss">
         @theme {
-            --font-display: 'Archivo', sans-serif;
-            --font-sans:    'Space Grotesk', sans-serif;
-            --font-mono:    'JetBrains Mono', monospace;
-            --font-serif:   'Fraunces', serif;
-
-            --color-paper: #F7F5FF;
-            --color-ink:   #1B1430;
-            --color-lilac: #8B78CC;
-            --color-plum:  #4E3A96;
-            --color-muted: #ACA4C4;
-            --color-dusk:  #E9E3FF;
-
-            --tracking-tightest: -0.04em;
-            --tracking-brutal:   -0.06em;
+            --color-paper:  #f5f1ea;
+            --color-ink:    #0f172a;
+            --color-lilac:  #7c3aed;
+            --color-plum:   #4e3a96;
+            --color-dusk:   #1e1035;
+            --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+            --font-sans:    'Syne', ui-sans-serif, system-ui, sans-serif;
+            --tracking-brutal:   0.04em;
+            --tracking-tightest: -0.02em;
         }
-
-        @layer base {
-            body {
-                background-color: #F7F5FF;
-                background-image: radial-gradient(circle, rgba(139,120,204,0.15) 1.5px, transparent 1.5px);
-                background-size: 28px 28px;
-            }
-            ::selection { background: #8B78CC; color: #F7F5FF; }
-        }
-
-        @layer utilities {
-            .text-mega {
-                font-size: clamp(4.5rem, 20vw, 16rem);
-                line-height: 0.85;
-                letter-spacing: -0.055em;
-            }
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .anim-in   { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-in-2 { animation: fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-in-3 { animation: fadeUp 0.6s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
-
-        /* Botón fill-up ink */
-        .btn-ink { position:relative; overflow:hidden; isolation:isolate; background:#1B1430; color:#F7F5FF; }
-        .btn-ink::after { content:''; position:absolute; inset:0; background:#4E3A96; transform:translateY(102%); transition:transform 0.2s cubic-bezier(0.4,0,0.2,1); z-index:0; }
-        .btn-ink:hover::after { transform:translateY(0); }
-        .btn-ink > span { position:relative; z-index:1; }
     </style>
 
-    <link rel="stylesheet" href="/css/app-static.css">
+    <link rel="stylesheet" href="<?php echo e(asset('css/app-static.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/vibez.css')); ?>">
 
     <?php if(request()->routeIs('login') || request()->routeIs('register')): ?>
-        <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('css/auth-vibez.css')); ?>">
     <?php endif; ?>
 
     

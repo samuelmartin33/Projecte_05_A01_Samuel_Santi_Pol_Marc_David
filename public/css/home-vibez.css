@@ -28,9 +28,9 @@
     --dark-line:   rgba(245,241,234,0.10);
 
     /* Tipografía display */
-    --font-display: 'Bebas Neue', 'Anton', 'Archivo', Impact, sans-serif;
-    --font-body:    'Archivo', 'Inter', system-ui, sans-serif;
-    --font-narrow:  'Archivo Narrow', 'Inter', system-ui, sans-serif;
+    --font-display: 'DM Sans', ui-sans-serif, sans-serif;
+    --font-body:    'Syne', ui-sans-serif, system-ui, sans-serif;
+    --font-narrow:  'Syne', ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ==========================================
@@ -38,7 +38,7 @@
    (este CSS solo se carga en la página home)
    ========================================== */
 body {
-    background: var(--dark-bg);
+    background: #0d0820;
     color: var(--dark-ink);
 }
 
@@ -49,7 +49,7 @@ body {
 /* Hero poster: imagen de fondo full-bleed */
 .hero-poster {
     position: relative;
-    min-height: 88vh;
+    min-height: 52vh;
     display: flex;
     align-items: flex-end;
     overflow: hidden;
@@ -90,8 +90,8 @@ body {
     z-index: 2;
 }
 .hero-poster-numbers-inner {
-    font-family: 'Anton', sans-serif;
-    font-size: clamp(120px, 18vw, 280px);
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(60px, 10vw, 150px);
     line-height: 0.82;
     text-align: right;
     color: transparent;
@@ -104,7 +104,7 @@ body {
     position: relative;
     z-index: 3;
     width: 100%;
-    padding: clamp(2rem, 5vw, 5rem) clamp(1.5rem, 5vw, 4rem) clamp(4rem, 8vw, 6rem);
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 5vw, 4rem) clamp(2rem, 4vw, 3rem);
     max-width: 860px;
 }
 
@@ -129,9 +129,10 @@ body {
 /* Título principal del hero con fuente display */
 .hero-titulo-vibez {
     font-family: var(--font-display);
-    font-size: clamp(3.5rem, 10vw, 8rem);
-    line-height: 0.90;
-    letter-spacing: 0.01em;
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
     color: #ffffff;
     text-transform: uppercase;
     margin: 0 0 28px;
@@ -424,7 +425,10 @@ body {
    7. SECCIÓN CONTENIDO — dark wrapper
    ========================================== */
 .home-seccion-dark {
-    background: var(--dark-bg);
+    background:
+        radial-gradient(circle, rgba(124,58,237,0.18) 1.5px, transparent 1.5px),
+        linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
+    background-size: 28px 28px, 100% 100%;
     padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2rem);
 }
 .home-seccion-dark-inner {
@@ -462,7 +466,7 @@ body {
 
 /* Título de sección con Archivo */
 .seccion-vibez-titulo {
-    font-family: 'Anton', var(--font-body);
+    font-family: 'DM Sans', var(--font-body);
     font-size: clamp(28px, 4vw, 48px);
     text-transform: uppercase;
     letter-spacing: 0.01em;

@@ -77,6 +77,7 @@
 {{-- ════════════════════════════════════════════════════
      CUERPO DEL DETALLE — 2 columnas
 ════════════════════════════════════════════════════ --}}
+<div class="eventos-detalle-wrap">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
@@ -217,7 +218,7 @@
                         <a href="{{ $evento->url_externa }}" target="_blank" class="btn-secundario w-full mt-3 block text-center">Ver en web oficial</a>
                     @endif
 
-                    <p class="text-center text-navy/40 text-xs mt-4">🔒 Compra segura · Entrada con código QR</p>
+                    <p class="text-center text-navy/40 text-xs mt-4"> Compra segura · Entrada con código QR</p>
                 </div>
 
                 @if($evento->latitud && $evento->longitud)
@@ -239,7 +240,7 @@
                     </div>
                 @else
                     <div class="ficha-mapa text-center py-6">
-                        <p class="text-navy/40 text-sm">📍 Ubicación no disponible</p>
+                        <p class="text-navy/40 text-sm"> Ubicación no disponible</p>
                     </div>
                 @endif
 
@@ -247,6 +248,7 @@
         </div>
 
     </div>
+</div>
 </div>
 
 {{-- ════════════════════════════════════════════════════

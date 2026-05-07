@@ -2,6 +2,10 @@
 
 @section('titulo', 'Mi Perfil — VIBEZ')
 
+@push('estilos')
+<link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
+@endpush
+
 @section('contenido')
 
 {{-- ════════════════════════════════════════════════════
@@ -64,9 +68,9 @@
 </section>
 
 {{-- ════════════════════════════════════════════════════
-     ALERTA FLASH
-     Aparece solo si el formulario redirigió con un mensaje
+     ALERTA FLASH + CONTENIDO PRINCIPAL
 ════════════════════════════════════════════════════ --}}
+<div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     @if(session('exito'))
         <div class="perfil-alerta perfil-alerta-ok">
@@ -247,6 +251,7 @@
 
     </div>
 
+</div>
 </div>
 
 @endsection

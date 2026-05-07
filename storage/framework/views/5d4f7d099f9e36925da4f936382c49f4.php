@@ -1,402 +1,626 @@
 <!DOCTYPE html>
-<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>VIBEZ — Descubre tu próximo evento</title>
     <link rel="icon" type="image/png" href="<?php echo e(asset('images/logo_vibez.png')); ?>">
 
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;900&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <style type="text/tailwindcss">
-        @theme {
-            --font-display: 'Archivo', sans-serif;
-            --font-sans:    'Space Grotesk', sans-serif;
-            --font-mono:    'JetBrains Mono', monospace;
-            --font-serif:   'Fraunces', serif;
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
-            --color-paper: #F7F5FF;
-            --color-ink:   #1B1430;
-            --color-lilac: #8B78CC;
-            --color-plum:  #4E3A96;
-            --color-muted: #ACA4C4;
-            --color-dusk:  #E9E3FF;
+    
+    <link rel="stylesheet" href="<?php echo e(asset('css/app-static.css')); ?>">
 
-            --tracking-tightest: -0.04em;
-            --tracking-brutal:   -0.06em;
-        }
+    
+    <link rel="stylesheet" href="<?php echo e(asset('css/home-vibez.css')); ?>">
 
-        @layer base {
-            *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-                @apply text-ink font-sans antialiased;
-                background-color: #F7F5FF;
-                background-image: radial-gradient(circle, rgba(139,120,204,0.18) 1.5px, transparent 1.5px);
-                background-size: 28px 28px;
-            }
-            ::selection { background: #8B78CC; color: #F7F5FF; }
-        }
+    <style>
+        /* ════════════════════════════════════════════════════
+           Estilos específicos de la landing pública VIBEZ
+           ════════════════════════════════════════════════════ */
 
-        @layer utilities {
-            .text-mega {
-                font-size: clamp(4.5rem, 20vw, 16rem);
-                line-height: 0.85;
-                letter-spacing: -0.055em;
-            }
-        }
-
-        /* ── Animaciones de entrada ── */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(28px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-
-        /* ── Orbs flotantes de fondo ── */
-        @keyframes orbA {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%       { transform: translate(30px, -20px) scale(1.06); }
-        }
-        @keyframes orbB {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%       { transform: translate(-22px, 26px) scale(1.04); }
-        }
-        @keyframes orbC {
-            0%, 100% { transform: translate(0, 0); }
-            33%       { transform: translate(14px, -18px); }
-            66%       { transform: translate(-10px, 10px); }
-        }
-
-        /* ── Marquee ── */
-        @keyframes ticker {
-            from { transform: translateX(0); }
-            to   { transform: translateX(-50%); }
-        }
-
-        /* ── Shimmer en el wordmark ── */
-        @keyframes wordmarkShimmer {
-            0%   { background-position: 0% 50%; }
-            50%  { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* ── Parpadeo suave del separador lila ── */
-        @keyframes pulse-line {
-            0%, 100% { opacity: 0.25; }
-            50%       { opacity: 0.6; }
-        }
-
-        /* ── Clases de stagger de entrada ── */
-        .anim-1 { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-2 { animation: fadeUp 0.7s 0.12s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-3 { animation: fadeUp 0.7s 0.24s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-4 { animation: fadeUp 0.7s 0.36s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-5 { animation: fadeUp 0.7s 0.48s cubic-bezier(0.16,1,0.3,1) both; }
-        .anim-fade { animation: fadeIn 1s 0.1s ease both; }
-
-        /* ── Wordmark con gradiente animado ── */
-        .wordmark-gradient {
-            background: linear-gradient(
-                270deg,
-                #8B78CC 0%, #4E3A96 30%, #1B1430 55%, #4E3A96 80%, #8B78CC 100%
-            );
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: wordmarkShimmer 6s ease infinite;
-        }
-
-        /* ── Botón primario: relleno desde abajo ── */
-        .btn-ink {
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-            background: #1B1430;
-            color: #F7F5FF;
-        }
-        .btn-ink::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: #4E3A96;
-            transform: translateY(102%);
-            transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
-        }
-        .btn-ink:hover::after { transform: translateY(0); }
-        .btn-ink > span { position: relative; z-index: 1; }
-
-        /* ── Botón ghost: relleno dusk desde abajo ── */
-        .btn-ghost-lila {
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-            border: 1.5px solid rgba(27, 20, 48, 0.3);
-            color: #1B1430;
-        }
-        .btn-ghost-lila::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: #E9E3FF;
-            transform: translateY(102%);
-            transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
-        }
-        .btn-ghost-lila:hover::after { transform: translateY(0); }
-        .btn-ghost-lila:hover { border-color: #8B78CC; }
-        .btn-ghost-lila > span { position: relative; z-index: 1; }
-
-        /* ── Feature card: hover lift ── */
-        .feature-card {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .feature-card:hover { transform: translateY(-4px); }
-
-        /* ── Separador lila pulsante ── */
-        .sep-pulse {
-            animation: pulse-line 3s ease-in-out infinite;
-        }
-
-        /* ── Orbs fijos de fondo ── */
-        .orb {
+        /* ── Navbar fija sobre el hero ── */
+        .welcome-nav {
             position: fixed;
-            border-radius: 50%;
+            top: 0; left: 0; right: 0; z-index: 200;
+            padding: 18px clamp(1.5rem, 4vw, 3.5rem);
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(180deg, rgba(7,6,12,0.88) 0%, transparent 100%);
+            backdrop-filter: blur(4px);
+        }
+        .welcome-nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .welcome-nav-logo img { height: 34px; width: auto; }
+        .welcome-nav-actions { display: flex; align-items: center; gap: 10px; }
+        .welcome-btn-ghost {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            color: rgba(245,241,234,0.65); text-decoration: none;
+            padding: 8px 18px; border: 1px solid rgba(245,241,234,0.22);
+            border-radius: 999px; transition: all 0.2s;
+        }
+        .welcome-btn-ghost:hover { border-color: rgba(245,241,234,0.55); color: #f5f1ea; }
+        .welcome-btn-solid {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            color: #f5f1ea; text-decoration: none;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border: 1px solid transparent; border-radius: 999px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 18px rgba(168,85,247,0.45);
+        }
+        .welcome-btn-solid:hover { box-shadow: 0 6px 28px rgba(168,85,247,0.65); transform: translateY(-1px); }
+
+        /* ── Chip CTA dentro del hero ── */
+        .hero-cta-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.14em;
+            color: #f5f1ea; text-decoration: none;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border-radius: 999px;
+            box-shadow: 0 8px 28px rgba(168,85,247,0.5);
+            transition: all 0.2s;
+        }
+        .hero-cta-link:hover { box-shadow: 0 12px 36px rgba(168,85,247,0.7); transform: translateY(-2px); }
+
+        /* ── Sección wrapper dark ── */
+        .landing-seccion {
+            background: #07060c;
+            padding: clamp(3rem, 6vw, 5rem) 0;
+        }
+        .landing-seccion-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 clamp(1.5rem, 4vw, 2rem);
+        }
+        .landing-seccion-header {
+            margin-bottom: 36px;
+        }
+        .landing-kicker {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.18em;
+            color: #a855f7;
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px;
+        }
+        .landing-kicker::before {
+            content: ''; width: 28px; height: 1px; background: #a855f7;
+        }
+        .landing-titulo {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(28px, 4vw, 52px);
+            text-transform: uppercase; letter-spacing: 0.01em;
+            color: #f5f1ea; margin: 0 0 6px;
+        }
+        .landing-subtitulo {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 14px; color: rgba(245,241,234,0.4);
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+
+        /* ── Carousel de eventos portrait ── */
+        .carousel-vibez {
+            overflow-x: auto; overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            cursor: grab;
+        }
+        .carousel-vibez:active { cursor: grabbing; }
+        .carousel-vibez::-webkit-scrollbar { display: none; }
+        .carousel-track {
+            display: flex; gap: 18px;
+            padding: 0 clamp(1.5rem, 4vw, 2rem) 12px;
+            width: max-content;
+        }
+
+        /* Tarjeta portrait del carousel */
+        .carousel-card {
+            width: 260px; flex-shrink: 0;
+            position: relative; cursor: pointer;
+            background: #0d0a18;
+            border: 1px solid rgba(245,241,234,0.08);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .carousel-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(168,85,247,0.35);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .carousel-card-img-wrap {
+            position: relative; height: 360px; overflow: hidden;
+        }
+        .carousel-card-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .carousel-card:hover .carousel-card-img { transform: scale(1.05); }
+        .carousel-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(7,6,12,0.96) 100%);
+        }
+        .carousel-card-num {
+            position: absolute; top: 12px; left: 14px;
+            font-family: 'Anton', sans-serif;
+            font-size: 64px; line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(245,241,234,0.15);
             pointer-events: none;
-            z-index: 0;
         }
-        .orb-1 {
-            width: 600px; height: 600px;
-            background: #8B78CC;
-            opacity: 0.22;
-            filter: blur(80px);
-            top: -180px; left: -180px;
-            animation: orbA 16s ease-in-out infinite;
+        .carousel-card-precio-badge {
+            position: absolute; top: 12px; right: 12px;
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            padding: 4px 10px; border-radius: 999px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: white;
         }
-        .orb-2 {
-            width: 500px; height: 500px;
-            background: #4E3A96;
-            opacity: 0.18;
-            filter: blur(70px);
-            bottom: -120px; right: -140px;
-            animation: orbB 20s ease-in-out infinite;
+        .carousel-card-precio-badge.gratis {
+            background: linear-gradient(135deg, #059669, #10b981);
         }
-        .orb-3 {
-            width: 340px; height: 340px;
-            background: #C4B5FD;
-            opacity: 0.35;
-            filter: blur(55px);
-            top: 35%; left: 48%;
-            animation: orbC 12s ease-in-out infinite;
+        .carousel-card-info {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 18px 14px 14px;
+        }
+        .carousel-card-cat {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            color: #a855f7; margin-bottom: 5px;
+        }
+        .carousel-card-titulo {
+            font-family: 'Anton', sans-serif;
+            font-size: 18px; text-transform: uppercase;
+            color: #f5f1ea; margin: 0 0 8px; line-height: 1.1;
+        }
+        .carousel-card-meta {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 11px; font-weight: 500;
+            color: rgba(245,241,234,0.45);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ── Sección mapa ── */
+        .map-section {
+            background: #07060c;
+            padding: clamp(3rem, 6vw, 5rem) 0 0;
+        }
+        .map-section-header {
+            padding: 0 clamp(1.5rem, 4vw, 2rem);
+            max-width: 1280px; margin: 0 auto 28px;
+        }
+        #mapa-eventos {
+            height: 520px; width: 100%;
+            background: #0d0a18;
+        }
+
+        /* ── CTA final ── */
+        .landing-cta {
+            background: #07060c;
+            padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 4vw, 2rem);
+            text-align: center;
+            border-top: 1px solid rgba(245,241,234,0.06);
+        }
+        .landing-cta-titulo {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(40px, 7vw, 96px);
+            text-transform: uppercase; line-height: 0.9;
+            color: #f5f1ea; margin: 0 0 28px;
+        }
+        .landing-cta-titulo em {
+            font-style: italic;
+            color: #a855f7; font-family: 'Bebas Neue', sans-serif;
+        }
+        .landing-cta-sub {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 16px; color: rgba(245,241,234,0.5);
+            max-width: 480px; margin: 0 auto 36px; line-height: 1.6;
+        }
+        .landing-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .landing-cta-btn-primary {
+            font-family: 'Anton', sans-serif;
+            font-size: 17px; text-transform: uppercase; letter-spacing: 0.04em;
+            color: #f5f1ea; text-decoration: none;
+            padding: 16px 36px; border-radius: 999px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            box-shadow: 0 8px 32px rgba(168,85,247,0.5);
+            transition: all 0.2s;
+        }
+        .landing-cta-btn-primary:hover { box-shadow: 0 14px 44px rgba(168,85,247,0.7); transform: translateY(-2px); }
+        .landing-cta-btn-ghost {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            color: rgba(245,241,234,0.7); text-decoration: none;
+            padding: 16px 28px; border-radius: 999px;
+            border: 1px solid rgba(245,241,234,0.2);
+            transition: all 0.2s;
+        }
+        .landing-cta-btn-ghost:hover { border-color: rgba(245,241,234,0.5); color: #f5f1ea; }
+
+        /* ── Footer ── */
+        .landing-footer {
+            background: #07060c;
+            border-top: 1px solid rgba(245,241,234,0.06);
+            padding: 20px clamp(1.5rem, 4vw, 2rem);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .landing-footer p {
+            font-family: 'Archivo Narrow', sans-serif;
+            font-size: 11px; color: rgba(245,241,234,0.3);
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+
+        /* ── Leaflet dark overrides ── */
+        .leaflet-popup-content-wrapper {
+            background: #0d0a18;
+            border: 1px solid rgba(168,85,247,0.35);
+            color: #f5f1ea;
+            border-radius: 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+        }
+        .leaflet-popup-tip { background: #0d0a18; }
+        .leaflet-popup-close-button { color: rgba(245,241,234,0.5) !important; }
+        .leaflet-popup-close-button:hover { color: #f5f1ea !important; }
+        .leaflet-container { background: #0d0a18; }
+        .leaflet-control-attribution { background: rgba(13,10,24,0.8) !important; color: rgba(245,241,234,0.35) !important; }
+        .leaflet-control-attribution a { color: rgba(168,85,247,0.7) !important; }
+        .leaflet-control-zoom a {
+            background: #0d0a18 !important; color: #f5f1ea !important;
+            border-color: rgba(245,241,234,0.15) !important;
+        }
+        .leaflet-control-zoom a:hover { background: rgba(168,85,247,0.2) !important; }
+
+        /* Marcador personalizado para el mapa */
+        .mapa-marker {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 2px solid rgba(245,241,234,0.8);
+            box-shadow: 0 4px 16px rgba(168,85,247,0.6);
+        }
+        .mapa-marker-inner {
+            width: 100%; height: 100%;
+            transform: rotate(45deg);
+            display: flex; align-items: center; justify-content: center;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-paper text-ink overflow-x-hidden relative">
+<body style="background:#07060c;color:#f5f1ea;margin:0;overflow-x:hidden;">
 
-    
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
-    <div class="orb orb-3" aria-hidden="true"></div>
 
-    
-    <div class="relative z-10 border-b border-lilac/25 px-6 sm:px-10 py-3
-                flex items-center justify-between shrink-0 anim-fade">
-        <span class="font-mono text-xs uppercase tracking-widest text-muted select-none">
-            VIBEZ &nbsp;·&nbsp; Est. 2025
-        </span>
+<nav class="welcome-nav" aria-label="Navegación principal">
+    <a href="<?php echo e(route('welcome')); ?>" class="welcome-nav-logo">
+        <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
+    </a>
+    <div class="welcome-nav-actions">
         <?php if(auth()->guard()->check()): ?>
-            <a href="<?php echo e(route('home')); ?>"
-               class="font-mono text-xs uppercase tracking-widest text-ink/50
-                      hover:text-lilac transition-colors duration-150">
-                Ir a la app &nbsp;→
+            <a href="<?php echo e(Auth::user()->isEmpresa() ? route('empresa.home') : route('home')); ?>" class="welcome-btn-solid">
+                Ir a mi cuenta
             </a>
         <?php else: ?>
-            <a href="/login"
-               class="font-mono text-xs uppercase tracking-widest text-ink/50
-                      hover:text-lilac transition-colors duration-150">
-                Iniciar sesión &nbsp;→
-            </a>
+            <a href="<?php echo e(route('login')); ?>" class="welcome-btn-ghost">Entrar</a>
+            <a href="<?php echo e(route('register')); ?>" class="welcome-btn-solid">Regístrate gratis</a>
         <?php endif; ?>
+    </div>
+</nav>
+
+
+<div class="hero-poster" style="min-height:100vh;">
+
+    
+    <?php if($eventos->isNotEmpty() && $eventos->first()->url_portada): ?>
+        <img src="<?php echo e($eventos->first()->url_portada); ?>" alt="" class="hero-poster-img" aria-hidden="true">
+    <?php else: ?>
+        <img src="https://picsum.photos/seed/vibez-welcome/1600/900" alt="" class="hero-poster-img" aria-hidden="true">
+    <?php endif; ?>
+    <div class="hero-poster-overlay"></div>
+
+    
+    <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+
+    
+    <div class="hero-poster-numbers" aria-hidden="true">
+        <div class="hero-poster-numbers-inner"><?php echo e(now()->format('d')); ?><br><?php echo e(now()->format('m')); ?></div>
     </div>
 
     
-    <div class="relative z-10 border-b border-lilac/25 px-4 sm:px-8 overflow-hidden shrink-0 anim-1">
-        <p class="wordmark-gradient font-display font-black text-mega leading-none py-2 sm:py-4 select-none"
-           aria-label="VIBEZ">
-            VIBEZ
+    <div class="hero-poster-content">
+        <p class="hero-kicker">
+            <span class="hero-kicker-line"></span>
+            La plataforma de la escena joven
+        </p>
+
+        <h1 class="hero-titulo-vibez">
+            Tu próxima
+            <span class="acento">aventura empieza aquí</span>
+        </h1>
+
+        <p class="hero-subtitulo-vibez">
+            Eventos, conciertos, festivales y trabajo —<br>
+            todo lo que vive tu escena, en un solo lugar.
+        </p>
+
+        
+        <div class="hero-stats" style="flex-wrap:wrap;gap:12px;margin-bottom:28px;">
+            <span class="hero-stat-pill">
+                <span class="hero-stat-dot"></span>
+                <?php echo e($eventos->count()); ?> eventos activos
+            </span>
+            <?php if($categorias->count()): ?>
+                <span class="hero-stat-pill">
+                    <span class="hero-stat-dot"></span>
+                    <?php echo e($categorias->count()); ?> categorías
+                </span>
+            <?php endif; ?>
+        </div>
+
+        <a href="<?php echo e(route('register')); ?>" class="hero-cta-link">
+            Únete gratis
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </div>
+
+</div>
+
+
+<div class="marquee-vibez" aria-hidden="true">
+    <div class="marquee-track">
+        <span class="marquee-item"> Música</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Cultura</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Techno</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Deporte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Gastronomía</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Networking</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Moda</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Tecnología</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Festivales</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Arte</span><span class="marquee-dot"></span>
+        
+        <span class="marquee-item"> Música</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Cultura</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Techno</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Deporte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Gastronomía</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Networking</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Moda</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Tecnología</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Festivales</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Arte</span><span class="marquee-dot"></span>
+    </div>
+</div>
+
+
+<?php if($eventos->isNotEmpty()): ?>
+<section class="landing-seccion">
+    <div class="landing-seccion-header landing-seccion-inner">
+        <p class="landing-kicker">Próximos eventos</p>
+        <h2 class="landing-titulo">Esto es lo que se mueve</h2>
+        <p class="landing-subtitulo">
+            <?php echo e($eventos->count()); ?> evento<?php echo e($eventos->count() !== 1 ? 's' : ''); ?> disponible<?php echo e($eventos->count() !== 1 ? 's' : ''); ?>
+
         </p>
     </div>
 
-    
-    <div class="relative z-10 border-b border-lilac/25 bg-dusk overflow-hidden shrink-0 py-2.5 anim-2">
-        <div style="display:inline-flex; white-space:nowrap; animation: ticker 28s linear infinite;">
-            <?php
-                $items = ['FESTIVALES', 'CONCIERTOS', 'EXPOSICIONES', 'BOLSA DE TRABAJO', 'ENTRADAS QR', 'COMUNIDAD', 'EVENTOS EN VIVO', 'NETWORKING'];
-                $ticker = implode(' &nbsp;/&nbsp; ', $items) . ' &nbsp;/&nbsp; ';
-            ?>
-            <span class="font-mono text-xs uppercase tracking-widest text-plum px-4"><?php echo str_repeat($ticker, 4); ?></span>
+    <div class="carousel-vibez" id="carousel-eventos">
+        <div class="carousel-track">
+            <?php $__currentLoopData = $eventos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $evento): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <article
+                    class="carousel-card"
+                    onclick="window.location.href='<?php echo e(route('eventos.detalle', $evento->id)); ?>'"
+                    title="<?php echo e($evento->titulo); ?>"
+                >
+                    <div class="carousel-card-img-wrap">
+                        <img
+                            src="<?php echo e($evento->url_portada); ?>"
+                            alt="<?php echo e($evento->titulo); ?>"
+                            class="carousel-card-img"
+                            onerror="this.src='https://picsum.photos/seed/ev-<?php echo e($evento->id); ?>/400/600'"
+                        >
+                        <div class="carousel-card-overlay"></div>
+
+                        
+                        <span class="carousel-card-num"><?php echo e(str_pad($index + 1, 2, '0', STR_PAD_LEFT)); ?></span>
+
+                        
+                        <span class="carousel-card-precio-badge <?php echo e($evento->es_gratuito ? 'gratis' : ''); ?>">
+                            <?php echo e($evento->precio_formateado); ?>
+
+                        </span>
+
+                        
+                        <div class="carousel-card-info">
+                            <p class="carousel-card-cat"><?php echo e($evento->categoria?->nombre ?? 'Evento'); ?></p>
+                            <h3 class="carousel-card-titulo"><?php echo e($evento->titulo); ?></h3>
+                            <div class="carousel-card-meta">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <?php echo e($evento->fecha_inicio->locale('es')->isoFormat('D MMM YYYY')); ?>
+
+                                <?php if($evento->ubicacion_nombre): ?>
+                                    &nbsp;·&nbsp;
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    </svg>
+                                    <?php echo e($evento->ubicacion_nombre); ?>
+
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
+</section>
+<?php endif; ?>
 
-    
-    <div class="relative z-10 flex-1 grid grid-cols-1 md:grid-cols-12 border-b border-lilac/20">
 
-        
-        <div class="md:col-span-7 border-b md:border-b-0 md:border-r border-lilac/20
-                    p-8 sm:p-10 lg:p-14 flex flex-col justify-between gap-10 anim-3">
-            <div>
-                <h1 class="font-display font-black text-4xl sm:text-5xl lg:text-6xl
-                           tracking-tightest leading-[0.92] uppercase text-ink">
-                    Descubre tu<br>próximo
-                </h1>
-                
-                <p class="font-serif italic font-light
-                          text-4xl sm:text-5xl lg:text-6xl
-                          leading-[0.92] mt-1"
-                   style="color: #8B78CC;">
-                    evento.
-                </p>
-
-                <div class="mt-8 h-px sep-pulse" style="background: #8B78CC;"></div>
-
-                <p class="mt-5 font-mono text-xs uppercase tracking-widest text-muted">
-                    Eventos &nbsp;·&nbsp; Entradas QR &nbsp;·&nbsp; Trabajo &nbsp;·&nbsp; Comunidad
-                </p>
-            </div>
-
-            <?php if(auth()->guard()->check()): ?>
-                <div>
-                    <p class="font-mono text-xs uppercase tracking-widest text-muted mb-4">
-                        — Sesión activa
-                    </p>
-                    <a href="<?php echo e(route('home')); ?>"
-                       class="btn-ink inline-block font-mono text-xs uppercase tracking-widest px-8 py-4">
-                        <span>Explorar eventos &nbsp;→</span>
-                    </a>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        
-        <div class="md:col-span-5 p-8 sm:p-10 lg:p-14 flex flex-col justify-between gap-10 anim-4">
-
-            <p class="font-sans text-base leading-relaxed text-ink/60 max-w-xs">
-                La plataforma de eventos para jóvenes. Descubre lo que pasa en tu ciudad,
-                compra entradas y conecta con gente de tu escena.
-            </p>
-
-            <?php if(auth()->guard()->guest()): ?>
-                <div class="flex flex-col gap-3">
-                    <a href="/register"
-                       class="btn-ink font-mono text-xs uppercase tracking-widest
-                              px-8 py-4 text-center block">
-                        <span>Regístrate gratis &nbsp;→</span>
-                    </a>
-                    <a href="/login"
-                       class="btn-ghost-lila font-mono text-xs uppercase tracking-widest
-                              px-8 py-4 text-center block">
-                        <span>Iniciar sesión</span>
-                    </a>
-                </div>
-            <?php endif; ?>
-
-            <?php if(auth()->guard()->check()): ?>
-                <div class="space-y-1">
-                    <p class="font-mono text-xs uppercase tracking-widest text-muted">Conectado como</p>
-                    <p class="font-sans font-semibold text-ink">
-                        <?php echo e(Auth::user()->nombre); ?> <?php echo e(Auth::user()->apellido1); ?>
-
-                    </p>
-                </div>
-            <?php endif; ?>
-
-            
-            <div class="flex items-center gap-3">
-                <div class="h-px flex-1 sep-pulse" style="background: linear-gradient(90deg, #8B78CC, #4E3A96);"></div>
-                <span class="font-mono text-xs select-none" style="color: #8B78CC;">※</span>
-                <div class="h-px flex-1 sep-pulse" style="background: linear-gradient(270deg, #8B78CC, #4E3A96);"></div>
-            </div>
-        </div>
+<?php if($eventosMapa->count() > 0): ?>
+<section class="map-section">
+    <div class="map-section-header">
+        <p class="landing-kicker" style="margin-bottom:10px">Eventos en el mapa</p>
+        <h2 class="landing-titulo">¿Dónde está la fiesta?</h2>
+        <p class="landing-subtitulo">
+            <?php echo e($eventosMapa->count()); ?> evento<?php echo e($eventosMapa->count() !== 1 ? 's' : ''); ?> en el mapa
+        </p>
     </div>
 
-    
-    <div class="relative z-10 grid grid-cols-2 md:grid-cols-4 shrink-0 anim-5">
+    <div id="mapa-eventos" role="region" aria-label="Mapa de eventos VIBEZ"></div>
+</section>
+<?php endif; ?>
 
-        
-        <div class="feature-card p-6 border-r border-lilac/20 border-b md:border-b-0"
-             style="background: #E9E3FF;">
-            <span class="font-mono text-xs" style="color: #8B78CC;">01</span>
-            <p class="font-display font-black text-lg sm:text-xl tracking-tightest leading-none mt-2 uppercase text-ink">
-                Eventos
-            </p>
-            <p class="font-sans text-xs mt-2 leading-relaxed" style="color: rgba(27,20,48,0.5);">
-                Conciertos, festivales y más cerca de ti
-            </p>
-        </div>
 
-        
-        <div class="feature-card p-6 border-b md:border-b-0 md:border-r border-lilac/30"
-             style="background: #8B78CC;">
-            <span class="font-mono text-xs" style="color: #E9E3FF; opacity: 0.7;">02</span>
-            <p class="font-display font-black text-lg sm:text-xl tracking-tightest leading-none mt-2 uppercase text-paper">
-                Entradas
-            </p>
-            <p class="font-sans text-xs mt-2 leading-relaxed" style="color: rgba(247,245,255,0.65);">
-                Compra y gestiona con código QR
-            </p>
-        </div>
-
-        
-        <div class="feature-card p-6 border-r border-plum/30"
-             style="background: #4E3A96;">
-            <span class="font-mono text-xs" style="color: #ACA4C4; opacity: 0.8;">03</span>
-            <p class="font-display font-black text-lg sm:text-xl tracking-tightest leading-none mt-2 uppercase text-paper">
-                Trabajo
-            </p>
-            <p class="font-sans text-xs mt-2 leading-relaxed" style="color: rgba(247,245,255,0.55);">
-                Bolsa de empleo en cultura y ocio
-            </p>
-        </div>
-
-        
-        <div class="feature-card p-6"
-             style="background: #1B1430;">
-            <span class="font-mono text-xs" style="color: #ACA4C4; opacity: 0.7;">04</span>
-            <p class="font-display font-black text-lg sm:text-xl tracking-tightest leading-none mt-2 uppercase text-paper">
-                Social
-            </p>
-            <p class="font-sans text-xs mt-2 leading-relaxed" style="color: rgba(247,245,255,0.45);">
-                Conecta con amigos y tu escena
-            </p>
-        </div>
+<section class="landing-cta">
+    <h2 class="landing-cta-titulo">
+        ¿A qué<br><em>esperas?</em>
+    </h2>
+    <p class="landing-cta-sub">
+        Únete a miles de jóvenes que ya viven su escena con VIBEZ.
+        Registro gratuito en menos de 2 minutos.
+    </p>
+    <div class="landing-cta-btns">
+        <a href="<?php echo e(route('register')); ?>" class="landing-cta-btn-primary">Crear cuenta gratis</a>
+        <a href="<?php echo e(route('login')); ?>" class="landing-cta-btn-ghost">Ya tengo cuenta</a>
     </div>
+</section>
 
-    
-    <footer class="relative z-10 shrink-0" style="background: #1B1430;">
-        <div class="px-6 sm:px-10 py-5 grid grid-cols-1 sm:grid-cols-3 items-center gap-4"
-             style="border-top: 1px solid rgba(139,120,204,0.2);">
-            <span class="font-display font-black text-xl tracking-brutal select-none wordmark-gradient">
-                VIBEZ
-            </span>
-            <div class="flex gap-6 justify-start sm:justify-center
-                        font-mono text-xs uppercase tracking-widest"
-                 style="color: rgba(247,245,255,0.3);">
-                <a href="#" class="hover:text-paper transition-colors duration-150">Privacidad</a>
-                <a href="# " class="hover:text-paper transition-colors duration-150">Contacto</a>
-            </div>
-            <span class="font-mono text-xs text-left sm:text-right"
-                  style="color: rgba(247,245,255,0.2);">
-                © <?php echo e(date('Y')); ?> &nbsp;—&nbsp; <?php echo e(now()->format('d.m.y')); ?>
 
-            </span>
-        </div>
-    </footer>
+<footer class="landing-footer">
+    <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ" style="height:28px;opacity:0.6;">
+    <p>&copy; <?php echo e(date('Y')); ?> VIBEZ — Plataforma de eventos para jóvenes</p>
+    <div style="display:flex;gap:20px;">
+        <a href="#" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;color:rgba(245,241,234,0.3);text-decoration:none;text-transform:uppercase;letter-spacing:0.1em;">Privacidad</a>
+        <a href="#" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;color:rgba(245,241,234,0.3);text-decoration:none;text-transform:uppercase;letter-spacing:0.1em;">Contacto</a>
+    </div>
+</footer>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
+
+<script>
+/* ════════════════════════════════════════════════════
+   MAPA LEAFLET — Inicialización con dark tiles
+   ════════════════════════════════════════════════════ */
+(function inicializarMapa() {
+    var contenedor = document.getElementById('mapa-eventos');
+    if (!contenedor) return;
+
+    var eventosMapa = <?php echo json_encode($eventosMapa, 15, 512) ?>;
+    if (!eventosMapa.length) return;
+
+    /* Calcular centro del mapa usando el promedio de coordenadas */
+    var sumLat = 0, sumLng = 0;
+    for (var i = 0; i < eventosMapa.length; i++) {
+        sumLat += eventosMapa[i].lat;
+        sumLng += eventosMapa[i].lng;
+    }
+    var centroLat = sumLat / eventosMapa.length;
+    var centroLng = sumLng / eventosMapa.length;
+
+    /* Crear mapa con tiles oscuros de CartoDB */
+    var mapa = L.map('mapa-eventos', {
+        center: [centroLat, centroLng],
+        zoom: 6,
+        zoomControl: true,
+        attributionControl: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://carto.com">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+    }).addTo(mapa);
+
+    /* Icono personalizado con el color de VIBEZ */
+    var iconoVibez = L.divIcon({
+        className: '',
+        html: '<div style="width:14px;height:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:50%;border:2px solid rgba(245,241,234,0.9);box-shadow:0 0 16px rgba(168,85,247,0.8),0 0 4px rgba(168,85,247,0.4);"></div>',
+        iconSize:   [14, 14],
+        iconAnchor: [7, 7],
+        popupAnchor: [0, -12],
+    });
+
+    /* Añadir un marcador por cada evento */
+    for (var j = 0; j < eventosMapa.length; j++) {
+        var ev = eventosMapa[j];
+        var popupHtml =
+            '<div style="font-family:\'Archivo\',sans-serif;">' +
+            '<p style="font-family:\'Archivo Narrow\',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#a855f7;margin:0 0 4px;">' + ev.categoria + '</p>' +
+            '<p style="font-size:14px;font-weight:700;color:#f5f1ea;margin:0 0 4px;">' + ev.titulo + '</p>' +
+            '<p style="font-size:11px;color:rgba(245,241,234,0.5);margin:0 0 10px;">' + ev.fecha + (ev.precio ? ' · ' + ev.precio : '') + '</p>' +
+            '<a href="' + ev.url + '" style="font-family:\'Archivo Narrow\',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#a855f7;text-decoration:none;">Ver evento →</a>' +
+            '</div>';
+
+        L.marker([ev.lat, ev.lng], { icon: iconoVibez })
+            .addTo(mapa)
+            .bindPopup(popupHtml, { maxWidth: 240, minWidth: 180 });
+    }
+
+    /* Ajustar zoom para que quepan todos los marcadores */
+    if (eventosMapa.length > 1) {
+        var bounds = L.latLngBounds(eventosMapa.map(function(e) { return [e.lat, e.lng]; }));
+        mapa.fitBounds(bounds, { padding: [48, 48] });
+    }
+})();
+
+/* ════════════════════════════════════════════════════
+   CAROUSEL — drag to scroll (sin EventListeners globales)
+   ════════════════════════════════════════════════════ */
+(function initCarousel() {
+    var carousel = document.getElementById('carousel-eventos');
+    if (!carousel) return;
+
+    var arrastrando = false;
+    var inicioX = 0;
+    var scrollX = 0;
+
+    carousel.onmousedown = function(e) {
+        arrastrando = true;
+        inicioX = e.pageX - carousel.offsetLeft;
+        scrollX = carousel.scrollLeft;
+        carousel.style.cursor = 'grabbing';
+    };
+    carousel.onmouseleave = function() {
+        arrastrando = false;
+        carousel.style.cursor = 'grab';
+    };
+    carousel.onmouseup = function() {
+        arrastrando = false;
+        carousel.style.cursor = 'grab';
+    };
+    carousel.onmousemove = function(e) {
+        if (!arrastrando) return;
+        e.preventDefault();
+        var x = e.pageX - carousel.offsetLeft;
+        carousel.scrollLeft = scrollX - (x - inicioX);
+    };
+})();
+</script>
 
 </body>
 </html>

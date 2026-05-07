@@ -7,49 +7,97 @@
 <?php $__env->startSection('contenido'); ?>
 
 
-<section class="relative overflow-hidden bg-ink" style="padding:80px 0 64px;">
+<section class="trabajos-hero">
 
-    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(139,120,204,0.15) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;z-index:0"></div>
-    <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(139,120,204,0.22) 0%,transparent 60%);top:-160px;left:-80px;pointer-events:none;z-index:0;animation:orbA 16s ease-in-out infinite"></div>
-    <div style="position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(78,58,150,0.18) 0%,transparent 60%);bottom:-80px;right:-60px;pointer-events:none;z-index:0;animation:orbB 20s ease-in-out infinite"></div>
+    <div class="trabajos-hero-bg" aria-hidden="true"></div>
+    <div class="trabajos-hero-orb trabajos-hero-orb-1" aria-hidden="true"></div>
+    <div class="trabajos-hero-orb trabajos-hero-orb-2" aria-hidden="true"></div>
 
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 relative" style="z-index:1">
+    <div class="trabajos-hero-inner">
 
-        <div class="grid md:grid-cols-12 gap-8 items-end">
-
-            <div class="md:col-span-8 anim-in">
-                <p class="font-mono text-xs uppercase tracking-widest text-paper/40 mb-4">
-                    — Bolsa de trabajo · Escena musical y eventos
-                </p>
-                <h1 class="font-display font-black uppercase text-paper tracking-tightest leading-[0.88]"
-                    style="font-size:clamp(3rem,8vw,7.5rem)">
-                    Trabaja en<br>
-                    <em class="text-lilac not-italic">la escena.</em>
-                </h1>
-            </div>
-
-            <div class="md:col-span-4 anim-in-2">
-                <p class="font-sans text-paper/60 text-sm leading-relaxed mb-8">
-                    Fotógrafos, técnicos de sonido, relaciones públicas —
-                    encuentra tu lugar en los mejores eventos del país.
-                </p>
-                <div class="flex gap-6">
-                    <div class="border-t border-paper/20 pt-4">
-                        <p class="font-display font-black text-2xl text-paper"><?php echo e($ofertas->count()); ?></p>
-                        <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">Ofertas</p>
-                    </div>
-                    <div class="border-t border-paper/20 pt-4">
-                        <p class="font-display font-black text-2xl text-paper"><?php echo e($ciudades->count()); ?></p>
-                        <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">Ciudades</p>
-                    </div>
-                    <div class="border-t border-paper/20 pt-4">
-                        <p class="font-display font-black text-2xl text-lilac"><?php echo e($categoriasTrabajo->count()); ?></p>
-                        <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">Categorías</p>
-                    </div>
+        
+        <div class="trabajos-hero-left">
+            <p class="trabajos-hero-kicker">
+                <span class="trabajos-hero-kicker-line"></span>
+                Bolsa de trabajo · Escena musical y eventos
+            </p>
+            <h1 class="trabajos-hero-titulo">
+                Trabaja en<br>
+                <em>la escena.</em>
+            </h1>
+            <div class="trabajos-hero-stats">
+                <div class="trabajos-hero-stat">
+                    <span class="trabajos-hero-stat-num"><?php echo e($ofertas->count()); ?></span>
+                    <span class="trabajos-hero-stat-label">Ofertas</span>
+                </div>
+                <div class="trabajos-hero-stat">
+                    <span class="trabajos-hero-stat-num"><?php echo e($ciudades->count()); ?></span>
+                    <span class="trabajos-hero-stat-label">Ciudades</span>
+                </div>
+                <div class="trabajos-hero-stat trabajos-hero-stat--lilac">
+                    <span class="trabajos-hero-stat-num"><?php echo e($categoriasTrabajo->count()); ?></span>
+                    <span class="trabajos-hero-stat-label">Categorías</span>
                 </div>
             </div>
-
         </div>
+
+        
+        <?php if($ofertas->isNotEmpty()): ?>
+        <div class="trabajos-carousel-wrap">
+            <div class="trabajos-carousel" id="trabajosCarousel">
+                <?php $__currentLoopData = $ofertas->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oferta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="carousel-oferta <?php echo e($loop->first ? 'active' : ''); ?>"
+                     data-index="<?php echo e($loop->index); ?>"
+                     onclick="irAOferta(<?php echo e($oferta->id); ?>)">
+
+                    <div class="co-header">
+                        <div class="co-avatar">
+                            <?php echo e(strtoupper(substr($oferta->organizador?->empresa?->nombre_empresa ?? 'E', 0, 2))); ?>
+
+                        </div>
+                        <div>
+                            <p class="co-empresa"><?php echo e($oferta->organizador?->empresa?->nombre_empresa ?? 'Empresa'); ?></p>
+                            <span class="co-badge"><?php echo e($oferta->categoria?->nombre ?? 'General'); ?></span>
+                        </div>
+                    </div>
+
+                    <h3 class="co-titulo"><?php echo e($oferta->titulo); ?></h3>
+
+                    <div class="co-datos">
+                        <?php if($oferta->ubicacion): ?>
+                        <span class="co-dato">
+                            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                            <?php echo e($oferta->ubicacion); ?>
+
+                        </span>
+                        <?php endif; ?>
+                        <span class="co-dato">
+                            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <?php echo e($oferta->vacantes); ?> vacante<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?>
+
+                        </span>
+                    </div>
+
+                    <div class="co-footer">
+                        <span class="co-salario"><?php echo e($oferta->salario_formateado); ?></span>
+                        <span class="co-flecha">→</span>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+
+            <?php if($ofertas->take(6)->count() > 1): ?>
+            <div class="carousel-dots" id="carouselDots">
+                <?php $__currentLoopData = $ofertas->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oferta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <button class="carousel-dot <?php echo e($loop->first ? 'active' : ''); ?>"
+                        data-index="<?php echo e($loop->index); ?>"
+                        aria-label="Oferta <?php echo e($loop->iteration); ?>"></button>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
     </div>
 </section>
 
@@ -115,7 +163,8 @@
 </section>
 
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<section class="trabajos-seccion-contenido">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <div id="cargando" class="hidden flex justify-center py-16">
         <div class="spinner"></div>
@@ -195,12 +244,12 @@
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
     </div>
-
+</div>
 </section>
 
 
-<section class="bg-ink relative overflow-hidden" style="padding:80px 0;margin-top:20px;">
-    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(139,120,204,0.12) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
+<section class="relative overflow-hidden" style="padding:80px 0;margin-top:0;background:linear-gradient(160deg,#130228 0%,#1a0f35 50%,#0e0722 100%);">
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(124,58,237,0.18) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
     <div class="max-w-3xl mx-auto px-6 text-center relative" style="z-index:1">
         <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mb-4">— Para organizadores</p>
         <h2 class="font-display font-black uppercase text-paper tracking-tightest leading-[0.9]"
@@ -221,6 +270,38 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script src="<?php echo e(asset('js/trabajos-index.js')); ?>"></script>
+<script>
+(function () {
+    var carousel = document.getElementById('trabajosCarousel');
+    if (!carousel) return;
+    var cards = carousel.querySelectorAll('.carousel-oferta');
+    var dots  = document.querySelectorAll('#carouselDots .carousel-dot');
+    var current = 0;
+    var timer;
+
+    function goTo(index) {
+        cards[current].classList.remove('active');
+        if (dots[current]) dots[current].classList.remove('active');
+        current = (index + cards.length) % cards.length;
+        cards[current].classList.add('active');
+        if (dots[current]) dots[current].classList.add('active');
+    }
+
+    function startTimer() {
+        timer = setInterval(function () { goTo(current + 1); }, 3200);
+    }
+
+    dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+            clearInterval(timer);
+            goTo(parseInt(this.dataset.index));
+            startTimer();
+        });
+    });
+
+    startTimer();
+})();
+</script>
 <?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/trabajos/index.blade.php ENDPATH**/ ?>

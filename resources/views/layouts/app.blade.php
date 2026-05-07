@@ -11,10 +11,26 @@
     {{-- Fuentes editoriales VIBEZ --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/app-static.css">
+    {{-- Tailwind CSS v4 CDN — genera utilidades al vuelo según el DOM --}}
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper:  #f5f1ea;
+            --color-ink:    #0f172a;
+            --color-lilac:  #7c3aed;
+            --color-plum:   #4e3a96;
+            --color-dusk:   #1e1035;
+            --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+            --font-sans:    'Syne', ui-sans-serif, system-ui, sans-serif;
+            --tracking-brutal:   0.04em;
+            --tracking-tightest: -0.02em;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ asset('css/app-static.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vibez.css') }}">
 
     @if (request()->routeIs('login') || request()->routeIs('register'))
         <link rel="stylesheet" href="{{ asset('css/auth-vibez.css') }}">

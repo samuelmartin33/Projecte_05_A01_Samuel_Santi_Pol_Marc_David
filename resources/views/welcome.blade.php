@@ -395,27 +395,27 @@
 ════════════════════════════════════════════════════ --}}
 <div class="marquee-vibez" aria-hidden="true">
     <div class="marquee-track">
-        <span class="marquee-item">🎵 Música</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎭 Cultura</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚡ Techno</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚽ Deporte</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🍕 Gastronomía</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🌐 Networking</span><span class="marquee-dot"></span>
-        <span class="marquee-item">👗 Moda</span><span class="marquee-dot"></span>
-        <span class="marquee-item">💻 Tecnología</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎪 Festivales</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎨 Arte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Música</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Cultura</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Techno</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Deporte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Gastronomía</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Networking</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Moda</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Tecnología</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Festivales</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Arte</span><span class="marquee-dot"></span>
         {{-- Segunda copia para el loop infinito --}}
-        <span class="marquee-item">🎵 Música</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎭 Cultura</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚡ Techno</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚽ Deporte</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🍕 Gastronomía</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🌐 Networking</span><span class="marquee-dot"></span>
-        <span class="marquee-item">👗 Moda</span><span class="marquee-dot"></span>
-        <span class="marquee-item">💻 Tecnología</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎪 Festivales</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎨 Arte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Música</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Cultura</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Techno</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Deporte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Gastronomía</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Networking</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Moda</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Tecnología</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Festivales</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Arte</span><span class="marquee-dot"></span>
     </div>
 </div>
 
