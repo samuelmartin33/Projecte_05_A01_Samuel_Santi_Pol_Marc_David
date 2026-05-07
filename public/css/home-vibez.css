@@ -1,0 +1,578 @@
+/* ============================================================
+   VIBEZ HOME — Variables CSS centralizadas + estilos extra
+   Importar DESPUÉS de app-static.css para poder sobrescribir
+   ============================================================ */
+
+/* ==========================================
+   1. VARIABLES — paleta VIBEZ completa
+   ========================================== */
+:root {
+    /* Marca principal */
+    --morado:      #7c3aed;
+    --morado-2:    #a855f7;
+    --magenta:     #7c3aed;        /* alias */
+    --violet-deep: #5b21b6;
+    --lilac-soft:  #c4b5fd;
+    --lilac-mist:  #ede9fe;
+
+    /* Fondos */
+    --bg:          #f7f5ff;
+    --cream:       #fafaff;
+    --navy:        #0f172a;
+    --ink:         #1e1b4b;
+
+    /* Dark editorial */
+    --dark-bg:     #07060c;
+    --dark-bg-2:   #0d0a18;
+    --dark-ink:    #f5f1ea;
+    --dark-line:   rgba(245,241,234,0.10);
+
+    /* Tipografía display */
+    --font-display: 'Bebas Neue', 'Anton', 'Archivo', Impact, sans-serif;
+    --font-body:    'Archivo', 'Inter', system-ui, sans-serif;
+    --font-narrow:  'Archivo Narrow', 'Inter', system-ui, sans-serif;
+}
+
+/* ==========================================
+   2. DARK BODY OVERRIDE — solo aplica en home
+   (este CSS solo se carga en la página home)
+   ========================================== */
+body {
+    background: var(--dark-bg);
+    color: var(--dark-ink);
+}
+
+/* ==========================================
+   3. HERO — diseño editorial oscuro con poster
+   ========================================== */
+
+/* Hero poster: imagen de fondo full-bleed */
+.hero-poster {
+    position: relative;
+    min-height: 88vh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+/* Imagen de fondo del poster */
+.hero-poster-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    filter: contrast(1.08) saturate(1.1) brightness(0.55);
+    z-index: 0;
+    will-change: transform;
+}
+
+/* Gradiente oscuro sobre la imagen */
+.hero-poster-overlay {
+    position: absolute; inset: 0;
+    background:
+        linear-gradient(180deg, rgba(7,6,12,0.35) 0%, rgba(7,6,12,0.15) 40%, rgba(7,6,12,0.92) 100%),
+        linear-gradient(90deg, rgba(7,6,12,0.6) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 10%, rgba(168,85,247,0.4) 0%, transparent 55%);
+    z-index: 1;
+}
+
+/* Números editoriales decorativos en esquina */
+.hero-poster-numbers {
+    position: absolute;
+    top: 0; right: 0;
+    width: 45%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 2rem 3rem;
+    pointer-events: none;
+    z-index: 2;
+}
+.hero-poster-numbers-inner {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(120px, 18vw, 280px);
+    line-height: 0.82;
+    text-align: right;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(245,241,234,0.12);
+    user-select: none;
+}
+
+/* Contenido del hero */
+.hero-poster-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    padding: clamp(2rem, 5vw, 5rem) clamp(1.5rem, 5vw, 4rem) clamp(4rem, 8vw, 6rem);
+    max-width: 860px;
+}
+
+/* Kicker sobre el título */
+.hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-narrow);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #c084fc;
+    margin-bottom: 24px;
+}
+.hero-kicker-line {
+    width: 36px; height: 1px;
+    background: #a855f7;
+}
+
+/* Título principal del hero con fuente display */
+.hero-titulo-vibez {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    line-height: 0.90;
+    letter-spacing: 0.01em;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin: 0 0 28px;
+}
+
+/* Línea de acento con gradiente (dentro del título) */
+.hero-titulo-vibez .acento {
+    background: linear-gradient(135deg, #c084fc, #e879f9, #f0abfc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+}
+
+/* Subtítulo del hero con Archivo Narrow */
+.hero-subtitulo-vibez {
+    font-family: var(--font-narrow);
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.02em;
+    max-width: 480px;
+    margin: 0 0 36px;
+    line-height: 1.6;
+}
+
+/* Pills de stats debajo del subtítulo */
+.hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.hero-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(7,6,12,0.55);
+    border: 1px solid rgba(168,85,247,0.35);
+    backdrop-filter: blur(10px);
+    border-radius: 999px;
+    font-family: var(--font-narrow);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245,241,234,0.88);
+}
+.hero-stat-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #a855f7;
+    animation: stat-pulse 1.8s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes stat-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* Orbs animados de fondo en el hero (igual que auth pages) */
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    will-change: transform;
+    z-index: 2;
+}
+.hero-orb-1 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%);
+    top: -120px; left: -80px;
+    animation: orb-flotar 9s ease-in-out infinite;
+}
+.hero-orb-2 {
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(168,85,247,0.28) 0%, transparent 70%);
+    bottom: -60px; right: -40px;
+    animation: orb-flotar 12s ease-in-out infinite reverse;
+}
+.hero-orb-3 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%);
+    top: 40%; left: 55%;
+    animation: orb-flotar 7s ease-in-out infinite 2s;
+}
+@keyframes orb-flotar {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(15px, -20px) scale(1.06); }
+    66%       { transform: translate(-10px, 12px) scale(0.96); }
+}
+
+/* ==========================================
+   4. MARQUEE — banda animada entre hero y filtros
+   ========================================== */
+.marquee-vibez {
+    background: linear-gradient(90deg, var(--violet-deep), var(--morado), var(--morado-2));
+    overflow: hidden;
+    padding: 10px 0;
+    white-space: nowrap;
+    position: relative;
+    /* borde difuminado en los extremos */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+    mask-image:         linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+/* Pista que se desplaza con animación CSS pura */
+.marquee-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    animation: scroll-marquee 28s linear infinite;
+    will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* Duplicamos la pista en el HTML para que el bucle sea infinito y sin salto */
+@keyframes scroll-marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* Cada item de la banda */
+.marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 28px;
+    font-family: var(--font-narrow);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+/* Separador entre items */
+.marquee-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* ==========================================
+   5. CHIPS DE MOOD — filtro rápido por vibe
+   ========================================== */
+.mood-strip {
+    background: var(--dark-bg-2);
+    border-bottom: 1px solid var(--dark-line);
+    padding: 14px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.mood-strip::-webkit-scrollbar { display: none; }
+
+.mood-strip-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 clamp(1rem, 4vw, 2rem);
+    width: max-content;
+}
+
+/* Etiqueta "Elige tu vibe" */
+.mood-label {
+    font-family: var(--font-narrow);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245, 241, 234, 0.35);
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+/* Chip individual */
+.mood-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 18px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(245,241,234,0.12);
+    background: rgba(245,241,234,0.04);
+    color: rgba(245,241,234,0.65);
+    font-family: var(--font-narrow);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    user-select: none;
+}
+.mood-chip:hover {
+    border-color: var(--morado-2);
+    background: rgba(168,85,247,0.12);
+    color: #c084fc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+}
+.mood-chip.activo {
+    background: linear-gradient(135deg, var(--morado), var(--morado-2));
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45);
+}
+
+/* ==========================================
+   6. FILTER BAR — dark override
+   ========================================== */
+.barra-filtros {
+    background: rgba(13, 10, 24, 0.96) !important;
+    border-bottom: 1px solid var(--dark-line) !important;
+    backdrop-filter: blur(12px);
+}
+.barra-filtros .filtro-label {
+    color: rgba(245,241,234,0.45) !important;
+}
+.barra-filtros .custom-select-wrapper {
+    background: rgba(245,241,234,0.05) !important;
+    border: 1px solid rgba(245,241,234,0.12) !important;
+    color: rgba(245,241,234,0.85) !important;
+}
+.barra-filtros .custom-select-wrapper:hover,
+.barra-filtros .custom-select-wrapper.abierto {
+    border-color: rgba(168,85,247,0.5) !important;
+    background: rgba(168,85,247,0.08) !important;
+}
+.barra-filtros .custom-select-display {
+    color: rgba(245,241,234,0.85) !important;
+}
+.barra-filtros .custom-select-arrow {
+    color: rgba(245,241,234,0.45) !important;
+}
+.custom-select-dropdown {
+    background: #0d0a18 !important;
+    border: 1px solid rgba(245,241,234,0.12) !important;
+}
+.custom-select-option {
+    color: rgba(245,241,234,0.75) !important;
+}
+.custom-select-option:hover {
+    background: rgba(168,85,247,0.15) !important;
+    color: #c084fc !important;
+}
+.custom-select-option.seleccionado {
+    background: rgba(168,85,247,0.2) !important;
+    color: #a855f7 !important;
+}
+/* Contador de resultados */
+.barra-filtros #contador-resultados {
+    color: var(--morado-2) !important;
+}
+/* Botón solo favoritos */
+.btn-favoritos-filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    background: rgba(245,241,234,0.04);
+    color: #a855f7;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 0.58rem 0.78rem;
+    border-radius: 0.8rem;
+    transition: all 0.2s ease;
+}
+.btn-favoritos-filtro:hover    { border-color: rgba(168,85,247,0.55); background: rgba(168,85,247,0.1); }
+.btn-favoritos-filtro.activo   { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #ffffff; border-color: transparent; }
+/* Botón limpiar */
+.btn-limpiar {
+    background: rgba(245,241,234,0.06) !important;
+    border-color: rgba(245,241,234,0.12) !important;
+    color: rgba(245,241,234,0.55) !important;
+}
+.btn-limpiar:hover {
+    background: rgba(245,241,234,0.10) !important;
+    color: var(--dark-ink) !important;
+}
+/* Texto "resultados" */
+.barra-filtros .text-sm {
+    color: rgba(245,241,234,0.4) !important;
+}
+
+/* ==========================================
+   7. SECCIÓN CONTENIDO — dark wrapper
+   ========================================== */
+.home-seccion-dark {
+    background: var(--dark-bg);
+    padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2rem);
+}
+.home-seccion-dark-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Separador decorativo de sección */
+.home-seccion-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+.home-seccion-kicker {
+    font-family: var(--font-narrow);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #a855f7;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.home-seccion-kicker::before {
+    content: '';
+    width: 28px; height: 1px;
+    background: #a855f7;
+    flex-shrink: 0;
+}
+
+/* Título de sección con Archivo */
+.seccion-vibez-titulo {
+    font-family: 'Anton', var(--font-body);
+    font-size: clamp(28px, 4vw, 48px);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--dark-ink) !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 6px;
+}
+.seccion-vibez-titulo svg { color: #a855f7; }
+
+/* Subtítulo de sección */
+.seccion-vibez-sub {
+    font-family: var(--font-narrow);
+    font-size: 14px;
+    color: rgba(245,241,234,0.45) !important;
+    margin: 0 0 28px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Contador de resultados con fuente narrow */
+#contador-resultados {
+    font-family: var(--font-narrow);
+    font-weight: 800;
+    color: var(--morado-2);
+}
+
+/* ==========================================
+   8. TARJETAS DE EVENTO — dark redesign
+   ========================================== */
+.card-evento {
+    background: var(--dark-bg-2) !important;
+    border: 1px solid var(--dark-line) !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-evento:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,85,247,0.3);
+    border-color: rgba(168,85,247,0.3) !important;
+}
+.card-titulo {
+    color: var(--dark-ink) !important;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+}
+.card-meta {
+    color: rgba(245,241,234,0.5) !important;
+}
+.card-organizador {
+    color: rgba(245,241,234,0.4) !important;
+}
+
+/* ==========================================
+   9. FAVORITOS — preservamos estilos
+   ========================================== */
+.btn-favorito-card {
+    position: absolute;
+    bottom: 0.65rem;
+    right: 0.65rem;
+    z-index: 12;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: rgba(7, 6, 12, 0.65);
+    backdrop-filter: blur(5px);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.btn-favorito-card:hover {
+    transform: scale(1.06);
+    background: rgba(7, 6, 12, 0.82);
+}
+.btn-favorito-card svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: currentColor;
+    opacity: 0.78;
+}
+.btn-favorito-card.activo {
+    background: rgba(244, 63, 94, 0.92);
+}
+.btn-favorito-card.activo svg { opacity: 1; }
+.btn-favorito-card.cargando  { opacity: 0.7; pointer-events: none; }
+
+/* ==========================================
+   10. SPINNER Y SIN RESULTADOS — dark
+   ========================================== */
+#sin-resultados {
+    color: var(--dark-ink) !important;
+}
+#sin-resultados p {
+    color: rgba(245,241,234,0.45) !important;
+}
+#sin-resultados .font-bold {
+    color: var(--dark-ink) !important;
+}
+
+/* ==========================================
+   11. GRID — dark overrides
+   ========================================== */
+#grid-resultados,
+#seccion-eventos {
+    /* Heredan del dark-bg del body */
+}

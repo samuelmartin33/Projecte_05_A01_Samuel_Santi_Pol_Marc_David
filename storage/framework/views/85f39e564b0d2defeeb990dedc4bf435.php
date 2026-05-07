@@ -1,20 +1,16 @@
-@extends('layouts.app')
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('title', 'Crear cuenta — VIBEZ')
-@section('html-class', 'auth-page')
-@section('body-class', 'grain')
+<?php $__env->startSection('title', 'Crear cuenta — VIBEZ'); ?>
+<?php $__env->startSection('html-class', 'auth-page'); ?>
+<?php $__env->startSection('body-class', 'grain'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="auth-shell">
 
-    {{-- ════════════════════════════════════════════════════
-         PANEL IZQUIERDO — foto editorial + branding
-    ════════════════════════════════════════════════════ --}}
+    
     <div class="auth-side">
         <img
             src="https://picsum.photos/seed/vibez-night-reg/800/1200"
@@ -24,16 +20,16 @@
         >
         <div class="auth-side-overlay"></div>
 
-        {{-- Top: logo + volver --}}
+        
         <div class="auth-side-top">
-            <a href="{{ route('home') }}" class="auth-logo" aria-label="VIBEZ — Inicio">
-                <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ">
+            <a href="<?php echo e(route('home')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
                 <span>VIBEZ</span>
             </a>
-            <a href="{{ route('login') }}" class="auth-back">← Entrar</a>
+            <a href="<?php echo e(route('login')); ?>" class="auth-back">← Entrar</a>
         </div>
 
-        {{-- Contenido editorial inferior --}}
+        
         <div class="auth-side-content">
             <p class="auth-kicker mono">
                 <span class="kicker-line"></span>
@@ -60,13 +56,11 @@
         </div>
 
         <div class="auth-side-bottom">
-            <span class="mono" style="font-size:10px;letter-spacing:0.18em">VIBEZ © {{ date('Y') }}</span>
+            <span class="mono" style="font-size:10px;letter-spacing:0.18em">VIBEZ © <?php echo e(date('Y')); ?></span>
         </div>
     </div>
 
-    {{-- ════════════════════════════════════════════════════
-         PANEL DERECHO — formulario de registro
-    ════════════════════════════════════════════════════ --}}
+    
     <div class="auth-main">
 
         <div class="deco-sticker deco-2">★ Nueva cuenta</div>
@@ -76,21 +70,21 @@
 
             <p class="auth-step mono">— REGISTRO</p>
 
-            {{-- Cabecera (id="formHeader" usado por register.js para estado pendiente) --}}
+            
             <div id="formHeader">
                 <h1 class="auth-title display">
                     Crea tu<br>
                     <em>cuenta.</em>
                 </h1>
                 <p class="auth-sub">
-                    ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
+                    ¿Ya tienes cuenta? <a href="<?php echo e(route('login')); ?>">Inicia sesión</a>
                 </p>
             </div>
 
-            {{-- Alerta global --}}
+            
             <div id="alert-global" class="alert alert-error" role="alert"></div>
 
-            {{-- Tabs de tipo de cuenta: Soy raver / Soy promotor --}}
+            
             <div class="auth-tabs">
                 <button
                     type="button"
@@ -114,11 +108,11 @@
                 </button>
             </div>
 
-            {{-- Formulario --}}
+            
             <form id="registerForm" novalidate autocomplete="off" onsubmit="registrar(event)">
                 <div class="auth-form">
 
-                    {{-- Nombre --}}
+                    
                     <div class="auth-field" id="field-nombre">
                         <label class="auth-label" for="nombre">Nombre</label>
                         <input
@@ -133,7 +127,7 @@
                         <span class="field-error" id="error-nombre" role="alert"></span>
                     </div>
 
-                    {{-- Apellidos en grid 2 columnas --}}
+                    
                     <div class="auth-grid-2">
                         <div class="auth-field" id="field-apellido1">
                             <label class="auth-label" for="apellido1">Primer apellido</label>
@@ -164,7 +158,7 @@
                         </div>
                     </div>
 
-                    {{-- Email --}}
+                    
                     <div class="auth-field" id="field-email">
                         <label class="auth-label" for="email">Correo electrónico</label>
                         <input
@@ -179,7 +173,7 @@
                         <span class="field-error" id="error-email" role="alert"></span>
                     </div>
 
-                    {{-- Contraseñas en grid 2 columnas --}}
+                    
                     <div class="auth-grid-2">
                         <div class="auth-field" id="field-password">
                             <label class="auth-label" for="password">Contraseña</label>
@@ -209,7 +203,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            {{-- Barra de fortaleza --}}
+                            
                             <div class="auth-strength">
                                 <div class="auth-strength-track">
                                     <div class="auth-strength-bar" id="strength-bar"></div>
@@ -250,8 +244,8 @@
                         </div>
                     </div>
 
-                    {{-- Tipo de cuenta: select oculto sincronizado con los tabs --}}
-                    {{-- El div existe para el classList.toggle('has-value') del JS, aunque esté oculto --}}
+                    
+                    
                     <div id="field-tipo_cuenta" style="display:none" aria-hidden="true">
                         <select
                             id="tipo_cuenta"
@@ -264,11 +258,11 @@
                             <option value="empresa">Empresa</option>
                         </select>
                     </div>
-                    {{-- Error e hint de tipo de cuenta fuera del div oculto para ser visibles --}}
+                    
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
                     <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px"></p>
 
-                    {{-- Fecha de nacimiento y teléfono --}}
+                    
                     <div class="auth-grid-2">
                         <div class="auth-field" id="field-fecha_nacimiento">
                             <label class="auth-label" for="fecha_nacimiento">Fecha de nacimiento</label>
@@ -297,7 +291,7 @@
                         </div>
                     </div>
 
-                    {{-- Fila de botones: submit + Google (id="btnRow" eliminado por JS en estado pendiente) --}}
+                    
                     <div id="btnRow">
                         <button
                             type="submit"
@@ -314,7 +308,7 @@
                         <div class="auth-divider"><span>o continúa con</span></div>
 
                         <div class="google-btn-wrapper">
-                            <div id="google-signin-btn" data-client-id="{{ config('services.google.client_id') }}"></div>
+                            <div id="google-signin-btn" data-client-id="<?php echo e(config('services.google.client_id')); ?>"></div>
                         </div>
                     </div>
 
@@ -330,13 +324,13 @@
 
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <script src="{{ asset('js/register.js') }}"></script>
+    <script src="<?php echo e(asset('js/register.js')); ?>"></script>
     <script>
         /* Inicializar tabs: el tab "cliente" arranca activo, sincronizar el select */
         (function () {
@@ -374,4 +368,6 @@
             etiqueta.textContent   = f > 0 ? (niveles[f] || '') : '';
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/register.blade.php ENDPATH**/ ?>

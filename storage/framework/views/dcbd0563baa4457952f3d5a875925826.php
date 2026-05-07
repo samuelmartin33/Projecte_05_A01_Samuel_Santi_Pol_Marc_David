@@ -1,16 +1,12 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Iniciar sesión — VIBEZ'); ?>
+<?php $__env->startSection('html-class', 'auth-page'); ?>
+<?php $__env->startSection('body-class', 'grain'); ?>
 
-@section('title', 'Iniciar sesión — VIBEZ')
-@section('html-class', 'auth-page')
-@section('body-class', 'grain')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="auth-shell">
 
-    {{-- ════════════════════════════════════════════════════
-         PANEL IZQUIERDO — foto editorial + branding
-    ════════════════════════════════════════════════════ --}}
+    
     <div class="auth-side">
         <img
             src="https://picsum.photos/seed/vibez-night-login/800/1200"
@@ -20,16 +16,16 @@
         >
         <div class="auth-side-overlay"></div>
 
-        {{-- Top: logo + volver --}}
+        
         <div class="auth-side-top">
-            <a href="{{ route('home') }}" class="auth-logo" aria-label="VIBEZ — Inicio">
-                <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ">
+            <a href="<?php echo e(route('home')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
                 <span>VIBEZ</span>
             </a>
-            <a href="{{ route('home') }}" class="auth-back">← Explorar</a>
+            <a href="<?php echo e(route('home')); ?>" class="auth-back">← Explorar</a>
         </div>
 
-        {{-- Contenido editorial inferior --}}
+        
         <div class="auth-side-content">
             <p class="auth-kicker mono">
                 <span class="kicker-line"></span>
@@ -49,13 +45,11 @@
         </div>
 
         <div class="auth-side-bottom">
-            <span class="mono" style="font-size:10px;letter-spacing:0.18em">VIBEZ © {{ date('Y') }}</span>
+            <span class="mono" style="font-size:10px;letter-spacing:0.18em">VIBEZ © <?php echo e(date('Y')); ?></span>
         </div>
     </div>
 
-    {{-- ════════════════════════════════════════════════════
-         PANEL DERECHO — formulario de acceso
-    ════════════════════════════════════════════════════ --}}
+    
     <div class="auth-main">
 
         <div class="deco-sticker deco-1">↯ Bienvenido</div>
@@ -71,17 +65,17 @@
             </h1>
 
             <p class="auth-sub">
-                ¿No tienes cuenta? <a href="{{ route('register') }}">Regístrate gratis</a>
+                ¿No tienes cuenta? <a href="<?php echo e(route('register')); ?>">Regístrate gratis</a>
             </p>
 
-            {{-- Alerta global: errores del backend --}}
+            
             <div id="alert-global" class="alert alert-error" role="alert"></div>
 
-            {{-- Formulario — novalidate: validación propia en login.js --}}
+            
             <form id="loginForm" novalidate autocomplete="off" onsubmit="iniciarSesion(event)">
                 <div class="auth-form">
 
-                    {{-- Campo email --}}
+                    
                     <div class="auth-field" id="field-email">
                         <label class="auth-label" for="email">Correo electrónico</label>
                         <input
@@ -96,7 +90,7 @@
                         <span class="field-error" id="error-email" role="alert"></span>
                     </div>
 
-                    {{-- Campo contraseña --}}
+                    
                     <div class="auth-field" id="field-password">
                         <label class="auth-label" for="password">Contraseña</label>
                         <div class="auth-input-wrap">
@@ -127,7 +121,7 @@
                         <span class="field-error" id="error-password" role="alert"></span>
                     </div>
 
-                    {{-- Botón submit con ripple y spinner --}}
+                    
                     <button
                         type="submit"
                         class="btn-primary auth-btn-main"
@@ -152,8 +146,10 @@
 
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
-    <script src="{{ asset('js/login.js') }}"></script>
-@endsection
+<?php $__env->startSection('scripts'); ?>
+    <script src="<?php echo e(asset('js/login.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/login.blade.php ENDPATH**/ ?>
