@@ -513,6 +513,7 @@ body {
     gap: 0.35rem;
     font-size: 0.92rem;
     font-weight: 600;
+    color: #e8e4f0;
 }
 
 .grid-form input:not([type="checkbox"]),
@@ -520,10 +521,25 @@ body {
 .grid-form textarea {
     font: inherit;
     font-weight: 400;
-    border: 1px solid var(--border);
+    border: 1px solid #d4d1dd;
     border-radius: 8px;
     padding: 0.6rem;
-    background: #fff;
+    background: #eae9ed;
+    color: #2d2633;
+}
+
+.grid-form input::placeholder,
+.grid-form textarea::placeholder {
+    color: #8b8691;
+}
+
+.grid-form input:focus,
+.grid-form select:focus,
+.grid-form textarea:focus {
+    outline: none;
+    background: #fafafa;
+    border-color: var(--morado);
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
 }
 
 .grid-form .full {
