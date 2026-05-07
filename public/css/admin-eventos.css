@@ -1,9 +1,12 @@
 :root {
-    --paper: #ffffff;
-    --ink: #1e1b4b;
+    --morado: #7c3aed;
+    --morado-2: #a855f7;
+    --dark-bg: #0d0820;
+    --dark-bg-2: #0d0a18;
+    --dark-ink: #f5f1ea;
+    --dark-line: rgba(245,241,234,0.10);
     --accent: #7c3aed;
     --danger: #be123c;
-    --border: #c4b5fd;
 }
 
 /* Importar fuente Inter desde Bunny Fonts (sin Google) */
@@ -16,8 +19,8 @@
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(180deg, #f7f5ff 0%, #f0ecff 30%, #f7f5ff 100%) fixed;
-    color: var(--ink);
+    background: linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
+    color: var(--dark-ink);
 }
 
 .admin-shell {
@@ -130,11 +133,18 @@ body {
 
 /* ─── CARDS ────────────────────────────────────────────── */
 .card {
-    background: var(--paper);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    background: var(--dark-bg-2);
+    border: 1px solid var(--dark-line);
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.2);
 }
 
 /* ─── ADMIN SECTIONS / TABLES ─────────────────────────── */
@@ -149,7 +159,7 @@ body {
 .panel-header h2 {
     margin: 0;
     font-size: 1.08rem;
-    color: #7c3aed;
+    color: var(--morado-2);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -204,18 +214,23 @@ body {
 .admin-table th,
 .admin-table td {
     padding: 0.8rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--dark-line);
     text-align: left;
     vertical-align: middle;
 }
 
 .tabla-eventos th,
 .admin-table th {
-    background: #ede9fe;
+    background: rgba(168, 85, 247, 0.1);
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #5b21b6;
+    color: var(--morado-2);
+}
+
+.tabla-eventos td,
+.admin-table td {
+    color: rgba(245, 241, 234, 0.8);
 }
 
 .actions-cell,
@@ -253,8 +268,8 @@ body {
 }
 
 .btn-secondary {
-    background: #ede9fe;
-    color: #5b21b6;
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--morado-2);
 }
 
 .btn-danger {
@@ -271,18 +286,18 @@ body {
 }
 
 .estado.activo {
-    background: #d1fae5;
-    color: #065f46;
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
 }
 
 .estado.inactivo {
-    background: #fee2e2;
-    color: #991b1b;
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
 }
 
 .empty {
     text-align: center;
-    color: #52606d;
+    color: rgba(245, 241, 234, 0.5);
 }
 
 /* ─── PAGINACION ───────────────────────────────────────── */
@@ -358,7 +373,7 @@ body {
 .dashboard-page {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 1.8rem;
 }
 
 .dashboard-metrics-card,
@@ -367,18 +382,28 @@ body {
 }
 
 .dashboard-section-title {
-    margin: 0 0 0.6rem 0;
+    margin: 0 0 1.2rem 0;
     padding: 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    color: #7c3aed;
+    color: var(--morado-2);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.dashboard-section-title::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--morado-2);
 }
 
 .dashboard-metrics-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
 }
 
 .dashboard-metric-item {
@@ -387,44 +412,49 @@ body {
     justify-content: space-between;
     gap: 0.75rem;
     min-width: 0;
-    padding: 1.35rem 1.1rem;
-    min-height: 120px;
+    padding: 1.5rem 1.35rem;
+    min-height: 130px;
+    border-right: 1px solid var(--dark-line);
+    border-bottom: 1px solid var(--dark-line);
 }
 
-.dashboard-metric-item + .dashboard-metric-item {
-    border-left: 1px solid var(--border);
+.dashboard-metric-item:nth-child(3n) {
+    border-right: none;
 }
 
 .dashboard-metric-item:nth-child(n + 4) {
-    border-top: 1px solid var(--border);
+    border-top: none;
 }
 
 .dashboard-metric-label {
     min-width: 0;
-    font-size: 1.06rem;
-    line-height: 1.35;
-    color: #7c3aed;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: rgba(245, 241, 234, 0.55);
     font-weight: 600;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .dashboard-metric-value {
     flex: 0 0 auto;
-    font-size: 2.3rem;
+    font-size: 2.5rem;
     line-height: 1;
-    font-weight: 700;
-    color: var(--accent);
+    font-weight: 800;
+    color: var(--morado-2);
     letter-spacing: -0.04em;
-    margin: 0.5rem 0 0;
+    margin: 0.8rem 0 0;
 }
 
 .dashboard-metric-value--danger {
-    color: #e24b4a;
+    color: #f87171;
 }
 
 .dashboard-actions-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
 }
 
 .dashboard-action-item {
@@ -432,16 +462,26 @@ body {
     align-items: center;
     justify-content: flex-start;
     gap: 0;
-    min-height: 80px;
-    padding: 1.2rem 1.1rem;
+    min-height: 90px;
+    padding: 1.5rem 1.35rem;
     text-decoration: none;
-    color: var(--ink);
+    color: var(--dark-ink);
     font-weight: 600;
-    transition: background 0.18s ease;
+    font-size: 0.95rem;
+    border-right: 1px solid var(--dark-line);
+    border-bottom: 1px solid var(--dark-line);
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dashboard-action-item:nth-child(even) {
+    border-right: none;
 }
 
 .dashboard-action-item:hover {
-    background: #f5efff;
+    background: rgba(168, 85, 247, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(168, 85, 247, 0.2);
+    color: var(--morado-2);
 }
 
 .dashboard-action-item:nth-child(odd) {

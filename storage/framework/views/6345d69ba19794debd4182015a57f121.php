@@ -1,5 +1,9 @@
 <?php $__env->startSection('titulo', 'Mi Perfil — VIBEZ'); ?>
 
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/perfil.css')); ?>">
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('contenido'); ?>
 
 
@@ -55,16 +59,13 @@
                 <p class="perfil-bio-hero"><?php echo e($usuario->biografia); ?></p>
             <?php endif; ?>
 
-            
-            <?php if($usuario->mood && !$usuario->isAdmin() && !$usuario->isEmpresa()): ?>
-                <span class="perfil-mood-hero"><?php echo e($usuario->mood); ?></span>
-            <?php endif; ?>
         </div>
 
     </div>
 </section>
 
 
+<div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <?php if(session('exito')): ?>
         <div class="perfil-alerta perfil-alerta-ok">
@@ -145,65 +146,6 @@
             </form>
         </div>
 
-        
-        
-        <?php if(!$usuario->isAdmin() && !$usuario->isEmpresa()): ?>
-        <div class="perfil-card">
-            <h2 class="perfil-card-titulo">Estado de ánimo</h2>
-            <p class="perfil-card-sub">
-                Visible para <strong>todos</strong> (amigos o no) y aparece en la barra de navegación
-            </p>
-
-            <form action="<?php echo e(route('perfil.mood')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
-
-                <div class="perfil-mood-grid">
-                    
-                    <?php
-                        $moods = [
-                            ''                    => '— Sin estado —',
-                            '🤕 De resaca'        => '🤕 De resaca',
-                            '🥳 De fiesta'        => '🥳 De fiesta',
-                            '🍺 Bebiendo cerveza' => '🍺 Bebiendo cerveza',
-                            '🍷 Bebiendo vino'    => '🍷 Bebiendo vino',
-                            '❤️ Enamorado/a'      => '❤️ Enamorado/a',
-                            '💃 Bailando'         => '💃 Bailando',
-                            '🎵 Escuchando música'=> '🎵 Escuchando música',
-                            '😎 Modo casual'      => '😎 Modo casual',
-                            '💪 En el gym'        => '💪 En el gym',
-                            '😴 Durmiendo'        => '😴 Durmiendo',
-                            '🍕 Comiendo'         => '🍕 Comiendo',
-                            '✈️ De viaje'         => '✈️ De viaje',
-                            '🎮 Gaming'           => '🎮 Gaming',
-                            '☀️ Tomando el sol'   => '☀️ Tomando el sol',
-                            '🤙 Con los amigos'   => '🤙 Con los amigos',
-                        ];
-                    ?>
-
-                    <?php $__currentLoopData = $moods; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $valor => $etiqueta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($valor === ''): ?>
-                            
-                            <label class="perfil-mood-opcion <?php echo e($usuario->mood === null ? 'perfil-mood-activo' : ''); ?>">
-                                <input type="radio" name="mood" value=""
-                                       <?php echo e($usuario->mood === null ? 'checked' : ''); ?>>
-                                <span><?php echo e($etiqueta); ?></span>
-                            </label>
-                        <?php else: ?>
-                            <label class="perfil-mood-opcion <?php echo e($usuario->mood === $valor ? 'perfil-mood-activo' : ''); ?>">
-                                <input type="radio" name="mood" value="<?php echo e($valor); ?>"
-                                       <?php echo e($usuario->mood === $valor ? 'checked' : ''); ?>>
-                                <span><?php echo e($etiqueta); ?></span>
-                            </label>
-                        <?php endif; ?>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-
-                <button type="submit" class="btn-perfil-guardar" style="margin-top:16px">
-                    Guardar estado
-                </button>
-            </form>
-        </div>
-        <?php endif; ?>
 
     </div>
 
@@ -292,10 +234,6 @@
                                     <?php echo e($amigo->nombre); ?> <?php echo e($amigo->apellido1); ?>
 
                                 </p>
-                                
-                                <?php if($amigo->mood): ?>
-                                    <p class="text-xs" style="color:rgba(15,23,42,0.45)"><?php echo e($amigo->mood); ?></p>
-                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -311,6 +249,7 @@
 
     </div>
 
+</div>
 </div>
 
 <?php $__env->stopSection(); ?>
