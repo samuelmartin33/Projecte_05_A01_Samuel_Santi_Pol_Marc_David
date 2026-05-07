@@ -358,66 +358,27 @@ body {
 .dashboard-page {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.9rem;
 }
 
-.dashboard-search-card,
 .dashboard-metrics-card,
 .dashboard-actions-card {
     padding: 0;
 }
 
-.dashboard-search-inner {
-    min-height: 72px;
-    padding: 1rem 1.15rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.dashboard-search-field {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.dashboard-search-icon {
-    width: 18px;
-    height: 18px;
-    color: var(--accent);
-    flex: 0 0 auto;
-}
-
-.dashboard-search-input {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--ink);
-    font-size: 0.98rem;
-    font-weight: 500;
-}
-
-.dashboard-search-input::placeholder {
-    color: #9ca3af;
-}
-
-.dashboard-search-shortcut {
-    flex: 0 0 auto;
-    padding-left: 1rem;
-    border-left: 1px solid var(--border);
-    color: #9ca3af;
-    font-size: 0.88rem;
+.dashboard-section-title {
+    margin: 0 0 0.6rem 0;
+    padding: 0;
+    font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    color: #7c3aed;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .dashboard-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .dashboard-metric-item {
@@ -432,6 +393,10 @@ body {
 
 .dashboard-metric-item + .dashboard-metric-item {
     border-left: 1px solid var(--border);
+}
+
+.dashboard-metric-item:nth-child(n + 4) {
+    border-top: 1px solid var(--border);
 }
 
 .dashboard-metric-label {
@@ -635,18 +600,6 @@ body {
    RESPONSIVE — Mobile  (≤ 800px)
 ═══════════════════════════════════════════════════════ */
 @media (max-width: 800px) {
-    .dashboard-search-inner {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-    }
-
-    .dashboard-search-shortcut {
-        padding-left: 0;
-        border-left: 0;
-        align-self: flex-end;
-    }
-
     .dashboard-metrics-grid {
         grid-template-columns: 1fr 1fr;
     }

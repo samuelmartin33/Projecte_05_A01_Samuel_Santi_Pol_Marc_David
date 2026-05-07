@@ -4,23 +4,7 @@
 
 @section('content')
     <section class="dashboard-page">
-        <div class="card dashboard-search-card">
-            <div class="dashboard-search-inner">
-                <div class="dashboard-search-field">
-                    <svg class="dashboard-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7"></circle>
-                        <path d="M20 20l-3.5-3.5"></path>
-                    </svg>
-                    <input
-                        type="text"
-                        class="dashboard-search-input"
-                        placeholder="Buscar eventos, usuarios..."
-                        aria-label="Buscar eventos, usuarios"
-                    >
-                </div>
-            </div>
-        </div>
-
+        <h2 class="dashboard-section-title">Datos</h2>
         <section class="card dashboard-metrics-card" aria-label="Métricas del panel">
             <div class="dashboard-metrics-grid">
                 <article class="dashboard-metric-item">
@@ -35,7 +19,14 @@
                     <span class="dashboard-metric-label">Empresas pendientes</span>
                     <span class="dashboard-metric-value dashboard-metric-value--danger">{{ $empresasPendientes }}</span>
                 </article>
-                
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Pedidos</span>
+                    <span class="dashboard-metric-value">{{ $totalPedidos }}</span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Categorías</span>
+                    <span class="dashboard-metric-value">{{ $totalCategorias }}</span>
+                </article>
                 <article class="dashboard-metric-item">
                     <span class="dashboard-metric-label">Pagos</span>
                     <span class="dashboard-metric-value">{{ $totalPagos }}</span>
@@ -43,6 +34,7 @@
             </div>
         </section>
 
+        <h2 class="dashboard-section-title">Acciones Rápidas</h2>
         <section class="card dashboard-actions-card" aria-label="Acciones rápidas">
             <div class="dashboard-actions-grid">
                 <a class="dashboard-action-item" href="{{ route('admin.eventos.create') }}">
