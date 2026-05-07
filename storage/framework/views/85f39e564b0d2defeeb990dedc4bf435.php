@@ -21,15 +21,6 @@
         <div class="auth-side-overlay"></div>
 
         
-        <div class="auth-side-top">
-            <a href="<?php echo e(route('home')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
-                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
-                <span>VIBEZ</span>
-            </a>
-            <a href="<?php echo e(route('login')); ?>" class="auth-back">← Entrar</a>
-        </div>
-
-        
         <div class="auth-side-content">
             <p class="auth-kicker mono">
                 <span class="kicker-line"></span>
@@ -64,15 +55,13 @@
     <div class="auth-main">
 
         
-        <div class="auth-main-topbar">
-            <a href="<?php echo e(route('welcome')); ?>" class="auth-back-home">← Inicio</a>
+        <div class="auth-main-topbar auth-main-topbar--register">
             <a href="<?php echo e(route('welcome')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
                 <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
                 <span>VIBEZ</span>
             </a>
+            <span class="auth-topbar-tag">★ Nueva cuenta</span>
         </div>
-
-        <div class="deco-sticker deco-2">★ Nueva cuenta</div>
         <div class="deco-numbers">07<br>01</div>
 
         <div class="auth-form-wrap auth-form-wide">
@@ -297,6 +286,38 @@
                     <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px"></p>
 
                     
+                    <div class="auth-field" id="empresa-field-wrap" style="display:none">
+                        <label class="auth-label" for="nombre_empresa">Empresa / Sala</label>
+                        <input
+                            type="text"
+                            id="nombre_empresa"
+                            name="nombre_empresa"
+                            placeholder="Razzmatazz S.L."
+                            autocomplete="organization"
+                        >
+                    </div>
+
+                    
+                    <div class="auth-mood-pick">
+                        <span class="auth-label mono">¿Qué te va?</span>
+                        <div class="auth-mood-grid">
+                            <label><input type="checkbox" name="musica[]" value="techno"><span>🌀 Techno</span></label>
+                            <label><input type="checkbox" name="musica[]" value="disco"><span>💋 Disco</span></label>
+                            <label><input type="checkbox" name="musica[]" value="reggaeton"><span>🔥 Reggaeton</span></label>
+                            <label><input type="checkbox" name="musica[]" value="indie"><span>🎸 Indie</span></label>
+                            <label><input type="checkbox" name="musica[]" value="conciertos"><span>🎤 Conciertos</span></label>
+                            <label><input type="checkbox" name="musica[]" value="chill"><span>🌅 Chill</span></label>
+                        </div>
+                    </div>
+
+                    
+                    <label class="auth-check auth-check-tall">
+                        <input type="checkbox" name="acepta_terminos" required>
+                        <span class="auth-check-box"></span>
+                        <span>Acepto los <a href="#">Términos de uso</a> y la <a href="#">Política de privacidad</a>. Soy mayor de 16 años.</span>
+                    </label>
+
+                    
                     <div id="btnRow">
                         <button
                             type="submit"
@@ -304,7 +325,7 @@
                             id="submitBtn"
                             onclick="rippleBtn(event, this)"
                         >
-                            <span class="btn-text">Crear cuenta</span>
+                            <span class="btn-text">Crear mi pase VIBEZ →</span>
                             <span class="btn-spinner" aria-hidden="true">
                                 <span class="spinner-ring"></span>
                             </span>
@@ -312,7 +333,7 @@
 
                         <div class="auth-divider"><span>o continúa con</span></div>
 
-                        <div class="google-btn-wrapper">
+                        <div class="google-btn-wrapper" id="google-btn-wrapper">
                             <div id="google-signin-btn" data-client-id="<?php echo e(config('services.google.client_id')); ?>"></div>
                         </div>
                     </div>
@@ -320,8 +341,8 @@
                 </div>
             </form>
 
-            <p class="auth-fineprint">
-                Al registrarte aceptas nuestros <a href="#">Términos</a> y <a href="#">Política de privacidad</a>
+            <p class="auth-fineprint mono">
+                Verificaremos tu email. ¡Empieza la fiesta inmediatamente!
             </p>
 
         </div>
@@ -345,15 +366,17 @@
 
         /* Cambia el tab activo y sincroniza el select oculto */
         function seleccionarTab(tipo, elTab) {
-            /* Actualizar estilos de tabs */
             var tabs = document.querySelectorAll('.auth-tab');
             for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
             elTab.classList.add('active');
 
-            /* Sincronizar select oculto y disparar la lógica de hint */
             var select = document.getElementById('tipo_cuenta');
             select.value = tipo;
             cambiarTipoCuenta(select);
+
+            /* Mostrar campo empresa solo para promotores */
+            var empresaWrap = document.getElementById('empresa-field-wrap');
+            if (empresaWrap) empresaWrap.style.display = tipo === 'empresa' ? 'flex' : 'none';
         }
 
         /* Actualiza la barra de fortaleza de la contraseña */
