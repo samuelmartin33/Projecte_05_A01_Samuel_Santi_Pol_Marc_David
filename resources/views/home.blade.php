@@ -9,77 +9,87 @@
 @section('contenido')
 
 {{-- ════════════════════════════════════════════════════
-     BANNER HERO — Fondo oscuro con orbs neon animados
+     HERO EDITORIAL
 ════════════════════════════════════════════════════ --}}
-<section class="hero-home">
+<section class="relative overflow-hidden bg-ink" style="padding:80px 0 64px;">
 
-    {{-- Partículas decorativas (estrellitas de luz) --}}
-    <div class="hero-particula hero-particula-1"></div>
-    <div class="hero-particula hero-particula-2"></div>
-    <div class="hero-particula hero-particula-3"></div>
-    <div class="hero-particula hero-particula-4"></div>
-    <div class="hero-particula hero-particula-5"></div>
+    {{-- Dot grid overlay --}}
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(139,120,204,0.15) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;z-index:0"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10">
+    {{-- Orbs animados --}}
+    <div style="position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(139,120,204,0.25) 0%,transparent 60%);top:-180px;right:-120px;pointer-events:none;z-index:0;animation:orbA 16s ease-in-out infinite"></div>
+    <div style="position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(78,58,150,0.2) 0%,transparent 60%);bottom:-100px;left:-80px;pointer-events:none;z-index:0;animation:orbB 20s ease-in-out infinite"></div>
 
-        {{-- Badge de bienvenida --}}
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
-             style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#c084fc;letter-spacing:0.06em;text-transform:uppercase;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
-            </svg>
-            La plataforma de la escena joven
+    <div class="max-w-7xl mx-auto px-6 sm:px-10 relative" style="z-index:1">
+
+        {{-- Grid editorial asimétrico --}}
+        <div class="grid md:grid-cols-12 gap-8 items-end">
+
+            {{-- Col izquierda: headline --}}
+            <div class="md:col-span-7 anim-in">
+                <p class="font-mono text-xs uppercase tracking-widest text-paper/40 mb-4">
+                    — La escena joven · {{ \Carbon\Carbon::now()->locale('es')->isoFormat('MMMM YYYY') }}
+                </p>
+                <h1 class="font-display font-black uppercase text-paper tracking-tightest leading-[0.88]"
+                    style="font-size:clamp(3.5rem,10vw,9rem)">
+                    Descubre<br>
+                    tu próximo<br>
+                    <em class="text-lilac not-italic">evento.</em>
+                </h1>
+            </div>
+
+            {{-- Col derecha: descripción + stats --}}
+            <div class="md:col-span-5 anim-in-2">
+                <p class="font-sans text-paper/60 text-base leading-relaxed mb-8 max-w-sm">
+                    Conciertos, festivales, exposiciones y trabajo —
+                    todo lo que vive tu escena en un solo lugar.
+                </p>
+                <div class="flex gap-8">
+                    <div class="border-t border-paper/20 pt-4">
+                        <p class="font-display font-black text-3xl text-paper">{{ $eventos->count() }}</p>
+                        <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">Eventos</p>
+                    </div>
+                    <div class="border-t border-paper/20 pt-4">
+                        <p class="font-display font-black text-3xl text-lilac">Live</p>
+                        <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">Ahora</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
-
-        <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Tu próxima<br>
-            <span class="text-gradient-claro">aventura empieza aquí</span>
-        </h1>
-
-        <p class="mt-5 text-white/60 text-base max-w-lg mx-auto leading-relaxed">
-            Eventos, conciertos, festivales y trabajo — todo lo que vive tu escena, en un solo lugar.
-        </p>
 
     </div>
 </section>
 
 {{-- ════════════════════════════════════════════════════
      BARRA DE FILTROS — sticky bajo el nav
-     Usa custom selects (sin look nativo del navegador)
+     Mantiene las clases CSS/JS funcionales
 ════════════════════════════════════════════════════ --}}
-<section class="barra-filtros">
+<section class="barra-filtros sticky top-14 z-40">
 
-    {{-- Overlay transparente para cerrar dropdowns al pulsar fuera --}}
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
          onclick="cerrarTodosDropdowns()"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
 
-        {{-- Contador de resultados --}}
         <p class="text-sm font-semibold mr-auto self-center"
            style="color:rgba(15,23,42,0.5)">
             <span id="contador-resultados">{{ $eventos->count() }}</span>
             <span style="color:var(--morado)"> resultados</span>
         </p>
 
-        {{-- ── Selector de CATEGORÍA personalizado ── --}}
         <div class="filtro-grupo" style="position:relative;z-index:250;">
             <label class="filtro-label">Categoría</label>
-            <div class="custom-select-wrapper"
-                 id="wrapper-categoria"
-                 onclick="toggleDropdown('categoria')">
+            <div class="custom-select-wrapper" id="wrapper-categoria" onclick="toggleDropdown('categoria')">
                 <span id="categoria-display" class="custom-select-display">Todas</span>
-                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
                 <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
-                    <div class="custom-select-option seleccionado"
-                         onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
+                    <div class="custom-select-option seleccionado" onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
                     @foreach ($categorias as $categoria)
-                        <div class="custom-select-option"
-                             onclick="seleccionarFiltro('categoria','{{ $categoria->id }}','{{ $categoria->nombre }}',event)">
+                        <div class="custom-select-option" onclick="seleccionarFiltro('categoria','{{ $categoria->id }}','{{ $categoria->nombre }}',event)">
                             {{ $categoria->nombre }}
                         </div>
                     @endforeach
@@ -88,25 +98,17 @@
             <input type="hidden" id="filtro-categoria" value="">
         </div>
 
-        {{-- ── Selector de UBICACIÓN personalizado ── --}}
         <div class="filtro-grupo" style="position:relative;z-index:240;">
             <label class="filtro-label">Ubicación</label>
-            <div class="custom-select-wrapper"
-                 id="wrapper-ubicacion"
-                 onclick="toggleDropdown('ubicacion')">
+            <div class="custom-select-wrapper" id="wrapper-ubicacion" onclick="toggleDropdown('ubicacion')">
                 <span id="ubicacion-display" class="custom-select-display">Todas las ciudades</span>
-                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
                 <div id="ubicacion-dropdown" class="custom-select-dropdown" style="display:none">
-                    <div class="custom-select-option seleccionado"
-                         onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">
-                        Todas las ciudades
-                    </div>
+                    <div class="custom-select-option seleccionado" onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">Todas las ciudades</div>
                     @foreach ($ubicaciones as $ubicacion)
-                        <div class="custom-select-option"
-                             onclick="seleccionarFiltro('ubicacion','{{ $ubicacion }}','{{ $ubicacion }}',event)">
+                        <div class="custom-select-option" onclick="seleccionarFiltro('ubicacion','{{ $ubicacion }}','{{ $ubicacion }}',event)">
                             {{ $ubicacion }}
                         </div>
                     @endforeach
@@ -115,7 +117,7 @@
             <input type="hidden" id="filtro-ubicacion" value="">
         </div>
 
-        {{-- ── Toggle SOLO FAVORITOS ── --}}
+        @auth
         <div class="filtro-grupo">
             <label class="filtro-label">Favoritos</label>
             <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
@@ -126,13 +128,12 @@
             </button>
             <input type="hidden" id="filtro-favoritos" value="0">
         </div>
+        @endauth
 
-        {{-- Botón limpiar — wrapped en filtro-grupo con label invisible para alinearlo ── --}}
         <div class="filtro-grupo">
             <span class="filtro-label" style="visibility:hidden">–</span>
             <button class="btn-limpiar" onclick="limpiarFiltros()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
                 Limpiar
@@ -143,30 +144,26 @@
 </section>
 
 {{-- ════════════════════════════════════════════════════
-     GRID DE TARJETAS (eventos + ofertas mezclados)
-     id="grid-resultados" es el target del AJAX
+     GRID DE EVENTOS
 ════════════════════════════════════════════════════ --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    {{-- Spinner de carga --}}
     <div id="cargando" class="hidden flex justify-center py-16">
         <div class="spinner"></div>
     </div>
 
-    {{-- Mensaje sin resultados --}}
     <div id="sin-resultados" class="hidden text-center py-20">
         <span class="flex justify-center mb-3" aria-hidden="true">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--violet-primary);opacity:0.5;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#8B78CC;opacity:0.5;">
                 <circle cx="10.5" cy="10.5" r="6.75"/>
                 <path d="M15.75 15.75L21 21"/>
             </svg>
         </span>
-        <p class="font-bold text-lg" style="color:var(--navy)">Sin resultados para estos filtros</p>
-        <p class="text-sm mt-1 mb-5" style="color:rgba(15,23,42,0.45)">Prueba a cambiar la categoría o la ciudad</p>
+        <p class="font-display font-black text-xl uppercase tracking-tightest text-ink">Sin resultados</p>
+        <p class="font-mono text-xs uppercase tracking-widest text-muted mt-2 mb-6">Prueba con otra categoría o ciudad</p>
         <button class="btn-morado" onclick="limpiarFiltros()">Ver todo</button>
     </div>
 
-    {{-- ── Sección EVENTOS ── --}}
     <div id="seccion-eventos">
         <div class="seccion-vibez-titulo">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -182,8 +179,7 @@
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
             @foreach ($eventos as $evento)
-                <article class="card-evento"
-                         onclick="irADetalle('evento', {{ $evento->id }})">
+                <article class="card-evento" onclick="irADetalle('evento', {{ $evento->id }})">
 
                     <div class="card-imagen-wrap">
                         <button type="button"
@@ -197,18 +193,13 @@
                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
                         </button>
-
                         <img src="{{ $evento->url_portada }}"
                              alt="{{ $evento->titulo }}"
                              class="card-imagen"
                              onerror="this.src='https://picsum.photos/seed/fallback-{{ $evento->id }}/600/400'">
-
-                        {{-- Badge con data-cat para el color CSS --}}
-                        <span class="badge-categoria"
-                              data-cat="{{ $evento->categoria?->nombre ?? 'Evento' }}">
+                        <span class="badge-categoria" data-cat="{{ $evento->categoria?->nombre ?? 'Evento' }}">
                             {{ $evento->categoria?->nombre ?? 'Evento' }}
                         </span>
-
                         <span class="badge-precio {{ $evento->es_gratuito ? 'badge-gratis' : '' }}">
                             {{ $evento->precio_formateado }}
                         </span>
@@ -218,35 +209,29 @@
                         <h3 class="card-titulo">{{ $evento->titulo }}</h3>
                         <p class="card-meta">
                             <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                             {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D MMM YYYY') }}
                         </p>
                         @if ($evento->ubicacion_nombre)
                             <p class="card-meta">
                                 <svg class="icono-meta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                                 {{ $evento->ubicacion_nombre }}
                             </p>
                         @endif
                         @if ($evento->organizador?->empresa)
-                            <p class="card-organizador">
-                                {{ $evento->organizador->empresa->nombre_empresa }}
-                            </p>
+                            <p class="card-organizador">{{ $evento->organizador->empresa->nombre_empresa }}</p>
                         @endif
                     </div>
                 </article>
             @endforeach
 
-        </div>{{-- fin #grid-eventos --}}
+        </div>
     </div>
 
-    {{-- Grid unificado para el AJAX (target del filtrado) --}}
     <div id="grid-resultados" class="hidden">
         <div id="grid-resultados-inner"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -257,9 +242,6 @@
 
 @endsection
 
-{{-- ════════════════════════════════════════════════════
-     SCRIPTS — Filtrado AJAX + Custom Selects
-════════════════════════════════════════════════════ --}}
 @push('scripts')
 <script>
 window.vibezFavoritosConfig = {

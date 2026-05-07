@@ -6,14 +6,65 @@
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title><?php if (! empty(trim($__env->yieldContent('title')))): ?><?php echo $__env->yieldContent('title'); ?><?php else: ?> <?php echo $__env->yieldContent('titulo', 'VIBEZ'); ?> — Descubre tu próximo evento <?php endif; ?></title>
 
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/logo_vibez.png')); ?>">
+
     
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;900&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style type="text/tailwindcss">
+        @theme {
+            --font-display: 'Archivo', sans-serif;
+            --font-sans:    'Space Grotesk', sans-serif;
+            --font-mono:    'JetBrains Mono', monospace;
+            --font-serif:   'Fraunces', serif;
+
+            --color-paper: #F7F5FF;
+            --color-ink:   #1B1430;
+            --color-lilac: #8B78CC;
+            --color-plum:  #4E3A96;
+            --color-muted: #ACA4C4;
+            --color-dusk:  #E9E3FF;
+
+            --tracking-tightest: -0.04em;
+            --tracking-brutal:   -0.06em;
+        }
+
+        @layer base {
+            body {
+                background-color: #F7F5FF;
+                background-image: radial-gradient(circle, rgba(139,120,204,0.15) 1.5px, transparent 1.5px);
+                background-size: 28px 28px;
+            }
+            ::selection { background: #8B78CC; color: #F7F5FF; }
+        }
+
+        @layer utilities {
+            .text-mega {
+                font-size: clamp(4.5rem, 20vw, 16rem);
+                line-height: 0.85;
+                letter-spacing: -0.055em;
+            }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim-in   { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+        .anim-in-2 { animation: fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
+        .anim-in-3 { animation: fadeUp 0.6s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+
+        /* Botón fill-up ink */
+        .btn-ink { position:relative; overflow:hidden; isolation:isolate; background:#1B1430; color:#F7F5FF; }
+        .btn-ink::after { content:''; position:absolute; inset:0; background:#4E3A96; transform:translateY(102%); transition:transform 0.2s cubic-bezier(0.4,0,0.2,1); z-index:0; }
+        .btn-ink:hover::after { transform:translateY(0); }
+        .btn-ink > span { position:relative; z-index:1; }
+    </style>
+
     <link rel="stylesheet" href="/css/app-static.css">
 
     <?php if(request()->routeIs('login') || request()->routeIs('register')): ?>
@@ -28,42 +79,46 @@
 
     
     <?php if(!View::hasSection('content')): ?>
-    <header class="nav-vibez sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+    <header class="sticky top-0 z-50 bg-paper border-b border-ink/15">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
+
+            <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
 
             
-            <?php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); ?>
-            <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>" class="nav-logo-link group">
-                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>"
-                     alt="VIBEZ"
-                     class="nav-logo-img">
+            <a href="<?php echo e($esEmpresa ? route('empresa.home') : route('home')); ?>"
+               class="font-display font-black text-2xl tracking-brutal text-ink
+                      hover:text-lilac transition-colors duration-100 select-none">
+                VIBEZ
             </a>
 
             
-            <nav class="hidden md:flex items-center gap-6">
+            <nav class="hidden md:flex items-center gap-8">
                 <?php if($esEmpresa): ?>
-                    
                     <a href="<?php echo e(route('empresa.home')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('empresa.home') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('empresa.home') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
                         Panel
                     </a>
                     <a href="<?php echo e(route('empresa.candidaturas.ofertas')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('empresa.candidaturas.*') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
                         Candidaturas
                     </a>
                 <?php else: ?>
-                    
                     <a href="<?php echo e(route('home')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('home') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('home') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
                         Explorar
                     </a>
                     <a href="<?php echo e(route('trabajos.index')); ?>"
-                       class="nav-link <?php echo e(request()->routeIs('trabajos.index') ? 'nav-link-activo' : ''); ?>">
-                        Bolsa de Trabajo
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('trabajos.index') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
+                        Trabajo
                     </a>
                     <?php if(auth()->guard()->check()): ?>
                     <a href="<?php echo e(route('social')); ?>"
-                       class="nav-link nav-social-link <?php echo e(request()->routeIs('social') ? 'nav-link-activo' : ''); ?>">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
+                              <?php echo e(request()->routeIs('social') ? 'text-ink' : 'text-muted hover:text-ink'); ?>">
                         Social
                         <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                     </a>
@@ -74,8 +129,15 @@
             
             <div class="flex items-center gap-3">
                 <?php if(auth()->guard()->guest()): ?>
-                    <a href="<?php echo e(route('login')); ?>" class="btn-nav-ghost">Entrar</a>
-                    <a href="<?php echo e(route('register')); ?>" class="btn-nav-solido">Registro</a>
+                    <a href="<?php echo e(route('login')); ?>"
+                       class="hidden sm:block font-mono text-xs uppercase tracking-widest
+                              text-ink/55 hover:text-ink transition-colors duration-100">
+                        Entrar
+                    </a>
+                    <a href="<?php echo e(route('register')); ?>"
+                       class="btn-ink font-mono text-xs uppercase tracking-widest px-5 py-2.5">
+                        <span>Registro &nbsp;→</span>
+                    </a>
                 <?php else: ?>
                     
                     <div class="nav-avatar-wrapper" id="navAvatarWrapper">
@@ -347,19 +409,23 @@
 
     
     <?php if(!View::hasSection('content')): ?>
-    <footer class="footer-vibez">
-        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center">
-                <img src="<?php echo e(asset('images/logo_vibez.png')); ?>"
-                     alt="VIBEZ"
-                     class="footer-logo-img">
+    <footer class="bg-ink text-paper border-t border-ink">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-8 border-b border-paper/10">
+                <div>
+                    <span class="font-display font-black text-2xl tracking-brutal select-none">VIBEZ</span>
+                    <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">La plataforma de tu escena</p>
+                </div>
+                <nav class="flex flex-wrap gap-6 sm:gap-8 font-mono text-xs uppercase tracking-widest text-paper/35">
+                    <a href="<?php echo e(route('home')); ?>" class="hover:text-paper transition-colors duration-100">Explorar</a>
+                    <a href="<?php echo e(route('trabajos.index')); ?>" class="hover:text-paper transition-colors duration-100">Trabajo</a>
+                    <a href="#" class="hover:text-paper transition-colors duration-100">Privacidad</a>
+                    <a href="#" class="hover:text-paper transition-colors duration-100">Contacto</a>
+                </nav>
             </div>
-            <p class="text-white/50 text-sm">
-                &copy; <?php echo e(date('Y')); ?> VIBEZ — Plataforma de eventos para jóvenes
-            </p>
-            <div class="flex gap-5 text-white/60 text-sm">
-                <a href="#" class="hover:text-white transition-colors">Privacidad</a>
-                <a href="#" class="hover:text-white transition-colors">Contacto</a>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 py-5">
+                <p class="font-mono text-xs text-paper/25">&copy; <?php echo e(date('Y')); ?> VIBEZ — Todos los derechos reservados.</p>
+                <p class="font-mono text-xs text-paper/20"><?php echo e(now()->format('d.m.y — H:i')); ?></p>
             </div>
         </div>
     </footer>
@@ -370,134 +436,7 @@
     <?php echo $__env->yieldContent('scripts'); ?>
 
     
-    <script>
-    function toggleMenuMovil() {
-        var panel   = document.getElementById('navMovilPanel');
-        var overlay = document.getElementById('navMovilOverlay');
-        var btn     = document.getElementById('navHamburger');
-        if (!panel) return;
-        var abierto = panel.classList.contains('activo');
-        if (abierto) {
-            cerrarMenuMovil();
-        } else {
-            panel.classList.add('activo');
-            overlay.classList.add('activo');
-            btn.setAttribute('aria-expanded', 'true');
-            btn.querySelector('.icono-ham').style.display = 'none';
-            btn.querySelector('.icono-x').style.display   = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    function cerrarMenuMovil() {
-        var panel   = document.getElementById('navMovilPanel');
-        var overlay = document.getElementById('navMovilOverlay');
-        var btn     = document.getElementById('navHamburger');
-        if (!panel) return;
-        panel.classList.remove('activo');
-        overlay.classList.remove('activo');
-        if (btn) {
-            btn.setAttribute('aria-expanded', 'false');
-            btn.querySelector('.icono-ham').style.display = 'block';
-            btn.querySelector('.icono-x').style.display   = 'none';
-        }
-        document.body.style.overflow = '';
-    }
-
-    // Cerrar el panel al pulsar Escape
-    document.onkeydown = function (e) {
-        if (e.key === 'Escape') cerrarMenuMovil();
-    };
-    </script>
-
-    <?php if(auth()->guard()->check()): ?>
-    
-    <script>
-    (function () {
-        // Consulta el contador cada 30 segundos y actualiza el badge del navbar
-        function refrescarBadgeSocial() {
-            fetch('/api/social/contador', { headers: { 'Accept': 'application/json' } })
-                .then(function (r) { return r.json(); })
-                .then(function (resp) {
-                    if (!resp.exito) return;
-                    var badge = document.getElementById('nav-badge-social');
-                    if (!badge) return;
-                    var total = resp.datos.total;
-                    if (total > 0) {
-                        badge.textContent   = total > 99 ? '99+' : total;
-                        badge.style.display = 'inline-flex';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                })
-                .catch(function () { /* silencioso */ });
-        }
-
-        // Primera consulta al cargar la página
-        refrescarBadgeSocial();
-        // Refresco periódico cada 30 segundos
-        setInterval(refrescarBadgeSocial, 30000);
-    })();
-    </script>
-
-    
-    <script>
-    /**
-     * Abre/cierra el dropdown del avatar de usuario en la navbar.
-     * Gestiona el aria-expanded para accesibilidad.
-     */
-    function toggleNavDropdown() {
-        const dropdown = document.getElementById('navDropdown');
-        const btn      = document.getElementById('navAvatarBtn');
-        const abierto  = dropdown.style.display === 'block';
-
-        dropdown.style.display = abierto ? 'none' : 'block';
-        btn.setAttribute('aria-expanded', String(!abierto));
-
-        // Animar entrada
-        if (!abierto) {
-            dropdown.style.animation = 'none';
-            dropdown.offsetHeight;  // reflow
-            dropdown.style.animation = 'dropdownEntrar 0.18s ease';
-        }
-    }
-
-    /** Cierra el dropdown si se pulsa fuera */
-    const anteriorClickDocumento = document.onclick;
-    document.onclick = function(e) {
-        if (typeof anteriorClickDocumento === 'function') {
-            anteriorClickDocumento(e);
-        }
-
-        const wrapper = document.getElementById('navAvatarWrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
-            const dropdown = document.getElementById('navDropdown');
-            const btn      = document.getElementById('navAvatarBtn');
-            if (dropdown) dropdown.style.display = 'none';
-            if (btn)      btn.setAttribute('aria-expanded', 'false');
-        }
-    };
-
-    /**
-     * Cierra la sesión del usuario mediante AJAX.
-     * Redirige a la landing tras el logout.
-     */
-    function cerrarSesion() {
-        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        fetch('/api/logout', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
-        })
-        .then(() => {
-            document.body.style.transition = 'opacity 0.3s';
-            document.body.style.opacity    = '0';
-            setTimeout(() => { window.location.href = '/'; }, 320);
-        })
-        .catch(() => { window.location.href = '/'; });
-    }
-    </script>
-    <?php endif; ?>
+    <script src="<?php echo e(asset('js/app-nav.js')); ?>"></script>
 </body>
 </html>
 <?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/layouts/app.blade.php ENDPATH**/ ?>

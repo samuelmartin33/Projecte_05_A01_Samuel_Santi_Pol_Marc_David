@@ -1,17 +1,15 @@
-@extends('layouts.app')
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
-@endpush
+<link rel="stylesheet" href="<?php echo e(asset('css/formularios.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@section('title', 'Crear cuenta — VIBEZ')
+<?php $__env->startSection('title', 'Crear cuenta — VIBEZ'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="min-h-screen flex">
 
-    {{-- ── Panel izquierdo editorial (solo desktop) ── --}}
+    
     <div class="hidden md:flex md:w-5/12 lg:w-2/5 flex-col justify-between p-12 relative overflow-hidden bg-ink">
 
         <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(139,120,204,0.13) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;z-index:0"></div>
@@ -19,7 +17,7 @@
         <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(78,58,150,0.18) 0%,transparent 60%);bottom:-80px;right:-60px;pointer-events:none;z-index:0"></div>
 
         <div style="position:relative;z-index:1">
-            <a href="{{ route('home') }}"
+            <a href="<?php echo e(route('home')); ?>"
                class="font-display font-black text-2xl tracking-brutal text-paper hover:text-lilac transition-colors duration-100 select-none">
                 VIBEZ
             </a>
@@ -49,19 +47,19 @@
         </div>
 
         <div style="position:relative;z-index:1">
-            <p class="font-mono text-xs text-paper/20">&copy; {{ date('Y') }} VIBEZ</p>
+            <p class="font-mono text-xs text-paper/20">&copy; <?php echo e(date('Y')); ?> VIBEZ</p>
         </div>
 
     </div>
 
-    {{-- ── Panel derecho: formulario de registro ── --}}
+    
     <div class="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-14 py-12 overflow-y-auto"
          style="background:#F7F5FF;background-image:radial-gradient(circle,rgba(139,120,204,0.1) 1.5px,transparent 1.5px);background-size:28px 28px;">
 
         <div style="max-width:520px;width:100%;margin:0 auto;">
 
-            {{-- Logo móvil --}}
-            <a href="{{ route('home') }}"
+            
+            <a href="<?php echo e(route('home')); ?>"
                class="md:hidden font-display font-black text-2xl tracking-brutal text-ink hover:text-lilac transition-colors duration-100 select-none block mb-10">
                 VIBEZ
             </a>
@@ -157,14 +155,14 @@
                         </span>
                     </button>
                     <div class="google-btn-wrapper">
-                        <div id="google-signin-btn" data-client-id="{{ config('services.google.client_id') }}"></div>
+                        <div id="google-signin-btn" data-client-id="<?php echo e(config('services.google.client_id')); ?>"></div>
                     </div>
                 </div>
 
             </form>
 
             <p class="form-switch">
-                ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
+                ¿Ya tienes cuenta? <a href="<?php echo e(route('login')); ?>">Inicia sesión</a>
             </p>
 
         </div>
@@ -172,11 +170,13 @@
 
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <script src="{{ asset('js/register.js') }}"></script>
-@endsection
+    <script src="<?php echo e(asset('js/register.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/register.blade.php ENDPATH**/ ?>
