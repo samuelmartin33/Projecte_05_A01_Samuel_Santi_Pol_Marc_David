@@ -7,7 +7,7 @@
 body {
     background-color: #f7f5ff;   /* blanco con toque lavanda muy suave */
     color: #1e1b4b;              /* morado muy oscuro, casi negro */
-    font-family: 'Inter', sans-serif;
+    font-family: 'Syne', sans-serif;
     overflow-x: hidden;
 }
 
@@ -129,7 +129,7 @@ body {
 
 /* --- Tipografía Premium --- */
 .font-premium {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Syne', sans-serif;
     letter-spacing: -0.02em;
 }
 
@@ -352,10 +352,7 @@ body {
     background: white;
     border-bottom: 1px solid #ede9fe;
     box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
-    position: sticky;
-    top: 64px;
     overflow: visible;
-    z-index: 40;
 }
 .barra-filtros .text-sm.font-semibold {
     position: static;
@@ -1333,7 +1330,7 @@ body {
     display: none;          /* ocultamos por defecto */
     background: none;
     border: none;
-    color: rgba(255,255,255,0.85);
+    color: rgba(15,23,42,0.65);
     cursor: pointer;
     padding: 6px;
     border-radius: 8px;
@@ -1342,7 +1339,7 @@ body {
     transition: background 0.15s, color 0.15s;
     flex-shrink: 0;
 }
-.nav-hamburger:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-hamburger:hover { background: rgba(15,23,42,0.06); color: #0f172a; }
 .nav-hamburger svg  { width: 22px; height: 22px; display: block; }
 
 /* En móvil (< 768px): mostrar hamburguesa y ocultar botones de invitado */
@@ -1509,3 +1506,83 @@ body {
     .perfil-hero .max-w-4xl  { padding-top: 20px; padding-bottom: 20px; }
 }
 .nav-movil-logout:hover  { color: #ef4444 !important; background: rgba(239,68,68,0.08) !important; }
+
+/* ============================================================
+   VIBEZ — Clases de tema custom
+   Reemplazan las @theme variables de Tailwind v4 que necesitan
+   compilación. Paper = blanco cálido, Ink = navy oscuro.
+   ============================================================ */
+
+/* ── Fondos ── */
+.bg-paper      { background-color: #f5f1ea; }
+.bg-ink        { background-color: #0f172a; }
+.bg-plum       { background-color: #4e3a96; }
+.bg-lilac      { background-color: #7c3aed; }
+.bg-dusk       { background-color: #1e1035; }
+.bg-paper\/90  { background-color: rgba(245, 241, 234, 0.90); }
+
+/* ── Texto ── */
+.text-ink   { color: #0f172a; }
+.text-paper { color: #f5f1ea; }
+.text-lilac { color: #7c3aed; }
+.text-muted { color: rgba(15, 23, 42, 0.50); }
+
+/* ── Texto con opacidad ── */
+.text-ink\/55   { color: rgba(15, 23, 42, 0.55); }
+.text-ink\/60   { color: rgba(15, 23, 42, 0.60); }
+.text-paper\/10 { color: rgba(245, 241, 234, 0.10); }
+.text-paper\/20 { color: rgba(245, 241, 234, 0.20); }
+.text-paper\/25 { color: rgba(245, 241, 234, 0.25); }
+.text-paper\/35 { color: rgba(245, 241, 234, 0.35); }
+.text-paper\/40 { color: rgba(245, 241, 234, 0.40); }
+.text-paper\/50 { color: rgba(245, 241, 234, 0.50); }
+.text-paper\/60 { color: rgba(245, 241, 234, 0.60); }
+
+/* ── Bordes ── */
+.border-lilac      { border-color: #7c3aed; }
+
+/* ── Bordes con opacidad ── */
+.border-ink\/10    { border-color: rgba(15, 23, 42, 0.10); }
+.border-ink\/15    { border-color: rgba(15, 23, 42, 0.15); }
+.border-ink\/35    { border-color: rgba(15, 23, 42, 0.35); }
+.border-paper\/10  { border-color: rgba(245, 241, 234, 0.10); }
+.border-paper\/20  { border-color: rgba(245, 241, 234, 0.20); }
+.border-lilac\/40  { border-color: rgba(124, 58, 237, 0.40); }
+
+/* ── Hovers ── */
+.hover\:text-ink:hover      { color: #0f172a; }
+.hover\:text-paper:hover    { color: #f5f1ea; }
+.hover\:text-lilac:hover    { color: #7c3aed; }
+.hover\:bg-plum:hover       { background-color: #4e3a96; }
+.hover\:bg-dusk:hover       { background-color: #1e1035; }
+.hover\:border-ink:hover    { border-color: #0f172a; }
+.hover\:border-lilac:hover  { border-color: #7c3aed; }
+
+/* ── Tipografía editorial ── */
+.font-display      { font-family: 'DM Sans', ui-sans-serif, sans-serif; font-weight: 700; }
+.tracking-brutal   { letter-spacing: 0.06em; }
+.tracking-tightest { letter-spacing: -0.04em; }
+
+/* ── Botón ink (oscuro, texto claro) ── */
+.btn-ink {
+    display: inline-flex;
+    align-items: center;
+    background-color: #0f172a;
+    color: #f5f1ea;
+    transition: background-color 0.075s;
+}
+.btn-ink:hover { background-color: #4e3a96; }
+
+/* ── Badge de notificaciones sociales en la navbar ── */
+.nav-badge-social {
+    position: absolute;
+    top: -4px; right: -8px;
+    min-width: 16px; height: 16px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.55rem; font-weight: 800;
+    border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+}

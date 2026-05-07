@@ -6,18 +6,34 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@hasSection('title')@yield('title')@else @yield('titulo', 'VIBEZ') — Descubre tu próximo evento @endif</title>
 
-    {{-- Fuente Inter --}}
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_vibez.png') }}">
+
+    {{-- Fuentes editoriales VIBEZ --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/css/app-static.css">
+    {{-- Tailwind CSS v4 CDN — genera utilidades al vuelo según el DOM --}}
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper:  #f5f1ea;
+            --color-ink:    #0f172a;
+            --color-lilac:  #7c3aed;
+            --color-plum:   #4e3a96;
+            --color-dusk:   #1e1035;
+            --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+            --font-sans:    'Syne', ui-sans-serif, system-ui, sans-serif;
+            --tracking-brutal:   0.04em;
+            --tracking-tightest: -0.02em;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ asset('css/app-static.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vibez.css') }}">
 
     @if (request()->routeIs('login') || request()->routeIs('register'))
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/auth-vibez.css') }}">
     @endif
 
     {{-- Espacio para estilos específicos de cada página (ej: Leaflet en el detalle) --}}
@@ -31,42 +47,46 @@
          Fija en la parte superior, con logo y navegación
     ═══════════════════════════════════════════════════════ --}}
     @if(!View::hasSection('content'))
-    <header class="nav-vibez sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+    <header class="sticky top-0 z-50 bg-paper border-b border-ink/15">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
 
-            {{-- Logo corporativo --}}
             @php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); @endphp
-            <a href="{{ $esEmpresa ? route('empresa.home') : route('home') }}" class="nav-logo-link group">
-                <img src="{{ asset('images/logo_vibez_white.png') }}"
-                     alt="VIBEZ"
-                     class="nav-logo-img">
+
+            {{-- Wordmark --}}
+            <a href="{{ $esEmpresa ? route('empresa.home') : route('home') }}"
+               class="font-display font-black text-2xl tracking-brutal text-ink
+                      hover:text-lilac transition-colors duration-100 select-none">
+                VIBEZ
             </a>
 
-            {{-- Navegación central --}}
-            <nav class="hidden md:flex items-center gap-6">
+            {{-- Navegación central (desktop) --}}
+            <nav class="hidden md:flex items-center gap-8">
                 @if($esEmpresa)
-                    {{-- Empresa: sus secciones propias --}}
                     <a href="{{ route('empresa.home') }}"
-                       class="nav-link {{ request()->routeIs('empresa.home') ? 'nav-link-activo' : '' }}">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('empresa.home') ? 'text-ink' : 'text-muted hover:text-ink' }}">
                         Panel
                     </a>
                     <a href="{{ route('empresa.candidaturas.ofertas') }}"
-                       class="nav-link {{ request()->routeIs('empresa.candidaturas.*') ? 'nav-link-activo' : '' }}">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('empresa.candidaturas.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
                         Candidaturas
                     </a>
                 @else
-                    {{-- Usuarios y visitantes: explorar y bolsa --}}
                     <a href="{{ route('home') }}"
-                       class="nav-link {{ request()->routeIs('home') ? 'nav-link-activo' : '' }}">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('home') ? 'text-ink' : 'text-muted hover:text-ink' }}">
                         Explorar
                     </a>
                     <a href="{{ route('trabajos.index') }}"
-                       class="nav-link {{ request()->routeIs('trabajos.index') ? 'nav-link-activo' : '' }}">
-                        Bolsa de Trabajo
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('trabajos.index') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                        Trabajo
                     </a>
                     @auth
                     <a href="{{ route('social') }}"
-                       class="nav-link nav-social-link {{ request()->routeIs('social') ? 'nav-link-activo' : '' }}">
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
+                              {{ request()->routeIs('social') ? 'text-ink' : 'text-muted hover:text-ink' }}">
                         Social
                         <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                     </a>
@@ -74,11 +94,18 @@
                 @endif
             </nav>
 
-            {{-- Botones de acción: guest → login/registro | auth → avatar --}}
+            {{-- Botones acción --}}
             <div class="flex items-center gap-3">
                 @guest
-                    <a href="{{ route('login') }}" class="btn-nav-ghost">Entrar</a>
-                    <a href="{{ route('register') }}" class="btn-nav-solido">Registro</a>
+                    <a href="{{ route('login') }}"
+                       class="hidden sm:block font-mono text-xs uppercase tracking-widest
+                              text-ink/55 hover:text-ink transition-colors duration-100">
+                        Entrar
+                    </a>
+                    <a href="{{ route('register') }}"
+                       class="btn-ink font-mono text-xs uppercase tracking-widest px-5 py-2.5">
+                        <span>Registro &nbsp;→</span>
+                    </a>
                 @else
                     {{-- Avatar con dropdown de perfil --}}
                     <div class="nav-avatar-wrapper" id="navAvatarWrapper">
@@ -353,19 +380,23 @@
          PIE DE PÁGINA
     ═══════════════════════════════════════════════════════ --}}
     @if(!View::hasSection('content'))
-    <footer class="footer-vibez">
-        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center">
-                <img src="{{ asset('images/logo_vibez.png') }}"
-                     alt="VIBEZ"
-                     class="footer-logo-img">
+    <footer class="bg-ink text-paper border-t border-ink">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-8 border-b border-paper/10">
+                <div>
+                    <span class="font-display font-black text-2xl tracking-brutal select-none">VIBEZ</span>
+                    <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mt-1">La plataforma de tu escena</p>
+                </div>
+                <nav class="flex flex-wrap gap-6 sm:gap-8 font-mono text-xs uppercase tracking-widest text-paper/35">
+                    <a href="{{ route('home') }}" class="hover:text-paper transition-colors duration-100">Explorar</a>
+                    <a href="{{ route('trabajos.index') }}" class="hover:text-paper transition-colors duration-100">Trabajo</a>
+                    <a href="#" class="hover:text-paper transition-colors duration-100">Privacidad</a>
+                    <a href="#" class="hover:text-paper transition-colors duration-100">Contacto</a>
+                </nav>
             </div>
-            <p class="text-white/50 text-sm">
-                &copy; {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes
-            </p>
-            <div class="flex gap-5 text-white/60 text-sm">
-                <a href="#" class="hover:text-white transition-colors">Privacidad</a>
-                <a href="#" class="hover:text-white transition-colors">Contacto</a>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 py-5">
+                <p class="font-mono text-xs text-paper/25">&copy; {{ date('Y') }} VIBEZ — Todos los derechos reservados.</p>
+                <p class="font-mono text-xs text-paper/20">{{ now()->format('d.m.y — H:i') }}</p>
             </div>
         </div>
     </footer>

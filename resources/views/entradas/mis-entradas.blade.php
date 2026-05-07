@@ -31,6 +31,7 @@
 </section>
 
 {{-- ════════ CONTENIDO PRINCIPAL ════════ --}}
+<div class="mis-entradas-page-wrap">
 <div class="max-w-3xl mx-auto px-4 py-8">
 
     @if($pedidos->isEmpty())
@@ -153,6 +154,7 @@
 
     @endif
 
+</div>
 </div>
 
 @endsection

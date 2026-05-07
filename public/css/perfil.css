@@ -1,0 +1,63 @@
+body {
+    background: #0d0820;
+    color: #f5f1ea;
+}
+.perfil-page-wrap {
+    background:
+        radial-gradient(circle, rgba(124,58,237,0.14) 1.5px, transparent 1.5px),
+        linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
+    background-size: 28px 28px, 100% 100%;
+    min-height: 60vh;
+    padding: 2rem 0 4rem;
+}
+.perfil-card {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(124,58,237,0.25) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: none !important;
+}
+.perfil-card-titulo { color: #f5f1ea !important; }
+.perfil-card-sub    { color: rgba(245,241,234,0.4) !important; }
+.perfil-field label { color: rgba(245,241,234,0.45) !important; }
+.perfil-field input,
+.perfil-field textarea {
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(124,58,237,0.25) !important;
+    color: #f5f1ea !important;
+}
+.perfil-field input:focus,
+.perfil-field textarea:focus {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.2) !important;
+    background: rgba(255,255,255,0.09) !important;
+}
+.perfil-field input::placeholder,
+.perfil-field textarea::placeholder { color: rgba(245,241,234,0.25) !important; }
+.perfil-field-hint { color: rgba(245,241,234,0.3) !important; }
+.perfil-badge-publica {
+    background: rgba(124,58,237,0.25) !important;
+    border: 1px solid rgba(124,58,237,0.4) !important;
+    color: #c084fc !important;
+}
+.perfil-solicitudes-titulo { color: rgba(245,241,234,0.6) !important; }
+.perfil-solicitud-item { border-bottom-color: rgba(255,255,255,0.06) !important; }
+.perfil-solicitud-item p[style] { color: rgba(245,241,234,0.85) !important; }
+.perfil-solicitud-avatar {
+    background: linear-gradient(135deg, #4e3a96, #7c3aed) !important;
+    color: white !important;
+    border: none !important;
+}
+.perfil-busqueda-lista {
+    background: rgba(13,10,24,0.96) !important;
+    border: 1px solid rgba(124,58,237,0.2) !important;
+}
+.perfil-busqueda-item:hover { background: rgba(124,58,237,0.12) !important; }
+.perfil-busqueda-item .font-semibold { color: #f5f1ea !important; }
+.perfil-busqueda-item .text-xs       { color: rgba(245,241,234,0.4) !important; }
+.perfil-alerta-ok    { background: rgba(16,185,129,0.15) !important; border-color: rgba(16,185,129,0.3) !important; color: #34d399 !important; }
+.perfil-alerta-error { background: rgba(239,68,68,0.15) !important; border-color: rgba(239,68,68,0.3) !important; color: #f87171 !important; }
+body [class*="text-navy"] { color: rgba(245,241,234,0.75) !important; }
+/* Friend request buttons */
+.perfil-btn-aceptar  { background: rgba(16,185,129,0.2) !important; border-color: rgba(16,185,129,0.4) !important; color: #34d399 !important; }
+.perfil-btn-rechazar { background: rgba(239,68,68,0.2) !important; border-color: rgba(239,68,68,0.35) !important; color: #f87171 !important; }

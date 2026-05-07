@@ -1,3 +1,41 @@
+body {
+    background: #0d0820;
+    color: #f5f1ea;
+}
+.confirmacion-page-wrap {
+    background:
+        radial-gradient(circle, rgba(124,58,237,0.14) 1.5px, transparent 1.5px),
+        linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
+    background-size: 28px 28px, 100% 100%;
+    min-height: 60vh;
+    padding: 2rem 0;
+}
+.ficha-evento {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(124,58,237,0.25) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 24px;
+}
+.seccion-titulo { color: #f5f1ea !important; }
+.confirmacion-evento-titulo { color: #f5f1ea !important; }
+.confirmacion-evento-fecha  { color: #c084fc !important; }
+.confirmacion-evento-lugar  { color: rgba(245,241,234,0.5) !important; }
+.confirmacion-entrada-count { color: rgba(245,241,234,0.5) !important; }
+.confirmacion-total-label   { color: rgba(245,241,234,0.35) !important; }
+.confirmacion-resumen-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+.confirmacion-entrada-num   { color: #f5f1ea !important; }
+.confirmacion-entrada-codigo { color: rgba(245,241,234,0.3) !important; }
+.confirmacion-entrada-divisor { border-top-color: rgba(124,58,237,0.3) !important; }
+.confirmacion-qr-marco {
+    background: white !important;
+    border-color: rgba(124,58,237,0.4) !important;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.2) !important;
+}
+.confirmacion-qr-texto { color: rgba(245,241,234,0.35) !important; }
+.confirmacion-acciones a[style] { color: #c084fc !important; }
+
 /*
  * entradas-confirmacion.css
  * Estilos para la página de confirmación de compra de entradas.

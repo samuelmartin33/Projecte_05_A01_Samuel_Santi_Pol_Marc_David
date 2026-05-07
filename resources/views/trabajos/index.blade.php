@@ -2,162 +2,160 @@
 
 @section('titulo', 'Bolsa de Trabajo')
 
+@push('estilos')
+<link rel="stylesheet" href="{{ asset('css/trabajos-index.css') }}">
+@endpush
+
 @section('contenido')
 
 {{-- ════════════════════════════════════════════════════
-     HERO — Fondo oscuro con orb neon y texto impactante
+     HERO — dark editorial + carrusel de ofertas
 ════════════════════════════════════════════════════ --}}
-<section style="background:linear-gradient(160deg,#05000f 0%,#130228 35%,#0a0118 65%,#0f172a 100%);
-                position:relative;overflow:hidden;padding:80px 0 60px;">
+<section class="trabajos-hero">
 
-    {{-- Orb neon morado --}}
-    <div style="position:absolute;width:500px;height:500px;
-                background:radial-gradient(circle,rgba(168,85,247,0.2) 0%,transparent 65%);
-                top:-120px;left:-80px;pointer-events:none;
-                animation:flotar-orb 10s ease-in-out infinite alternate;"></div>
+    <div class="trabajos-hero-bg" aria-hidden="true"></div>
+    <div class="trabajos-hero-orb trabajos-hero-orb-1" aria-hidden="true"></div>
+    <div class="trabajos-hero-orb trabajos-hero-orb-2" aria-hidden="true"></div>
 
-    {{-- Orb neon verde (salario = dinero = verde) --}}
-    <div style="position:absolute;width:400px;height:400px;
-                background:radial-gradient(circle,rgba(16,185,129,0.12) 0%,transparent 65%);
-                bottom:-60px;right:-40px;pointer-events:none;
-                animation:flotar-orb 8s ease-in-out infinite alternate-reverse;"></div>
+    <div class="trabajos-hero-inner">
 
-    {{-- Partículas --}}
-    <div class="hero-particula hero-particula-1"></div>
-    <div class="hero-particula hero-particula-2"></div>
-    <div class="hero-particula hero-particula-3"></div>
-    <div class="hero-particula hero-particula-4"></div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative" style="z-index:1;">
-
-        {{-- Badge --}}
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6"
-             style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);
-                    color:#6ee7b7;letter-spacing:0.06em;text-transform:uppercase;">
-            💼 Trabaja en la escena
-        </div>
-
-        <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight max-w-2xl">
-            Encuentra tu sitio<br>
-            <span style="background:linear-gradient(135deg,#c084fc 0%,#f0abfc 40%,#6ee7b7 100%);
-                         -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-                         background-clip:text;">
-                en la escena
-            </span>
-        </h1>
-
-        <p class="mt-4 max-w-xl leading-relaxed"
-           style="color:rgba(255,255,255,0.55);font-size:1rem;">
-            Fotógrafos, técnicos de sonido, relaciones públicas, camareros…
-            Trabaja en los mejores eventos y festivales del país.
-        </p>
-
-        {{-- Stats row --}}
-        <div class="flex flex-wrap gap-8 mt-10">
-            <div>
-                <p class="text-3xl font-black text-white">{{ $ofertas->count() }}</p>
-                <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">
-                    Ofertas activas
-                </p>
-            </div>
-            <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
-            <div>
-                <p class="text-3xl font-black text-white">{{ $ciudades->count() }}</p>
-                <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">
-                    Ciudades
-                </p>
-            </div>
-            <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
-            <div>
-                <p class="text-3xl font-black text-white">{{ $categoriasTrabajo->count() }}</p>
-                <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">
-                    Categorías
-                </p>
+        {{-- Columna izquierda: branding --}}
+        <div class="trabajos-hero-left">
+            <p class="trabajos-hero-kicker">
+                <span class="trabajos-hero-kicker-line"></span>
+                Bolsa de trabajo · Escena musical y eventos
+            </p>
+            <h1 class="trabajos-hero-titulo">
+                Trabaja en<br>
+                <em>la escena.</em>
+            </h1>
+            <div class="trabajos-hero-stats">
+                <div class="trabajos-hero-stat">
+                    <span class="trabajos-hero-stat-num">{{ $ofertas->count() }}</span>
+                    <span class="trabajos-hero-stat-label">Ofertas</span>
+                </div>
+                <div class="trabajos-hero-stat">
+                    <span class="trabajos-hero-stat-num">{{ $ciudades->count() }}</span>
+                    <span class="trabajos-hero-stat-label">Ciudades</span>
+                </div>
+                <div class="trabajos-hero-stat trabajos-hero-stat--lilac">
+                    <span class="trabajos-hero-stat-num">{{ $categoriasTrabajo->count() }}</span>
+                    <span class="trabajos-hero-stat-label">Categorías</span>
+                </div>
             </div>
         </div>
+
+        {{-- Columna derecha: carrusel de ofertas --}}
+        @if($ofertas->isNotEmpty())
+        <div class="trabajos-carousel-wrap">
+            <div class="trabajos-carousel" id="trabajosCarousel">
+                @foreach($ofertas->take(6) as $oferta)
+                <div class="carousel-oferta {{ $loop->first ? 'active' : '' }}"
+                     data-index="{{ $loop->index }}"
+                     onclick="irAOferta({{ $oferta->id }})">
+
+                    <div class="co-header">
+                        <div class="co-avatar">
+                            {{ strtoupper(substr($oferta->organizador?->empresa?->nombre_empresa ?? 'E', 0, 2)) }}
+                        </div>
+                        <div>
+                            <p class="co-empresa">{{ $oferta->organizador?->empresa?->nombre_empresa ?? 'Empresa' }}</p>
+                            <span class="co-badge">{{ $oferta->categoria?->nombre ?? 'General' }}</span>
+                        </div>
+                    </div>
+
+                    <h3 class="co-titulo">{{ $oferta->titulo }}</h3>
+
+                    <div class="co-datos">
+                        @if($oferta->ubicacion)
+                        <span class="co-dato">
+                            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                            {{ $oferta->ubicacion }}
+                        </span>
+                        @endif
+                        <span class="co-dato">
+                            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            {{ $oferta->vacantes }} vacante{{ $oferta->vacantes !== 1 ? 's' : '' }}
+                        </span>
+                    </div>
+
+                    <div class="co-footer">
+                        <span class="co-salario">{{ $oferta->salario_formateado }}</span>
+                        <span class="co-flecha">→</span>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            @if($ofertas->take(6)->count() > 1)
+            <div class="carousel-dots" id="carouselDots">
+                @foreach($ofertas->take(6) as $oferta)
+                <button class="carousel-dot {{ $loop->first ? 'active' : '' }}"
+                        data-index="{{ $loop->index }}"
+                        aria-label="Oferta {{ $loop->iteration }}"></button>
+                @endforeach
+            </div>
+            @endif
+        </div>
+        @endif
 
     </div>
 </section>
 
 {{-- ════════════════════════════════════════════════════
-     BARRA DE FILTROS — sticky bajo el nav
+     BARRA DE FILTROS — clases funcionales intactas
 ════════════════════════════════════════════════════ --}}
-<section class="barra-filtros sticky top-0 z-40">
+<section class="barra-filtros sticky top-14 z-40">
 
-    {{-- Overlay para cerrar dropdowns --}}
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
          onclick="cerrarTodosDropdowns()"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
 
-        {{-- Contador --}}
-        <p class="text-sm font-semibold mr-auto self-center"
-           style="color:rgba(15,23,42,0.5)">
+        <p class="text-sm font-semibold mr-auto self-center" style="color:rgba(15,23,42,0.5)">
             <span id="contador-resultados">{{ $ofertas->count() }}</span>
             <span style="color:var(--morado)"> oferta{{ $ofertas->count() !== 1 ? 's' : '' }}</span>
         </p>
 
-        {{-- ── Custom select CATEGORÍA ── --}}
         <div class="filtro-grupo" style="position:relative;z-index:250;">
             <label class="filtro-label">Categoría</label>
-            <div class="custom-select-wrapper"
-                 id="wrapper-categoria"
-                 onclick="toggleDropdown('categoria')">
+            <div class="custom-select-wrapper" id="wrapper-categoria" onclick="toggleDropdown('categoria')">
                 <span id="categoria-display" class="custom-select-display">Todas las categorías</span>
-                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
                 <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
-                    <div class="custom-select-option seleccionado"
-                         onclick="seleccionarFiltro('categoria','','Todas las categorías',event)">
-                        Todas las categorías
-                    </div>
-                    @foreach ($categoriasTrabajo as $cat)
-                        <div class="custom-select-option"
-                             onclick="seleccionarFiltro('categoria','{{ $cat->id }}','{{ $cat->nombre }}',event)">
-                            {{ $cat->nombre }}
-                        </div>
+                    <div class="custom-select-option seleccionado" onclick="seleccionarFiltro('categoria','','Todas las categorías',event)">Todas las categorías</div>
+                    @foreach($categoriasTrabajo as $cat)
+                        <div class="custom-select-option" onclick="seleccionarFiltro('categoria','{{ $cat->id }}','{{ $cat->nombre }}',event)">{{ $cat->nombre }}</div>
                     @endforeach
                 </div>
             </div>
             <input type="hidden" id="filtro-categoria" value="">
         </div>
 
-        {{-- ── Custom select CIUDAD ── --}}
         <div class="filtro-grupo" style="position:relative;z-index:240;">
             <label class="filtro-label">Ciudad</label>
-            <div class="custom-select-wrapper"
-                 id="wrapper-ciudad"
-                 onclick="toggleDropdown('ciudad')">
+            <div class="custom-select-wrapper" id="wrapper-ciudad" onclick="toggleDropdown('ciudad')">
                 <span id="ciudad-display" class="custom-select-display">Todas las ciudades</span>
-                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
                 <div id="ciudad-dropdown" class="custom-select-dropdown" style="display:none">
-                    <div class="custom-select-option seleccionado"
-                         onclick="seleccionarFiltro('ciudad','','Todas las ciudades',event)">
-                        Todas las ciudades
-                    </div>
-                    @foreach ($ciudades as $ciudad)
-                        <div class="custom-select-option"
-                             onclick="seleccionarFiltro('ciudad','{{ $ciudad }}','{{ $ciudad }}',event)">
-                            {{ $ciudad }}
-                        </div>
+                    <div class="custom-select-option seleccionado" onclick="seleccionarFiltro('ciudad','','Todas las ciudades',event)">Todas las ciudades</div>
+                    @foreach($ciudades as $ciudad)
+                        <div class="custom-select-option" onclick="seleccionarFiltro('ciudad','{{ $ciudad }}','{{ $ciudad }}',event)">{{ $ciudad }}</div>
                     @endforeach
                 </div>
             </div>
             <input type="hidden" id="filtro-ciudad" value="">
         </div>
 
-        {{-- Botón limpiar --}}
         <div class="filtro-grupo">
             <span class="filtro-label" style="visibility:hidden">–</span>
             <button class="btn-limpiar" onclick="limpiarFiltros()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
                 Limpiar
@@ -168,90 +166,69 @@
 </section>
 
 {{-- ════════════════════════════════════════════════════
-     GRID DE OFERTAS
+     GRID DE OFERTAS — clases funcionales intactas
 ════════════════════════════════════════════════════ --}}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<section class="trabajos-seccion-contenido">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    {{-- Spinner --}}
     <div id="cargando" class="hidden flex justify-center py-16">
         <div class="spinner"></div>
     </div>
 
-    {{-- Sin resultados --}}
     <div id="sin-resultados" class="hidden text-center py-20">
-        <p class="text-5xl mb-3">🔍</p>
-        <p class="font-bold text-lg" style="color:var(--navy)">No hay ofertas para estos filtros</p>
-        <p class="text-sm mt-1 mb-5" style="color:rgba(15,23,42,0.45)">Prueba con otra categoría o ciudad</p>
+        <p class="font-display font-black text-xl uppercase tracking-tightest text-ink mb-2">Sin ofertas</p>
+        <p class="font-mono text-xs uppercase tracking-widest text-muted mb-6">Prueba con otra categoría o ciudad</p>
         <button class="btn-morado" onclick="limpiarFiltros()">Ver todas las ofertas</button>
     </div>
 
-    {{-- Grid de tarjetas --}}
-    <div id="grid-ofertas"
-         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="grid-ofertas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        @foreach ($ofertas as $oferta)
-            <article class="card-trabajo-grande"
-                     onclick="irAOferta({{ $oferta->id }})">
+        @foreach($ofertas as $oferta)
+            <article class="card-trabajo-grande" onclick="irAOferta({{ $oferta->id }})">
 
-                {{-- Cabecera con categoría + badge --}}
                 <div class="ctg-header">
-                    {{-- Icono de la categoría --}}
                     <div class="ctg-icono">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div>
                         <span class="ctg-badge">{{ $oferta->categoria?->nombre ?? 'General' }}</span>
-                        <p class="ctg-empresa">
-                            {{ $oferta->organizador?->empresa?->nombre_empresa ?? 'Empresa' }}
-                        </p>
+                        <p class="ctg-empresa">{{ $oferta->organizador?->empresa?->nombre_empresa ?? 'Empresa' }}</p>
                     </div>
                 </div>
 
-                {{-- Título --}}
                 <h3 class="ctg-titulo">{{ $oferta->titulo }}</h3>
 
-                {{-- Descripción corta --}}
-                @if ($oferta->descripcion)
-                    <p class="ctg-desc">
-                        {{ Str::limit($oferta->descripcion, 110) }}
-                    </p>
+                @if($oferta->descripcion)
+                    <p class="ctg-desc">{{ Str::limit($oferta->descripcion, 110) }}</p>
                 @endif
 
-                {{-- Datos clave --}}
                 <div class="ctg-datos">
-                    @if ($oferta->ubicacion)
+                    @if($oferta->ubicacion)
                         <span class="ctg-dato">
                             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             </svg>
                             {{ $oferta->ubicacion }}
                         </span>
                     @endif
-
                     <span class="ctg-dato">
                         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         {{ $oferta->vacantes }} vacante{{ $oferta->vacantes !== 1 ? 's' : '' }}
                     </span>
-
-                    @if ($oferta->fecha_inicio_trabajo)
+                    @if($oferta->fecha_inicio_trabajo)
                         <span class="ctg-dato">
                             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                             {{ \Carbon\Carbon::parse($oferta->fecha_inicio_trabajo)->locale('es')->isoFormat('D MMM YYYY') }}
                         </span>
                     @endif
                 </div>
 
-                {{-- Footer: salario + botón --}}
                 <div class="ctg-footer">
                     <div>
                         <p class="ctg-salario-label">Salario</p>
@@ -269,42 +246,64 @@
         @endforeach
 
     </div>
-
+</div>
 </section>
 
 {{-- ════════════════════════════════════════════════════
-     CTA BOTTOM — ¿Eres empresa? Publica tu oferta
+     CTA EDITORIAL
 ════════════════════════════════════════════════════ --}}
-<section style="background:linear-gradient(135deg,#060012,#130228,#0f172a);padding:60px 0;margin-top:20px;">
-    <div class="max-w-3xl mx-auto px-6 text-center">
-        <p class="text-4xl mb-4">🏢</p>
-        <h2 class="text-2xl sm:text-3xl font-black text-white mb-3">
-            ¿Organizas eventos?
+<section class="relative overflow-hidden" style="padding:80px 0;margin-top:0;background:linear-gradient(160deg,#130228 0%,#1a0f35 50%,#0e0722 100%);">
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(124,58,237,0.18) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
+    <div class="max-w-3xl mx-auto px-6 text-center relative" style="z-index:1">
+        <p class="font-mono text-xs uppercase tracking-widest text-paper/35 mb-4">— Para organizadores</p>
+        <h2 class="font-display font-black uppercase text-paper tracking-tightest leading-[0.9]"
+            style="font-size:clamp(2rem,5vw,4rem)">
+            ¿Organizas<br>eventos?
         </h2>
-        <p style="color:rgba(255,255,255,0.5);font-size:0.95rem;max-width:480px;margin:0 auto 28px;">
+        <p class="font-sans text-paper/50 text-base mt-6 mb-8 max-w-md mx-auto leading-relaxed">
             Publica tus ofertas de trabajo y encuentra al equipo perfecto para tus festivales, conciertos y eventos.
         </p>
         <a href="{{ route('home') }}"
-           class="btn-morado inline-block px-8 py-3">
-            Explorar la plataforma
+           class="btn-ink font-mono text-xs uppercase tracking-widest px-8 py-4 inline-block">
+            <span>Explorar la plataforma →</span>
         </a>
     </div>
 </section>
 
 @endsection
 
-{{-- ════════════════════════════════════════════════════
-     ESTILOS ESPECÍFICOS DE ESTA PÁGINA
-════════════════════════════════════════════════════ --}}
-{{-- Las clases de las tarjetas (.card-trabajo-grande, .ctg-*) están en trabajos-index.css --}}
-@push('estilos')
-<link rel="stylesheet" href="{{ asset('css/trabajos-index.css') }}">
-@endpush
-
-{{-- ════════════════════════════════════════════════════
-     SCRIPTS — Custom selects + filtrado AJAX
-════════════════════════════════════════════════════ --}}
-{{-- La lógica de filtros y generación de tarjetas está en trabajos-index.js --}}
 @push('scripts')
 <script src="{{ asset('js/trabajos-index.js') }}"></script>
+<script>
+(function () {
+    var carousel = document.getElementById('trabajosCarousel');
+    if (!carousel) return;
+    var cards = carousel.querySelectorAll('.carousel-oferta');
+    var dots  = document.querySelectorAll('#carouselDots .carousel-dot');
+    var current = 0;
+    var timer;
+
+    function goTo(index) {
+        cards[current].classList.remove('active');
+        if (dots[current]) dots[current].classList.remove('active');
+        current = (index + cards.length) % cards.length;
+        cards[current].classList.add('active');
+        if (dots[current]) dots[current].classList.add('active');
+    }
+
+    function startTimer() {
+        timer = setInterval(function () { goTo(current + 1); }, 3200);
+    }
+
+    dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+            clearInterval(timer);
+            goTo(parseInt(this.dataset.index));
+            startTimer();
+        });
+    });
+
+    startTimer();
+})();
+</script>
 @endpush
