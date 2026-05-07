@@ -256,59 +256,60 @@
 <?php if(auth()->guard()->check()): ?>
 <?php if(!Auth::user()->isAdmin()): ?>
 <div id="modal-compra"
-     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(27,20,48,0.75);backdrop-filter:blur(4px);"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,6,12,0.80);backdrop-filter:blur(4px);"
      onclick="if(event.target===this)cerrarModalCompra()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                background:#F7F5FF;padding:2rem;width:calc(100% - 2rem);max-width:440px;
-                box-shadow:0 25px 60px rgba(27,20,48,0.35);border:1px solid rgba(27,20,48,0.1);">
+                background:#0d0a18;padding:2rem;width:calc(100% - 2rem);max-width:440px;
+                box-shadow:0 25px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(124,58,237,0.2);
+                border:1px solid rgba(245,241,234,0.10);">
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-            <h2 style="font-family:'Archivo',sans-serif;font-weight:900;font-size:1.25rem;color:#1B1430;margin:0;text-transform:uppercase;letter-spacing:-0.03em;">
+            <h2 style="font-family:'DM Sans',sans-serif;font-weight:900;font-size:1.25rem;color:#f5f1ea;margin:0;text-transform:uppercase;letter-spacing:-0.02em;">
                 Comprar entradas
             </h2>
             <button onclick="cerrarModalCompra()"
-                    style="background:none;border:none;cursor:pointer;font-size:1.75rem;color:#ACA4C4;line-height:1">×</button>
+                    style="background:none;border:none;cursor:pointer;font-size:1.75rem;color:rgba(245,241,234,0.4);line-height:1">×</button>
         </div>
 
-        <div style="background:#E9E3FF;padding:1rem;margin-bottom:1.5rem;border-left:3px solid #8B78CC;">
-            <p style="font-family:'Archivo',sans-serif;font-weight:700;color:#1B1430;margin:0;font-size:0.95rem"><?php echo e($evento->titulo); ?></p>
-            <p style="font-family:'JetBrains Mono',monospace;color:#8B78CC;font-size:0.8rem;margin:4px 0 0;text-transform:uppercase;letter-spacing:0.05em;">
+        <div style="background:rgba(124,58,237,0.15);padding:1rem;margin-bottom:1.5rem;border-left:3px solid #a855f7;">
+            <p style="font-family:'DM Sans',sans-serif;font-weight:700;color:#f5f1ea;margin:0;font-size:0.95rem"><?php echo e($evento->titulo); ?></p>
+            <p style="font-family:'Syne',sans-serif;color:#c084fc;font-size:0.8rem;margin:4px 0 0;text-transform:uppercase;letter-spacing:0.05em;">
                 <?php echo e(\Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D [de] MMMM [de] YYYY')); ?>
 
             </p>
         </div>
 
         <div style="margin-bottom:1.5rem">
-            <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#1B1430;display:block;margin-bottom:10px">
+            <label style="font-family:'Syne',sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);display:block;margin-bottom:10px">
                 Cantidad de entradas
             </label>
             <div style="display:flex;align-items:center;gap:16px">
                 <button type="button" onclick="cambiarCantidad(-1)"
-                        style="width:40px;height:40px;border:2px solid #8B78CC;background:#F7F5FF;color:#8B78CC;font-size:1.25rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">−</button>
-                <span id="modal-cantidad" style="font-size:1.5rem;font-weight:900;color:#1B1430;min-width:40px;text-align:center">1</span>
+                        style="width:40px;height:40px;border:2px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.15);color:#c084fc;font-size:1.25rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">−</button>
+                <span id="modal-cantidad" style="font-family:'DM Sans',sans-serif;font-size:1.5rem;font-weight:900;color:#f5f1ea;min-width:40px;text-align:center">1</span>
                 <button type="button" onclick="cambiarCantidad(1)"
-                        style="width:40px;height:40px;border:2px solid #8B78CC;background:#F7F5FF;color:#8B78CC;font-size:1.25rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
+                        style="width:40px;height:40px;border:2px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.15);color:#c084fc;font-size:1.25rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
             </div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(27,20,48,0.1);padding-top:1rem;margin-bottom:1.5rem">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#ACA4C4;">Total</span>
-            <span id="modal-total" class="text-gradient" style="font-size:1.75rem;font-weight:900">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.08);padding-top:1rem;margin-bottom:1.5rem">
+            <span style="font-family:'Syne',sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.4);">Total</span>
+            <span id="modal-total" class="text-gradient" style="font-family:'DM Sans',sans-serif;font-size:1.75rem;font-weight:900">
                 <?php if($evento->es_gratuito): ?> Gratis
                 <?php else: ?> <?php echo e(number_format($evento->precio_base, 2)); ?> €
                 <?php endif; ?>
             </span>
         </div>
 
-        <div id="modal-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:10px 14px;font-size:0.875rem;margin-bottom:1rem"></div>
+        <div id="modal-error" style="display:none;background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.35);color:#f87171;padding:10px 14px;font-family:'Syne',sans-serif;font-size:0.875rem;margin-bottom:1rem"></div>
 
         <button id="modal-btn-comprar" onclick="confirmarCompra()" class="btn-comprar w-full">
             <?php echo e($evento->es_gratuito ? 'Reservar gratis' : 'Confirmar compra'); ?>
 
         </button>
 
-        <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#ACA4C4;margin-top:12px;margin-bottom:0;text-transform:uppercase;letter-spacing:0.05em;">
-            🔒 Transacción segura · Recibirás tu QR al instante
+        <p style="text-align:center;font-family:'Syne',sans-serif;font-size:0.7rem;color:rgba(245,241,234,0.3);margin-top:12px;margin-bottom:0;text-transform:uppercase;letter-spacing:0.05em;">
+             Transacción segura · Recibirás tu QR al instante
         </p>
     </div>
 </div>

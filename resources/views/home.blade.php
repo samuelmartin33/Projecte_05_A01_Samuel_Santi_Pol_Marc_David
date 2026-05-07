@@ -110,27 +110,7 @@
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     MOOD CHIPS — Filtro rápido por vibe/categoría
-════════════════════════════════════════════════════ --}}
-<div class="mood-strip">
-    <div class="mood-strip-inner">
-        <span class="mood-label">Elige tu vibe</span>
 
-        {{-- Chip "Todos" — limpia los filtros --}}
-        <button type="button" class="mood-chip activo" id="mood-chip-todos"
-                onclick="seleccionarMood(this, '', 'Todas')">
-             Todos
-        </button>
-
-        @foreach ($categorias as $categoria)
-            <button type="button" class="mood-chip"
-                    onclick="seleccionarMood(this, '{{ $categoria->id }}', '{{ $categoria->nombre }}')">
-                {{ $categoria->nombre }}
-            </button>
-        @endforeach
-    </div>
-</div>
 
 {{-- ════════════════════════════════════════════════════
      BARRA DE FILTROS — sticky bajo el nav
@@ -208,7 +188,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
-                Limpiar
+                
             </button>
         </div>
 

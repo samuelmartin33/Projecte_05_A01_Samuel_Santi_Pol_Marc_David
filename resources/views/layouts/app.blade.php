@@ -47,16 +47,19 @@
          Fija en la parte superior, con logo y navegación
     ═══════════════════════════════════════════════════════ --}}
     @if(!View::hasSection('content'))
-    <header class="sticky top-0 z-50 bg-paper border-b border-ink/15">
+    <header class="nav-vibez sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-14">
 
             @php $esEmpresa = Auth::check() && Auth::user()->isEmpresa(); @endphp
 
-            {{-- Wordmark --}}
+            {{-- Logo imagen --}}
             <a href="{{ $esEmpresa ? route('empresa.home') : route('home') }}"
-               class="font-display font-black text-2xl tracking-brutal text-ink
-                      hover:text-lilac transition-colors duration-100 select-none">
-                VIBEZ
+               class="flex items-center flex-shrink-0 select-none"
+               style="opacity:1;transition:opacity 0.15s">
+                <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ"
+                     style="height:38px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(255,255,255,0.25));transition:filter 0.2s,transform 0.2s"
+                     onmouseover="this.style.filter='drop-shadow(0 0 14px rgba(255,255,255,0.55))';this.style.transform='scale(1.04)'"
+                     onmouseout="this.style.filter='drop-shadow(0 0 8px rgba(255,255,255,0.25))';this.style.transform='scale(1)'">
             </a>
 
             {{-- Navegación central (desktop) --}}
@@ -64,29 +67,29 @@
                 @if($esEmpresa)
                     <a href="{{ route('empresa.home') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                              {{ request()->routeIs('empresa.home') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                              {{ request()->routeIs('empresa.home') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Panel
                     </a>
                     <a href="{{ route('empresa.candidaturas.ofertas') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                              {{ request()->routeIs('empresa.candidaturas.*') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                              {{ request()->routeIs('empresa.candidaturas.*') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Candidaturas
                     </a>
                 @else
                     <a href="{{ route('home') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                              {{ request()->routeIs('home') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                              {{ request()->routeIs('home') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Explorar
                     </a>
                     <a href="{{ route('trabajos.index') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                              {{ request()->routeIs('trabajos.index') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                              {{ request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Trabajo
                     </a>
                     @auth
                     <a href="{{ route('social') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative
-                              {{ request()->routeIs('social') ? 'text-ink' : 'text-muted hover:text-ink' }}">
+                              {{ request()->routeIs('social') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Social
                         <span class="nav-badge-social" id="nav-badge-social" style="display:none">0</span>
                     </a>
@@ -99,11 +102,14 @@
                 @guest
                     <a href="{{ route('login') }}"
                        class="hidden sm:block font-mono text-xs uppercase tracking-widest
-                              text-ink/55 hover:text-ink transition-colors duration-100">
+                              text-white/65 hover:text-white transition-colors duration-100">
                         Entrar
                     </a>
                     <a href="{{ route('register') }}"
-                       class="btn-ink font-mono text-xs uppercase tracking-widest px-5 py-2.5">
+                       class="font-mono text-xs uppercase tracking-widest px-5 py-2.5"
+                       style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:white;border-radius:999px;transition:background 0.15s,border-color 0.15s"
+                       onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.borderColor='rgba(255,255,255,0.65)'"
+                       onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.borderColor='rgba(255,255,255,0.4)'">
                         <span>Registro &nbsp;→</span>
                     </a>
                 @else
@@ -130,8 +136,7 @@
                             {{-- Badge de mood: solo el emoji, flotante en la esquina del avatar --}}
                             @if(Auth::user()->mood)
                                 <span class="nav-mood-badge" title="{{ Auth::user()->mood }}">
-                                    {{-- Extraemos solo el emoji (primera palabra antes del espacio) --}}
-                                    {{ explode(' ', Auth::user()->mood, 2)[0] }}
+                                    {{ mb_substr(Auth::user()->mood, 0, 1) }}
                                 </span>
                             @endif
                         </div>
@@ -144,7 +149,7 @@
                                 <p class="nav-dropdown-nombre">{{ Auth::user()->nombre }} {{ Auth::user()->apellido1 }}</p>
                                 <p class="nav-dropdown-email">{{ Auth::user()->email }}</p>
                                 @if(Auth::user()->mood)
-                                    <p class="nav-dropdown-mood">{{ Auth::user()->mood }}</p>
+                                    <p class="nav-dropdown-mood">{{ explode(' ', Auth::user()->mood, 2)[0] }}</p>
                                 @endif
                             </div>
 
@@ -161,7 +166,7 @@
 
                             @if($esEmpresa)
                                 {{-- Panel empresa --}}
-                                <a href="{{ route('empresa.home') }}" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                                <a href="{{ route('empresa.home') }}" class="nav-dropdown-item" style="color:#c084fc;font-weight:700">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -199,7 +204,7 @@
 
                             {{-- Panel de administración: solo visible para admins --}}
                             @if(Auth::user()->es_admin)
-                                <a href="{{ route('admin.dashboard') }}" class="nav-dropdown-item" style="color:#7c3aed;font-weight:700">
+                                <a href="{{ route('admin.dashboard') }}" class="nav-dropdown-item" style="color:#c084fc;font-weight:700">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>

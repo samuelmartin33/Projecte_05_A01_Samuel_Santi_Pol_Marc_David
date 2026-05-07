@@ -135,17 +135,15 @@ class PerfilController extends Controller
      * Guarda el mood (estado de ánimo) del usuario.
      * El mood es público: lo puede ver cualquier persona.
      */
-    public function actualizarMood(Request $request): RedirectResponse
+    public function actualizarMood(Request $request): RedirectResponse|JsonResponse
     {
         $request->validate([
-            // nullable permite enviar cadena vacía para borrar el mood
             'mood' => ['nullable', 'string', 'max:100'],
         ]);
 
         /** @var Usuario $usuario */
         $usuario = Auth::user();
 
-        // Si mood es vacío ('') lo guardamos como null para que no aparezca
         $usuario->update([
             'mood'                => $request->mood ?: null,
             'fecha_actualizacion' => now(),
@@ -154,6 +152,14 @@ class PerfilController extends Controller
         $mensaje = $request->mood
             ? 'Estado de ánimo actualizado.'
             : 'Estado de ánimo eliminado.';
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje,
+                'mood'    => $request->mood ?: null,
+            ]);
+        }
 
         return redirect()->route('perfil')->with('exito', $mensaje);
     }

@@ -3,52 +3,53 @@
 @section('title', 'Admin | Dashboard')
 
 @section('content')
-    <header class="admin-header">
-        <div>
-            <h1>Dashboard inicial</h1>
-            <p>Primera version del panel. Actualmente se administran eventos, usuarios y empresas.</p>
-        </div>
-        <a class="btn btn-secondary" href="{{ route('home') }}">Volver al inicio</a>
-    </header>
+    <section class="dashboard-page">
+        <h2 class="dashboard-section-title">Datos</h2>
+        <section class="card dashboard-metrics-card" aria-label="Métricas del panel">
+            <div class="dashboard-metrics-grid">
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Eventos activos</span>
+                    <span class="dashboard-metric-value">{{ $eventosActivos }}</span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Usuarios activos</span>
+                    <span class="dashboard-metric-value">{{ $usuariosActivos }}</span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Empresas pendientes</span>
+                    <span class="dashboard-metric-value dashboard-metric-value--danger">{{ $empresasPendientes }}</span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Pedidos</span>
+                    <span class="dashboard-metric-value">{{ $totalPedidos }}</span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Categorías</span>
+                    <span class="dashboard-metric-value">{{ $totalCategorias }}</span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Pagos</span>
+                    <span class="dashboard-metric-value">{{ $totalPagos }}</span>
+                </article>
+            </div>
+        </section>
 
-    <section class="card quick-actions">
-        <h2>Acciones rapidas</h2>
-        <div class="quick-actions-grid">
-            <a class="quick-action-item" href="{{ route('admin.eventos.create') }}">Crear evento</a>
-            <a class="quick-action-item" href="{{ route('admin.usuarios.create') }}">Crear usuario</a>
-            <a class="quick-action-item" href="{{ route('admin.empresas.index') }}">Gestionar empresas</a>
-            <a class="quick-action-item" href="{{ route('admin.pedidos.create') }}">Crear pedido</a>
-            <a class="quick-action-item" href="{{ route('admin.pagos.create') }}">Registrar pago</a>
-        </div>
-    </section>
-
-    <section class="dashboard-cards">
-        <article class="card stat-card">
-            <h2>Eventos activos</h2>
-            <p class="stat-number">{{ $eventosActivos }}</p>
-        </article>
-
-        <a href="{{ route('admin.usuarios.index') }}" class="card stat-card" style="text-decoration:none;color:inherit;">
-            <h2>Usuarios activos</h2>
-            <p class="stat-number">{{ $usuariosActivos }}</p>
-        </a>
-
-        <a href="{{ route('admin.empresas.index') }}" class="card stat-card {{ $empresasPendientes > 0 ? 'stat-card--alert' : '' }}" style="text-decoration:none;color:inherit;">
-            <h2>Empresas pendientes</h2>
-            <p class="stat-number">{{ $empresasPendientes }}</p>
-            @if ($empresasPendientes > 0)
-                <p class="stat-hint">Requieren revisión</p>
-            @endif
-        </a>
-
-        <a href="{{ route('admin.pedidos.index') }}" class="card stat-card" style="text-decoration:none;color:inherit;">
-            <h2>Pedidos</h2>
-            <p class="stat-number">{{ $totalPedidos }}</p>
-        </a>
-
-        <a href="{{ route('admin.pagos.index') }}" class="card stat-card" style="text-decoration:none;color:inherit;">
-            <h2>Pagos</h2>
-            <p class="stat-number">{{ $totalPagos }}</p>
-        </a>
+        <h2 class="dashboard-section-title">Acciones Rápidas</h2>
+        <section class="card dashboard-actions-card" aria-label="Acciones rápidas">
+            <div class="dashboard-actions-grid">
+                <a class="dashboard-action-item" href="{{ route('admin.eventos.create') }}">
+                    <span>Crear evento</span>
+                </a>
+                <a class="dashboard-action-item" href="{{ route('admin.usuarios.create') }}">
+                    <span>Crear usuario</span>
+                </a>
+                <a class="dashboard-action-item" href="{{ route('admin.empresas.index') }}">
+                    <span>Gestionar empresas</span>
+                </a>
+                <a class="dashboard-action-item" href="{{ route('admin.categorias.index') }}">
+                    <span>Gestionar categorías</span>
+                </a>
+            </div>
+        </section>
     </section>
 @endsection

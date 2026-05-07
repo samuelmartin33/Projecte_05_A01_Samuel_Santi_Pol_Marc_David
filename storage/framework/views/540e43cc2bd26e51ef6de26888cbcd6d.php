@@ -80,27 +80,27 @@
 <div class="marquee-vibez" aria-hidden="true">
     
     <div class="marquee-track">
-        <span class="marquee-item">🎵 Música</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎭 Cultura</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚡ Techno</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚽ Deporte</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🍕 Gastronomía</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🌐 Networking</span><span class="marquee-dot"></span>
-        <span class="marquee-item">👗 Moda</span><span class="marquee-dot"></span>
-        <span class="marquee-item">💻 Tecnología</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎪 Festivales</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎨 Arte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Música</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Cultura</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Techno</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Deporte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Gastronomía</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Networking</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Moda</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Tecnología</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Festivales</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Arte</span><span class="marquee-dot"></span>
         
-        <span class="marquee-item">🎵 Música</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎭 Cultura</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚡ Techno</span><span class="marquee-dot"></span>
-        <span class="marquee-item">⚽ Deporte</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🍕 Gastronomía</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🌐 Networking</span><span class="marquee-dot"></span>
-        <span class="marquee-item">👗 Moda</span><span class="marquee-dot"></span>
-        <span class="marquee-item">💻 Tecnología</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎪 Festivales</span><span class="marquee-dot"></span>
-        <span class="marquee-item">🎨 Arte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Música</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Cultura</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Techno</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Deporte</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Gastronomía</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Networking</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Moda</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Tecnología</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Festivales</span><span class="marquee-dot"></span>
+        <span class="marquee-item"> Arte</span><span class="marquee-dot"></span>
     </div>
 </div>
 
@@ -112,7 +112,7 @@
         
         <button type="button" class="mood-chip activo" id="mood-chip-todos"
                 onclick="seleccionarMood(this, '', 'Todas')">
-            ✨ Todos
+             Todos
         </button>
 
         <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoria): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -126,39 +126,31 @@
 </div>
 
 
-<section class="barra-filtros">
+<section class="barra-filtros sticky top-14 z-40">
 
-    
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
          onclick="cerrarTodosDropdowns()"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-end gap-3">
 
-        
         <p class="text-sm font-semibold mr-auto self-center"
            style="color:rgba(245,241,234,0.45)">
             <span id="contador-resultados"><?php echo e($eventos->count()); ?></span>
             <span style="color:rgba(168,85,247,0.85)"> resultados</span>
         </p>
 
-        
         <div class="filtro-grupo" style="position:relative;z-index:250;">
             <label class="filtro-label">Categoría</label>
-            <div class="custom-select-wrapper"
-                 id="wrapper-categoria"
-                 onclick="toggleDropdown('categoria')">
+            <div class="custom-select-wrapper" id="wrapper-categoria" onclick="toggleDropdown('categoria')">
                 <span id="categoria-display" class="custom-select-display">Todas</span>
-                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
                 <div id="categoria-dropdown" class="custom-select-dropdown" style="display:none">
-                    <div class="custom-select-option seleccionado"
-                         onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
+                    <div class="custom-select-option seleccionado" onclick="seleccionarFiltro('categoria','','Todas',event)">Todas</div>
                     <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoria): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="custom-select-option"
-                             onclick="seleccionarFiltro('categoria','<?php echo e($categoria->id); ?>','<?php echo e($categoria->nombre); ?>',event)">
+                        <div class="custom-select-option" onclick="seleccionarFiltro('categoria','<?php echo e($categoria->id); ?>','<?php echo e($categoria->nombre); ?>',event)">
                             <?php echo e($categoria->nombre); ?>
 
                         </div>
@@ -168,25 +160,17 @@
             <input type="hidden" id="filtro-categoria" value="">
         </div>
 
-        
         <div class="filtro-grupo" style="position:relative;z-index:240;">
             <label class="filtro-label">Ubicación</label>
-            <div class="custom-select-wrapper"
-                 id="wrapper-ubicacion"
-                 onclick="toggleDropdown('ubicacion')">
+            <div class="custom-select-wrapper" id="wrapper-ubicacion" onclick="toggleDropdown('ubicacion')">
                 <span id="ubicacion-display" class="custom-select-display">Todas las ciudades</span>
-                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
                 <div id="ubicacion-dropdown" class="custom-select-dropdown" style="display:none">
-                    <div class="custom-select-option seleccionado"
-                         onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">
-                        Todas las ciudades
-                    </div>
+                    <div class="custom-select-option seleccionado" onclick="seleccionarFiltro('ubicacion','','Todas las ciudades',event)">Todas las ciudades</div>
                     <?php $__currentLoopData = $ubicaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ubicacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="custom-select-option"
-                             onclick="seleccionarFiltro('ubicacion','<?php echo e($ubicacion); ?>','<?php echo e($ubicacion); ?>',event)">
+                        <div class="custom-select-option" onclick="seleccionarFiltro('ubicacion','<?php echo e($ubicacion); ?>','<?php echo e($ubicacion); ?>',event)">
                             <?php echo e($ubicacion); ?>
 
                         </div>
@@ -196,7 +180,7 @@
             <input type="hidden" id="filtro-ubicacion" value="">
         </div>
 
-        
+        <?php if(auth()->guard()->check()): ?>
         <div class="filtro-grupo">
             <label class="filtro-label">Favoritos</label>
             <button type="button" id="btn-solo-favoritos" class="btn-favoritos-filtro" onclick="toggleSoloFavoritos()">
@@ -207,13 +191,13 @@
             </button>
             <input type="hidden" id="filtro-favoritos" value="0">
         </div>
+        <?php endif; ?>
 
         
         <div class="filtro-grupo">
             <span class="filtro-label" style="visibility:hidden">–</span>
             <button class="btn-limpiar" onclick="limpiarFiltros()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
                 Limpiar
@@ -343,7 +327,6 @@
 </section>
 
 <?php $__env->stopSection(); ?>
-
 
 <?php $__env->startPush('scripts'); ?>
 <script>

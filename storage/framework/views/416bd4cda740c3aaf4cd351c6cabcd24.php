@@ -26,6 +26,7 @@
 </div>
 
 
+<div class="confirmacion-page-wrap">
 <div class="max-w-2xl mx-auto px-4 py-8">
 
     
@@ -128,6 +129,7 @@
         </a>
     </div>
 
+</div>
 </div>
 
 <?php $__env->stopSection(); ?>

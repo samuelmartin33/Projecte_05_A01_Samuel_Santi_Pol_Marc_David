@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
 
         // Social
         $this->call(SeguimientosSeeder::class);
+        $this->call(EventoPostsSeeder::class);
 
         // Mensajería
         $this->call(ChatsSeeder::class);

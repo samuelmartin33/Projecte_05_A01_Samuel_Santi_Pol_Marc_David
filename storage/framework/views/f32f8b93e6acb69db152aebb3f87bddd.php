@@ -1,53 +1,54 @@
 <?php $__env->startSection('title', 'Admin | Dashboard'); ?>
 
 <?php $__env->startSection('content'); ?>
-    <header class="admin-header">
-        <div>
-            <h1>Dashboard inicial</h1>
-            <p>Primera version del panel. Actualmente se administran eventos, usuarios y empresas.</p>
-        </div>
-        <a class="btn btn-secondary" href="<?php echo e(route('home')); ?>">Volver al inicio</a>
-    </header>
+    <section class="dashboard-page">
+        <h2 class="dashboard-section-title">Datos</h2>
+        <section class="card dashboard-metrics-card" aria-label="Métricas del panel">
+            <div class="dashboard-metrics-grid">
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Eventos activos</span>
+                    <span class="dashboard-metric-value"><?php echo e($eventosActivos); ?></span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Usuarios activos</span>
+                    <span class="dashboard-metric-value"><?php echo e($usuariosActivos); ?></span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Empresas pendientes</span>
+                    <span class="dashboard-metric-value dashboard-metric-value--danger"><?php echo e($empresasPendientes); ?></span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Pedidos</span>
+                    <span class="dashboard-metric-value"><?php echo e($totalPedidos); ?></span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Categorías</span>
+                    <span class="dashboard-metric-value"><?php echo e($totalCategorias); ?></span>
+                </article>
+                <article class="dashboard-metric-item">
+                    <span class="dashboard-metric-label">Pagos</span>
+                    <span class="dashboard-metric-value"><?php echo e($totalPagos); ?></span>
+                </article>
+            </div>
+        </section>
 
-    <section class="card quick-actions">
-        <h2>Acciones rapidas</h2>
-        <div class="quick-actions-grid">
-            <a class="quick-action-item" href="<?php echo e(route('admin.eventos.create')); ?>">Crear evento</a>
-            <a class="quick-action-item" href="<?php echo e(route('admin.usuarios.create')); ?>">Crear usuario</a>
-            <a class="quick-action-item" href="<?php echo e(route('admin.empresas.index')); ?>">Gestionar empresas</a>
-            <a class="quick-action-item" href="<?php echo e(route('admin.pedidos.create')); ?>">Crear pedido</a>
-            <a class="quick-action-item" href="<?php echo e(route('admin.pagos.create')); ?>">Registrar pago</a>
-        </div>
-    </section>
-
-    <section class="dashboard-cards">
-        <article class="card stat-card">
-            <h2>Eventos activos</h2>
-            <p class="stat-number"><?php echo e($eventosActivos); ?></p>
-        </article>
-
-        <a href="<?php echo e(route('admin.usuarios.index')); ?>" class="card stat-card" style="text-decoration:none;color:inherit;">
-            <h2>Usuarios activos</h2>
-            <p class="stat-number"><?php echo e($usuariosActivos); ?></p>
-        </a>
-
-        <a href="<?php echo e(route('admin.empresas.index')); ?>" class="card stat-card <?php echo e($empresasPendientes > 0 ? 'stat-card--alert' : ''); ?>" style="text-decoration:none;color:inherit;">
-            <h2>Empresas pendientes</h2>
-            <p class="stat-number"><?php echo e($empresasPendientes); ?></p>
-            <?php if($empresasPendientes > 0): ?>
-                <p class="stat-hint">Requieren revisión</p>
-            <?php endif; ?>
-        </a>
-
-        <a href="<?php echo e(route('admin.pedidos.index')); ?>" class="card stat-card" style="text-decoration:none;color:inherit;">
-            <h2>Pedidos</h2>
-            <p class="stat-number"><?php echo e($totalPedidos); ?></p>
-        </a>
-
-        <a href="<?php echo e(route('admin.pagos.index')); ?>" class="card stat-card" style="text-decoration:none;color:inherit;">
-            <h2>Pagos</h2>
-            <p class="stat-number"><?php echo e($totalPagos); ?></p>
-        </a>
+        <h2 class="dashboard-section-title">Acciones Rápidas</h2>
+        <section class="card dashboard-actions-card" aria-label="Acciones rápidas">
+            <div class="dashboard-actions-grid">
+                <a class="dashboard-action-item" href="<?php echo e(route('admin.eventos.create')); ?>">
+                    <span>Crear evento</span>
+                </a>
+                <a class="dashboard-action-item" href="<?php echo e(route('admin.usuarios.create')); ?>">
+                    <span>Crear usuario</span>
+                </a>
+                <a class="dashboard-action-item" href="<?php echo e(route('admin.empresas.index')); ?>">
+                    <span>Gestionar empresas</span>
+                </a>
+                <a class="dashboard-action-item" href="<?php echo e(route('admin.categorias.index')); ?>">
+                    <span>Gestionar categorías</span>
+                </a>
+            </div>
+        </section>
     </section>
 <?php $__env->stopSection(); ?>
 

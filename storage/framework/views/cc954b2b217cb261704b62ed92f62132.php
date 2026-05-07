@@ -1,5 +1,9 @@
 <?php $__env->startSection('titulo', 'Mi Perfil — VIBEZ'); ?>
 
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/perfil.css')); ?>">
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('contenido'); ?>
 
 
@@ -55,16 +59,13 @@
                 <p class="perfil-bio-hero"><?php echo e($usuario->biografia); ?></p>
             <?php endif; ?>
 
-            
-            <?php if($usuario->mood && !$usuario->isAdmin() && !$usuario->isEmpresa()): ?>
-                <span class="perfil-mood-hero"><?php echo e($usuario->mood); ?></span>
-            <?php endif; ?>
         </div>
 
     </div>
 </section>
 
 
+<div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <?php if(session('exito')): ?>
         <div class="perfil-alerta perfil-alerta-ok">
@@ -84,10 +85,7 @@
 </div>
 
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    
-    <div class="lg:col-span-2 flex flex-col gap-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
 
         
         
@@ -146,171 +144,65 @@
         </div>
 
         
-        
-        <?php if(!$usuario->isAdmin() && !$usuario->isEmpresa()): ?>
         <div class="perfil-card">
-            <h2 class="perfil-card-titulo">Estado de ánimo</h2>
-            <p class="perfil-card-sub">
-                Visible para <strong>todos</strong> (amigos o no) y aparece en la barra de navegación
-            </p>
+            <h2 class="perfil-card-titulo">Mi estado de ánimo</h2>
+            <p class="perfil-card-sub">Elige cómo te sientes · Visible para tus amigos</p>
 
-            <form action="<?php echo e(route('perfil.mood')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <div id="mood-alerta" class="perfil-alerta perfil-alerta-ok" style="display:none; margin-top:0.75rem;"></div>
 
-                <div class="perfil-mood-grid">
-                    
-                    <?php
-                        $moods = [
-                            ''                    => '— Sin estado —',
-                            '🤕 De resaca'        => '🤕 De resaca',
-                            '🥳 De fiesta'        => '🥳 De fiesta',
-                            '🍺 Bebiendo cerveza' => '🍺 Bebiendo cerveza',
-                            '🍷 Bebiendo vino'    => '🍷 Bebiendo vino',
-                            '❤️ Enamorado/a'      => '❤️ Enamorado/a',
-                            '💃 Bailando'         => '💃 Bailando',
-                            '🎵 Escuchando música'=> '🎵 Escuchando música',
-                            '😎 Modo casual'      => '😎 Modo casual',
-                            '💪 En el gym'        => '💪 En el gym',
-                            '😴 Durmiendo'        => '😴 Durmiendo',
-                            '🍕 Comiendo'         => '🍕 Comiendo',
-                            '✈️ De viaje'         => '✈️ De viaje',
-                            '🎮 Gaming'           => '🎮 Gaming',
-                            '☀️ Tomando el sol'   => '☀️ Tomando el sol',
-                            '🤙 Con los amigos'   => '🤙 Con los amigos',
-                        ];
-                    ?>
-
-                    <?php $__currentLoopData = $moods; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $valor => $etiqueta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if($valor === ''): ?>
-                            
-                            <label class="perfil-mood-opcion <?php echo e($usuario->mood === null ? 'perfil-mood-activo' : ''); ?>">
-                                <input type="radio" name="mood" value=""
-                                       <?php echo e($usuario->mood === null ? 'checked' : ''); ?>>
-                                <span><?php echo e($etiqueta); ?></span>
-                            </label>
-                        <?php else: ?>
-                            <label class="perfil-mood-opcion <?php echo e($usuario->mood === $valor ? 'perfil-mood-activo' : ''); ?>">
-                                <input type="radio" name="mood" value="<?php echo e($valor); ?>"
-                                       <?php echo e($usuario->mood === $valor ? 'checked' : ''); ?>>
-                                <span><?php echo e($etiqueta); ?></span>
-                            </label>
-                        <?php endif; ?>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-
-                <button type="submit" class="btn-perfil-guardar" style="margin-top:16px">
-                    Guardar estado
-                </button>
-            </form>
-        </div>
-        <?php endif; ?>
-
-    </div>
-
-    
-    <div class="flex flex-col gap-6">
-
-        
-        <?php if(!$usuario->isAdmin()): ?>
-        <div class="perfil-card" id="amigos">
-            <h2 class="perfil-card-titulo">Amigos</h2>
-
-            
-            <div class="perfil-field">
-                <label for="buscarAmigo">Buscar por nombre o email</label>
-                <input type="text" id="buscarAmigo" placeholder="Escribe al menos 2 caracteres..."
-                       oninput="buscarAmigos(this.value)">
+            <div id="mood-activo" style="<?php echo e($usuario->mood ? 'display:flex' : 'display:none'); ?>; align-items:center; gap:0.75rem; margin-top:0.75rem; padding:0.6rem 0.9rem; border-radius:0.5rem; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35);">
+                <span id="mood-activo-texto" style="font-size:0.9rem; color:#c084fc; flex:1;"><?php echo e($usuario->mood); ?></span>
+                <button type="button" onclick="seleccionarMood('', null)" style="background:transparent; border:none; color:rgba(245,241,234,0.4); cursor:pointer; font-size:0.8rem; padding:0; line-height:1;" title="Quitar estado">✕ Quitar</button>
             </div>
 
-            
-            <div id="resultadosBusqueda" style="display:none" class="perfil-busqueda-lista"></div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem; margin-top:1rem;">
+                <?php $__currentLoopData = ['🥳 De fiesta', '🎵 Escuchando música', '🌙 Noche de salida', '🔥 Con ganas de juerga', '🍻 Tomando algo', '🕺 Bailando', '😎 Tranquilo/a', '😴 Descansando', '💤 Sin planes', '🎶 Modo techno']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opcion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <button type="button"
+                            class="mood-opcion <?php echo e($usuario->mood === $opcion ? 'mood-opcion--activo' : ''); ?>"
+                            onclick="seleccionarMood('<?php echo e($opcion); ?>', this)">
+                        <?php echo e($opcion); ?>
 
-            
-            <?php if($solicitudesPendientes->count() > 0): ?>
-                <div class="perfil-solicitudes-wrap">
-                    <h3 class="perfil-solicitudes-titulo">
-                        Solicitudes recibidas
-                        <span class="perfil-badge-count"><?php echo e($solicitudesPendientes->count()); ?></span>
-                    </h3>
-
-                    <?php $__currentLoopData = $solicitudesPendientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $solicitud): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="perfil-solicitud-item">
-                            
-                            <div class="perfil-solicitud-avatar">
-                                <?php if($solicitud->solicitante->foto_url): ?>
-                                    <img src="<?php echo e($solicitud->solicitante->foto_url); ?>" alt="">
-                                <?php else: ?>
-                                    <?php echo e(strtoupper(substr($solicitud->solicitante->nombre,0,1))); ?>
-
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-sm truncate" style="color:#0f172a">
-                                    <?php echo e($solicitud->solicitante->nombre); ?> <?php echo e($solicitud->solicitante->apellido1); ?>
-
-                                </p>
-                            </div>
-
-                            
-                            <div class="flex gap-1">
-                                
-                                <form action="<?php echo e(route('amigos.aceptar', $solicitud->id)); ?>" method="POST" style="display:inline">
-                                    <?php echo csrf_field(); ?>
-                                    <button type="submit" class="perfil-btn-aceptar" title="Aceptar">✓</button>
-                                </form>
-
-                                
-                                <form action="<?php echo e(route('amigos.rechazar', $solicitud->id)); ?>" method="POST" style="display:inline">
-                                    <?php echo csrf_field(); ?>
-                                    <button type="submit" class="perfil-btn-rechazar" title="Rechazar">✕</button>
-                                </form>
-                            </div>
-                        </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-            <?php endif; ?>
-
-            
-            <div class="perfil-amigos-lista">
-                <?php if($amigos->count() > 0): ?>
-                    <h3 class="perfil-solicitudes-titulo mt-4">
-                        Tus amigos (<?php echo e($amigos->count()); ?>)
-                    </h3>
-                    <?php $__currentLoopData = $amigos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $amigo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="perfil-solicitud-item">
-                            <div class="perfil-solicitud-avatar">
-                                <?php if($amigo->foto_url): ?>
-                                    <img src="<?php echo e($amigo->foto_url); ?>" alt="">
-                                <?php else: ?>
-                                    <?php echo e(strtoupper(substr($amigo->nombre,0,1))); ?>
-
-                                <?php endif; ?>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-sm truncate" style="color:#0f172a">
-                                    <?php echo e($amigo->nombre); ?> <?php echo e($amigo->apellido1); ?>
-
-                                </p>
-                                
-                                <?php if($amigo->mood): ?>
-                                    <p class="text-xs" style="color:rgba(15,23,42,0.45)"><?php echo e($amigo->mood); ?></p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php else: ?>
-                    <p class="text-sm text-center py-4" style="color:rgba(15,23,42,0.4)">
-                        Aún no tienes amigos en VIBEZ. ¡Busca a alguien!
-                    </p>
-                <?php endif; ?>
+                    </button>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
+            <div style="margin-top:1rem; position:relative;">
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button type="button" id="btn-emoji-picker"
+                            onclick="toggleEmojiPicker(event)"
+                            title="Seleccionar emoji"
+                            style="flex-shrink:0; background:rgba(124,58,237,0.15); border:1.5px solid rgba(124,58,237,0.3); border-radius:0.5rem; padding:0.4rem 0.6rem; cursor:pointer; font-size:1.15rem; line-height:1;">
+                        <span id="emoji-seleccionado" style="opacity:0.4;">🙂</span>
+                    </button>
+                    <input type="text" id="mood-personalizado"
+                           placeholder="Escribe tu propio estado..."
+                           maxlength="96"
+                           style="flex:1;"
+                           onkeydown="if(event.key==='Enter'){enviarMoodPersonalizado();}">
+                    <button type="button" onclick="enviarMoodPersonalizado()" class="btn-perfil-guardar" style="white-space:nowrap; padding:0 1rem;">
+                        Guardar
+                    </button>
+                </div>
+
+                <p id="mood-emoji-aviso" style="display:none; margin:0.35rem 0 0; font-size:0.78rem; color:#f87171;">
+                    Selecciona un emoji antes de guardar.
+                </p>
+
+                <div id="emoji-picker-panel"
+                     onclick="event.stopPropagation()"
+                     style="display:none; position:absolute; bottom:calc(100% + 0.4rem); left:0; z-index:200; background:#0d0a18; border:1px solid rgba(124,58,237,0.35); border-radius:0.75rem; padding:0.75rem; width:100%; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+                    <div style="display:grid; grid-template-columns:repeat(8,1fr); gap:0.2rem;">
+                        <?php $__currentLoopData = ['😀','😎','😴','🥳','😊','🤩','😤','🥺','🤔','😅','🙄','😏','🥰','😂','😭','🤯','🔥','💜','✨','⚡','🌙','🌈','💫','🎉','🎵','🎶','🕺','💃','🍻','☕','🍕','🎮','📚','🏃','🤙','👑','🦋','🌸']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $emoji): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <button type="button"
+                                    onclick="insertarEmoji('<?php echo e($emoji); ?>')"
+                                    class="emoji-btn"><?php echo e($emoji); ?></button>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                </div>
+            </div>
         </div>
-        <?php endif; ?>
 
-    </div>
-
+</div>
 </div>
 
 <?php $__env->stopSection(); ?>

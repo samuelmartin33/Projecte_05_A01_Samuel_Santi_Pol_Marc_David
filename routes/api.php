@@ -15,6 +15,7 @@
  */
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EventoPostController;
 use App\Http\Controllers\FavoritoController;
 use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\PerfilController;
@@ -68,4 +69,11 @@ Route::middleware('auth')->prefix('social')->group(function () {
 
     // Badge del navbar
     Route::get('/contador',                      [SocialController::class, 'contadorNoLeidos']);
+
+    // Publicaciones de eventos
+    Route::get('/posts',                         [EventoPostController::class, 'feed']);
+    Route::post('/posts',                        [EventoPostController::class, 'store']);
+    Route::get('/posts/{id}/comentarios',        [EventoPostController::class, 'comentariosPaginados'])->where('id', '[0-9]+');
+    Route::post('/posts/{id}/comentarios',       [EventoPostController::class, 'comentar'])->where('id', '[0-9]+');
+    Route::get('/mis-eventos-asistidos',         [EventoPostController::class, 'misEventosAsistidos']);
 });
