@@ -484,23 +484,6 @@
 @endif
 
 {{-- ════════════════════════════════════════════════════
-     MAPA LEAFLET — todos los eventos con coordenadas
-════════════════════════════════════════════════════ --}}
-@if ($eventosMapa->count() > 0)
-<section class="map-section">
-    <div class="map-section-header">
-        <p class="landing-kicker" style="margin-bottom:10px">Eventos en el mapa</p>
-        <h2 class="landing-titulo">¿Dónde está la fiesta?</h2>
-        <p class="landing-subtitulo">
-            {{ $eventosMapa->count() }} evento{{ $eventosMapa->count() !== 1 ? 's' : '' }} en el mapa
-        </p>
-    </div>
-
-    <div id="mapa-eventos" role="region" aria-label="Mapa de eventos VIBEZ"></div>
-</section>
-@endif
-
-{{-- ════════════════════════════════════════════════════
      CTA FINAL — llamada a la acción
 ════════════════════════════════════════════════════ --}}
 <section class="landing-cta">

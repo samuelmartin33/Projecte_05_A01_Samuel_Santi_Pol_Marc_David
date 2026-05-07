@@ -480,21 +480,6 @@
 <?php endif; ?>
 
 
-<?php if($eventosMapa->count() > 0): ?>
-<section class="map-section">
-    <div class="map-section-header">
-        <p class="landing-kicker" style="margin-bottom:10px">Eventos en el mapa</p>
-        <h2 class="landing-titulo">¿Dónde está la fiesta?</h2>
-        <p class="landing-subtitulo">
-            <?php echo e($eventosMapa->count()); ?> evento<?php echo e($eventosMapa->count() !== 1 ? 's' : ''); ?> en el mapa
-        </p>
-    </div>
-
-    <div id="mapa-eventos" role="region" aria-label="Mapa de eventos VIBEZ"></div>
-</section>
-<?php endif; ?>
-
-
 <section class="landing-cta">
     <h2 class="landing-cta-titulo">
         ¿A qué<br><em>esperas?</em>
