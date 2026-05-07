@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Entrar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body class="grain">
+
+<div class="auth-shell">
+
+  <!-- ═══ LEFT — Brand panel full bleed ═══ -->
+  <aside class="auth-side">
+    <div class="auth-side-watermark"><span>VBZ</span></div>
+
+    <div class="auth-side-top">
+      <a href="vibez-home.html" class="auth-logo">
+        <img src="assets/logo_vibez.png" alt="VIBEZ">
+        <span class="display">VIBEZ</span>
+      </a>
+      <a href="vibez-home.html" class="mono auth-back">← Volver al home</a>
+    </div>
+
+    <div class="auth-side-content">
+      <div class="mono auth-kicker">
+        <span class="kicker-line"></span>
+        Edición #428 · Mayo 2026
+      </div>
+      <h1 class="display auth-side-title">
+        Esta noche<br><em>se rompe</em>.
+      </h1>
+      <p class="auth-side-sub">
+        Eventos, conciertos, festivales y bolsa de trabajo — todo lo que vive tu escena, en un solo sitio.
+      </p>
+
+      <div class="auth-side-pills">
+        <span class="auth-pill"><span class="dot"></span>Charlotte de Witte · 9 May</span>
+        <span class="auth-pill">Primavera Sound · phase 3</span>
+        <span class="auth-pill">Bad Bunny · Pacha</span>
+      </div>
+    </div>
+
+    <div class="auth-side-bottom mono">
+      VIBEZ · NIGHT EDITION 26 · BCN
+    </div>
+  </aside>
+
+  <!-- ═══ RIGHT — Form ═══ -->
+  <main class="auth-main">
+    <div class="auth-form-wrap">
+
+      <div class="mono auth-step">01 · Acceso</div>
+
+      <h2 class="display auth-title">
+        Entra a la <em>fiesta</em>.
+      </h2>
+      <p class="auth-sub">
+        ¿Aún no tienes cuenta? <a href="vibez-register.html">Regístrate aquí</a>.
+      </p>
+
+      <form class="auth-form" onsubmit="event.preventDefault(); document.getElementById('toast').classList.add('show'); setTimeout(()=>document.getElementById('toast').classList.remove('show'),2400);">
+
+        <label class="auth-field">
+          <span class="auth-label mono">Email</span>
+          <input type="email" placeholder="tu@email.com" required>
+        </label>
+
+        <label class="auth-field">
+          <span class="auth-label mono">Contraseña</span>
+          <div class="auth-input-wrap">
+            <input type="password" id="pw" placeholder="••••••••••" required>
+            <button type="button" class="auth-eye" onclick="var p=document.getElementById('pw');p.type=p.type==='password'?'text':'password';this.classList.toggle('on');">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </label>
+
+        <div class="auth-row-between">
+          <label class="auth-check">
+            <input type="checkbox" checked>
+            <span class="auth-check-box"></span>
+            <span>Recuérdame 30 días</span>
+          </label>
+          <a href="#" class="auth-link-small">¿Olvidaste tu pass?</a>
+        </div>
+
+        <button type="submit" class="btn-primary auth-btn-main">
+          Entrar a VIBEZ →
+        </button>
+
+        <div class="auth-divider">
+          <span class="mono">o continúa con</span>
+        </div>
+
+        <div class="auth-socials">
+          <button type="button" class="auth-social">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M21.35 11.1H12v3.2h5.35c-.5 2.4-2.6 4.1-5.35 4.1a5.4 5.4 0 1 1 0-10.8c1.4 0 2.6.5 3.5 1.4l2.4-2.4A8.7 8.7 0 0 0 12 4a8.6 8.6 0 0 0 0 17.2c5 0 8.5-3.5 8.5-8.6 0-.5 0-1-.15-1.5z"/></svg>
+            Google
+          </button>
+          <button type="button" class="auth-social">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M16.4 1.5c.1 1.2-.4 2.4-1.2 3.3-.9 1-2.2 1.7-3.4 1.6-.1-1.2.5-2.4 1.2-3.2.9-1 2.3-1.7 3.4-1.7zm3.6 16.4c-.7 1.6-1 2.3-1.9 3.7-1.2 1.9-2.9 4.3-5 4.3-1.9 0-2.4-1.2-5-1.2-2.5 0-3.1 1.2-5 1.2-2.1 0-3.7-2.2-4.9-4.1C-1 18.3-1.4 13.5.7 10.6c1.4-2 3.7-3.2 5.8-3.2 2.2 0 3.6 1.2 5.4 1.2 1.8 0 2.9-1.2 5.4-1.2 1.9 0 3.9 1 5.3 2.8-4.7 2.6-3.9 9.3-2.6 7.7z"/></svg>
+            Apple
+          </button>
+          <button type="button" class="auth-social">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22 12a10 10 0 1 0-11.6 9.9V14.9H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v6.9A10 10 0 0 0 22 12z"/></svg>
+            Facebook
+          </button>
+        </div>
+
+        <p class="auth-fineprint mono">
+          Al entrar aceptas nuestros <a href="#">términos</a> y la <a href="#">política de privacidad</a>.
+        </p>
+      </form>
+    </div>
+
+    <!-- decorative side stickers -->
+    <div class="deco-sticker deco-1">VIP · ACCESS</div>
+    <div class="deco-sticker deco-2">★ MEMBER</div>
+    <div class="deco-numbers">28<br>05<br>26</div>
+  </main>
+
+</div>
+
+<div id="toast" class="auth-toast">✓ Sesión iniciada (mock)</div>
+
+</body>
+</html>
