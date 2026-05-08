@@ -26,7 +26,7 @@
             </div>
 
             <p class="soc-vacio" id="feed-vacio" style="display:none">
-                Aún no hay publicaciones de los eventos a los que has asistido.<br>¡Sé el primero!
+                Aún no hay publicaciones.<br>¡Sé el primero en compartir un evento!
             </p>
 
             <p class="soc-cargar-mas" id="feed-cargar-mas" style="display:none"

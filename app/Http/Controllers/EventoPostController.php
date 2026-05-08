@@ -23,12 +23,6 @@ class EventoPostController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
 
-        $eventoIds = Entrada::where('estado_entrada', 2)
-            ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
-            ->pluck('evento_id')
-            ->unique()
-            ->values();
-
         $pagina    = max(1, (int) $request->get('pagina', 1));
         $porPagina = 15;
 
@@ -40,7 +34,6 @@ class EventoPostController extends Controller
                 'comentarios.usuario:id,nombre,apellido1,foto_url',
             ])
             ->where('estado', 1)
-            ->whereIn('evento_id', $eventoIds)
             ->when($request->filled('evento_id'), fn ($q) => $q->where('evento_id', (int) $request->evento_id))
             ->orderByDesc('fecha_creacion');
 
