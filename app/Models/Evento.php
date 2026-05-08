@@ -59,11 +59,11 @@ class Evento extends Model
     // Protege contra Mass Assignment: solo se pueden asignar los campos listados aquí.
     protected $fillable = [
         'organizador_id', 'categoria_evento_id', 'tipo_evento',
-        'titulo', 'descripcion', 'fecha_inicio', 'fecha_fin',
+        'titulo', 'tagline', 'descripcion', 'fecha_inicio', 'fecha_fin',
         'ubicacion_nombre', 'ubicacion_direccion',
         'latitud', 'longitud', 'precio_base', 'aforo_maximo',
         'aforo_actual', 'edad_minima', 'es_gratuito',
-        'url_externa', 'estado', 'fecha_creacion', 'fecha_actualizacion',
+        'url_externa', 'estado', 'featured', 'fecha_creacion', 'fecha_actualizacion',
     ];
 
     /**
@@ -83,7 +83,8 @@ class Evento extends Model
         'precio_base'  => 'float',
         'latitud'      => 'float',
         'longitud'     => 'float',
-        'es_gratuito'  => 'boolean',  // 0/1 en BD → true/false en PHP
+        'es_gratuito'  => 'boolean',
+        'featured'     => 'boolean',
         'fecha_inicio' => 'datetime',
         'fecha_fin'    => 'datetime',
         'fecha_creacion'      => 'datetime',
@@ -213,6 +214,47 @@ class Evento extends Model
         if ($this->es_gratuito) {
             return 'Gratis';
         }
-        return '€ ' . number_format($this->precio_base, 2);
+        return number_format($this->precio_base, 0) . ' €';
+    }
+
+    /* Fecha formateada: "Sáb 9 May" */
+    public function getFechaFmtAttribute(): string
+    {
+        return $this->fecha_inicio
+            ? ucfirst($this->fecha_inicio->isoFormat('ddd D MMM'))
+            : '';
+    }
+
+    /* Horario: "23:00 — 06:00" */
+    public function getHoraAttribute(): string
+    {
+        $inicio = $this->fecha_inicio ? $this->fecha_inicio->format('H:i') : '';
+        if ($this->fecha_fin) {
+            return $inicio . ' — ' . $this->fecha_fin->format('H:i');
+        }
+        return $inicio;
+    }
+
+    /* Coordenadas [lat, lng] para Leaflet */
+    public function getCoordsAttribute(): ?array
+    {
+        if ($this->latitud && $this->longitud) {
+            return [(float) $this->latitud, (float) $this->longitud];
+        }
+        return null;
+    }
+
+    /* Aforo disponible */
+    public function getCuposDisponiblesAttribute(): ?int
+    {
+        if ($this->aforo_maximo === null) return null;
+        return max(0, $this->aforo_maximo - $this->aforo_actual);
+    }
+
+    /* Sold out */
+    public function getSoldOutAttribute(): bool
+    {
+        return $this->aforo_maximo !== null
+            && $this->aforo_actual >= $this->aforo_maximo;
     }
 }
