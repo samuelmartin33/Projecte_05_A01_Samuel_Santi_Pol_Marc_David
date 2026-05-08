@@ -11,69 +11,65 @@
 <div class="auth-shell auth-shell-3col">
 
     
-    <div class="auth-side">
-        <img
-            src="https://picsum.photos/seed/vibez-night-reg/800/1200"
-            alt=""
-            class="auth-side-img"
-            aria-hidden="true"
-        >
-        <div class="auth-side-overlay"></div>
+    <aside class="auth-side">
+
+        
+        <div class="auth-side-watermark" aria-hidden="true">
+            <span>VBZ</span>
+        </div>
+
+        
+        <div class="auth-side-top">
+            <a href="<?php echo e(route('welcome')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
+                <span class="display">VIBEZ</span>
+            </a>
+            <a href="<?php echo e(route('welcome')); ?>" class="mono auth-back">← Volver</a>
+        </div>
 
         
         <div class="auth-side-content">
-            <p class="auth-kicker mono">
+            <div class="mono auth-kicker">
                 <span class="kicker-line"></span>
-                Tu viaje empieza aquí
+                Sé parte · Edición #428
+            </div>
+            <h1 class="display auth-side-title">
+                Bienvenido<br><em>a la lista</em>.
+            </h1>
+            <p class="auth-side-sub">
+                Crea tu pase VIBEZ y desbloquea entradas anticipadas, descuentos exclusivos y eventos solo para miembros.
             </p>
-            <h2 class="auth-side-title display">
-                Únete<br>
-                <em>al ritual.</em>
-            </h2>
             <ul class="auth-side-bullets">
-                <li>
-                    <span class="bullet-num">01</span>
-                    Descubre eventos únicos
-                </li>
-                <li>
-                    <span class="bullet-num">02</span>
-                    Conecta con la comunidad
-                </li>
-                <li>
-                    <span class="bullet-num">03</span>
-                    Trabaja en lo que te apasiona
-                </li>
+                <li><span class="bullet-num">01</span> Pre-venta 48h antes que nadie</li>
+                <li><span class="bullet-num">02</span> Cupones y entradas con descuento</li>
+                <li><span class="bullet-num">03</span> QR digital · sin imprimir nada</li>
+                <li><span class="bullet-num">04</span> Bolsa de trabajo de la escena</li>
             </ul>
         </div>
 
-        <div class="auth-side-bottom">
-            <span class="mono" style="font-size:10px;letter-spacing:0.18em">VIBEZ © <?php echo e(date('Y')); ?></span>
+        <div class="auth-side-bottom mono">
+            VIBEZ · NIGHT EDITION <?php echo e(date('Y')); ?> · BCN
         </div>
-    </div>
+
+    </aside>
 
     
-    <div class="auth-main">
+    <main class="auth-main">
 
         
-        <div class="auth-main-topbar auth-main-topbar--register">
-            <a href="<?php echo e(route('welcome')); ?>" class="auth-logo" aria-label="VIBEZ — Inicio">
-                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
-                <span>VIBEZ</span>
-            </a>
-            <span class="auth-topbar-tag">★ Nueva cuenta</span>
-        </div>
-        <div class="deco-numbers">07<br>01</div>
+        <div class="deco-sticker deco-1">NEW · MEMBER</div>
+        <div class="deco-sticker deco-2">★ EDICIÓN 428</div>
+        <div class="deco-numbers" aria-hidden="true"><?php echo e(now()->format('d')); ?><br><?php echo e(now()->format('m')); ?></div>
 
         <div class="auth-form-wrap auth-form-wide">
 
-            <p class="auth-step mono">— REGISTRO</p>
+            <p class="mono auth-step">02 · Registro</p>
 
             
             <div id="formHeader">
-                <h1 class="auth-title display">
-                    Crea tu<br>
-                    <em>cuenta.</em>
-                </h1>
+                <h2 class="display auth-title">
+                    Crea tu <em>pase</em>.
+                </h2>
                 <p class="auth-sub">
                     ¿Ya tienes cuenta? <a href="<?php echo e(route('login')); ?>">Inicia sesión</a>
                 </p>
@@ -223,7 +219,7 @@
                                         <path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/>
                                         <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+                                    <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
                                     </svg>
                                 </button>
@@ -260,7 +256,7 @@
                                         <path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/>
                                         <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+                                    <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
                                     </svg>
                                 </button>
@@ -283,7 +279,7 @@
                         </select>
                     </div>
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
-                    <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px"></p>
+                    <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px;color:rgba(245,241,234,0.45)"></p>
 
                     
                     <div class="auth-field" id="empresa-field-wrap" style="display:none">
@@ -346,7 +342,8 @@
             </p>
 
         </div>
-    </div>
+
+    </main>
 
 </div>
 
@@ -358,7 +355,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <script src="<?php echo e(asset('js/register.js')); ?>"></script>
     <script>
-        /* Inicializar tabs: el tab "cliente" arranca activo, sincronizar el select */
+        /* Inicializar tabs: "cliente" arranca activo, sincronizar el select */
         (function () {
             var select = document.getElementById('tipo_cuenta');
             if (select) { select.value = 'cliente'; cambiarTipoCuenta(select); }
@@ -379,7 +376,7 @@
             if (empresaWrap) empresaWrap.style.display = tipo === 'empresa' ? 'flex' : 'none';
         }
 
-        /* Actualiza la barra de fortaleza de la contraseña */
+        /* Barra de fortaleza de la contraseña */
         function actualizarFortaleza(valor) {
             var barra    = document.getElementById('strength-bar');
             var etiqueta = document.getElementById('strength-label');
@@ -390,8 +387,8 @@
             if (/[0-9]/.test(valor))         f += 25;
             if (/[^A-Za-z0-9]/.test(valor)) f += 25;
             barra.style.width = f + '%';
-            var colores  = { 25: '#ef4444', 50: '#f59e0b', 75: '#3b82f6', 100: '' };
-            var niveles  = { 25: 'Débil',   50: 'Regular', 75: 'Fuerte',  100: 'Excelente' };
+            var colores = { 25: '#ef4444', 50: '#f59e0b', 75: '#3b82f6', 100: '' };
+            var niveles = { 25: 'Débil', 50: 'Regular', 75: 'Fuerte', 100: 'Excelente' };
             barra.style.background = colores[f] || '';
             etiqueta.textContent   = f > 0 ? (niveles[f] || '') : '';
         }
