@@ -4,6 +4,8 @@
 
 @section('content')
 
+@include('partials.home.nav')
+
 <div class="auth-bg">
     <div class="aurora-blob"></div>
     <div class="aurora-blob"></div>

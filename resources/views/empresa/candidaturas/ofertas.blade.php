@@ -6,7 +6,9 @@
 <link rel="stylesheet" href="{{ asset('css/empresa-candidaturas-ofertas.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 {{-- ══ Hero ══ --}}
 <section class="cand-hero">

@@ -20,6 +20,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+html.auth-page,
+html.auth-page body { height: 100%; overflow: hidden; }
 body {
   background: var(--bg);
   color: var(--ink);
@@ -59,7 +61,8 @@ body {
 .auth-shell {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 /* Variante register: panel derecho más ancho */
 .auth-shell-3col {
@@ -82,7 +85,7 @@ body {
   flex-direction: column;
   padding: 36px 48px;
   color: var(--ink);
-  min-height: 100vh;
+  height: 100vh;
   background:
     radial-gradient(ellipse 80% 60% at 80% 20%, rgba(168,85,247,0.32) 0%, transparent 60%),
     radial-gradient(ellipse 70% 50% at 15% 85%, rgba(124,58,237,0.28) 0%, transparent 65%),
@@ -278,11 +281,12 @@ body {
 .auth-main {
   position: relative;
   background: var(--bg);
-  padding: 60px 56px;
+  padding: 36px 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  height: 100vh;
 }
 /* Register necesita scroll vertical */
 .auth-shell-3col .auth-main {
@@ -315,8 +319,8 @@ body {
 
 /* Títulos del formulario */
 .auth-title {
-  font-size: clamp(56px, 7vw, 96px);
-  margin: 0 0 14px;
+  font-size: clamp(36px, 4.5vw, 68px);
+  margin: 0 0 6px;
 }
 .auth-title em {
   font-style: italic;
@@ -328,7 +332,7 @@ body {
   font-family: 'Archivo', sans-serif;
   font-size: 14px;
   color: var(--ink-dim);
-  margin: 0 0 36px;
+  margin: 0 0 16px;
 }
 .auth-sub a {
   color: var(--morado-2);
@@ -344,7 +348,7 @@ body {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 /* Grids de campos */
@@ -490,6 +494,15 @@ body {
 }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(168,85,247,0.65); }
 .btn-primary:active { transform: translateY(0); }
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  pointer-events: none;
+  transform: scale(0);
+  animation: ripple-expand 0.7s ease-out forwards;
+}
+@keyframes ripple-expand { to { transform: scale(2); opacity: 0; } }
 
 .auth-btn-main {
   padding: 18px 24px;
@@ -497,9 +510,11 @@ body {
   font-size: 17px;
   margin-top: 8px;
   width: 100%;
+  min-height: 58px;
+  box-sizing: border-box;
 }
 
-/* Estados del botón (spinner) */
+/* Estados del botón (spinner + éxito) */
 .btn-text { display: inline; }
 .btn-spinner { display: none; align-items: center; justify-content: center; }
 .auth-btn-main.loading .btn-text    { display: none; }
@@ -513,12 +528,25 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Estado éxito (verde) */
+.success-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.check-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 /* ════════════════════════════════════════════════════════════
    DIVISOR + BOTONES SOCIALES
    ════════════════════════════════════════════════════════════ */
 .auth-divider {
   display: flex; align-items: center; gap: 14px;
-  margin: 24px 0 16px;
+  margin: 14px 0 10px;
 }
 .auth-divider::before,
 .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }

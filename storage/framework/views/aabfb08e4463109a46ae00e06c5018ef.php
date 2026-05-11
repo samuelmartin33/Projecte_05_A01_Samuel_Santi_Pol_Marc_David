@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Crear Oferta — VIBEZ'); ?>
 
-@section('titulo', 'Crear Oferta — VIBEZ')
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <style>
     .form-crear-evento {
         background: white;
@@ -150,13 +148,13 @@
         border-radius: 0 0.75rem 0.75rem 0;
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-@include('partials.home.nav')
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-{{-- Hero --}}
+
 <section class="hero-home">
     <div class="hero-particula hero-particula-1"></div>
     <div class="hero-particula hero-particula-2"></div>
@@ -177,24 +175,24 @@
     </div>
 </section>
 
-{{-- Formulario --}}
+
 <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    @if ($errors->any())
+    <?php if($errors->any()): ?>
         <div class="alert-errores">
             <strong>⚠ Revisa los siguientes campos:</strong>
             <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?>
 
-    <form action="{{ route('empresa.ofertas.store') }}" method="POST" class="form-crear-evento">
-        @csrf
+    <form action="<?php echo e(route('empresa.ofertas.store')); ?>" method="POST" class="form-crear-evento">
+        <?php echo csrf_field(); ?>
 
-        {{-- ── INFORMACIÓN BÁSICA ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -205,20 +203,20 @@
         <div class="form-grupo">
             <label class="form-label">Título del puesto <span class="form-required">*</span></label>
             <input type="text" name="titulo" class="form-input" maxlength="300"
-                   value="{{ old('titulo') }}"
+                   value="<?php echo e(old('titulo')); ?>"
                    placeholder="Ej: Camarero/a para eventos de verano">
         </div>
 
         <div class="form-grupo">
             <label class="form-label">Descripción del puesto</label>
             <textarea name="descripcion" class="form-textarea" rows="4"
-                      placeholder="Describe las tareas, el ambiente de trabajo, horarios...">{{ old('descripcion') }}</textarea>
+                      placeholder="Describe las tareas, el ambiente de trabajo, horarios..."><?php echo e(old('descripcion')); ?></textarea>
         </div>
 
         <div class="form-grupo">
             <label class="form-label">Requisitos</label>
             <textarea name="requisitos" class="form-textarea" rows="3"
-                      placeholder="Experiencia mínima, formación requerida, habilidades...">{{ old('requisitos') }}</textarea>
+                      placeholder="Experiencia mínima, formación requerida, habilidades..."><?php echo e(old('requisitos')); ?></textarea>
         </div>
 
         <div class="form-grupo-doble">
@@ -226,24 +224,25 @@
                 <label class="form-label">Categoría <span class="form-required">*</span></label>
                 <select name="categoria_trabajo_id" class="form-select">
                     <option value="">Selecciona categoría</option>
-                    @foreach ($categorias as $cat)
-                        <option value="{{ $cat->id }}" @selected(old('categoria_trabajo_id') == $cat->id)>
-                            {{ $cat->nombre }}
+                    <?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($cat->id); ?>" <?php if(old('categoria_trabajo_id') == $cat->id): echo 'selected'; endif; ?>>
+                            <?php echo e($cat->nombre); ?>
+
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
             <div>
                 <label class="form-label">Vacantes</label>
                 <input type="number" min="1" name="vacantes" class="form-input"
-                       value="{{ old('vacantes') }}" placeholder="Ej: 3">
+                       value="<?php echo e(old('vacantes')); ?>" placeholder="Ej: 3">
                 <p class="form-hint">Opcional. Déjalo vacío si no hay límite.</p>
             </div>
         </div>
 
         <hr class="form-divider">
 
-        {{-- ── UBICACIÓN Y FECHAS ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -255,27 +254,27 @@
         <div class="form-grupo">
             <label class="form-label">Ciudad / Ubicación</label>
             <input type="text" name="ubicacion" class="form-input" maxlength="300"
-                   value="{{ old('ubicacion') }}" placeholder="Ej: Barcelona">
+                   value="<?php echo e(old('ubicacion')); ?>" placeholder="Ej: Barcelona">
         </div>
 
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Fecha de inicio</label>
                 <input type="date" name="fecha_inicio_trabajo" class="form-input"
-                       value="{{ old('fecha_inicio_trabajo') }}">
+                       value="<?php echo e(old('fecha_inicio_trabajo')); ?>">
                 <p class="form-hint">Opcional. Cuándo empieza el trabajo.</p>
             </div>
             <div>
                 <label class="form-label">Fecha de fin</label>
                 <input type="date" name="fecha_fin_trabajo" class="form-input"
-                       value="{{ old('fecha_fin_trabajo') }}">
+                       value="<?php echo e(old('fecha_fin_trabajo')); ?>">
                 <p class="form-hint">Opcional. Déjalo vacío si es indefinido.</p>
             </div>
         </div>
 
         <hr class="form-divider">
 
-        {{-- ── SALARIO ── --}}
+        
         <div class="form-section-title">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -289,7 +288,7 @@
                 <div class="salario-prefix">
                     <span>€</span>
                     <input type="number" min="0" step="50" name="salario_min" class="form-input"
-                           value="{{ old('salario_min') }}" placeholder="1.200">
+                           value="<?php echo e(old('salario_min')); ?>" placeholder="1.200">
                 </div>
                 <p class="form-hint">Opcional. Déjalo vacío si es a negociar.</p>
             </div>
@@ -298,12 +297,12 @@
                 <div class="salario-prefix">
                     <span>€</span>
                     <input type="number" min="0" step="50" name="salario_max" class="form-input"
-                           value="{{ old('salario_max') }}" placeholder="1.800">
+                           value="<?php echo e(old('salario_max')); ?>" placeholder="1.800">
                 </div>
             </div>
         </div>
 
-        {{-- ── ACCIONES ── --}}
+        
         <div class="form-actions">
             <button type="submit" class="btn-guardar">
                 <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="18" height="18">
@@ -311,9 +310,11 @@
                 </svg>
                 Publicar oferta
             </button>
-            <a href="{{ route('empresa.home') }}" class="btn-cancelar">Cancelar</a>
+            <a href="<?php echo e(route('empresa.home')); ?>" class="btn-cancelar">Cancelar</a>
         </div>
     </form>
 </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/ofertas/crear.blade.php ENDPATH**/ ?>
