@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EntradaComprada;
 use App\Models\Entrada;
 use App\Models\Evento;
 use App\Models\Pedido;
@@ -9,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -142,6 +145,14 @@ class EntradaController extends Controller
 
                 return $pedido;
             });
+
+            // Enviamos el correo con los QR al usuario (sin cortar el flujo si falla).
+            try {
+                $pedido->load(['entradas.evento', 'usuario']);
+                Mail::to($usuario->email)->send(new EntradaComprada($pedido));
+            } catch (\Throwable $e) {
+                Log::warning('No se pudo enviar el correo de entradas: ' . $e->getMessage());
+            }
 
             // Devolvemos la URL de confirmación para que el JS redirija al usuario.
             return response()->json([
