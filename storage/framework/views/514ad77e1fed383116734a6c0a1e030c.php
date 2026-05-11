@@ -168,4 +168,4 @@ function vibezGridLimpiar() {
   vibezGridFiltrar();
 }
 </script>
-<?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/grid-eventos.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/grid-eventos.blade.php ENDPATH**/ ?>

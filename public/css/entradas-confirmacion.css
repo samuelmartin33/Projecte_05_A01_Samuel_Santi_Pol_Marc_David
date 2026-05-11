@@ -1,302 +1,290 @@
-body {
-    background: #0d0820;
-    color: #f5f1ea;
+/* ════════════════════════════════════════════════════════════════
+   VIBEZ — Entradas / Confirmación
+   Sustituye public/css/entradas-confirmacion.css por este archivo.
+   ════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+    --vb-bg:        #0d0820;
+    --vb-bg-2:      #07060c;
+    --vb-card:      #0d0a18;
+    --vb-ink:       #f5f1ea;
+    --vb-ink-dim:   rgba(245,241,234,0.55);
+    --vb-ink-faint: rgba(245,241,234,0.18);
+    --vb-line:      rgba(245,241,234,0.12);
+    --vb-morado:    #7c3aed;
+    --vb-magenta:   #a855f7;
+    --vb-magenta-2: #c084fc;
+    --vb-ok:        #34d399;
 }
+
+body { background: var(--vb-bg) !important; color: var(--vb-ink) !important; font-family: 'Archivo', system-ui, sans-serif; }
+
+/* ── HERO de ÉXITO ─────────────────────────── */
+.confirmacion-hero {
+    position: relative;
+    border: 1.5px solid var(--vb-ok);
+    background: rgba(52,211,153,0.06);
+    padding: 36px 40px 32px;
+    margin: 32px auto;
+    max-width: 760px;
+    overflow: hidden;
+    text-align: left;
+    display: flex; align-items: center; gap: 24px;
+}
+.confirmacion-hero::before {
+    content: 'PAID';
+    position: absolute; right: -20px; top: -50px;
+    font-family: 'Anton', sans-serif;
+    font-size: 200px;
+    color: rgba(52,211,153,0.08);
+    line-height: 1;
+    transform: rotate(-12deg);
+    pointer-events: none;
+}
+.confirmacion-hero-icono {
+    width: 64px; height: 64px;
+    border: 2px solid var(--vb-ok);
+    border-radius: 50%;
+    color: var(--vb-ok);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    background: transparent;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+.confirmacion-hero-icono svg { width: 32px; height: 32px; }
+.confirmacion-hero-titulo {
+    font-family: 'Anton', sans-serif !important;
+    font-size: clamp(40px, 6vw, 64px) !important;
+    line-height: 0.88 !important;
+    text-transform: uppercase;
+    color: var(--vb-ink) !important;
+    margin: 0;
+    letter-spacing: -0.005em;
+    position: relative;
+    z-index: 1;
+}
+.confirmacion-hero-subtitulo {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 12px !important;
+    color: var(--vb-ok) !important;
+    margin-top: 8px !important;
+    font-weight: 600;
+}
+
+/* ── WRAPPER ───────────────────────────────── */
 .confirmacion-page-wrap {
     background:
-        radial-gradient(circle, rgba(124,58,237,0.14) 1.5px, transparent 1.5px),
-        linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
+      radial-gradient(circle, rgba(124,58,237,0.10) 1.5px, transparent 1.5px),
+      linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
     background-size: 28px 28px, 100% 100%;
-    min-height: 60vh;
-    padding: 2rem 0;
+    padding-bottom: 4rem;
 }
+
+/* ── FICHA EVENTO / TARJETAS GENÉRICAS ─────── */
 .ficha-evento {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(124,58,237,0.25) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-radius: 20px;
-    padding: 24px;
-}
-.seccion-titulo { color: #f5f1ea !important; }
-.confirmacion-evento-titulo { color: #f5f1ea !important; }
-.confirmacion-evento-fecha  { color: #c084fc !important; }
-.confirmacion-evento-lugar  { color: rgba(245,241,234,0.5) !important; }
-.confirmacion-entrada-count { color: rgba(245,241,234,0.5) !important; }
-.confirmacion-total-label   { color: rgba(245,241,234,0.35) !important; }
-.confirmacion-resumen-footer { border-top-color: rgba(255,255,255,0.1) !important; }
-.confirmacion-entrada-num   { color: #f5f1ea !important; }
-.confirmacion-entrada-codigo { color: rgba(245,241,234,0.3) !important; }
-.confirmacion-entrada-divisor { border-top-color: rgba(124,58,237,0.3) !important; }
-.confirmacion-qr-marco {
-    background: white !important;
-    border-color: rgba(124,58,237,0.4) !important;
-    box-shadow: 0 4px 20px rgba(124,58,237,0.2) !important;
-}
-.confirmacion-qr-texto { color: rgba(245,241,234,0.35) !important; }
-.confirmacion-acciones a[style] { color: #c084fc !important; }
-
-/*
- * entradas-confirmacion.css
- * Estilos para la página de confirmación de compra de entradas.
- *
- * Este archivo es cargado únicamente en la vista confirmacion.blade.php.
- * Sustituye todos los atributos style="" inline que tenía el HTML,
- * mejorando la separación entre presentación (CSS) y estructura (HTML).
- *
- * Paleta utilizada:
- *   Verde éxito  : #059669 / #10b981  (Tailwind emerald-600/500)
- *   Morado marca : #7c3aed / #a855f7  (Tailwind violet-700/500)
- *   Texto oscuro : var(--navy, #0f172a)
- *   Gris suave   : #64748b / #94a3b8
- *   Borde lila   : #ede9fe
- */
-
-
-/* ══════════════════════════════════════════
-   HERO — Cabecera verde de éxito
-══════════════════════════════════════════ */
-
-/*
- * Fondo con gradiente verde que indica que la compra fue exitosa.
- * El gradiente va de un verde más oscuro (izquierda) a uno más claro (derecha).
- */
-.confirmacion-hero {
-    background: linear-gradient(135deg, #059669, #10b981);
-    padding: 3rem 1rem;
-    text-align: center;
+    background: var(--vb-card) !important;
+    border: 1px solid var(--vb-line) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 28px !important;
+    color: var(--vb-ink);
 }
 
-/*
- * Círculo semitransparente blanco que enmarca el icono de check.
- * margin:0 auto lo centra horizontalmente dentro del bloque.
- */
-.confirmacion-hero-icono {
-    width: 64px;
-    height: 64px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-}
-
-/* Icono SVG de check dentro del círculo */
-.confirmacion-hero-icono svg {
-    width: 36px;
-    height: 36px;
-    color: #fff;
-}
-
-/* Título principal "¡Compra realizada!" */
-.confirmacion-hero-titulo {
-    color: #fff;
-    font-weight: 900;
-    font-size: 1.75rem;
-    margin: 0 0 0.5rem;
-}
-
-/* Subtítulo con número de pedido y fecha */
-.confirmacion-hero-subtitulo {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 1rem;
+.seccion-titulo {
+    font-family: 'Anton', sans-serif !important;
+    font-size: 28px !important;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    color: var(--vb-ink) !important;
+    line-height: 1;
     margin: 0;
 }
 
-
-/* ══════════════════════════════════════════
-   RESUMEN DEL EVENTO
-══════════════════════════════════════════ */
-
-/*
- * Fila horizontal con icono + datos del evento.
- * gap:12px separa el icono de los textos.
- */
+/* ── RESUMEN DEL PEDIDO ────────────────────── */
 .confirmacion-evento-fila {
     display: flex;
-    gap: 12px;
+    gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px dashed var(--vb-line);
     align-items: flex-start;
-    margin-bottom: 1rem;
 }
-
-/*
- * Cuadrado morado con icono de ticket.
- * flex-shrink:0 impide que se reduzca si el texto es largo.
- */
 .confirmacion-evento-icono {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--vb-morado), var(--vb-magenta));
+    color: var(--vb-ink);
+    display: grid; place-items: center;
     flex-shrink: 0;
+    border-radius: 0;
 }
-
-/* Icono SVG del evento */
-.confirmacion-evento-icono svg {
-    width: 24px;
-    height: 24px;
-    color: #fff;
-}
-
-/* Nombre del evento */
+.confirmacion-evento-icono svg { width: 28px; height: 28px; }
 .confirmacion-evento-titulo {
-    font-weight: 700;
-    color: var(--navy, #0f172a);
-    margin: 0;
+    font-family: 'Anton', sans-serif !important;
+    font-size: 24px !important;
+    text-transform: uppercase;
+    color: var(--vb-ink) !important;
+    margin: 0 0 4px;
+    line-height: 1;
 }
-
-/* Fecha del evento en morado */
 .confirmacion-evento-fecha {
-    color: #7c3aed;
-    font-size: 0.875rem;
-    margin: 2px 0 0;
+    font-family: 'Archivo Narrow', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 11px !important;
+    color: var(--vb-magenta-2) !important;
+    margin: 0;
+    font-weight: 600;
 }
-
-/* Ubicación del evento en gris */
 .confirmacion-evento-lugar {
-    color: #64748b;
-    font-size: 0.8rem;
-    margin: 2px 0 0;
+    font-size: 13px !important;
+    color: var(--vb-ink-dim) !important;
+    margin-top: 4px !important;
 }
 
-/*
- * Fila inferior del resumen: cantidad de entradas (izquierda) + total (derecha).
- * border-top separa visualmente del contenido anterior.
- */
 .confirmacion-resumen-footer {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #ede9fe;
-    padding-top: 1rem;
+    align-items: flex-end;
+    padding-top: 22px;
+    margin-top: 18px;
+    border-top: 1.5px solid var(--vb-magenta);
 }
-
-/* Texto "N entrada(s)" */
 .confirmacion-entrada-count {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 12px !important;
+    color: var(--vb-ink-dim) !important;
     margin: 0;
-    color: #64748b;
-    font-size: 0.875rem;
+    font-weight: 600;
 }
-
-/* Etiqueta "Total" encima del importe */
 .confirmacion-total-label {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 10px !important;
+    color: var(--vb-ink-dim) !important;
     margin: 0;
-    font-size: 0.75rem;
-    color: #94a3b8;
     text-align: right;
 }
+.text-gradient {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    color: var(--vb-magenta-2) !important;
+    font-family: 'Anton', sans-serif !important;
+}
 
-
-/* ══════════════════════════════════════════
-   TARJETAS DE ENTRADA INDIVIDUAL
-══════════════════════════════════════════ */
-
-/*
- * Cabecera de cada entrada: número y precio en la misma fila.
- * margin-bottom separa de la zona del QR.
- */
+/* ── ENTRADAS INDIVIDUALES ─────────────────── */
 .confirmacion-entrada-cabecera {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--vb-line);
+    margin-bottom: 20px;
 }
-
-/* "Entrada #N" en negrita */
 .confirmacion-entrada-num {
-    font-weight: 800;
-    color: var(--navy, #0f172a);
+    font-family: 'Anton', sans-serif !important;
+    font-size: 28px !important;
+    text-transform: uppercase;
+    color: var(--vb-ink) !important;
     margin: 0;
-    font-size: 1rem;
+    line-height: 1;
 }
-
-/* UUID del QR en tipografía monoespaciada para facilitar la lectura */
 .confirmacion-entrada-codigo {
-    font-family: monospace;
-    font-size: 0.7rem;
-    color: #94a3b8;
-    margin: 4px 0 0;
-    word-break: break-all; /* el UUID es largo; rompe la línea si es necesario */
+    font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+    font-size: 11px !important;
+    color: var(--vb-ink-dim) !important;
+    letter-spacing: 0.05em;
+    margin: 6px 0 0 !important;
 }
-
-/* Columna del precio, alineada a la derecha */
-.confirmacion-entrada-precio-col {
-    text-align: right;
-    flex-shrink: 0;
-    margin-left: 12px;
-}
-
-/*
- * Línea de separación con estilo "talonario" (borde discontinuo).
- * margin:0 -2rem rompe el padding del contenedor padre para que
- * la línea llegue de borde a borde (efecto corte de ticket).
- */
+.confirmacion-entrada-precio-col { text-align: right; }
 .confirmacion-entrada-divisor {
-    border-top: 2px dashed #ede9fe;
-    margin: 0 -2rem 1.25rem;
+    border: none;
+    border-top: 1px dashed var(--vb-line);
+    margin: 0 -28px 20px;
+    position: relative;
 }
+.confirmacion-entrada-divisor::before,
+.confirmacion-entrada-divisor::after {
+    content: '';
+    position: absolute;
+    width: 24px; height: 24px;
+    background: var(--vb-bg);
+    border-radius: 50%;
+    top: -12px;
+}
+.confirmacion-entrada-divisor::before { left: -12px; }
+.confirmacion-entrada-divisor::after { right: -12px; }
 
-/* Centra el bloque del código QR */
+/* ── QR ────────────────────────────────────── */
 .confirmacion-qr-centrado {
-    text-align: center;
-}
-
-/*
- * Marco decorativo alrededor del QR.
- * display:inline-block permite que el fondo blanco se ajuste al contenido.
- * box-shadow sutil para dar profundidad sin destacar demasiado.
- */
-.confirmacion-qr-marco {
-    display: inline-block;
-    padding: 12px;
-    background: #fff;
-    border: 3px solid #ede9fe;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
-}
-
-/*
- * Contenedor donde la librería QRCode.js dibuja el código QR.
- * El tamaño debe coincidir con los parámetros pasados a new QRCode().
- */
-.confirmacion-qr-canvas {
-    width: 220px;
-    height: 220px;
-    margin: 0 auto;
-}
-
-/* Texto de instrucción bajo el QR */
-.confirmacion-qr-texto {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    margin: 10px 0 0;
-}
-
-
-/* ══════════════════════════════════════════
-   SECCIÓN DE ACCIONES FINALES
-══════════════════════════════════════════ */
-
-/*
- * Bloque de botones al final de la página.
- * flex-direction:column apila los botones verticalmente.
- * align-items:center los centra horizontalmente.
- */
-.confirmacion-acciones {
-    text-align: center;
-    margin-top: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     align-items: center;
+    padding: 8px 0 4px;
+}
+.confirmacion-qr-marco {
+    background: var(--vb-ink);
+    padding: 16px;
+    border-radius: 0;
+    box-shadow: 0 20px 50px rgba(168,85,247,0.25);
+}
+.confirmacion-qr-canvas {
+    width: 200px;
+    height: 200px;
+    display: grid;
+    place-items: center;
+}
+.confirmacion-qr-canvas img,
+.confirmacion-qr-canvas canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+.confirmacion-qr-texto {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 10px !important;
+    color: var(--vb-ink-dim) !important;
+    margin-top: 14px !important;
+    font-weight: 600;
 }
 
-/* Ajuste de padding para el botón principal en este contexto */
-.confirmacion-acciones .btn-comprar {
+/* ── ACCIONES FINALES ──────────────────────── */
+.confirmacion-acciones {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+}
+.btn-comprar {
+    background: var(--vb-magenta) !important;
+    color: var(--vb-ink) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: 'Anton', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 16px !important;
+    padding: 16px 32px !important;
+    text-decoration: none;
     display: inline-block;
-    padding: 0.85rem 2.5rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-comprar:hover { background: var(--vb-ink) !important; color: var(--vb-bg) !important; }
+.confirmacion-acciones a[style*="7c3aed"] {
+    color: var(--vb-magenta-2) !important;
+    font-family: 'Archivo Narrow', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 11px !important;
+    font-weight: 600;
 }

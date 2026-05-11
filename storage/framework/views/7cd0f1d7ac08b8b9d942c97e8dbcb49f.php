@@ -1,4 +1,30 @@
-<header id="vibez-home-nav" style="position:sticky;top:0;z-index:50;background:transparent;border-bottom:1px solid transparent;transition:all 0.3s ease;">
+<style>
+  :root {
+    --bg: #07060c; --bg-2: #0d0820; --ink: #f5f1ea;
+    --ink-dim: rgba(245,241,234,0.55); --ink-faint: rgba(245,241,234,0.18);
+    --morado: #7c3aed; --magenta: #a855f7; --magenta-2: #c084fc;
+    --cream: #f5f1ea; --line: rgba(245,241,234,0.12);
+  }
+  #vibez-home-nav .mono {
+    font-family: 'Archivo Narrow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  #vibez-home-nav .btn-primary {
+    background: var(--magenta);
+    color: var(--cream);
+    border: none;
+    cursor: pointer;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  #vibez-home-nav .btn-primary:hover { background: var(--cream); color: var(--bg); }
+</style>
+<header id="vibez-home-nav" style="position:sticky;top:0;z-index:50;background:rgba(7,6,12,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line);transition:all 0.3s ease;">
   <div style="max-width:1480px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
 
     
@@ -106,4 +132,4 @@
 
   </div>
 </header>
-<?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>

@@ -1,37 +1,33 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Mi Perfil — VIBEZ'); ?>
 
-@section('titulo', 'Mi Perfil — VIBEZ')
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/perfil.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@push('estilos')
-<link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
-@endpush
+<?php $__env->startSection('content'); ?>
 
-@section('content')
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-@include('partials.home.nav')
 
-{{-- ════════════════════════════════════════════════════
-     HERO DE PERFIL
-     Muestra avatar (con preview de foto), nombre, bio y mood
-════════════════════════════════════════════════════ --}}
 <section class="perfil-hero">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center sm:items-end gap-6">
 
-        {{-- ── Foto de perfil con formulario simple ── --}}
-        {{-- enctype="multipart/form-data" es obligatorio para enviar archivos --}}
-        <form id="formFoto" action="{{ route('perfil.foto') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+        
+        
+        <form id="formFoto" action="<?php echo e(route('perfil.foto')); ?>" method="POST" enctype="multipart/form-data">
+            <?php echo csrf_field(); ?>
             <div style="position:relative; display:inline-block; flex-shrink:0;">
-                {{-- Avatar: al hacer clic abre el selector de archivo --}}
+                
                 <div class="perfil-avatar-wrap" onclick="document.getElementById('inputFoto').click()">
                     <div class="perfil-avatar" id="avatarPreview">
-                        @if($usuario->foto_url)
-                            <img src="{{ $usuario->foto_url }}" alt="{{ $usuario->nombre }}">
-                        @else
+                        <?php if($usuario->foto_url): ?>
+                            <img src="<?php echo e($usuario->foto_url); ?>" alt="<?php echo e($usuario->nombre); ?>">
+                        <?php else: ?>
                             <span class="perfil-avatar-iniciales">
-                                {{ strtoupper(substr($usuario->nombre,0,1)) }}{{ strtoupper(substr($usuario->apellido1 ?? '',0,1)) }}
+                                <?php echo e(strtoupper(substr($usuario->nombre,0,1))); ?><?php echo e(strtoupper(substr($usuario->apellido1 ?? '',0,1))); ?>
+
                             </span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                     <div class="perfil-avatar-overlay">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -40,81 +36,79 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
-                    {{-- Input oculto; cuando el usuario elige un archivo se llama previsualizarFoto() --}}
+                    
                     <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none"
                            onchange="previsualizarFoto(this)">
                 </div>
 
-                {{-- Botón guardar foto: oculto hasta que el usuario seleccione una imagen --}}
+                
                 <button type="submit" id="btnGuardarFoto" class="btn-perfil-guardar btn-foto-hero" style="display:none">
                     Guardar foto
                 </button>
             </div>
         </form>
 
-        {{-- ── Nombre, email, bio y mood ── --}}
+        
         <div class="flex-1">
             <h1 class="text-2xl sm:text-3xl font-black text-white">
-                {{ $usuario->nombre }} {{ $usuario->apellido1 }}
-            </h1>
-            <p class="text-white/50 text-sm mt-1">{{ $usuario->email }}</p>
+                <?php echo e($usuario->nombre); ?> <?php echo e($usuario->apellido1); ?>
 
-            {{-- Biografía visible en el hero para que los amigos la vean --}}
-            @if($usuario->biografia)
-                <p class="perfil-bio-hero">{{ $usuario->biografia }}</p>
-            @endif
+            </h1>
+            <p class="text-white/50 text-sm mt-1"><?php echo e($usuario->email); ?></p>
+
+            
+            <?php if($usuario->biografia): ?>
+                <p class="perfil-bio-hero"><?php echo e($usuario->biografia); ?></p>
+            <?php endif; ?>
 
         </div>
 
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     ALERTA FLASH + CONTENIDO PRINCIPAL
-════════════════════════════════════════════════════ --}}
+
 <div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-    @if(session('exito'))
+    <?php if(session('exito')): ?>
         <div class="perfil-alerta perfil-alerta-ok">
-            ✓ {{ session('exito') }}
-        </div>
-    @endif
+            ✓ <?php echo e(session('exito')); ?>
 
-    {{-- Errores de validación (Laravel los guarda en $errors tras redirigir) --}}
-    @if($errors->any())
-        <div class="perfil-alerta perfil-alerta-error">
-            @foreach($errors->all() as $error)
-                {{ $error }}<br>
-            @endforeach
         </div>
-    @endif
+    <?php endif; ?>
+
+    
+    <?php if($errors->any()): ?>
+        <div class="perfil-alerta perfil-alerta-error">
+            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php echo e($error); ?><br>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    <?php endif; ?>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     CONTENIDO PRINCIPAL
-════════════════════════════════════════════════════ --}}
+
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
 
-        {{-- ══ TARJETA: Datos personales ══ --}}
-        {{-- Formulario normal: action + method + @csrf. Sin AJAX, fácil de entender. --}}
+        
+        
         <div class="perfil-card">
             <h2 class="perfil-card-titulo">Datos personales</h2>
             <p class="perfil-card-sub">Edita tu información y pulsa "Guardar"</p>
 
-            <form action="{{ route('perfil.actualizar') }}" method="POST" novalidate>
-                @csrf
+            <form action="<?php echo e(route('perfil.actualizar')); ?>" method="POST" novalidate>
+                <?php echo csrf_field(); ?>
 
                 <div class="perfil-grid-2">
                     <div class="perfil-field">
                         <label for="nombre">Nombre</label>
-                        {{-- old('nombre', ...) recupera el valor anterior si la validación falla --}}
+                        
                         <input type="text" id="nombre" name="nombre"
-                               value="{{ old('nombre', $usuario->nombre) }}" required>
+                               value="<?php echo e(old('nombre', $usuario->nombre)); ?>" required>
                     </div>
                     <div class="perfil-field">
                         <label for="apellido1">Primer apellido</label>
                         <input type="text" id="apellido1" name="apellido1"
-                               value="{{ old('apellido1', $usuario->apellido1) }}" required>
+                               value="<?php echo e(old('apellido1', $usuario->apellido1)); ?>" required>
                     </div>
                 </div>
 
@@ -122,26 +116,26 @@
                     <div class="perfil-field">
                         <label for="apellido2">Segundo apellido</label>
                         <input type="text" id="apellido2" name="apellido2"
-                               value="{{ old('apellido2', $usuario->apellido2) }}">
+                               value="<?php echo e(old('apellido2', $usuario->apellido2)); ?>">
                     </div>
                     <div class="perfil-field">
                         <label for="telefono">Teléfono</label>
                         <input type="tel" id="telefono" name="telefono"
-                               value="{{ old('telefono', $usuario->telefono) }}">
+                               value="<?php echo e(old('telefono', $usuario->telefono)); ?>">
                     </div>
                 </div>
 
                 <div class="perfil-field">
                     <label for="fecha_nacimiento">Fecha de nacimiento</label>
                     <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
-                           value="{{ old('fecha_nacimiento', $usuario->fecha_nacimiento) }}">
+                           value="<?php echo e(old('fecha_nacimiento', $usuario->fecha_nacimiento)); ?>">
                 </div>
 
-                {{-- La bio es pública: la ven los amigos en la cabecera del perfil --}}
+                
                 <div class="perfil-field">
                     <label for="biografia">Biografía <span class="perfil-badge-publica">Pública</span></label>
                     <textarea id="biografia" name="biografia" rows="3"
-                              placeholder="Cuéntanos algo sobre ti...">{{ old('biografia', $usuario->biografia) }}</textarea>
+                              placeholder="Cuéntanos algo sobre ti..."><?php echo e(old('biografia', $usuario->biografia)); ?></textarea>
                     <span class="perfil-field-hint">Máx. 500 caracteres · Visible para todos tus amigos</span>
                 </div>
 
@@ -151,26 +145,27 @@
             </form>
         </div>
 
-        {{-- ══ TARJETA: Estado de ánimo ══ --}}
+        
         <div class="perfil-card">
             <h2 class="perfil-card-titulo">Mi estado de ánimo</h2>
             <p class="perfil-card-sub">Elige cómo te sientes · Visible para tus amigos</p>
 
             <div id="mood-alerta" class="perfil-alerta perfil-alerta-ok" style="display:none; margin-top:0.75rem;"></div>
 
-            <div id="mood-activo" style="{{ $usuario->mood ? 'display:flex' : 'display:none' }}; align-items:center; gap:0.75rem; margin-top:0.75rem; padding:0.6rem 0.9rem; border-radius:0.5rem; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35);">
-                <span id="mood-activo-texto" style="font-size:0.9rem; color:#c084fc; flex:1;">{{ $usuario->mood }}</span>
+            <div id="mood-activo" style="<?php echo e($usuario->mood ? 'display:flex' : 'display:none'); ?>; align-items:center; gap:0.75rem; margin-top:0.75rem; padding:0.6rem 0.9rem; border-radius:0.5rem; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35);">
+                <span id="mood-activo-texto" style="font-size:0.9rem; color:#c084fc; flex:1;"><?php echo e($usuario->mood); ?></span>
                 <button type="button" onclick="seleccionarMood('', null)" style="background:transparent; border:none; color:rgba(245,241,234,0.4); cursor:pointer; font-size:0.8rem; padding:0; line-height:1;" title="Quitar estado">✕ Quitar</button>
             </div>
 
             <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem; margin-top:1rem;">
-                @foreach(['🥳 De fiesta', '🎵 Escuchando música', '🌙 Noche de salida', '🔥 Con ganas de juerga', '🍻 Tomando algo', '🕺 Bailando', '😎 Tranquilo/a', '😴 Descansando', '💤 Sin planes', '🎶 Modo techno'] as $opcion)
+                <?php $__currentLoopData = ['🥳 De fiesta', '🎵 Escuchando música', '🌙 Noche de salida', '🔥 Con ganas de juerga', '🍻 Tomando algo', '🕺 Bailando', '😎 Tranquilo/a', '😴 Descansando', '💤 Sin planes', '🎶 Modo techno']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opcion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <button type="button"
-                            class="mood-opcion {{ $usuario->mood === $opcion ? 'mood-opcion--activo' : '' }}"
-                            onclick="seleccionarMood('{{ $opcion }}', this)">
-                        {{ $opcion }}
+                            class="mood-opcion <?php echo e($usuario->mood === $opcion ? 'mood-opcion--activo' : ''); ?>"
+                            onclick="seleccionarMood('<?php echo e($opcion); ?>', this)">
+                        <?php echo e($opcion); ?>
+
                     </button>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <div style="margin-top:1rem; position:relative;">
@@ -199,11 +194,11 @@
                      onclick="event.stopPropagation()"
                      style="display:none; position:absolute; bottom:calc(100% + 0.4rem); left:0; z-index:200; background:#0d0a18; border:1px solid rgba(124,58,237,0.35); border-radius:0.75rem; padding:0.75rem; width:100%; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.6);">
                     <div style="display:grid; grid-template-columns:repeat(8,1fr); gap:0.2rem;">
-                        @foreach(['😀','😎','😴','🥳','😊','🤩','😤','🥺','🤔','😅','🙄','😏','🥰','😂','😭','🤯','🔥','💜','✨','⚡','🌙','🌈','💫','🎉','🎵','🎶','🕺','💃','🍻','☕','🍕','🎮','📚','🏃','🤙','👑','🦋','🌸'] as $emoji)
+                        <?php $__currentLoopData = ['😀','😎','😴','🥳','😊','🤩','😤','🥺','🤔','😅','🙄','😏','🥰','😂','😭','🤯','🔥','💜','✨','⚡','🌙','🌈','💫','🎉','🎵','🎶','🕺','💃','🍻','☕','🍕','🎮','📚','🏃','🤙','👑','🦋','🌸']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $emoji): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <button type="button"
-                                    onclick="insertarEmoji('{{ $emoji }}')"
-                                    class="emoji-btn">{{ $emoji }}</button>
-                        @endforeach
+                                    onclick="insertarEmoji('<?php echo e($emoji); ?>')"
+                                    class="emoji-btn"><?php echo e($emoji); ?></button>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
@@ -212,8 +207,10 @@
 </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
-    <script src="{{ asset('js/perfil.js') }}"></script>
-@endsection
+<?php $__env->startSection('scripts'); ?>
+    <script src="<?php echo e(asset('js/perfil.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/perfil/index.blade.php ENDPATH**/ ?>
