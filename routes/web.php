@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
+use App\Http\Controllers\Empresa\ValidacionQRController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\PerfilController;
@@ -166,6 +167,12 @@ Route::middleware('auth')->prefix('empresa/candidaturas')->name('empresa.candida
     Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])
          ->where('ofertaId', '[0-9]+')
          ->name('cerrar-oferta');
+});
+
+/* — Validación QR de entradas (empresa) — */
+Route::middleware('auth')->prefix('empresa/validacion')->name('empresa.validacion.')->group(function () {
+    Route::get('/',        [ValidacionQRController::class, 'index'])->name('index');
+    Route::post('/validar',[ValidacionQRController::class, 'validar'])->name('validar');
 });
 
 /* — Perfil de usuario — */
