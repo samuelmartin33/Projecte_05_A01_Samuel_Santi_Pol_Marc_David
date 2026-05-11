@@ -97,4 +97,4 @@
 <div class="form-actions">
     <button type="submit" class="btn btn-primary">Guardar</button>
     <a href="<?php echo e(route('admin.usuarios.index')); ?>" class="btn btn-secondary">Cancelar</a>
-</div><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/admin/usuarios/_form.blade.php ENDPATH**/ ?>
+</div><?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/admin/usuarios/_form.blade.php ENDPATH**/ ?>
