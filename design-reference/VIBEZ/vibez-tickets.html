@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Mis tickets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vibez-shared.css">
+<style>
+  .tab-bar { display: inline-flex; gap: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 999px; background: rgba(13,10,24,0.6); }
+  .tab-btn { padding: 10px 22px; border-radius: 999px; border: none; background: transparent; color: var(--ink-dim); font-family: 'Archivo Narrow'; font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: all 0.2s; }
+  .tab-btn.active { background: var(--magenta); color: var(--cream); }
+  .tab-btn:hover:not(.active) { color: var(--ink); }
+
+  .ticket { display: grid; grid-template-columns: 220px 1fr 200px; background: linear-gradient(135deg, rgba(168,85,247,0.07), rgba(13,10,24,0.7)); border: 1px solid rgba(168,85,247,0.25); border-radius: 18px; overflow: hidden; position: relative; transition: all 0.3s ease; }
+  .ticket:hover { border-color: rgba(168,85,247,0.6); transform: translateY(-3px); box-shadow: 0 20px 50px rgba(168,85,247,0.18); }
+  .ticket.next { border-color: rgba(168,85,247,0.7); box-shadow: 0 0 0 3px rgba(168,85,247,0.12), 0 20px 50px rgba(168,85,247,0.25); }
+  .t-img { position: relative; overflow: hidden; min-height: 220px; }
+  .t-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(1.05) brightness(0.75); }
+  .t-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, transparent 70%, rgba(13,10,24,0.95) 100%); }
+  .t-cat { position: absolute; top: 14px; left: 14px; z-index: 2; }
+  .t-body { padding: 24px 28px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; position: relative; }
+  .t-body::before, .t-body::after { content: ''; position: absolute; width: 24px; height: 24px; background: var(--bg); border-radius: 50%; left: -12px; }
+  .t-body::before { top: 50%; transform: translateY(-50%); margin-top: -22px; }
+  .t-body::after { top: 50%; transform: translateY(-50%); margin-top: 22px; }
+  .t-title { font-family: 'Anton'; font-size: 28px; line-height: 0.95; margin: 0; text-transform: uppercase; }
+  .t-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-family: 'Archivo Narrow'; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .t-meta div span { color: var(--ink-dim); display: block; margin-bottom: 4px; font-size: 9px; letter-spacing: 0.18em; }
+  .t-meta div strong { font-weight: 700; font-size: 13px; }
+  .t-qr-side { background: rgba(245,241,234,0.02); border-left: 1px dashed var(--line); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; }
+  .t-qr-side::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background-image: linear-gradient(180deg, transparent 0%, transparent 50%, var(--magenta) 50%, var(--magenta) 100%); background-size: 1px 16px; background-repeat: repeat-y; }
+  .qr-box { width: 110px; height: 110px; background: var(--cream); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; }
+  .qr-svg { width: 100%; height: 100%; }
+  .t-code { font-family: 'Archivo Narrow'; font-size: 10px; letter-spacing: 0.2em; color: var(--ink-dim); text-transform: uppercase; }
+  .t-cant { font-family: 'Anton'; font-size: 22px; color: var(--magenta); }
+
+  .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 480px; margin-top: 24px; }
+  .cd-cell { background: rgba(13,10,24,0.7); border: 1px solid var(--line); padding: 14px 6px; text-align: center; border-radius: 8px; }
+  .cd-num { font-family: 'Anton'; font-size: clamp(28px, 5vw, 44px); color: var(--magenta); line-height: 1; }
+  .cd-lbl { font-family: 'Archivo Narrow'; font-size: 9px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; }
+
+  .empty-state { padding: 80px 40px; text-align: center; border: 1.5px dashed var(--line); border-radius: 18px; }
+
+  @media (max-width: 880px) {
+    .ticket { grid-template-columns: 1fr; }
+    .t-img { min-height: 160px; }
+    .t-img::after { background: linear-gradient(180deg, transparent 0%, transparent 60%, rgba(13,10,24,0.95) 100%); }
+    .t-qr-side { border-left: none; border-top: 1px dashed var(--line); flex-direction: row; justify-content: space-between; padding: 20px 24px; }
+    .t-body::before, .t-body::after { display: none; }
+  }
+</style>
+</head>
+<body class="grain">
+
+<!-- NAV -->
+<header class="v-nav">
+  <div class="v-nav-inner">
+    <a href="vibez-home.html" class="v-nav-logo"><img src="assets/logo_vibez.png" alt=""><span>VIBEZ</span></a>
+    <nav class="v-nav-links">
+      <a href="vibez-home.html">Para ti</a>
+      <a href="vibez-tickets.html" class="active">Mis tickets</a>
+      <a href="vibez-home.html">Esta noche</a>
+      <a href="vibez-bolsa.html">Bolsa</a>
+      <a href="vibez-social.html">Social</a>
+    </nav>
+    <div class="v-nav-right">
+      <button class="v-nav-bell" onclick="alert('Notificaciones')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
+      <button class="v-nav-avatar"><span class="av">SM</span><span class="nm">Samuel</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="v-hero">
+  <div class="v-hero-inner">
+    <div class="s-kicker">Tu colección · 3 activos · 12 totales</div>
+    <h1>Mis<br><em>tickets</em>.</h1>
+    <p class="sub">Tu wallet de fiestas. Guarda, comparte, escanea — la noche cabe en tu bolsillo.</p>
+
+    <div class="stats-strip">
+      <div class="stat-cell"><div class="stat-num">3</div><div class="stat-lbl">Próximos</div></div>
+      <div class="stat-cell"><div class="stat-num">12</div><div class="stat-lbl">Histórico</div></div>
+      <div class="stat-cell"><div class="stat-num" style="color:var(--ink)">1 840</div><div class="stat-lbl">Puntos VIBEZ</div></div>
+      <div class="stat-cell"><div class="stat-num" style="color:var(--ink)">2</div><div class="stat-lbl">Cupones</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- NEXT EVENT countdown -->
+<section class="section tight">
+  <div class="s-head">
+    <div>
+      <div class="s-kicker">Tu próximo evento</div>
+      <h2 class="s-title">Empieza <em>en</em></h2>
+    </div>
+    <a href="#" style="font-family:'Archivo Narrow';font-size:11px;color:var(--magenta-2);text-decoration:none;border-bottom:1px solid currentColor;letter-spacing:0.18em;text-transform:uppercase">Ver detalle →</a>
+  </div>
+  <div style="background:linear-gradient(135deg, rgba(168,85,247,0.08), rgba(13,10,24,0.7));border:1px solid rgba(168,85,247,0.3);border-radius:18px;padding:32px 36px;display:grid;grid-template-columns:1.6fr 1fr;gap:32px;align-items:center" class="next-grid">
+    <div>
+      <span class="sticker">★ HOY · 22:00</span>
+      <h3 style="font-family:'Anton';font-size:clamp(36px,5vw,64px);margin:18px 0 8px;line-height:0.95">AMNESIA × FELICIDAD</h3>
+      <p style="font-family:'Archivo Narrow';font-size:14px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.12em;margin:0">Charlotte de Witte · Razzmatazz · Barcelona</p>
+      <div class="countdown" id="cd">
+        <div class="cd-cell"><div class="cd-num" id="cd-d">00</div><div class="cd-lbl">Días</div></div>
+        <div class="cd-cell"><div class="cd-num" id="cd-h">07</div><div class="cd-lbl">Horas</div></div>
+        <div class="cd-cell"><div class="cd-num" id="cd-m">42</div><div class="cd-lbl">Min</div></div>
+        <div class="cd-cell"><div class="cd-num" id="cd-s">18</div><div class="cd-lbl">Seg</div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button class="btn-primary" style="padding:18px 28px;border-radius:999px;font-size:15px">Mostrar QR →</button>
+      <button class="btn-ghost" style="padding:14px 24px;border-radius:999px;font-size:13px">Añadir a Wallet</button>
+      <button class="btn-ghost" style="padding:14px 24px;border-radius:999px;font-size:13px">Compartir con amig@s</button>
+    </div>
+  </div>
+</section>
+
+<!-- TABS -->
+<section class="section tight" style="padding-top:20px">
+  <div class="tab-bar" id="tabs">
+    <button class="tab-btn active" data-tab="proximos" onclick="setTab('proximos')">Próximos (3)</button>
+    <button class="tab-btn" data-tab="pasados" onclick="setTab('pasados')">Pasados (12)</button>
+    <button class="tab-btn" data-tab="cancelados" onclick="setTab('cancelados')">Cancelados (1)</button>
+  </div>
+</section>
+
+<!-- TICKETS LIST -->
+<section class="section" style="padding-top:30px">
+  <div id="tickets-list" style="display:flex;flex-direction:column;gap:18px"></div>
+</section>
+
+<!-- SHARE INVITE -->
+<section class="section">
+  <div style="background:linear-gradient(135deg, rgba(124,58,237,0.18), rgba(168,85,247,0.08));border:1px solid rgba(168,85,247,0.4);border-radius:24px;padding:48px;display:grid;grid-template-columns:1.4fr 1fr;gap:32px;align-items:center" class="share-grid">
+    <div>
+      <div class="s-kicker">Refiere y gana</div>
+      <h2 class="s-title">Trae un<br><em>colega</em>.</h2>
+      <p style="font-family:'Archivo Narrow';font-size:16px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.08em;margin:20px 0;max-width:480px">Por cada amig@ que entre con tu código, los dos os lleváis <strong style="color:var(--ink)">10€ en cupones</strong>.</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="background:rgba(7,6,12,0.6);border:1px solid var(--line);padding:14px 18px;border-radius:999px;font-family:'Archivo Narrow';font-size:14px;letter-spacing:0.2em">VBZ-<strong style="color:var(--magenta)">SAM2026</strong></div>
+        <button class="btn-primary" style="padding:14px 24px;border-radius:999px;font-size:13px" onclick="navigator.clipboard.writeText('VBZ-SAM2026')">Copiar código</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center">
+      <div style="font-family:'Anton';font-size:clamp(80px, 14vw, 180px);line-height:0.85;color:transparent;-webkit-text-stroke:1.5px rgba(168,85,247,0.4);text-align:center">+10<em style="font-style:italic;color:var(--magenta);font-family:'Bebas Neue';-webkit-text-stroke:0">€</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="v-foot">
+  <div class="v-foot-inner">
+    <div class="v-foot-big">TUS NOCHES · <em>EN BOLSILLO</em></div>
+    <div class="v-foot-bottom">
+      <div>© 2026 VIBEZ · Barcelona</div>
+      <div>Términos · Privacidad · Contacto</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Tickets data (mock)
+  const TICKETS = {
+    proximos: [
+      { id: 'VBZ-4821', cantidad: 2, titulo: 'AMNESIA × FELICIDAD', artista: 'Charlotte de Witte', fecha: 'Vie 09 May', hora: '22:00 — 06:00', lugar: 'Razzmatazz', ciudad: 'Barcelona', cat: 'Techno', img: 'https://picsum.photos/seed/vibez-techno-1/1400/1750', next: true },
+      { id: 'VBZ-4822', cantidad: 1, titulo: 'PRIMAVERA SOUND', artista: 'Día 2 · LCD Soundsystem', fecha: 'Vie 30 May', hora: '14:00 — 04:00', lugar: 'Parc del Fòrum', ciudad: 'Barcelona', cat: 'Festival', img: 'https://picsum.photos/seed/vibez-festival-2/1400/1750' },
+      { id: 'VBZ-4823', cantidad: 1, titulo: 'BAD BUNNY × MIAMI VIBES', artista: 'Bad Bunny + invitados', fecha: 'Dom 21 Jun', hora: '22:00 — 03:00', lugar: 'Pacha BCN', ciudad: 'Barcelona', cat: 'Reggaeton', img: 'https://picsum.photos/seed/vibez-club-3/1400/1750' }
+    ],
+    pasados: [
+      { id: 'VBZ-4711', cantidad: 1, titulo: 'JAZZ EN LA AZOTEA', artista: 'Quartet J. Pegenaute', fecha: 'Dom 17 Mar', hora: '20:30', lugar: 'Hotel Casa Fuster', ciudad: 'Barcelona', cat: 'Jazz', img: 'https://picsum.photos/seed/vibez-jazz-4/1400/1400', past: true },
+      { id: 'VBZ-4682', cantidad: 2, titulo: 'NOCHE ÍTALO DISCO', artista: 'DJ residentes', fecha: 'Sáb 22 Feb', hora: '23:00 — 05:00', lugar: 'Sala [2] de Apolo', ciudad: 'Barcelona', cat: 'Remember', img: 'https://picsum.photos/seed/vibez-italo-5/1400/1400', past: true }
+    ],
+    cancelados: [
+      { id: 'VBZ-4598', cantidad: 1, titulo: 'TECHNO REWORK', artista: 'Cancelado por aforo', fecha: 'Sáb 04 Ene', hora: '—', lugar: 'Industria', ciudad: 'Barcelona', cat: 'Techno', img: 'https://picsum.photos/seed/vibez-club-3/1400/1750', cancelled: true }
+    ]
+  };
+
+  // QR pseudo-aleatorio determinista
+  function qrSvg(seed) {
+    const size = 21;
+    let cells = '';
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const h = ((seed * 131 + x * 17 + y * 31) ^ (x * y)) & 0xff;
+        // corners as finder patterns
+        const inFinder = (x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7);
+        let on = false;
+        if (inFinder) {
+          const cx = x < 7 ? 3 : (x >= size - 7 ? size - 4 : -1);
+          const cy = y < 7 ? 3 : (y >= size - 7 ? size - 4 : -1);
+          const dx = Math.abs(x - cx), dy = Math.abs(y - cy);
+          const d = Math.max(dx, dy);
+          on = d === 0 || d === 2 || d === 3;
+        } else {
+          on = h > 130;
+        }
+        if (on) cells += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+      }
+    }
+    return `<svg class="qr-svg" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="white"/><g fill="black">${cells}</g></svg>`;
+  }
+
+  function renderTickets(which) {
+    const list = TICKETS[which] || [];
+    const el = document.getElementById('tickets-list');
+    if (!list.length) {
+      el.innerHTML = `<div class="empty-state"><div class="s-kicker" style="justify-content:center">Vacío</div><h3 style="font-family:'Anton';font-size:48px;margin:8px 0">Nada por aquí.</h3><p style="font-family:'Archivo Narrow';color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.1em">Empieza a coleccionar noches.</p><a href="vibez-home.html" class="btn-primary" style="display:inline-block;padding:14px 24px;border-radius:999px;font-size:13px;margin-top:18px;text-decoration:none">Explorar eventos →</a></div>`;
+      return;
+    }
+    const seed = (s) => s.split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+    el.innerHTML = list.map(t => `
+      <article class="ticket ${t.next ? 'next' : ''}" onclick="alert('Ticket ${t.id}')" style="cursor:pointer; opacity:${t.past || t.cancelled ? 0.55 : 1}">
+        <div class="t-img">
+          <img src="${t.img}" alt="">
+          <span class="sticker t-cat" style="font-size:11px">${t.cat}</span>
+          ${t.next ? '<span class="sticker t-cat" style="top:14px;right:14px;left:auto;background:var(--cream);color:var(--bg);transform:rotate(2deg);font-size:11px">★ Hoy</span>' : ''}
+          ${t.cancelled ? '<span class="sticker t-cat" style="top:14px;right:14px;left:auto;background:#ef4444;font-size:11px">Cancelado</span>' : ''}
+        </div>
+        <div class="t-body">
+          <div>
+            <h3 class="t-title">${t.titulo}</h3>
+            <p style="font-family:'Archivo Narrow';font-size:13px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.1em;margin:6px 0 0">${t.artista}</p>
+          </div>
+          <div class="t-meta">
+            <div><span>Fecha</span><strong>${t.fecha}</strong></div>
+            <div><span>Horario</span><strong>${t.hora}</strong></div>
+            <div><span>Sala</span><strong>${t.lugar}</strong></div>
+            <div><span>Ciudad</span><strong>${t.ciudad}</strong></div>
+          </div>
+        </div>
+        <div class="t-qr-side">
+          <div class="qr-box">${qrSvg(seed(t.id))}</div>
+          <div class="t-cant">×${t.cantidad}</div>
+          <div class="t-code">#${t.id}</div>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  function setTab(which) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === which));
+    renderTickets(which);
+  }
+
+  renderTickets('proximos');
+
+  // Countdown
+  const target = new Date();
+  target.setHours(target.getHours() + 7, target.getMinutes() + 42, 18, 0);
+  setInterval(() => {
+    const diff = Math.max(0, target - new Date());
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff / 3600000) % 24);
+    const m = Math.floor((diff / 60000) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+    document.getElementById('cd-d').textContent = String(d).padStart(2, '0');
+    document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
+    document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
+    document.getElementById('cd-s').textContent = String(s).padStart(2, '0');
+  }, 1000);
+</script>
+
+</body>
+</html>

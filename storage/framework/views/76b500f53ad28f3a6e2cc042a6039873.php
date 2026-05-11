@@ -1,31 +1,25 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Social — VIBEZ'); ?>
 
-@section('title', 'Social — VIBEZ')
 
-{{-- Usamos @section('content') como la home para activar el modo oscuro completo --}}
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-{{-- ── Estilos base (dark theme) ── --}}
-<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
-<link rel="stylesheet" href="{{ asset('css/social.css') }}">
 
-{{-- El nav home mide aprox. 94px; ajustamos la altura del wrapper social --}}
+<link rel="stylesheet" href="<?php echo e(asset('css/vibez-home.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('css/social.css')); ?>">
+
+
 <style>
   .soc                                { height: calc(100vh - 94px); }
   @media (min-width: 900px)           { .soc { height: calc(100vh - 94px); } }
 </style>
 
-{{-- ════ NAV ════ --}}
-@include('partials.home.nav')
 
-{{-- ════════════════════════════════════════════════════
-     WRAPPER PRINCIPAL
-════════════════════════════════════════════════════ --}}
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+
 <div class="soc" id="soc">
 
-    {{-- ══════════════════════════════════════
-         PANEL: Publicaciones (por defecto)
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-panel activo" id="panel-feed">
 
         <header class="soc-topbar">
@@ -56,9 +50,7 @@
 
     </div>
 
-    {{-- ══════════════════════════════════════
-         PANEL: Mensajes
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-panel" id="panel-chats">
 
         <div class="chats-col-izq">
@@ -120,9 +112,7 @@
 
     </div>
 
-    {{-- ══════════════════════════════════════
-         PANEL: Amigos
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-panel" id="panel-amigos">
 
         <header class="soc-topbar">
@@ -154,9 +144,7 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════
-         BOTTOM NAVIGATION / SIDEBAR
-         ══════════════════════════════════════ --}}
+    
     <nav class="soc-bottom-nav">
 
         <div class="soc-sidebar-header">
@@ -199,9 +187,7 @@
 
     </nav>
 
-    {{-- ══════════════════════════════════════
-         MODAL: Nueva publicación
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-modal-overlay" id="pub-modal-overlay" style="display:none"
          onclick="cerrarModalPublicacion()">
         <div class="soc-modal" onclick="event.stopPropagation()">
@@ -226,7 +212,7 @@
                           placeholder="Cuenta cómo fue el evento…"
                           maxlength="1000" rows="3"></textarea>
 
-                {{-- ── Visibilidad ── --}}
+                
                 <label class="soc-field-label">¿Quién puede verlo?</label>
                 <select id="pub-select-visibilidad" class="soc-select">
                     <option value="1">🌍 Todos</option>
@@ -257,9 +243,7 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════
-         MODAL: Añadir amigo
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-modal-overlay" id="modal-amigo-overlay" style="display:none"
          onclick="cerrarModalAnadirAmigo()">
         <div class="soc-modal" onclick="event.stopPropagation()">
@@ -293,12 +277,14 @@
         </div>
     </div>
 
-</div>{{-- /soc --}}
+</div>
 
-{{-- ── Scripts ── --}}
+
 <script>
-    window.miUsuarioId = {{ Auth::id() }};
+    window.miUsuarioId = <?php echo e(Auth::id()); ?>;
 </script>
-<script src="{{ asset('js/social.js') }}"></script>
+<script src="<?php echo e(asset('js/social.js')); ?>"></script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/social/index.blade.php ENDPATH**/ ?>

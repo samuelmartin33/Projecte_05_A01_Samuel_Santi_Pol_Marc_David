@@ -14,6 +14,7 @@ class EventoPost extends Model
         'evento_id',
         'descripcion',
         'estado',
+        'visibilidad',
         'fecha_creacion',
         'fecha_actualizacion',
     ];

@@ -1,40 +1,39 @@
-@extends('admin.layouts.dashboard')
+<?php $__env->startSection('title', 'Dashboard — VIBEZ Admin'); ?>
 
-@section('title', 'Dashboard — VIBEZ Admin')
+<?php $__env->startSection('content'); ?>
 
-@section('content')
 
-{{-- ── Hero de bienvenida ── --}}
 <div class="adm-hero">
     <div class="adm-hero-row">
         <div>
             <p class="adm-hero-kicker">
-                ▸ Panel de control · {{ now()->locale('es')->isoFormat('dddd, D [de] MMMM') }}
+                ▸ Panel de control · <?php echo e(now()->locale('es')->isoFormat('dddd, D [de] MMMM')); ?>
+
             </p>
             <h1>Panel <em>Admin</em></h1>
             <p class="adm-hero-sub">
-                {{ $eventosActivos }} evento{{ $eventosActivos !== 1 ? 's' : '' }} activo{{ $eventosActivos !== 1 ? 's' : '' }},
-                {{ $usuariosActivos }} usuarios verificados
-                @if($empresasPendientes > 0)
-                    · <strong style="color:var(--adm-warn)">{{ $empresasPendientes }} empresa{{ $empresasPendientes !== 1 ? 's' : '' }} pendiente{{ $empresasPendientes !== 1 ? 's' : '' }}</strong>
-                @endif
+                <?php echo e($eventosActivos); ?> evento<?php echo e($eventosActivos !== 1 ? 's' : ''); ?> activo<?php echo e($eventosActivos !== 1 ? 's' : ''); ?>,
+                <?php echo e($usuariosActivos); ?> usuarios verificados
+                <?php if($empresasPendientes > 0): ?>
+                    · <strong style="color:var(--adm-warn)"><?php echo e($empresasPendientes); ?> empresa<?php echo e($empresasPendientes !== 1 ? 's' : ''); ?> pendiente<?php echo e($empresasPendientes !== 1 ? 's' : ''); ?></strong>
+                <?php endif; ?>
             </p>
         </div>
         <div class="adm-hero-actions">
-            <a href="{{ route('admin.eventos.create') }}" class="adm-btn-pri">
+            <a href="<?php echo e(route('admin.eventos.create')); ?>" class="adm-btn-pri">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
                 Nuevo evento
             </a>
-            <a href="{{ route('admin.empresas.index') }}" class="adm-btn-ghost">
+            <a href="<?php echo e(route('admin.empresas.index')); ?>" class="adm-btn-ghost">
                 Gestionar empresas
             </a>
         </div>
     </div>
 </div>
 
-{{-- ── KPI Grid ── --}}
+
 <div class="adm-kpi-grid">
 
     <div class="adm-kpi">
@@ -49,7 +48,7 @@
                 </svg>
             </div>
         </div>
-        <div class="adm-kpi-value">{{ $eventosActivos }}</div>
+        <div class="adm-kpi-value"><?php echo e($eventosActivos); ?></div>
         <div class="adm-kpi-foot">
             <span class="adm-kpi-lbl">eventos publicados</span>
         </div>
@@ -71,9 +70,9 @@
                 </svg>
             </div>
         </div>
-        <div class="adm-kpi-value">{{ $usuariosActivos }}</div>
+        <div class="adm-kpi-value"><?php echo e($usuariosActivos); ?></div>
         <div class="adm-kpi-foot">
-            <span class="adm-kpi-lbl">de {{ $totalUsuarios }} registrados</span>
+            <span class="adm-kpi-lbl">de <?php echo e($totalUsuarios); ?> registrados</span>
         </div>
         <svg class="adm-spark" viewBox="0 0 80 24" preserveAspectRatio="none">
             <polyline points="0,20 14,18 28,14 42,16 56,10 70,7 80,3"
@@ -92,7 +91,7 @@
                 </svg>
             </div>
         </div>
-        <div class="adm-kpi-value {{ $empresasPendientes > 0 ? 'warn' : '' }}">{{ $empresasPendientes }}</div>
+        <div class="adm-kpi-value <?php echo e($empresasPendientes > 0 ? 'warn' : ''); ?>"><?php echo e($empresasPendientes); ?></div>
         <div class="adm-kpi-foot">
             <span class="adm-kpi-lbl">esperando aprobación</span>
         </div>
@@ -108,7 +107,7 @@
                 </svg>
             </div>
         </div>
-        <div class="adm-kpi-value">{{ $totalPedidos }}</div>
+        <div class="adm-kpi-value"><?php echo e($totalPedidos); ?></div>
         <div class="adm-kpi-foot">
             <span class="adm-kpi-lbl">pedidos registrados</span>
         </div>
@@ -120,7 +119,7 @@
 
 </div>
 
-{{-- ── Acciones + Resumen ── --}}
+
 <div class="adm-two-col">
 
     <div class="adm-card">
@@ -131,7 +130,7 @@
             </div>
         </div>
         <div class="adm-actions-grid">
-            <a href="{{ route('admin.eventos.create') }}" class="adm-action-item">
+            <a href="<?php echo e(route('admin.eventos.create')); ?>" class="adm-action-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
@@ -140,7 +139,7 @@
                 </svg>
                 Crear evento
             </a>
-            <a href="{{ route('admin.usuarios.create') }}" class="adm-action-item">
+            <a href="<?php echo e(route('admin.usuarios.create')); ?>" class="adm-action-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                     <circle cx="8.5" cy="7" r="4"/>
@@ -148,7 +147,7 @@
                 </svg>
                 Crear usuario
             </a>
-            <a href="{{ route('admin.empresas.index') }}" class="adm-action-item">
+            <a href="<?php echo e(route('admin.empresas.index')); ?>" class="adm-action-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/>
                     <path d="M3 21h18"/>
@@ -156,20 +155,20 @@
                 </svg>
                 Gestionar empresas
             </a>
-            <a href="{{ route('admin.categorias.index') }}" class="adm-action-item">
+            <a href="<?php echo e(route('admin.categorias.index')); ?>" class="adm-action-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
                     <line x1="7" y1="7" x2="7.01" y2="7"/>
                 </svg>
                 Categorías
             </a>
-            <a href="{{ route('admin.pedidos.index') }}" class="adm-action-item">
+            <a href="<?php echo e(route('admin.pedidos.index')); ?>" class="adm-action-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M2 9V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>
                 </svg>
                 Ver pedidos
             </a>
-            <a href="{{ route('admin.pagos.index') }}" class="adm-action-item">
+            <a href="<?php echo e(route('admin.pagos.index')); ?>" class="adm-action-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="1" x2="12" y2="23"/>
                     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
@@ -189,20 +188,21 @@
         <div>
             <div class="adm-stat-row">
                 <span class="adm-stat-label">Total usuarios</span>
-                <span class="adm-stat-value">{{ $totalUsuarios }}</span>
+                <span class="adm-stat-value"><?php echo e($totalUsuarios); ?></span>
             </div>
             <div class="adm-stat-row">
                 <span class="adm-stat-label">Pagos registrados</span>
-                <span class="adm-stat-value">{{ $totalPagos }}</span>
+                <span class="adm-stat-value"><?php echo e($totalPagos); ?></span>
             </div>
             <div class="adm-stat-row">
                 <span class="adm-stat-label">Categorías</span>
-                <span class="adm-stat-value">{{ $totalCategorias }}</span>
+                <span class="adm-stat-value"><?php echo e($totalCategorias); ?></span>
             </div>
             <div class="adm-stat-row">
                 <span class="adm-stat-label">Empresas pendientes</span>
-                <span class="adm-stat-value" style="{{ $empresasPendientes > 0 ? 'color:var(--adm-warn)' : '' }}">
-                    {{ $empresasPendientes }}
+                <span class="adm-stat-value" style="<?php echo e($empresasPendientes > 0 ? 'color:var(--adm-warn)' : ''); ?>">
+                    <?php echo e($empresasPendientes); ?>
+
                 </span>
             </div>
         </div>
@@ -210,23 +210,26 @@
 
 </div>
 
-{{-- ── Aviso de empresas pendientes ── --}}
-@if($empresasPendientes > 0)
+
+<?php if($empresasPendientes > 0): ?>
 <div class="adm-card adm-section">
     <div class="adm-card-head">
         <div>
             <h3 class="adm-card-title">Pendientes de aprobación</h3>
             <div class="adm-card-sub">
-                {{ $empresasPendientes }} empresa{{ $empresasPendientes !== 1 ? 's' : '' }}
+                <?php echo e($empresasPendientes); ?> empresa<?php echo e($empresasPendientes !== 1 ? 's' : ''); ?>
+
                 esperando revisión
             </div>
         </div>
-        <a href="{{ route('admin.empresas.index') }}" class="adm-btn-ghost">Ver todas →</a>
+        <a href="<?php echo e(route('admin.empresas.index')); ?>" class="adm-btn-ghost">Ver todas →</a>
     </div>
     <p style="color:var(--adm-ink-dim);font-size:13px;margin:0;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;line-height:1.6">
         Revisa y aprueba o rechaza las empresas pendientes desde el gestor de empresas.
     </p>
 </div>
-@endif
+<?php endif; ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

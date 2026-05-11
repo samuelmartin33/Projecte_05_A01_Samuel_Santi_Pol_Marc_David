@@ -3,6 +3,9 @@
    Layout tipo Instagram: feed central + bottom nav fijo.
    ============================================================ */
 
+/* Fuentes del diseño VIBEZ */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&display=swap');
+
 /* ── Variables ── */
 :root {
     --soc-bg:          #0d0820;
@@ -65,11 +68,13 @@
 }
 
 .soc-topbar-titulo {
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-family: 'Anton', 'Archivo', system-ui, sans-serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
     color: var(--soc-text);
     margin: 0;
-    letter-spacing: -0.02em;
 }
 
 .soc-topbar-btn {
@@ -276,54 +281,66 @@
    ============================================================ */
 
 #feed-scroll {
-    padding-bottom: 12px;
+    padding: 12px 0 20px;
 }
 
-/* ── Post card (estilo Instagram) ── */
+/* ── Post card (estilo VIBEZ — tarjeta redondeada) ── */
 .post-card {
-    background: var(--soc-card);
-    border-bottom: 1px solid var(--soc-border);
-    margin-bottom: 4px;
-    transition: none;
+    background: rgba(13,10,24,0.5);
+    border: 1px solid var(--soc-border);
+    border-radius: 18px;
+    margin: 0 10px 18px;
+    overflow: hidden;
+    transition: border-color 0.25s;
 }
+.post-card:hover { border-color: rgba(168,85,247,0.35); }
 
 /* Cabecera del post */
 .post-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
+    padding: 16px 18px;
 }
 .post-head-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
 }
 .post-head-meta {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 2px;
     min-width: 0;
 }
 .post-autor {
-    font-size: 0.875rem;
+    font-family: 'Archivo Narrow', 'Archivo', system-ui, sans-serif;
+    font-size: 0.8rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: var(--soc-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .post-evento-tag {
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-family: 'Archivo Narrow', 'Archivo', system-ui, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
     color: #a78bfa;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .post-fecha-tag {
-    font-size: 0.68rem;
+    font-family: 'Archivo Narrow', 'Archivo', system-ui, sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
     color: var(--soc-text-dim);
 }
 
@@ -371,14 +388,18 @@
 }
 
 .post-caption {
+    font-family: 'Archivo Narrow', 'Archivo', system-ui, sans-serif;
     font-size: 0.875rem;
     color: var(--soc-text);
-    line-height: 1.6;
+    line-height: 1.5;
     margin: 0 0 10px;
     word-break: break-word;
+    letter-spacing: 0.01em;
 }
 .post-caption strong {
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: var(--soc-text);
     margin-right: 6px;
 }
@@ -1152,6 +1173,7 @@
 
 .post-carousel-slide img {
     width: 100%;
+    aspect-ratio: 4 / 5;
     max-height: 560px;
     object-fit: cover;
     display: block;
@@ -1286,7 +1308,7 @@
     /* Contenedor: fila horizontal, ocupa toda la pantalla */
     .soc {
         max-width: none;
-        height: calc(100vh - 56px);
+        height: calc(100vh - 94px);
         flex-direction: row;
     }
 
