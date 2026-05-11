@@ -1,21 +1,19 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Revisar Currículums — ' . $empresa->nombre_empresa); ?>
 
-@section('titulo', 'Revisar Currículums — ' . $empresa->nombre_empresa)
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/empresa-candidaturas-ofertas.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@push('estilos')
-<link rel="stylesheet" href="{{ asset('css/empresa-candidaturas-ofertas.css') }}">
-@endpush
+<?php $__env->startSection('content'); ?>
 
-@section('content')
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-@include('partials.home.nav')
 
-{{-- ══ Hero ══ --}}
 <section class="cand-hero">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {{-- Breadcrumb --}}
-        <a href="{{ route('empresa.home') }}"
+        
+        <a href="<?php echo e(route('empresa.home')); ?>"
            class="inline-flex items-center gap-1.5 text-slate-400 hover:text-white text-sm font-medium transition-colors mb-6">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -32,17 +30,17 @@
                 <h1 class="text-3xl sm:text-4xl font-black text-white leading-tight">
                     Tus ofertas publicadas
                 </h1>
-                <p class="text-slate-400 mt-1 text-sm">{{ $empresa->nombre_empresa }}</p>
+                <p class="text-slate-400 mt-1 text-sm"><?php echo e($empresa->nombre_empresa); ?></p>
             </div>
 
-            {{-- Stats --}}
+            
             <div class="flex gap-3">
                 <div class="stat-box">
-                    <p class="text-2xl font-black text-white">{{ $ofertas->total() }}</p>
+                    <p class="text-2xl font-black text-white"><?php echo e($ofertas->total()); ?></p>
                     <p class="text-slate-400 text-xs mt-0.5">Ofertas</p>
                 </div>
                 <div class="stat-box">
-                    <p class="text-2xl font-black text-purple-300">{{ $totalCandidaturas }}</p>
+                    <p class="text-2xl font-black text-purple-300"><?php echo e($totalCandidaturas); ?></p>
                     <p class="text-slate-400 text-xs mt-0.5">Candidaturas</p>
                 </div>
             </div>
@@ -50,8 +48,8 @@
     </div>
 </section>
 
-{{-- ══ Filtros ══ --}}
-@php
+
+<?php
     $baseOfertas   = route('empresa.candidaturas.ofertas');
     $ordenOfAct    = request('orden', 'reciente');
     $estadoOfAct   = request('estado', null);
@@ -60,43 +58,43 @@
         ['estado' => $est, 'orden' => $ord],
         fn($v) => $v !== null && $v !== ''
     ));
-@endphp
+?>
 <div class="sticky top-16 z-30" style="background:rgba(13,8,32,0.92);border-bottom:1px solid rgba(245,241,234,0.10);backdrop-filter:blur(20px);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-3">
 
-        {{-- Estado --}}
+        
         <div class="flex items-center gap-1.5">
-            <a href="{{ $mkUrl(null, $ordenOfAct) }}"
-               class="filtro-btn {{ $estadoOfAct === null ? 'activo' : '' }}">Todas</a>
-            <a href="{{ $mkUrl('1', $ordenOfAct) }}"
-               class="filtro-btn {{ $estadoOfAct === '1' ? 'activo' : '' }}">Activas</a>
-            <a href="{{ $mkUrl('0', $ordenOfAct) }}"
-               class="filtro-btn {{ $estadoOfAct === '0' ? 'activo' : '' }}">Cerradas</a>
+            <a href="<?php echo e($mkUrl(null, $ordenOfAct)); ?>"
+               class="filtro-btn <?php echo e($estadoOfAct === null ? 'activo' : ''); ?>">Todas</a>
+            <a href="<?php echo e($mkUrl('1', $ordenOfAct)); ?>"
+               class="filtro-btn <?php echo e($estadoOfAct === '1' ? 'activo' : ''); ?>">Activas</a>
+            <a href="<?php echo e($mkUrl('0', $ordenOfAct)); ?>"
+               class="filtro-btn <?php echo e($estadoOfAct === '0' ? 'activo' : ''); ?>">Cerradas</a>
         </div>
 
         <div class="ml-auto flex items-center gap-2">
             <label class="text-navy/50 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
             <select class="filtro-select"
-                    onchange="window.location.href='{{ $baseOfertas }}?{{ $estadoPrefix }}orden='+this.value">
-                <option value="reciente"   {{ $ordenOfAct === 'reciente'   ? 'selected' : '' }}>Más reciente</option>
-                <option value="candidatos" {{ $ordenOfAct === 'candidatos' ? 'selected' : '' }}>Más candidatos</option>
-                <option value="titulo"     {{ $ordenOfAct === 'titulo'     ? 'selected' : '' }}>Alfabético</option>
+                    onchange="window.location.href='<?php echo e($baseOfertas); ?>?<?php echo e($estadoPrefix); ?>orden='+this.value">
+                <option value="reciente"   <?php echo e($ordenOfAct === 'reciente'   ? 'selected' : ''); ?>>Más reciente</option>
+                <option value="candidatos" <?php echo e($ordenOfAct === 'candidatos' ? 'selected' : ''); ?>>Más candidatos</option>
+                <option value="titulo"     <?php echo e($ordenOfAct === 'titulo'     ? 'selected' : ''); ?>>Alfabético</option>
             </select>
-            @if($estadoOfAct !== null || request('orden'))
-                <a href="{{ $baseOfertas }}"
+            <?php if($estadoOfAct !== null || request('orden')): ?>
+                <a href="<?php echo e($baseOfertas); ?>"
                    class="text-navy/40 hover:text-navy text-xs font-semibold transition-colors">
                     Limpiar
                 </a>
-            @endif
+            <?php endif; ?>
         </div>
 
     </div>
 </div>
 
-{{-- ══ Grid de ofertas ══ --}}
+
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    @if($ofertas->isEmpty())
+    <?php if($ofertas->isEmpty()): ?>
         <div class="empty-state">
             <div class="w-16 h-16 flex items-center justify-center mx-auto mb-4" style="background:rgba(245,241,234,0.05);">
                 <svg class="w-8 h-8" style="color:rgba(245,241,234,0.20);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,61 +105,67 @@
             <h3 class="font-bold text-lg mb-1" style="color:rgba(245,241,234,0.50);">No hay ofertas publicadas</h3>
             <p class="text-sm" style="color:rgba(245,241,234,0.35);">Cuando publiques ofertas de trabajo, aparecerán aquí.</p>
         </div>
-    @else
+    <?php else: ?>
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            @foreach($ofertas as $oferta)
+            <?php $__currentLoopData = $ofertas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oferta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="oferta-card">
 
-                {{-- Header: título + estado --}}
+                
                 <div class="flex items-start justify-between gap-2">
                     <h2 class="text-navy font-bold text-base leading-snug flex-1">
-                        {{ $oferta->titulo }}
+                        <?php echo e($oferta->titulo); ?>
+
                     </h2>
-                    <span class="badge-estado {{ $oferta->estado ? 'badge-activa' : 'badge-cerrada' }} flex-shrink-0">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $oferta->estado ? 'bg-green-500' : 'bg-slate-400' }}"></span>
-                        {{ $oferta->estado ? 'Activa' : 'Cerrada' }}
+                    <span class="badge-estado <?php echo e($oferta->estado ? 'badge-activa' : 'badge-cerrada'); ?> flex-shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full <?php echo e($oferta->estado ? 'bg-green-500' : 'bg-slate-400'); ?>"></span>
+                        <?php echo e($oferta->estado ? 'Activa' : 'Cerrada'); ?>
+
                     </span>
                 </div>
 
-                {{-- Categoría + ubicación --}}
+                
                 <div class="flex flex-wrap gap-2 text-xs text-navy/50 font-medium">
-                    @if($oferta->categoria)
+                    <?php if($oferta->categoria): ?>
                         <span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md">
-                            {{ $oferta->categoria->nombre }}
+                            <?php echo e($oferta->categoria->nombre); ?>
+
                         </span>
-                    @endif
-                    @if($oferta->ubicacion)
+                    <?php endif; ?>
+                    <?php if($oferta->ubicacion): ?>
                         <span class="flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             </svg>
-                            {{ $oferta->ubicacion }}
+                            <?php echo e($oferta->ubicacion); ?>
+
                         </span>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
-                {{-- Fecha + salario --}}
+                
                 <div class="flex items-center gap-4 text-xs text-navy/40 font-medium">
-                    <span>Publicada el {{ \Carbon\Carbon::parse($oferta->fecha_creacion)->format('d/m/Y') }}</span>
-                    <span class="text-green-600 font-semibold">{{ $oferta->salario_formateado }}</span>
+                    <span>Publicada el <?php echo e(\Carbon\Carbon::parse($oferta->fecha_creacion)->format('d/m/Y')); ?></span>
+                    <span class="text-green-600 font-semibold"><?php echo e($oferta->salario_formateado); ?></span>
                 </div>
 
-                {{-- Separador --}}
+                
                 <hr class="border-navy/6">
 
-                {{-- Candidaturas + botón --}}
+                
                 <div class="flex items-center justify-between">
-                    <span class="badge-cands {{ $oferta->candidaturas_count > 0 ? 'badge-cands-ok' : 'badge-cands-none' }}">
+                    <span class="badge-cands <?php echo e($oferta->candidaturas_count > 0 ? 'badge-cands-ok' : 'badge-cands-none'); ?>">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        {{ $oferta->candidaturas_count }}
-                        {{ $oferta->candidaturas_count === 1 ? 'candidato' : 'candidatos' }}
+                        <?php echo e($oferta->candidaturas_count); ?>
+
+                        <?php echo e($oferta->candidaturas_count === 1 ? 'candidato' : 'candidatos'); ?>
+
                     </span>
 
-                    <a href="{{ route('empresa.candidaturas.detalle', $oferta->id) }}"
+                    <a href="<?php echo e(route('empresa.candidaturas.detalle', $oferta->id)); ?>"
                        class="inline-flex items-center gap-1.5 text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors">
                         Ver CVs
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,16 +175,18 @@
                 </div>
 
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-        {{-- Paginación --}}
-        @if($ofertas->hasPages())
+        
+        <?php if($ofertas->hasPages()): ?>
             <div class="mt-10 flex justify-center">
-                {{ $ofertas->links() }}
+                <?php echo e($ofertas->links()); ?>
+
             </div>
-        @endif
-    @endif
+        <?php endif; ?>
+    <?php endif; ?>
 </main>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/candidaturas/ofertas.blade.php ENDPATH**/ ?>

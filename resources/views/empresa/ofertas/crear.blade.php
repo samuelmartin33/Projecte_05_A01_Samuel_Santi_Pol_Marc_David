@@ -4,16 +4,15 @@
 
 @push('estilos')
 <style>
+    body { background: #07060c; }
+
     .form-crear-evento {
-        background: white;
-        border: 1px solid #ede9fe;
-        border-radius: 1.25rem;
-        padding: 2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(124,58,237,0.06);
+        background: #0d0a18;
+        border: 1px solid rgba(245,241,234,0.10);
+        border-radius: 0;
+        padding: 2.25rem;
     }
-    .form-grupo {
-        margin-bottom: 1.25rem;
-    }
+    .form-grupo { margin-bottom: 1.25rem; }
     .form-grupo-doble {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -24,131 +23,135 @@
         .form-grupo-doble { grid-template-columns: 1fr; }
     }
     .form-label {
-        display: block;
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: var(--navy);
-        margin-bottom: 0.35rem;
-        letter-spacing: 0.02em;
+        display: flex;
+        justify-content: space-between;
+        font-family: 'Archivo Narrow', sans-serif;
+        font-size: 0.625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: rgba(245,241,234,0.55);
+        margin-bottom: 8px;
     }
-    .form-label .form-required {
-        color: #dc2626;
-        margin-left: 2px;
-    }
+    .form-label .form-required { color: #f87171; margin-left: 4px; }
     .form-input,
     .form-select,
     .form-textarea {
         width: 100%;
-        padding: 0.7rem 0.9rem;
-        border: 1.5px solid #ddd6fe;
-        border-radius: 0.75rem;
-        font-size: 0.9rem;
-        font-family: 'Inter', sans-serif;
-        color: var(--navy);
-        background: #faf8ff;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        padding: 6px 0;
+        border: none;
+        border-bottom: 1.5px solid rgba(245,241,234,0.18);
+        border-radius: 0;
+        font-size: 1.0625rem;
+        font-family: 'Archivo', sans-serif;
+        color: #f5f1ea;
+        background: transparent;
+        transition: border-color 0.2s;
         outline: none;
         box-sizing: border-box;
     }
     .form-input:focus,
     .form-select:focus,
-    .form-textarea:focus {
-        border-color: var(--morado);
-        box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
-    }
+    .form-textarea:focus { border-bottom-color: #a855f7; }
     .form-input::placeholder,
-    .form-textarea::placeholder {
-        color: rgba(15,23,42,0.3);
-    }
-    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-textarea::placeholder { color: rgba(245,241,234,0.25); }
+    .form-textarea { resize: vertical; min-height: 80px; }
     .form-select {
         appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
-        background-position: right 12px center;
-        padding-right: 36px;
+        background-position: right 4px center;
+        padding-right: 24px;
+        cursor: pointer;
     }
+    .form-select option { background: #0d0a18; color: #f5f1ea; }
     .form-hint {
-        font-size: 0.75rem;
-        color: rgba(15,23,42,0.4);
-        margin-top: 0.3rem;
+        font-family: 'Archivo Narrow', sans-serif;
+        font-size: 0.5625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: rgba(245,241,234,0.18);
+        margin-top: 6px;
     }
     .form-divider {
         border: none;
-        border-top: 1px solid #f0eeff;
-        margin: 1.5rem 0;
+        border-top: 1px dashed rgba(245,241,234,0.10);
+        margin: 1.75rem 0;
     }
     .form-section-title {
-        font-size: 0.95rem;
-        font-weight: 800;
-        color: var(--morado);
+        font-family: 'Archivo Narrow', sans-serif;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: #c084fc;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 8px;
     }
-    .form-section-title svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .form-section-title svg { width: 14px; height: 14px; flex-shrink: 0; }
     .form-actions {
         display: flex;
         align-items: center;
         gap: 1rem;
-        margin-top: 1.5rem;
+        margin-top: 2rem;
         padding-top: 1.5rem;
-        border-top: 1px solid #f0eeff;
+        border-top: 1px solid rgba(245,241,234,0.10);
     }
     .btn-guardar {
-        display: inline-flex; align-items: center; gap: 0.5rem;
-        padding: 0.85rem 2rem;
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
-        color: #fff; font-weight: 800; font-size: 0.95rem;
-        border: none; border-radius: 0.85rem; cursor: pointer;
-        transition: transform 0.15s, box-shadow 0.2s;
-        box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+        font-family: 'Anton', sans-serif;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: -0.005em;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 22px;
+        background: #a855f7;
+        color: #f5f1ea;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
     }
-    .btn-guardar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 28px rgba(124,58,237,0.45);
-    }
+    .btn-guardar:hover { background: #c084fc; color: #07060c; }
     .btn-cancelar {
-        padding: 0.85rem 1.5rem;
+        font-family: 'Archivo Narrow', sans-serif;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        padding: 12px 18px;
         background: transparent;
-        border: 1.5px solid #ddd6fe;
-        color: var(--navy);
-        font-weight: 600; font-size: 0.9rem;
-        border-radius: 0.85rem; cursor: pointer;
+        border: 1px solid rgba(245,241,234,0.10);
+        color: rgba(245,241,234,0.55);
+        cursor: pointer;
         text-decoration: none;
-        transition: background 0.15s, border-color 0.15s;
+        transition: border-color 0.15s, color 0.15s;
     }
-    .btn-cancelar:hover { background: #f7f5ff; border-color: var(--morado); }
+    .btn-cancelar:hover { border-color: rgba(245,241,234,0.3); color: #f5f1ea; }
     .alert-errores {
-        background: #fef2f2;
-        border: 1.5px solid #fecaca;
-        border-radius: 0.75rem;
+        background: rgba(239,68,68,0.10);
+        border: 1px solid rgba(239,68,68,0.4);
         padding: 1rem 1.25rem;
         margin-bottom: 1.5rem;
-        color: #991b1b;
+        color: #f87171;
         font-size: 0.85rem;
     }
-    .alert-errores strong { display: block; margin-bottom: 0.4rem; }
+    .alert-errores strong { display: block; margin-bottom: 0.4rem; font-family: 'Archivo Narrow', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
     .alert-errores ul { margin: 0; padding-left: 1.25rem; }
     .alert-errores li { margin-bottom: 0.2rem; }
-    .salario-prefix {
-        display: flex;
-        align-items: center;
+    .salario-prefix { display: flex; align-items: flex-end; gap: 0; }
+    .salario-prefix > span {
+        font-family: 'Archivo Narrow', sans-serif;
+        font-size: 0.625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: rgba(245,241,234,0.55);
+        padding: 0 8px 8px 0;
+        flex-shrink: 0;
     }
-    .salario-prefix span {
-        background: #ede9fe;
-        border: 1.5px solid #ddd6fe;
-        border-right: none;
-        border-radius: 0.75rem 0 0 0.75rem;
-        padding: 0.7rem 0.75rem;
-        font-weight: 700;
-        color: var(--morado);
-        font-size: 0.9rem;
-    }
-    .salario-prefix .form-input {
-        border-radius: 0 0.75rem 0.75rem 0;
-    }
+    .salario-prefix .form-input { flex: 1; }
 </style>
 @endpush
 
