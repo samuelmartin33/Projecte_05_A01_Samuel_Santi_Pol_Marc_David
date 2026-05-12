@@ -42,10 +42,11 @@
           $esEmpresa = Auth::user()->isEmpresa();
           if ($esEmpresa) {
             $navLinks = [
-              ['Panel',        route('empresa.home'),                 'empresa.home'],
-              ['Candidaturas', route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
-              ['Crear evento', route('empresa.eventos.create'),       'empresa.eventos.create'],
-              ['Crear oferta', route('empresa.ofertas.create'),       'empresa.ofertas.create'],
+              ['Panel',          route('empresa.home'),                 'empresa.home'],
+              ['Candidaturas',   route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
+              ['Administración', route('empresa.facturacion.index'),          'empresa.facturacion.*'],
+              ['Crear evento',   route('empresa.eventos.create'),       'empresa.eventos.create'],
+              ['Crear oferta',   route('empresa.ofertas.create'),       'empresa.ofertas.create'],
             ];
           } else {
             $navLinks = array_filter([
@@ -107,10 +108,11 @@
         <div id="navDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.95);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:14px;padding:8px;min-width:220px;box-shadow:0 20px 50px rgba(0,0,0,0.5);z-index:100;">
           <?php if($esEmpresa): ?>
             <?php $__currentLoopData = [
-              ['Mi empresa',    route('empresa.home')],
-              ['Candidaturas',  route('empresa.candidaturas.ofertas')],
-              ['Crear evento',  route('empresa.eventos.create')],
-              ['Crear oferta',  route('empresa.ofertas.create')],
+              ['Mi empresa',      route('empresa.home')],
+              ['Candidaturas',    route('empresa.candidaturas.ofertas')],
+              ['Administración',  route('empresa.facturacion.index')],
+              ['Crear evento',    route('empresa.eventos.create')],
+              ['Crear oferta',    route('empresa.ofertas.create')],
             ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$item, $url]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
               <a href="<?php echo e($url); ?>" onclick="document.getElementById('navDropdown').style.display='none'"
                  style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
@@ -157,4 +159,4 @@
 
   </div>
 </header>
-<?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>

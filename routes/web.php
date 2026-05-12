@@ -32,9 +32,11 @@ use App\Http\Controllers\Admin\CategoriaEventoController as AdminCategoriaContro
 use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
 use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
+use App\Http\Controllers\Admin\FacturacionEventoController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
 use App\Http\Controllers\Empresa\ValidacionQRController;
+use App\Http\Controllers\Empresa\FacturacionController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\PerfilController;
@@ -197,6 +199,13 @@ Route::middleware('auth')->prefix('empresa/validacion')->name('empresa.validacio
     Route::post('/validar',[ValidacionQRController::class, 'validar'])->name('validar');
 });
 
+/* — Facturación de empresa — */
+Route::middleware('auth')->prefix('empresa/facturacion')->name('empresa.facturacion.')->group(function () {
+    Route::get('/',                                [FacturacionController::class, 'index'])       ->name('index');
+    Route::get('/{factura}/descargar',             [FacturacionController::class, 'descargar'])   ->name('descargar');
+    Route::get('/evento/{evento}/generar-pdf',     [FacturacionController::class, 'generarPdf'])  ->name('generar-pdf');
+});
+
 /* — Perfil de usuario — */
 Route::middleware('auth')->group(function () {
 
@@ -301,6 +310,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.pagos.update');
     Route::delete('/admin/pagos/{pago}', [AdminPagoController::class, 'destroy'])
          ->name('admin.pagos.destroy');
+
+    /* Facturación por evento */
+    Route::prefix('admin/facturacion')->name('admin.facturacion.')->group(function () {
+        Route::get('/',                          [FacturacionEventoController::class, 'index'])    ->name('index');
+        Route::get('/{evento}/empezar',          [FacturacionEventoController::class, 'empezar'])  ->name('empezar');
+        Route::post('/{evento}/confirmar',       [FacturacionEventoController::class, 'confirmar'])->name('confirmar');
+        Route::get('/factura/{factura}/descargar',[FacturacionEventoController::class, 'descargar'])->name('descargar');
+        Route::patch('/factura/{factura}/anular', [FacturacionEventoController::class, 'anular'])   ->name('anular');
+    });
 });
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —
