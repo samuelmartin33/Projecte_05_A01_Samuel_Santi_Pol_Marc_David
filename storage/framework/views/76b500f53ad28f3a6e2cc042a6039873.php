@@ -1,68 +1,62 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Social — VIBEZ'); ?>
 
-@section('title', 'Social — VIBEZ')
 
-{{-- Usamos @section('content') como la home para activar el modo oscuro completo --}}
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-{{-- ── Estilos base (dark theme) ── --}}
-<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
-<link rel="stylesheet" href="{{ asset('css/social.css') }}">
 
-{{-- El nav home mide aprox. 94px; ajustamos la altura del wrapper social --}}
+<link rel="stylesheet" href="<?php echo e(asset('css/vibez-home.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('css/social.css')); ?>">
+
+
 <style>
   .soc                                { height: calc(100vh - 94px); }
   @media (min-width: 900px)           { .soc { height: calc(100vh - 94px); } }
 </style>
 
-{{-- ════ NAV ════ --}}
-@include('partials.home.nav')
 
-{{-- ════════════════════════════════════════════════════
-     WRAPPER PRINCIPAL
-════════════════════════════════════════════════════ --}}
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+
 <div class="soc" id="soc">
 
-    {{-- ══════════════════════════════════════
-         PANEL: Publicaciones (por defecto)
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-panel activo" id="panel-feed">
 
-        {{-- btn-nueva-pub oculto: JS lo muestra/oculta según eventos disponibles --}}
+        
         <button id="btn-nueva-pub" style="display:none" onclick="abrirModalPublicacion()"></button>
 
         <div class="soc-scroll" id="feed-scroll">
 
-            {{-- ── HERO ── --}}
+            
             <div class="soc-hero-mini">
                 <p class="soc-hero-kicker">VIBEZ Tribe · tu comunidad</p>
                 <h1 class="soc-hero-titulo">Tu <em>tribu</em><br>en vivo.</h1>
                 <p class="soc-hero-sub">Quién va a dónde, qué se está liando, cuál es el plan. La nightlife se vive mejor en grupo.</p>
             </div>
 
-            {{-- ── STORIES ── --}}
+            
             <div class="soc-stories-row no-scrollbar">
-                @php $u = Auth::user(); @endphp
+                <?php $u = Auth::user(); ?>
                 <div class="soc-story" onclick="abrirModalPublicacion()" title="Publicar">
                     <div class="soc-story-ring soc-story-ring--you">
                         <div class="soc-story-av-you">+</div>
                     </div>
                     <div class="soc-story-name">Tu story</div>
                 </div>
-                @foreach([['AM','@amigo1'],['XR','@xavi.r'],['LG','@laura.g'],['PB','@pablo_b'],['NF','@nuria_f'],['DR','@dani_r']] as [$ini,$handle])
+                <?php $__currentLoopData = [['AM','@amigo1'],['XR','@xavi.r'],['LG','@laura.g'],['PB','@pablo_b'],['NF','@nuria_f'],['DR','@dani_r']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$ini,$handle]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="soc-story">
                     <div class="soc-story-ring">
-                        <div class="soc-story-av">{{ $ini }}</div>
+                        <div class="soc-story-av"><?php echo e($ini); ?></div>
                     </div>
-                    <div class="soc-story-name">{{ $handle }}</div>
+                    <div class="soc-story-name"><?php echo e($handle); ?></div>
                 </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
-            {{-- ── FEED + SIDEBAR ── --}}
+            
             <div class="soc-feed-layout">
 
-                {{-- COLUMNA FEED --}}
+                
                 <div class="soc-feed-col">
                     <div id="feed-lista"></div>
 
@@ -78,10 +72,10 @@
                        onclick="cargarMasPosts()">Cargar más publicaciones</p>
                 </div>
 
-                {{-- SIDEBAR DERECHO (solo desktop) --}}
+                
                 <aside class="soc-sidebar-right">
 
-                    {{-- Crews activos --}}
+                    
                     <div class="soc-side-card">
                         <h3 class="soc-side-title">Crews <em>activos</em></h3>
                         <div style="display:flex;flex-direction:column;gap:12px">
@@ -122,7 +116,7 @@
                         <button class="soc-side-btn-ghost" style="margin-top:18px">+ Crear crew</button>
                     </div>
 
-                    {{-- Trending esta noche --}}
+                    
                     <div class="soc-side-card">
                         <h3 class="soc-side-title">Trending <em>esta noche</em></h3>
                         <div>
@@ -164,7 +158,7 @@
                         </div>
                     </div>
 
-                    {{-- Sugeridos para seguir --}}
+                    
                     <div class="soc-side-card">
                         <h3 class="soc-side-title">Sugeridos para <em>seguir</em></h3>
                         <div style="display:flex;flex-direction:column;gap:2px">
@@ -201,9 +195,7 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════
-         PANEL: Mensajes
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-panel" id="panel-chats">
 
         <div class="chats-col-izq">
@@ -265,9 +257,7 @@
 
     </div>
 
-    {{-- ══════════════════════════════════════
-         PANEL: Amigos
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-panel" id="panel-amigos">
 
         <header class="soc-topbar">
@@ -299,9 +289,7 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════
-         BOTTOM NAVIGATION / SIDEBAR
-         ══════════════════════════════════════ --}}
+    
     <nav class="soc-bottom-nav">
 
         <div class="soc-sidebar-header">
@@ -344,9 +332,7 @@
 
     </nav>
 
-    {{-- ══════════════════════════════════════
-         MODAL: Nueva publicación
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-modal-overlay" id="pub-modal-overlay" style="display:none"
          onclick="cerrarModalPublicacion()">
         <div class="soc-modal" onclick="event.stopPropagation()">
@@ -371,7 +357,7 @@
                           placeholder="Cuenta cómo fue el evento…"
                           maxlength="1000" rows="3"></textarea>
 
-                {{-- ── Visibilidad ── --}}
+                
                 <label class="soc-field-label">¿Quién puede verlo?</label>
                 <select id="pub-select-visibilidad" class="soc-select">
                     <option value="1">🌍 Todos</option>
@@ -402,9 +388,7 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════
-         MODAL: Añadir amigo
-         ══════════════════════════════════════ --}}
+    
     <div class="soc-modal-overlay" id="modal-amigo-overlay" style="display:none"
          onclick="cerrarModalAnadirAmigo()">
         <div class="soc-modal" onclick="event.stopPropagation()">
@@ -438,12 +422,14 @@
         </div>
     </div>
 
-</div>{{-- /soc --}}
+</div>
 
-{{-- ── Scripts ── --}}
+
 <script>
-    window.miUsuarioId = {{ Auth::id() }};
+    window.miUsuarioId = <?php echo e(Auth::id()); ?>;
 </script>
-<script src="{{ asset('js/social.js') }}"></script>
+<script src="<?php echo e(asset('js/social.js')); ?>"></script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/social/index.blade.php ENDPATH**/ ?>

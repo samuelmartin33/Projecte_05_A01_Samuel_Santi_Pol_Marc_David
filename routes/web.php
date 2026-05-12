@@ -42,6 +42,8 @@ use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
 use App\Models\CategoriaEvento;
+use App\Models\Usuario;
+use App\Models\Empresa;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,7 +80,13 @@ Route::get('/', function () {
         ])
         ->values();
 
-    return view('welcome', compact('eventos', 'categorias', 'eventosMapa'));
+    /* Estadísticas reales para la sección proof */
+    $statRavers     = Usuario::where('es_admin', 0)->where('estado', 1)->count();
+    $statEventos    = Evento::where('estado', 1)->count();
+    $statPromotores = Empresa::where('estado', 1)->count();
+    $statSatisf     = 98;
+
+    return view('welcome', compact('eventos', 'categorias', 'eventosMapa', 'statRavers', 'statEventos', 'statPromotores', 'statSatisf'));
 })->name('welcome');
 
 // --- Detalle de un evento específico ---

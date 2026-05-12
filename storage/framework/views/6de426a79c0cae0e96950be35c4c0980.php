@@ -1,20 +1,16 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', $oferta->titulo); ?>
 
-@section('titulo', $oferta->titulo)
+<?php $__env->startPush('estilos'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/trabajos-detalle.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@push('estilos')
-<link rel="stylesheet" href="{{ asset('css/trabajos-detalle.css') }}">
-@endpush
+<?php $__env->startSection('content'); ?>
 
-@section('content')
+<link rel="stylesheet" href="<?php echo e(asset('css/vibez-home.css')); ?>">
 
-<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-@include('partials.home.nav')
 
-{{-- ════════════════════════════════════════════════════
-     HERO EDITORIAL
-════════════════════════════════════════════════════ --}}
 <div class="relative overflow-hidden bg-ink" style="min-height:360px;">
 
     <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(139,120,204,0.13) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
@@ -22,7 +18,7 @@
 
     <div class="max-w-7xl mx-auto px-6 sm:px-10 py-14 relative" style="z-index:1">
 
-        <a href="{{ route('trabajos.index') }}"
+        <a href="<?php echo e(route('trabajos.index')); ?>"
            class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-paper/50 hover:text-paper transition-colors duration-100 mb-8">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -36,76 +32,75 @@
 
         <h1 class="font-display font-black uppercase text-paper tracking-tightest leading-[0.88] max-w-4xl"
             style="font-size:clamp(2rem,5vw,5rem)">
-            {{ $oferta->titulo }}
+            <?php echo e($oferta->titulo); ?>
+
         </h1>
 
         <div class="flex flex-wrap items-center gap-6 mt-6">
-            @if($oferta->organizador?->empresa)
+            <?php if($oferta->organizador?->empresa): ?>
                 <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-paper/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                    <span class="font-mono text-xs uppercase tracking-widest text-paper/60 font-bold">{{ $oferta->organizador->empresa->nombre_empresa }}</span>
+                    <span class="font-mono text-xs uppercase tracking-widest text-paper/60 font-bold"><?php echo e($oferta->organizador->empresa->nombre_empresa); ?></span>
                 </div>
-            @endif
-            @if($oferta->ubicacion)
+            <?php endif; ?>
+            <?php if($oferta->ubicacion): ?>
                 <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-paper/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     </svg>
-                    <span class="font-mono text-xs uppercase tracking-widest text-paper/60">{{ $oferta->ubicacion }}</span>
+                    <span class="font-mono text-xs uppercase tracking-widest text-paper/60"><?php echo e($oferta->ubicacion); ?></span>
                 </div>
-            @endif
+            <?php endif; ?>
             <div class="flex items-center gap-2">
-                <span class="font-mono text-xs uppercase tracking-widest text-lilac font-bold">{{ $oferta->salario_formateado }}</span>
+                <span class="font-mono text-xs uppercase tracking-widest text-lilac font-bold"><?php echo e($oferta->salario_formateado); ?></span>
             </div>
         </div>
 
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     CUERPO DEL DETALLE
-════════════════════════════════════════════════════ --}}
+
 <div class="trabajos-detalle-wrap">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
         <div class="lg:col-span-2 space-y-8">
 
-            @if($oferta->descripcion)
+            <?php if($oferta->descripcion): ?>
                 <section class="seccion-detalle">
                     <h2 class="seccion-titulo">Descripción del puesto</h2>
-                    <p class="text-navy/80 leading-relaxed">{{ $oferta->descripcion }}</p>
+                    <p class="text-navy/80 leading-relaxed"><?php echo e($oferta->descripcion); ?></p>
                 </section>
-            @endif
+            <?php endif; ?>
 
-            @if($oferta->requisitos)
+            <?php if($oferta->requisitos): ?>
                 <section class="seccion-detalle">
                     <h2 class="seccion-titulo">Requisitos</h2>
-                    <p class="text-navy/80 leading-relaxed">{{ $oferta->requisitos }}</p>
+                    <p class="text-navy/80 leading-relaxed"><?php echo e($oferta->requisitos); ?></p>
                 </section>
-            @endif
+            <?php endif; ?>
 
             <section class="seccion-detalle">
                 <h2 class="seccion-titulo">Detalles</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     <div class="ficha-dato">
                         <span class="ficha-dato-label">Vacantes</span>
-                        <span class="ficha-dato-valor">{{ $oferta->vacantes }}</span>
+                        <span class="ficha-dato-valor"><?php echo e($oferta->vacantes); ?></span>
                     </div>
-                    @if($oferta->fecha_inicio_trabajo)
+                    <?php if($oferta->fecha_inicio_trabajo): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Inicio</span>
-                            <span class="ficha-dato-valor">{{ \Carbon\Carbon::parse($oferta->fecha_inicio_trabajo)->format('d/m/Y') }}</span>
+                            <span class="ficha-dato-valor"><?php echo e(\Carbon\Carbon::parse($oferta->fecha_inicio_trabajo)->format('d/m/Y')); ?></span>
                         </div>
-                    @endif
-                    @if($oferta->fecha_fin_trabajo)
+                    <?php endif; ?>
+                    <?php if($oferta->fecha_fin_trabajo): ?>
                         <div class="ficha-dato">
                             <span class="ficha-dato-label">Fin contrato</span>
-                            <span class="ficha-dato-valor">{{ \Carbon\Carbon::parse($oferta->fecha_fin_trabajo)->format('d/m/Y') }}</span>
+                            <span class="ficha-dato-valor"><?php echo e(\Carbon\Carbon::parse($oferta->fecha_fin_trabajo)->format('d/m/Y')); ?></span>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </section>
 
@@ -117,15 +112,15 @@
 
                     <div class="text-center mb-6">
                         <p class="text-navy/50 text-sm uppercase tracking-widest font-semibold mb-1">Salario</p>
-                        <p class="text-2xl font-black text-green-600">{{ $oferta->salario_formateado }}</p>
+                        <p class="text-2xl font-black text-green-600"><?php echo e($oferta->salario_formateado); ?></p>
                     </div>
 
                     <div class="bg-purple-50 rounded-xl p-4 text-center mb-6">
-                        <p class="text-3xl font-black text-navy">{{ $oferta->vacantes }}</p>
-                        <p class="text-navy/50 text-sm">vacante{{ $oferta->vacantes !== 1 ? 's' : '' }} disponible{{ $oferta->vacantes !== 1 ? 's' : '' }}</p>
+                        <p class="text-3xl font-black text-navy"><?php echo e($oferta->vacantes); ?></p>
+                        <p class="text-navy/50 text-sm">vacante<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?> disponible<?php echo e($oferta->vacantes !== 1 ? 's' : ''); ?></p>
                     </div>
 
-                    <button class="btn-comprar w-full" onclick="abrirPostulacion({{ $oferta->id }})">
+                    <button class="btn-comprar w-full" onclick="abrirPostulacion(<?php echo e($oferta->id); ?>)">
                         Postularme ahora
                     </button>
 
@@ -141,12 +136,10 @@
 </div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════════
-     MODALES DE POSTULACIÓN — estructura funcional intacta
-═══════════════════════════════════════════════════════════════ --}}
+
 <div id="modal-overlay" class="modal-overlay" onclick="cerrarAlClickarFuera(event)">
 
-    {{-- ── MODAL 1: Elegir método ── --}}
+    
     <div id="modal-eleccion" class="modal-box max-w-lg" style="display:none">
         <div class="p-7">
             <div class="flex items-start justify-between mb-5">
@@ -183,7 +176,7 @@
         </div>
     </div>
 
-    {{-- ── MODAL 2: Formulario CV ── --}}
+    
     <div id="modal-formulario" class="modal-box max-w-2xl flex flex-col" style="display:none;max-height:92vh">
         <div class="flex items-center justify-between px-6 py-4 border-b border-navy/10 flex-shrink-0">
             <div class="flex items-center gap-3">
@@ -205,7 +198,7 @@
         </div>
         <div class="modal-scrollable">
             <form id="form-cv" class="px-6 py-5 space-y-7" novalidate>
-                @csrf
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="oferta_id" id="oferta-id-form" value="">
 
                 <section>
@@ -288,7 +281,7 @@
         </div>
     </div>
 
-    {{-- ── MODAL 3: Subir archivo ── --}}
+    
     <div id="modal-archivo" class="modal-box max-w-md" style="display:none">
         <div class="flex items-center justify-between px-6 py-4 border-b border-navy/10">
             <div class="flex items-center gap-3">
@@ -305,7 +298,7 @@
             </button>
         </div>
         <form id="form-archivo" class="px-6 py-5 space-y-5">
-            @csrf
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="oferta_id" id="oferta-id-archivo" value="">
             <div id="dropzone" class="dropzone-area" onclick="document.getElementById('cv-file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
                 <div class="w-14 h-14 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
@@ -328,7 +321,7 @@
         </div>
     </div>
 
-    {{-- ── MODAL: Éxito ── --}}
+    
     <div id="modal-exito" class="modal-box max-w-md text-center" style="display:none">
         <div class="p-8">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
@@ -344,8 +337,10 @@
 
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
-<script src="{{ asset('js/trabajos-detalle.js') }}"></script>
-@endpush
+<?php $__env->startPush('scripts'); ?>
+<script src="<?php echo e(asset('js/trabajos-detalle.js')); ?>"></script>
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/trabajos/detalle.blade.php ENDPATH**/ ?>
