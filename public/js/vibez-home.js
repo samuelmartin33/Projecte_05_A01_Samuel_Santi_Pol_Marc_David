@@ -1,4 +1,4 @@
-/**
+    /**
  * vibez-home.js — VIBEZ Home interactiva
  * Funciones globales sin addEventListener (regla del proyecto).
  * Todo se llama desde onclick/onscroll inline en el HTML.
