@@ -376,7 +376,9 @@ body { background: #07060c; }
 </style>
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 <div class="validacion-wrapper">
 

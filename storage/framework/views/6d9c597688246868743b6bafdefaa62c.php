@@ -374,7 +374,9 @@ body { background: #07060c; }
 </style>
 <?php $__env->stopPush(); ?>
 
-<?php $__env->startSection('contenido'); ?>
+<?php $__env->startSection('content'); ?>
+
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="validacion-wrapper">
 
