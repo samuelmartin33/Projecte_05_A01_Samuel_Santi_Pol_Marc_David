@@ -38,13 +38,23 @@
     <nav style="display:flex;gap:28px;">
       <?php if(auth()->guard()->check()): ?>
         <?php
-          $esAdmin = Auth::user()->es_admin;
-          $navLinks = array_filter([
-            ['Para ti',     route('home'),                  'home'],
-            !$esAdmin ? ['Mis tickets', route('entradas.mis-entradas'), 'entradas.mis-entradas'] : null,
-            ['Bolsa',       route('trabajos.index'),        'trabajos.index'],
-            ['Social',      route('social'),                'social'],
-          ]);
+          $esAdmin   = Auth::user()->es_admin;
+          $esEmpresa = Auth::user()->isEmpresa();
+          if ($esEmpresa) {
+            $navLinks = [
+              ['Panel',        route('empresa.home'),                 'empresa.home'],
+              ['Candidaturas', route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
+              ['Crear evento', route('empresa.eventos.create'),       'empresa.eventos.create'],
+              ['Crear oferta', route('empresa.ofertas.create'),       'empresa.ofertas.create'],
+            ];
+          } else {
+            $navLinks = array_filter([
+              ['Para ti',     route('home'),                        'home'],
+              !$esAdmin ? ['Mis tickets', route('entradas.mis-entradas'), 'entradas.mis-entradas'] : null,
+              ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
+              ['Social',      route('social'),                      'social'],
+            ]);
+          }
         ?>
       <?php else: ?>
         <?php
@@ -95,21 +105,36 @@
 
         
         <div id="navDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.95);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:14px;padding:8px;min-width:220px;box-shadow:0 20px 50px rgba(0,0,0,0.5);z-index:100;">
-          <?php $__currentLoopData = [
-            ['Mi perfil', route('perfil')],
-            ['Mis tickets', route('entradas.mis-entradas')],
-            ['Favoritos', route('perfil')],
-          ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$item, $url]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <a href="<?php echo e($url); ?>" onclick="document.getElementById('navDropdown').style.display='none'"
-               style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
-              <?php echo e($item); ?>
+          <?php if($esEmpresa): ?>
+            <?php $__currentLoopData = [
+              ['Mi empresa',    route('empresa.home')],
+              ['Candidaturas',  route('empresa.candidaturas.ofertas')],
+              ['Crear evento',  route('empresa.eventos.create')],
+              ['Crear oferta',  route('empresa.ofertas.create')],
+            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$item, $url]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <a href="<?php echo e($url); ?>" onclick="document.getElementById('navDropdown').style.display='none'"
+                 style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+                <?php echo e($item); ?>
 
-            </a>
-          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-          <?php if($u->es_admin): ?>
-            <a href="<?php echo e(route('admin.dashboard')); ?>" style="display:block;padding:10px 14px;color:var(--magenta-2);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">
-              Panel Admin
-            </a>
+              </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+          <?php else: ?>
+            <?php $__currentLoopData = [
+              ['Mi perfil',   route('perfil')],
+              ['Mis tickets', route('entradas.mis-entradas')],
+              ['Favoritos',   route('perfil')],
+            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$item, $url]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <a href="<?php echo e($url); ?>" onclick="document.getElementById('navDropdown').style.display='none'"
+                 style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+                <?php echo e($item); ?>
+
+              </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php if($u->es_admin): ?>
+              <a href="<?php echo e(route('admin.dashboard')); ?>" style="display:block;padding:10px 14px;color:var(--magenta-2);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">
+                Panel Admin
+              </a>
+            <?php endif; ?>
           <?php endif; ?>
           <button onclick="cerrarSesion()" style="display:block;width:100%;padding:10px 14px;color:var(--magenta);background:none;border:none;text-align:left;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;">
             — Cerrar sesión

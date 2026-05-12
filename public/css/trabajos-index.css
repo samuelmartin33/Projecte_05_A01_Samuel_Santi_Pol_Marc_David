@@ -14,16 +14,6 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   NAVBAR HOME — siempre sólido en esta página
-══════════════════════════════════════════ */
-#vibez-home-nav {
-    background: rgba(7,6,12,0.95) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(245,241,234,0.10) !important;
-}
-
-/* ══════════════════════════════════════════
    BARRA DE FILTROS — dark override
 ══════════════════════════════════════════ */
 .barra-filtros {
@@ -158,8 +148,8 @@ body {
 
 .trabajos-hero-titulo {
     font-family: 'Anton', sans-serif;
-    font-size: clamp(2.4rem, 6vw, 5rem);
-    line-height: 0.9;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.88;
     letter-spacing: -0.01em;
     color: #f5f1ea;
     text-transform: uppercase;
