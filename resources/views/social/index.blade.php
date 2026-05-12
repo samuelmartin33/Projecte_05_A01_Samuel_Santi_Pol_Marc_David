@@ -1,9 +1,26 @@
 @extends('layouts.app')
 
-@section('title', 'Social')
+@section('title', 'Social — VIBEZ')
 
-@section('contenido')
+{{-- Usamos @section('content') como la home para activar el modo oscuro completo --}}
+@section('content')
 
+{{-- ── Estilos base (dark theme) ── --}}
+<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+<link rel="stylesheet" href="{{ asset('css/social.css') }}">
+
+{{-- El nav home mide aprox. 94px; ajustamos la altura del wrapper social --}}
+<style>
+  .soc                                { height: calc(100vh - 94px); }
+  @media (min-width: 900px)           { .soc { height: calc(100vh - 94px); } }
+</style>
+
+{{-- ════ NAV ════ --}}
+@include('partials.home.nav')
+
+{{-- ════════════════════════════════════════════════════
+     WRAPPER PRINCIPAL
+════════════════════════════════════════════════════ --}}
 <div class="soc" id="soc">
 
     {{-- ══════════════════════════════════════
@@ -44,14 +61,12 @@
          ══════════════════════════════════════ --}}
     <div class="soc-panel" id="panel-chats">
 
-        {{-- En desktop: columna izquierda (header + lista). En móvil: display:contents (transparente) --}}
         <div class="chats-col-izq">
 
             <header class="soc-topbar">
                 <h1 class="soc-topbar-titulo">Mensajes</h1>
             </header>
 
-            {{-- Sub-vista: lista de conversaciones --}}
             <div class="soc-subpanel activo" id="chats-lista-view">
                 <div id="lista-chats" class="soc-list">
                     <div id="skeleton-chats">
@@ -62,12 +77,10 @@
                 </div>
             </div>
 
-        </div>{{-- /chats-col-izq --}}
+        </div>
 
-        {{-- Sub-vista: chat abierto --}}
         <div class="soc-subpanel" id="chats-ventana-view">
 
-            {{-- Estado vacío: visible en desktop cuando no hay chat seleccionado --}}
             <div class="soc-chat-empty" id="chat-vacio-desktop">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -124,14 +137,12 @@
 
         <div class="soc-scroll">
 
-            {{-- Solicitudes pendientes --}}
             <div id="seccion-solicitudes" style="display:none">
                 <p class="soc-section-label">Solicitudes recibidas</p>
                 <div id="lista-solicitudes"></div>
                 <div class="soc-divider"></div>
             </div>
 
-            {{-- Lista de amigos --}}
             <p class="soc-section-label">Mis amigos</p>
             <div id="lista-amigos" class="soc-list">
                 <div id="skeleton-amigos">
@@ -144,11 +155,10 @@
     </div>
 
     {{-- ══════════════════════════════════════
-         BOTTOM NAVIGATION
+         BOTTOM NAVIGATION / SIDEBAR
          ══════════════════════════════════════ --}}
     <nav class="soc-bottom-nav">
 
-        {{-- Cabecera del sidebar (solo visible en desktop) --}}
         <div class="soc-sidebar-header">
             <span class="soc-sidebar-titulo">VIBEZ <span>Social</span></span>
         </div>
@@ -216,6 +226,13 @@
                           placeholder="Cuenta cómo fue el evento…"
                           maxlength="1000" rows="3"></textarea>
 
+                {{-- ── Visibilidad ── --}}
+                <label class="soc-field-label">¿Quién puede verlo?</label>
+                <select id="pub-select-visibilidad" class="soc-select">
+                    <option value="1">🌍 Todos</option>
+                    <option value="2">🔒 Solo mis amigos</option>
+                </select>
+
                 <label class="soc-field-label">Fotos * (mínimo 1, máximo 10)</label>
                 <div class="soc-upload-area"
                      onclick="document.getElementById('pub-input-fotos').click()">
@@ -278,15 +295,10 @@
 
 </div>{{-- /soc --}}
 
-@endsection
-
-@section('extra-css')
-<link rel="stylesheet" href="{{ asset('css/social.css') }}">
-@endsection
-
-@section('scripts')
+{{-- ── Scripts ── --}}
 <script>
     window.miUsuarioId = {{ Auth::id() }};
 </script>
 <script src="{{ asset('js/social.js') }}"></script>
+
 @endsection

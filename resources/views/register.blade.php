@@ -28,7 +28,11 @@
                 <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ">
                 <span class="display">VIBEZ</span>
             </a>
-            <a href="{{ route('welcome') }}" class="mono auth-back">← Volver</a>
+            @if(request('origen') === 'home')
+                <a href="{{ route('home') }}" class="mono auth-back">← Volver al home</a>
+            @else
+                <a href="{{ route('welcome') }}" class="mono auth-back">← Volver</a>
+            @endif
         </div>
 
         {{-- Contenido editorial (empujado al fondo del panel) --}}
@@ -71,10 +75,23 @@
 
             <p class="mono auth-step">02 · Registro</p>
 
+            {{-- Aviso especial cuando viene del CTA "Soy promotor" del home --}}
+            @if(request('origen') === 'home')
+            <div style="background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.35);padding:12px 16px;margin-bottom:20px;font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.8);display:flex;align-items:flex-start;gap:10px;">
+                <span style="color:var(--magenta);font-size:16px;flex-shrink:0;">ℹ</span>
+                <span>Estás creando una cuenta nueva de empresa. <strong style="color:var(--ink);">Tu sesión actual no se cierra</strong> — puedes
+                <a href="{{ route('home') }}" style="color:var(--magenta);text-decoration:underline;">volver al home</a> cuando quieras.</span>
+            </div>
+            @endif
+
             {{-- Cabecera (id="formHeader" usado por register.js en estado pendiente) --}}
             <div id="formHeader">
                 <h2 class="display auth-title">
-                    Crea tu <em>pase</em>.
+                    @if(request('tipo') === 'empresa')
+                        Crea tu <em>cuenta de promotor</em>.
+                    @else
+                        Crea tu <em>pase</em>.
+                    @endif
                 </h2>
                 <p class="auth-sub">
                     ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
@@ -398,5 +415,14 @@
             barra.style.background = colores[f] || '';
             etiqueta.textContent   = f > 0 ? (niveles[f] || '') : '';
         }
+
+        /* ── Auto-seleccionar tab si viene con ?tipo=empresa ─── */
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('tipo') === 'empresa') {
+                var tabEmpresa = document.querySelector('[data-tipo="empresa"]');
+                if (tabEmpresa) seleccionarTab('empresa', tabEmpresa);
+            }
+        })();
     </script>
 @endsection

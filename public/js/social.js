@@ -162,10 +162,13 @@ function cargarMasPosts() {
 /* ── Renderizado de posts (estilo Instagram) ── */
 
 function renderizarPost(post) {
-    var avatarHtml  = construirAvatar(post.autor.foto_url, post.autor.nombre, post.autor.apellido1, 'sm');
-    var autorNombre = escaparHtml(post.autor.nombre + ' ' + post.autor.apellido1);
-    var eventoLabel = escaparHtml(post.evento.titulo);
-    var fechaLabel  = formatearFechaRelativa(post.fecha);
+    var avatarHtml    = construirAvatar(post.autor.foto_url, post.autor.nombre, post.autor.apellido1, 'sm');
+    var autorNombre   = escaparHtml(post.autor.nombre + ' ' + post.autor.apellido1);
+    var eventoLabel   = escaparHtml(post.evento.titulo);
+    var fechaLabel    = formatearFechaRelativa(post.fecha);
+    var visiBadge     = post.visibilidad === 2
+        ? '<span style="font-size:0.6rem;color:rgba(245,241,234,0.35);margin-left:4px;" title="Solo amigos">🔒</span>'
+        : '';
 
     // Imágenes (imagen única o carrusel)
     var imagenesHtml = renderizarImagenes(post);
@@ -213,7 +216,7 @@ function renderizarPost(post) {
          +     '<div class="post-head-left">'
          +       '<div class="post-avatar">' + avatarHtml + '</div>'
          +       '<div class="post-head-meta">'
-         +         '<span class="post-autor">' + autorNombre + '</span>'
+         +         '<span class="post-autor">' + autorNombre + visiBadge + '</span>'
          +         '<span class="post-evento-tag">' + eventoLabel + '</span>'
          +       '</div>'
          +     '</div>'
@@ -450,11 +453,12 @@ function cargarTodosComentarios(postId) {
 /* ── Modal: nueva publicación ── */
 
 function abrirModalPublicacion() {
-    document.getElementById('pub-modal-overlay').style.display = 'flex';
-    document.getElementById('pub-select-evento').value         = '';
-    document.getElementById('pub-textarea-desc').value         = '';
-    document.getElementById('pub-input-fotos').value           = '';
-    document.getElementById('pub-preview-grid').innerHTML      = '';
+    document.getElementById('pub-modal-overlay').style.display    = 'flex';
+    document.getElementById('pub-select-evento').value            = '';
+    document.getElementById('pub-textarea-desc').value            = '';
+    document.getElementById('pub-select-visibilidad').value       = '1';
+    document.getElementById('pub-input-fotos').value              = '';
+    document.getElementById('pub-preview-grid').innerHTML         = '';
     var btn = document.getElementById('pub-btn-publicar');
     btn.disabled    = false;
     btn.textContent = 'Publicar';
@@ -479,9 +483,10 @@ function previsualizarFotos(input) {
 }
 
 function publicarPost() {
-    var eventoId    = document.getElementById('pub-select-evento').value;
-    var descripcion = document.getElementById('pub-textarea-desc').value.trim();
-    var inputFotos  = document.getElementById('pub-input-fotos');
+    var eventoId     = document.getElementById('pub-select-evento').value;
+    var descripcion  = document.getElementById('pub-textarea-desc').value.trim();
+    var visibilidad  = document.getElementById('pub-select-visibilidad').value || '1';
+    var inputFotos   = document.getElementById('pub-input-fotos');
 
     if (!eventoId) { alert('Selecciona un evento.'); return; }
     if (!inputFotos.files || inputFotos.files.length === 0) {
@@ -495,6 +500,7 @@ function publicarPost() {
 
     var formData = new FormData();
     formData.append('evento_id', eventoId);
+    formData.append('visibilidad', visibilidad);
     if (descripcion) formData.append('descripcion', descripcion);
     Array.from(inputFotos.files).slice(0, 10).forEach(function (file, i) {
         formData.append('imagenes[' + i + ']', file);

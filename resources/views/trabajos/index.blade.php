@@ -3,10 +3,13 @@
 @section('titulo', 'Bolsa de Trabajo')
 
 @push('estilos')
+<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
 <link rel="stylesheet" href="{{ asset('css/trabajos-index.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 {{-- ════════════════════════════════════════════════════
      HERO — dark editorial + carrusel de ofertas
@@ -105,7 +108,7 @@
 {{-- ════════════════════════════════════════════════════
      BARRA DE FILTROS — clases funcionales intactas
 ════════════════════════════════════════════════════ --}}
-<section class="barra-filtros sticky top-14 z-40">
+<section class="barra-filtros sticky z-40">
 
     <div id="overlay-dropdowns"
          style="display:none;position:fixed;inset:0;z-index:200;"
@@ -271,6 +274,7 @@
 </section>
 
 @endsection
+
 
 @push('scripts')
 <script src="{{ asset('js/trabajos-index.js') }}"></script>

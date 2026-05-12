@@ -1,58 +1,110 @@
 /**
  * entradas-mis-entradas.js — VIBEZ
  *
- * Gestiona la interactividad de la página "Mis Entradas":
- *   1. Generación de QR: busca todos los elementos con `data-codigo` y crea
- *      el código QR dentro de cada uno usando la librería qrcodejs.
- *   2. Toggle del panel QR: muestra u oculta el QR individual de cada entrada
- *      al pulsar el botón "Ver QR" / "Ocultar QR".
- *
- * Dependencias:
- *   - Librería externa QRCode.js (qrcodejs): debe cargarse en el HTML ANTES que
- *     este script. Si se invierte el orden, `QRCode` no estará definida y la
- *     generación de QR fallará con ReferenceError.
- *   - El HTML debe tener elementos con `data-codigo` para la generación automática
- *     de QR, y pares (panel, botón) accesibles por ID para el toggle.
- *
- * Funciones públicas (llamadas desde onclick en el HTML):
- *   toggleQr(qrId, btnId) — muestra u oculta el panel QR de una entrada concreta
+ * Funciones:
+ *  1. Generación de QR con qrcodejs para cada entrada (data-codigo).
+ *  2. Cuenta atrás en tiempo real para el próximo evento con entrada activa.
+ *  3. Toggle de QR al hacer clic en la tarjeta del pedido.
+ *  4. Filtro de tarjetas por estado (Todas / Activas / Usadas).
  */
 
-// Al igual que en entradas-confirmacion.js, usamos el patrón de selección por
-// data-attribute para localizar todos los contenedores QR sin depender de clases
-// o IDs específicos. El servidor puede generar N entradas y este código las
-// procesa todas de forma genérica con un solo forEach.
-document.querySelectorAll('[data-codigo]').forEach(function(el) {
 
-    // La librería qrcodejs recibe el elemento contenedor y las opciones,
-    // genera el QR internamente y lo inserta como hijo del elemento.
+/* ════ 1. GENERACIÓN DE CÓDIGOS QR ════
+   Busca todos los elementos con [data-codigo] y genera el QR dentro.
+   Depende de qrcodejs, que debe cargarse en el HTML ANTES que este script. */
+document.querySelectorAll('[data-codigo]').forEach(function(el) {
     new QRCode(el, {
-        // El código único de la entrada viaja desde PHP hasta aquí a través del
-        // atributo data-codigo del HTML, evitando así mezclar PHP y JavaScript.
         text:       el.dataset.codigo,
-        width:      200,
-        height:     200,
+        width:      180,
+        height:     180,
         colorDark:  '#000000',
         colorLight: '#ffffff',
     });
 });
 
-/**
- * Muestra u oculta el panel que contiene el QR de una entrada,
- * y actualiza el texto del botón según el estado resultante.
- * Se llama directamente desde el atributo onclick del botón en el HTML.
- *
- * @param {string} qrId  - ID del elemento <div> que contiene el QR (ej: "qr-panel-5")
- * @param {string} btnId - ID del botón que disparó la acción (ej: "qr-btn-5")
- */
-function toggleQr(qrId, btnId) {
-    var panel   = document.getElementById(qrId);
-    var btn     = document.getElementById(btnId);
-    // Detectamos el estado actual comprobando si el panel ya es visible
-    var visible = panel.style.display !== 'none';
-    // Alternamos la visibilidad: si era visible lo ocultamos, y viceversa
-    panel.style.display = visible ? 'none' : 'block';
-    // Actualizamos el texto del botón para que refleje la acción disponible:
-    // si el QR acaba de ocultarse el botón dice "Ver QR", y si se acaba de mostrar, "Ocultar QR"
-    btn.textContent     = visible ? 'Ver QR' : 'Ocultar QR';
+
+/* ════ 2. CUENTA ATRÁS DEL PRÓXIMO EVENTO ════
+   Lee la fecha ISO del atributo data-fecha del banner y actualiza los
+   dígitos cada segundo hasta que el evento llegue. */
+(function() {
+    var banner = document.querySelector('.me-cnt-row');
+    if (!banner) return;
+
+    var target = new Date(banner.dataset.fecha).getTime();
+
+    /* Actualiza los cuatro bloques de tiempo del countdown */
+    function actualizar() {
+        var diff = target - Date.now();
+
+        if (diff <= 0) {
+            ['cnt-dias','cnt-horas','cnt-min','cnt-seg'].forEach(function(id) {
+                document.getElementById(id).textContent = '00';
+            });
+            return;
+        }
+
+        var dias  = Math.floor(diff / 86400000);
+        var horas = Math.floor((diff % 86400000) / 3600000);
+        var min   = Math.floor((diff % 3600000)  / 60000);
+        var seg   = Math.floor((diff % 60000)    / 1000);
+
+        document.getElementById('cnt-dias').textContent  = String(dias).padStart(2, '0');
+        document.getElementById('cnt-horas').textContent = String(horas).padStart(2, '0');
+        document.getElementById('cnt-min').textContent   = String(min).padStart(2, '0');
+        document.getElementById('cnt-seg').textContent   = String(seg).padStart(2, '0');
+    }
+
+    actualizar();
+    setInterval(actualizar, 1000);
+})();
+
+
+/* ════ 3. TOGGLE DE QR POR TARJETA ════
+   Al pulsar en una tarjeta de pedido se muestra u oculta el panel de QR.
+   El chevron rota para indicar el estado abierto/cerrado.
+   Llamado con onclick desde el div .me-ticket-card en el HTML. */
+function toggleTicketQr(pedidoId) {
+    var panel   = document.getElementById('qr-panel-'  + pedidoId);
+    var chevron = document.getElementById('chevron-' + pedidoId);
+    var abierto = panel.style.display !== 'none';
+
+    panel.style.display = abierto ? 'none' : 'block';
+
+    /* Rotamos el chevron para dar feedback visual */
+    if (chevron) {
+        if (abierto) {
+            chevron.classList.remove('abierto');
+        } else {
+            chevron.classList.add('abierto');
+        }
+    }
+}
+
+
+/* ════ 4. FILTRO DE ENTRADAS ════
+   Muestra solo las tarjetas cuyo data-estado coincida con el filtro.
+   Los botones de filtro marcan la clase .activo en el seleccionado.
+   Llamado con onclick desde los botones .me-filtro-btn en el HTML. */
+function filtrarEntradas(filtro, btnPulsado) {
+    /* Marcar botón activo */
+    document.querySelectorAll('.me-filtro-btn').forEach(function(btn) {
+        btn.classList.remove('activo');
+    });
+    if (btnPulsado) btnPulsado.classList.add('activo');
+
+    var cards    = document.querySelectorAll('.me-ticket-card');
+    var visibles = 0;
+
+    /* Mostrar u ocultar cada tarjeta según su estado */
+    cards.forEach(function(card) {
+        var mostrar = filtro === 'todas' || card.dataset.estado === filtro;
+        card.style.display = mostrar ? '' : 'none';
+        if (mostrar) visibles++;
+    });
+
+    /* Mensaje si ninguna tarjeta coincide con el filtro */
+    var noResultados = document.getElementById('me-no-resultados');
+    if (noResultados) {
+        noResultados.style.display = visibles === 0 ? '' : 'none';
+    }
 }

@@ -6,7 +6,9 @@
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 {{-- ════════════════════════════════════════════════════
      HERO — Panel de empresa (fondo oscuro como el resto del app)

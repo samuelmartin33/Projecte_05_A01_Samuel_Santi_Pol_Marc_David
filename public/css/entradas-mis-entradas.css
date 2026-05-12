@@ -1,361 +1,432 @@
+/* ══════════════════════════════════════════════════════
+   entradas-mis-entradas.css — Página "Mis Entradas" VIBEZ
+   Rediseño estilo DICE: tarjetas oscuras, countdown, filtros.
+══════════════════════════════════════════════════════ */
+
 body {
     background: #0d0820;
     color: #f5f1ea;
 }
-.mis-entradas-page-wrap {
+
+
+/* ─── BOTÓN VOLVER ─── */
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: rgba(245,241,234,0.45);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.btn-volver:hover { color: #c084fc; }
+
+
+/* ─── HERO / CABECERA ─── */
+.me-hero {
+    background: linear-gradient(160deg, #08010f 0%, #130228 55%, #0e0722 100%);
+    padding: 2.5rem 0 2.25rem;
+    border-bottom: 1px solid rgba(124,58,237,0.15);
+}
+.me-hero-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+.me-hero-titulo {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 0 0.3rem;
+    line-height: 1.1;
+}
+.me-hero-subtitulo {
+    color: rgba(245,241,234,0.4);
+    font-size: 0.85rem;
+    margin: 0;
+    font-family: monospace;
+}
+
+
+/* ─── COUNTDOWN ─── */
+.me-countdown-banner {
+    margin-top: 2rem;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.32);
+    border-radius: 18px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.me-countdown-label {
+    font-size: 0.6rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #a855f7;
+    margin: 0 0 5px;
+}
+.me-countdown-evento {
+    font-weight: 800;
+    color: #fff;
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+    line-height: 1.2;
+}
+.me-countdown-fecha {
+    font-size: 0.72rem;
+    color: rgba(245,241,234,0.35);
+    margin: 0;
+    font-family: monospace;
+}
+.me-countdown-timer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.me-countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(124,58,237,0.28);
+    border-radius: 10px;
+    padding: 8px 10px;
+    min-width: 48px;
+}
+.me-countdown-num {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #fff;
+    font-family: monospace;
+    line-height: 1;
+}
+.me-countdown-lbl {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245,241,234,0.35);
+    margin-top: 3px;
+    font-family: monospace;
+}
+.me-countdown-sep {
+    font-size: 1.1rem;
+    color: rgba(168,85,247,0.5);
+    font-weight: 900;
+    padding-bottom: 14px;
+    line-height: 1;
+}
+
+
+/* ─── PÁGINA WRAP ─── */
+.me-page-wrap {
     background:
-        radial-gradient(circle, rgba(124,58,237,0.14) 1.5px, transparent 1.5px),
-        linear-gradient(160deg, #130228 0%, #1a0f35 45%, #0e0722 75%, #130228 100%);
+        radial-gradient(circle, rgba(124,58,237,0.09) 1.5px, transparent 1.5px),
+        linear-gradient(160deg, #08010f 0%, #130228 45%, #0e0722 75%, #08010f 100%);
     background-size: 28px 28px, 100% 100%;
     min-height: 60vh;
-    padding: 2rem 0;
+    padding: 2.5rem 0 5rem;
 }
-.seccion-detalle {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(124,58,237,0.25) !important;
+.me-page-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+
+/* ─── FILTROS ─── */
+.me-filtros {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+}
+.me-filtro-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(124,58,237,0.2);
+    color: rgba(245,241,234,0.45);
+    border-radius: 999px;
+    padding: 7px 20px;
+    font-size: 0.72rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.me-filtro-btn.activo {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 700;
+}
+.me-filtro-btn:hover:not(.activo) {
+    background: rgba(124,58,237,0.1);
+    color: #c084fc;
+    border-color: rgba(124,58,237,0.38);
+}
+
+
+/* ─── TARJETA DE TICKET ─── */
+.me-ticket-card {
+    margin-bottom: 1.25rem;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(124,58,237,0.28);
+    background: rgba(255,255,255,0.03);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    box-shadow: none !important;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    user-select: none;
 }
-.mis-entradas-vacio-icono {
-    background: rgba(124,58,237,0.15) !important;
-    border-color: rgba(124,58,237,0.3) !important;
+.me-ticket-card:hover {
+    border-color: rgba(168,85,247,0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(124,58,237,0.15);
 }
-.mis-entradas-vacio-titulo { color: #f5f1ea !important; }
-.mis-entradas-vacio-texto  { color: rgba(245,241,234,0.45) !important; }
-.mis-entradas-talonario-sep { border-top-color: rgba(124,58,237,0.3) !important; }
-.mis-entradas-talonario-circulo-izq,
-.mis-entradas-talonario-circulo-der {
-    background: #0d0820 !important;
-    border-color: rgba(124,58,237,0.3) !important;
+.me-ticket-activa {
+    border-color: rgba(124,58,237,0.35);
 }
-.mis-entradas-entrada-num   { color: #f5f1ea !important; }
-.mis-entradas-entrada-codigo { color: rgba(245,241,234,0.3) !important; }
-.btn-secundario {
-    background: rgba(255,255,255,0.05) !important;
-    border-color: rgba(124,58,237,0.35) !important;
-    color: #c084fc !important;
-}
-.btn-secundario:hover { background: rgba(124,58,237,0.12) !important; }
-.mis-entradas-qr-marco {
-    background: white !important;
-    border-color: rgba(124,58,237,0.4) !important;
+.me-ticket-usada {
+    border-color: rgba(100,116,139,0.18);
+    opacity: 0.72;
 }
 
-/*
- * entradas-mis-entradas.css
- * Estilos para la página "Mis Entradas" (wallet de tickets del usuario).
- *
- * Este archivo es cargado únicamente en la vista mis-entradas.blade.php.
- * Sustituye todos los atributos style="" que tenía el HTML.
- *
- * El diseño imita el aspecto de un talonario de entradas físico:
- *   - Cabecera oscura (fondo degradado navy)
- *   - Separador con línea discontinua y círculos en los bordes (efecto "perforación")
- *   - Cuerpo claro con el código QR plegable
- */
+
+/* ─── CABECERA DE LA TARJETA ─── */
+.me-ticket-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #060011, #1a0f35);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+.me-ticket-evento-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Badge de estado (Activa / Usada) */
+.me-ticket-badge {
+    display: inline-block;
+    font-size: 0.58rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 9px;
+}
+.me-badge-activa {
+    background: rgba(52,211,153,0.1);
+    border: 1px solid rgba(52,211,153,0.28);
+    color: #34d399;
+}
+.me-badge-usada {
+    background: rgba(148,163,184,0.08);
+    border: 1px solid rgba(148,163,184,0.18);
+    color: #94a3b8;
+}
+
+/* Nombre del evento */
+.me-ticket-titulo {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 8px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fecha y lugar (fila con icono) */
+.me-ticket-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.73rem;
+    color: rgba(245,241,234,0.4);
+    margin: 4px 0 0;
+    font-family: monospace;
+}
+.me-ticket-meta svg { flex-shrink: 0; }
+
+/* Columna derecha: cantidad + precio + chevron */
+.me-ticket-derecha {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.me-ticket-cantidad {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: rgba(168,85,247,0.65);
+    font-family: monospace;
+    line-height: 1;
+}
+.me-ticket-precio {
+    font-size: 0.88rem;
+    font-weight: 800;
+    margin: 0;
+}
+.me-precio-gratis { color: #34d399; }
+.me-ticket-chevron {
+    color: rgba(245,241,234,0.28);
+    transition: transform 0.25s ease;
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+}
+.me-ticket-chevron.abierto {
+    transform: rotate(180deg);
+    color: #c084fc;
+}
 
 
-/* ══════════════════════════════════════════
-   ESTADO VACÍO — sin entradas compradas
-══════════════════════════════════════════ */
+/* ─── SEPARADOR TALONARIO ─── */
+.me-ticket-sep {
+    position: relative;
+    border-top: 2px dashed rgba(124,58,237,0.28);
+}
+.me-ticket-circulo-izq,
+.me-ticket-circulo-der {
+    position: absolute;
+    top: -11px;
+    width: 22px;
+    height: 22px;
+    background: #0d0820;
+    border-radius: 50%;
+    border: 2px solid rgba(124,58,237,0.28);
+}
+.me-ticket-circulo-izq { left: -11px; }
+.me-ticket-circulo-der { right: -11px; }
 
-/* Contenedor del estado vacío (centrado con padding generoso) */
-.mis-entradas-vacio {
+
+/* ─── PANEL QR ─── */
+.me-ticket-qr-panel {
+    padding: 22px 24px 26px;
+    background: rgba(0,0,0,0.18);
+}
+.me-qr-multi-label {
+    font-size: 0.68rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245,241,234,0.3);
+    margin: 0 0 18px;
     text-align: center;
-    padding: 3rem 1.5rem;
+}
+.me-qr-grid {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.me-qr-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.me-qr-marco {
+    background: #fff;
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow: 0 4px 28px rgba(124,58,237,0.22);
+}
+.me-qr-canvas {
+    width: 180px;
+    height: 180px;
+    display: block;
+}
+.me-qr-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(245,241,234,0.65);
+    margin: 0;
+}
+.me-qr-codigo {
+    font-family: monospace;
+    font-size: 0.55rem;
+    color: rgba(245,241,234,0.22);
+    margin: 0;
+}
+.me-qr-instruccion {
+    text-align: center;
+    font-size: 0.7rem;
+    color: rgba(245,241,234,0.28);
+    margin: 18px 0 0;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
-/*
- * Círculo con icono de ticket para el estado vacío.
- * border:2px solid #ddd6fe añade un anillo lila exterior.
- */
-.mis-entradas-vacio-icono {
+
+/* ─── ESTADO VACÍO ─── */
+.me-vacio {
+    text-align: center;
+    padding: 4rem 1.5rem;
+}
+.me-vacio-icono {
     width: 64px;
     height: 64px;
-    background: #f0ecff;
+    background: rgba(124,58,237,0.12);
+    border: 2px solid rgba(124,58,237,0.28);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
-    border: 2px solid #ddd6fe;
+    margin: 0 auto 1.25rem;
 }
-
-/* Icono SVG dentro del círculo */
-.mis-entradas-vacio-icono svg {
+.me-vacio-icono svg {
     width: 32px;
     height: 32px;
     color: #7c3aed;
 }
-
-/* Título "Aún no tienes entradas" */
-.mis-entradas-vacio-titulo {
+.me-vacio-titulo {
     font-weight: 800;
-    color: var(--navy, #0f172a);
-    margin: 0 0 0.5rem;
+    color: #f5f1ea;
     font-size: 1.1rem;
+    margin: 0 0 0.5rem;
 }
-
-/* Texto descriptivo bajo el título */
-.mis-entradas-vacio-texto {
-    color: #64748b;
+.me-vacio-texto {
+    color: rgba(245,241,234,0.35);
+    font-size: 0.88rem;
     margin: 0 0 1.75rem;
-    font-size: 0.9rem;
 }
-
-/* Ajuste del botón "Explorar eventos" en el estado vacío */
-.mis-entradas-vacio-btn {
+.me-vacio-btn {
     display: inline-block;
     padding: 0.8rem 2rem;
     width: auto;
 }
 
 
-/* ══════════════════════════════════════════
-   TARJETA DE PEDIDO
-   Cada pedido (orden de compra) se muestra como
-   una tarjeta estilo talonario de entradas.
-══════════════════════════════════════════ */
-
-/*
- * La tarjeta base usa la clase .seccion-detalle para el fondo/borde.
- * Aquí añadimos padding:0 (para que la cabecera oscura llegue al borde)
- * y overflow:hidden (para que el border-radius recorte el gradiente).
- */
-.mis-entradas-pedido {
-    margin-bottom: 1.5rem;
-    padding: 0;
-    overflow: hidden;
-}
-
-/*
- * Cabecera oscura de cada pedido con información del evento.
- * background con degradado navy-morado profundo (estética "noche de festival").
- */
-.mis-entradas-pedido-header {
-    padding: 18px 28px;
-    background: linear-gradient(135deg, #05000f, #1e1035);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-/* Columna izquierda: título del evento, fecha y ID de pedido */
-.mis-entradas-pedido-info {
-    min-width: 0; /* permite que text-overflow:ellipsis funcione */
-    flex: 1;
-}
-
-/* Nombre del evento (truncado con ellipsis si es largo) */
-.mis-entradas-pedido-titulo {
-    font-weight: 800;
-    color: #fff;
-    margin: 0;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Fecha y ciudad del evento (en tono lila claro) */
-.mis-entradas-pedido-fecha {
-    color: rgba(192, 132, 252, 0.85);
-    font-size: 0.78rem;
-    margin: 3px 0 0;
-}
-
-/* ID del pedido y timestamp (muy tenue, secundario) */
-.mis-entradas-pedido-meta {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 0.7rem;
-    margin: 3px 0 0;
-}
-
-/* Columna derecha: badge de cantidad y precio total */
-.mis-entradas-pedido-precio-col {
-    text-align: right;
-    flex-shrink: 0;
-}
-
-/*
- * Badge con el número de entradas del pedido.
- * background semi-transparente morado para mantener consistencia visual
- * con el degradado de la cabecera.
- */
-.mis-entradas-badge-entradas {
-    background: rgba(168, 85, 247, 0.2);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    color: #c084fc;
-    font-weight: 700;
-    font-size: 0.7rem;
-    padding: 3px 10px;
-    border-radius: 999px;
-    display: inline-block;
-}
-
-/* Fila del precio total del pedido */
-.mis-entradas-precio-total {
-    margin: 5px 0 0;
-    font-weight: 800;
-    font-size: 1rem;
-}
-
-/* Color verde para cuando el precio es 0€ (entrada gratuita) */
-.precio-gratis {
-    color: #34d399;
-}
-
-/* Lista de entradas dentro del pedido (con padding lateral) */
-.mis-entradas-entradas-lista {
-    padding: 0 28px;
-}
-
-
-/* ══════════════════════════════════════════
-   SEPARADOR DE TALONARIO
-   Simula el borde perforado de un ticket físico.
-   La línea discontinua va de borde a borde.
-   Los círculos en los extremos simulan los agujeros de punzonado.
-══════════════════════════════════════════ */
-
-/*
- * Contenedor relativo para poder posicionar los círculos con position:absolute.
- * margin:0 -28px compensa el padding del contenedor padre (.mis-entradas-entradas-lista)
- * para que la línea llegue de borde a borde.
- */
-.mis-entradas-talonario-sep {
-    position: relative;
-    margin: 0 -28px;
-    border-top: 2px dashed #ede9fe;
-}
-
-/*
- * Círculos en cada extremo del separador.
- * Se posicionan con valores negativos (left/right:-11px, top:-11px)
- * para que queden centrados sobre la línea discontinua,
- * dando la ilusión de que la tarjeta está perforada.
- */
-.mis-entradas-talonario-circulo-izq {
-    position: absolute;
-    left: -11px;
-    top: -11px;
-    width: 22px;
-    height: 22px;
-    background: #f0ecff; /* mismo color que el fondo de la página */
-    border-radius: 50%;
-    border: 2px solid #ede9fe;
-}
-
-.mis-entradas-talonario-circulo-der {
-    position: absolute;
-    right: -11px;
-    top: -11px;
-    width: 22px;
-    height: 22px;
-    background: #f0ecff;
-    border-radius: 50%;
-    border: 2px solid #ede9fe;
-}
-
-
-/* ══════════════════════════════════════════
-   FILA DE ENTRADA INDIVIDUAL
-══════════════════════════════════════════ */
-
-/* Área de cada entrada dentro del pedido */
-.mis-entradas-entrada-fila {
-    padding: 16px 0;
-}
-
-/* Cabecera de la entrada: número (izquierda) + botón QR (derecha) */
-.mis-entradas-entrada-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Columna de información de la entrada */
-.mis-entradas-entrada-info {
-    min-width: 0; /* necesario para truncar el UUID con ellipsis */
-}
-
-/* "Entrada #N" */
-.mis-entradas-entrada-num {
-    font-weight: 700;
-    color: var(--navy, #0f172a);
-    margin: 0;
-    font-size: 0.875rem;
-}
-
-/*
- * UUID del código QR en tipografía monoespaciada.
- * max-width:200px + text-overflow evita que el UUID largo
- * desborde la tarjeta en pantallas pequeñas.
- */
-.mis-entradas-entrada-codigo {
-    font-family: monospace;
-    font-size: 0.62rem;
-    color: #94a3b8;
-    margin: 3px 0 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 200px;
-}
-
-/* Ajuste del botón "Ver QR" para que sea compacto */
-.mis-entradas-btn-qr {
-    padding: 7px 18px;
-    font-size: 0.8rem;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    width: auto;
-}
-
-
-/* ══════════════════════════════════════════
-   PANEL DE CÓDIGO QR (plegable)
-   toggleQr() en mis-entradas.js gestiona display:block/none.
-   El display:none inicial va como style="" en el HTML para que
-   el JS pueda detectarlo con panel.style.display !== 'none'.
-══════════════════════════════════════════ */
-
-/* Estilos del panel QR cuando está visible (solo los que no son display) */
-.mis-entradas-qr-panel {
-    text-align: center;
-    padding-top: 14px;
-}
-
-/*
- * Marco blanco decorativo alrededor del QR.
- * display:inline-block permite que el fondo se ajuste al tamaño del canvas.
- */
-.mis-entradas-qr-marco {
-    display: inline-block;
-    padding: 10px;
-    background: #fff;
-    border: 2px solid #ede9fe;
-    border-radius: 14px;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
-}
-
-/*
- * Div donde la librería QRCode.js dibuja el canvas del QR.
- * El tamaño debe coincidir con los parámetros en entradas-mis-entradas.js.
- */
-.mis-entradas-qr-canvas {
-    width: 200px;
-    height: 200px;
-    margin: 0 auto;
-}
-
-/* Texto de instrucción bajo el QR */
-.mis-entradas-qr-texto {
-    font-size: 0.72rem;
-    color: #94a3b8;
-    margin: 8px 0 0;
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+    .me-countdown-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .me-countdown-timer { gap: 5px; }
+    .me-countdown-unit { min-width: 42px; padding: 6px 8px; }
+    .me-countdown-num  { font-size: 1.1rem; }
+    .me-ticket-header  { padding: 16px; }
+    .me-ticket-qr-panel { padding: 16px; }
+    .me-ticket-titulo  { font-size: 0.95rem; }
+    .me-ticket-cantidad { font-size: 1.3rem; }
+    .me-filtros { flex-wrap: wrap; }
 }

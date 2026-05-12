@@ -105,6 +105,20 @@ Route::post('/trabajos/{id}/postular-archivo', [PublicEventoController::class, '
 Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
     ->name('api.filtrar');
 
+// --- Mapa de eventos a pantalla completa ---
+Route::get('/mapa', [PublicEventoController::class, 'mapa'])
+    ->name('mapa');
+
+// --- Páginas estáticas del footer ---
+Route::view('/quienes-somos',  'static.quienes-somos')->name('quienes-somos');
+Route::view('/manifiesto',     'static.manifiesto')->name('manifiesto');
+Route::view('/prensa',         'static.prensa')->name('prensa');
+Route::view('/contacto',       'static.contacto')->name('contacto');
+Route::view('/privacidad',     'static.privacidad')->name('privacidad');
+Route::view('/cookies',        'static.cookies')->name('cookies');
+Route::view('/terminos',       'static.terminos')->name('terminos');
+Route::view('/devoluciones',   'static.devoluciones')->name('devoluciones');
+
 // --- Página completa de Bolsa de Trabajo ---
 Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
     ->name('trabajos.index');
