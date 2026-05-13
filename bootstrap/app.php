@@ -11,9 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\RedirectIfPortero::class,
+        ]);
         $middleware->alias([
             'admin'      => \App\Http\Middleware\IsAdmin::class,
             'verificado' => \App\Http\Middleware\EstaVerificado::class,
+            'no-portero' => \App\Http\Middleware\RedirectIfPortero::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

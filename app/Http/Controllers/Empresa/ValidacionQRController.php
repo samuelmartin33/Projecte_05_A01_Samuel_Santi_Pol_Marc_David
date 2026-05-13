@@ -13,11 +13,15 @@ class ValidacionQRController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user || !$user->isEmpresa()) {
+        if (!$user) abort(403);
+
+        if ($user->isEmpresa()) {
+            $empresa = $user->empresa;
+        } elseif ($user->isOrganizador()) {
+            $empresa = $user->organizador->empresa ?? null;
+        } else {
             abort(403, 'Acceso restringido a empresas.');
         }
-
-        $empresa = $user->empresa;
 
         if (!$empresa) {
             abort(403, 'Tu cuenta no tiene un perfil de empresa configurado.');
