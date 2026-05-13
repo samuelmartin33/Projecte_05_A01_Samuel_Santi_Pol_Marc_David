@@ -11,7 +11,7 @@
     {{-- Fuentes editoriales VIBEZ --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,700;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
 
     {{-- Tailwind CSS v4 CDN — genera utilidades al vuelo según el DOM --}}
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -75,6 +75,11 @@
                               {{ request()->routeIs('empresa.candidaturas.*') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Candidaturas
                     </a>
+                    <a href="{{ route('empresa.facturacion.index') }}"
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('empresa.facturacion.*') ? 'text-white' : 'text-white/60 hover:text-white' }}">
+                        Administración
+                    </a>
                 @else
                     <a href="{{ route('home') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
@@ -136,8 +141,7 @@
                             {{-- Badge de mood: solo el emoji, flotante en la esquina del avatar --}}
                             @if(Auth::user()->mood)
                                 <span class="nav-mood-badge" title="{{ Auth::user()->mood }}">
-                                    {{-- Extraemos solo el emoji (primera palabra antes del espacio) --}}
-                                    {{ explode(' ', Auth::user()->mood, 2)[0] }}
+                                    {{ mb_substr(Auth::user()->mood, 0, 1) }}
                                 </span>
                             @endif
                         </div>
@@ -150,7 +154,7 @@
                                 <p class="nav-dropdown-nombre">{{ Auth::user()->nombre }} {{ Auth::user()->apellido1 }}</p>
                                 <p class="nav-dropdown-email">{{ Auth::user()->email }}</p>
                                 @if(Auth::user()->mood)
-                                    <p class="nav-dropdown-mood">{{ Auth::user()->mood }}</p>
+                                    <p class="nav-dropdown-mood">{{ explode(' ', Auth::user()->mood, 2)[0] }}</p>
                                 @endif
                             </div>
 
@@ -180,6 +184,13 @@
                                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                     Revisar Currículums
+                                </a>
+                                <a href="{{ route('empresa.facturacion.index') }}" class="nav-dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                    Facturación
                                 </a>
                             @else
                                 {{-- Mis entradas (solo usuarios normales) --}}
@@ -303,6 +314,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 Candidaturas
+            </a>
+            <a href="{{ route('empresa.facturacion.index') }}"
+               class="nav-movil-link {{ request()->routeIs('empresa.facturacion.*') ? 'nav-movil-activo' : '' }}"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Facturación
             </a>
         @else
             {{-- Usuarios y visitantes: explorar, bolsa y social --}}

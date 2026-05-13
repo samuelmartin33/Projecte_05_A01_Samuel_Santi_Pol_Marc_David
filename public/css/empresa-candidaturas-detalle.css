@@ -1,99 +1,331 @@
-.cand-hero { background: linear-gradient(135deg,#0f0f23 0%,#1a1040 60%,#0f0f23 100%);
-             border-bottom: 1px solid rgba(139,92,246,0.2); }
+/* ── VIBEZ Empresa Candidaturas Detalle — Dark theme ── */
 
+body { background: #07060c; }
+
+/* ── Hero ── */
+.cand-hero {
+    background: radial-gradient(circle at 30% 30%, rgba(168,85,247,0.22), transparent 60%), #0d0820;
+    border-bottom: 1px solid rgba(245,241,234,0.10);
+}
+.cand-hero h1 {
+    font-family: 'Anton', sans-serif !important;
+    text-transform: uppercase !important;
+    letter-spacing: -0.005em !important;
+    line-height: 0.9 !important;
+    color: #f5f1ea !important;
+}
+.cand-hero a { color: rgba(245,241,234,0.55) !important; }
+.cand-hero a:hover { color: #f5f1ea !important; }
+.cand-hero .text-slate-400 { color: rgba(245,241,234,0.55) !important; }
+.cand-hero .text-green-400 { color: #34d399 !important; }
+.cand-hero .text-slate-500 { color: rgba(245,241,234,0.40) !important; }
+
+/* Candidature count box */
+.cand-hero [style*="rgba(255,255,255"] {
+    background: #0d0a18 !important;
+    border: 1px solid rgba(245,241,234,0.10) !important;
+    border-radius: 0 !important;
+}
+.cand-hero .text-purple-300 { color: #c084fc !important; font-family: 'Anton', sans-serif !important; }
+.cand-hero .text-slate-400 { color: rgba(245,241,234,0.55) !important; }
+
+/* Close offer button */
+.cand-hero button[id="btn-cerrar-oferta"] {
+    border-radius: 0 !important;
+    font-family: 'Archivo Narrow', sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+}
+
+/* ── Sticky filter bar (tab estados) ── */
+.cand-hero + .sticky {
+    background: rgba(13,8,32,0.92) !important;
+    border-bottom-color: rgba(245,241,234,0.10) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(20px);
+}
+.cand-hero + .sticky .text-navy\/40 { color: rgba(245,241,234,0.40) !important; }
+
+/* ── Tab estado buttons ── */
+.tab-estado {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 8px 14px;
+    background: transparent;
+    color: rgba(245,241,234,0.55);
+    border: 1px solid rgba(245,241,234,0.10);
+    border-radius: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.15s, border-color 0.15s;
+}
+.tab-estado:hover { color: #f5f1ea; border-color: rgba(245,241,234,0.3); }
+.tab-estado.activo {
+    background: #a855f7;
+    color: #f5f1ea;
+    border-color: #a855f7;
+    font-weight: 700;
+}
+
+/* ── Filter select ── */
+.filtro-select {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    background: transparent;
+    color: #f5f1ea;
+    border: 1px solid rgba(245,241,234,0.10);
+    border-radius: 0;
+    padding: 8px 12px;
+    cursor: pointer;
+    outline: none;
+}
+.filtro-select option { background: #0d0a18; color: #f5f1ea; }
+.filtro-select:focus { border-color: #a855f7; }
+
+/* ── Candidature list table container ── */
+#candidaturas-lista > div.rounded-2xl,
+#candidaturas-lista > div.bg-white {
+    background: #0d0a18 !important;
+    border: 1px solid rgba(245,241,234,0.10) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Table header */
+#candidaturas-lista .grid.bg-navy\/3,
+#candidaturas-lista [class*="bg-navy"] {
+    background: rgba(168,85,247,0.06) !important;
+    border-bottom-color: rgba(245,241,234,0.10) !important;
+}
+#candidaturas-lista p.text-navy\/40 { color: rgba(245,241,234,0.40) !important; }
+
+/* ── Candidate rows ── */
 .cand-row {
     display: grid;
     grid-template-columns: 2.5rem 1fr auto;
     align-items: center;
     gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(26,26,46,0.06);
-    transition: background .15s;
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(245,241,234,0.10);
+    transition: background 0.15s;
 }
-.cand-row:hover { background: #fafafa; }
+.cand-row:last-child { border-bottom: none; }
+.cand-row:hover { background: rgba(168,85,247,0.04); }
+
+/* Candidate name and info inside rows */
+.cand-row .font-bold.text-navy { color: #f5f1ea !important; }
+.cand-row .text-navy { color: #f5f1ea !important; }
+.cand-row .text-navy\/45 { color: rgba(245,241,234,0.45) !important; }
+.cand-row .text-navy\/30 { color: rgba(245,241,234,0.30) !important; }
+.cand-row .text-green-600 { color: #34d399 !important; }
+
+/* ── Avatar ── */
 .cand-avatar {
-    width: 2.5rem; height: 2.5rem;
+    width: 2.75rem; height: 2.75rem;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 0.8rem; color: #fff;
+    font-family: 'Anton', sans-serif;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: #f5f1ea;
     flex-shrink: 0;
-    background: linear-gradient(135deg,#7c3aed,#a855f7);
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
 }
 
+/* ── Estado badge (tag pill on candidate name) ── */
 .estado-badge {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 0.2rem 0.65rem; border-radius: 999px;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.5625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 3px 8px;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
+/* ── Estado select (dropdown in each row) ── */
 .estado-select {
-    font-size: 0.72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.05em;
-    border: none; border-radius: 999px;
-    padding: 0.2rem 0.5rem; cursor: pointer;
-    outline: none; appearance: none;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(245,241,234,0.10);
+    border-radius: 0;
+    padding: 8px 28px 8px 10px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7280' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23c084fc' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.4rem center;
-    padding-right: 1.4rem;
+    background-position: right 0.5rem center;
+    background-color: transparent;
+    color: #f5f1ea;
 }
-.estado-1 { background:#dbeafe; color:#1d4ed8; }
-.estado-2 { background:#fef3c7; color:#b45309; }
-.estado-3 { background:#dcfce7; color:#15803d; }
-.estado-4 { background:#fee2e2; color:#b91c1c; }
+.estado-select option { background: #0d0a18; color: #f5f1ea; }
 
-.tab-estado {
-    padding: 0.4rem 1rem; border-radius: 0.6rem;
-    font-size: 0.8rem; font-weight: 600;
-    border: 1.5px solid rgba(26,26,46,0.1);
-    background: #fff; color: #64748b;
-    cursor: pointer; transition: all .15s; white-space: nowrap;
+/* Estado color variants */
+.estado-1 { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.4); color: #60a5fa; }
+.estado-2 { background: rgba(251,191,36,0.15);  border-color: rgba(251,191,36,0.4);  color: #fbbf24; }
+.estado-3 { background: rgba(52,211,153,0.15);  border-color: rgba(52,211,153,0.4);  color: #34d399; }
+.estado-4 { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); color: #f87171; }
+
+/* ── Action buttons in rows ── */
+.cand-row button[title="Ver CV completo"],
+.cand-row button[onclick*="verCv"] {
+    width: 36px; height: 36px;
+    background: rgba(168,85,247,0.18) !important;
+    border: 1px solid rgba(168,85,247,0.4) !important;
+    color: #c084fc !important;
+    border-radius: 0 !important;
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: background 0.15s;
 }
-.tab-estado:hover  { border-color: #8b5cf6; color: #7c3aed; }
-.tab-estado.activo { border-color: #8b5cf6; background: #ede9fe; color: #6d28d9; font-weight: 700; }
+.cand-row button[title="Ver CV completo"]:hover,
+.cand-row button[onclick*="verCv"]:hover {
+    background: rgba(168,85,247,0.30) !important;
+}
+.cand-row a[title="Descargar CV"] {
+    width: 36px; height: 36px;
+    background: rgba(52,211,153,0.15) !important;
+    border: 1px solid rgba(52,211,153,0.4) !important;
+    color: #34d399 !important;
+    border-radius: 0 !important;
+    display: grid; place-items: center;
+    transition: background 0.15s;
+}
+.cand-row a[title="Descargar CV"]:hover {
+    background: rgba(52,211,153,0.25) !important;
+}
 
+/* ── Empty state ── */
+.text-navy\/50 { color: rgba(245,241,234,0.50) !important; }
+.text-navy\/30 { color: rgba(245,241,234,0.30) !important; }
+.text-purple-600 { color: #c084fc !important; }
+.bg-navy\/5 { background: rgba(245,241,234,0.05) !important; }
+.text-navy\/25 { color: rgba(245,241,234,0.25) !important; }
+
+/* ── CV Modal overlay ── */
 .cv-modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.70);
+    backdrop-filter: blur(6px);
     z-index: 200; display: none;
     align-items: center; justify-content: center;
     padding: 1rem;
 }
 .cv-modal-overlay.abierto { display: flex; }
+
+/* ── CV Modal box ── */
 .cv-modal {
-    background: #fff; border-radius: 1.25rem;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    border-radius: 0;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
     width: 100%; max-width: 680px;
     max-height: 90vh;
     display: flex; flex-direction: column;
     animation: cvModalIn .2s ease;
 }
 @keyframes cvModalIn {
-    from { opacity:0; transform:translateY(14px) scale(0.98); }
-    to   { opacity:1; transform:translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(14px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .cv-modal-body { overflow-y: auto; flex: 1; }
-.cv-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(26,26,46,0.07); }
+
+/* Modal header */
+.cv-modal .flex.items-center.justify-between {
+    border-bottom-color: rgba(245,241,234,0.10) !important;
+}
+.cv-modal #cv-modal-nombre { color: #f5f1ea !important; font-family: 'Anton', sans-serif !important; text-transform: uppercase !important; }
+.cv-modal #cv-modal-sub { color: rgba(245,241,234,0.40) !important; }
+.cv-modal button.text-navy\/30 { color: rgba(245,241,234,0.30) !important; }
+.cv-modal button.text-navy\/30:hover { color: #f5f1ea !important; }
+
+/* Modal footer */
+.cv-modal .border-t { border-top-color: rgba(245,241,234,0.10) !important; }
+.cv-modal button.text-navy\/40 { color: rgba(245,241,234,0.40) !important; }
+.cv-modal button.text-navy\/40:hover { color: #f5f1ea !important; }
+
+/* ── CV sections (rendered by JS) ── */
+.cv-section {
+    padding: 20px 24px;
+    border-bottom: 1px dashed rgba(245,241,234,0.10);
+}
 .cv-section:last-child { border-bottom: none; }
 .cv-section-title {
-    font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: rgba(26,26,46,0.4);
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.40);
     margin-bottom: 0.5rem;
 }
 .cv-section-body {
-    font-size: 0.9rem; color: #1a1a2e;
+    font-size: 0.9rem;
+    color: #f5f1ea;
     line-height: 1.65;
     white-space: pre-wrap;
 }
+
+/* ── Skill chips in CV ── */
 .chip {
     display: inline-block;
-    background: #f1f5f9; color: #475569;
-    border-radius: 0.5rem;
+    background: rgba(168,85,247,0.16);
+    border: 1px solid rgba(168,85,247,0.4);
+    color: #c084fc;
+    border-radius: 0;
     padding: 0.2rem 0.6rem;
-    font-size: 0.75rem; font-weight: 600;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
     margin: 0.2rem 0.15rem;
+}
+
+/* ── Download button in modal footer ── */
+.cv-modal #cv-download-btn {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+    background: rgba(52,211,153,0.15) !important;
+    border: 1px solid rgba(52,211,153,0.4) !important;
+    color: #34d399 !important;
+    border-radius: 0 !important;
+    padding: 8px 14px !important;
+}
+
+/* ── Pagination ── */
+nav[aria-label] span,
+nav[aria-label] a {
+    background: transparent !important;
+    border-color: rgba(245,241,234,0.10) !important;
+    color: rgba(245,241,234,0.55) !important;
+    border-radius: 0 !important;
+}
+nav[aria-label] a:hover { border-color: #a855f7 !important; color: #a855f7 !important; }
+nav[aria-label] [aria-current="page"] span {
+    background: #a855f7 !important;
+    color: #f5f1ea !important;
+    border-color: #a855f7 !important;
 }

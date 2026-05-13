@@ -6,7 +6,11 @@
 <link rel="stylesheet" href="{{ asset('css/trabajos-detalle.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+
+@include('partials.home.nav')
 
 {{-- ════════════════════════════════════════════════════
      HERO EDITORIAL

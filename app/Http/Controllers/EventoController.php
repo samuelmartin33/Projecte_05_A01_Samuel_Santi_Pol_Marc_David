@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Entrada;
 use App\Models\Evento;
 use App\Models\CategoriaEvento;
 use App\Models\BolsaOfertaTrabajo;
@@ -20,34 +21,98 @@ class EventoController extends Controller
      */
     public function index()
     {
-        $eventos = Evento::with(['categoria', 'portada', 'organizador.empresa'])
+        /* Evento destacado: el primero con featured=1, o el más próximo */
+        $eventoFeatured = Evento::with(['categoria', 'portada'])
             ->where('estado', 1)
-            ->orderBy('fecha_inicio', 'asc')
+            ->where('featured', 1)
+            ->orderBy('fecha_inicio')
+            ->first()
+            ?? Evento::with(['categoria', 'portada'])
+                ->where('estado', 1)
+                ->orderBy('fecha_inicio')
+                ->first();
+
+        /* Resto de eventos (sin el featured) */
+        $eventos = Evento::with(['categoria', 'portada'])
+            ->where('estado', 1)
+            ->when($eventoFeatured, fn ($q) => $q->where('id', '!=', $eventoFeatured->id))
+            ->orderBy('fecha_inicio')
             ->get();
 
-        $categorias = CategoriaEvento::where('estado', 1)
-            ->orderBy('nombre')
-            ->get();
+        /* Categorías de BD (para el chip bar) */
+        $categorias = CategoriaEvento::where('estado', 1)->orderBy('nombre')->get();
 
+        /* Ubicaciones únicas (compatibilidad con código existente) */
         $ubicaciones = Evento::where('estado', 1)
             ->whereNotNull('ubicacion_nombre')
             ->orderBy('ubicacion_nombre')
             ->distinct()
             ->pluck('ubicacion_nombre');
 
+        /* Favoritos del usuario autenticado */
         $favoritosIds = [];
-        if (Auth::check()) {
-            /** @var \App\Models\Usuario $usuario */
-            $usuario = Auth::user();
-
-            $favoritosIds = $usuario
-                ->favoritos()
+        /** @var \App\Models\Usuario|null $usuario */
+        $usuario = Auth::user();
+        if ($usuario) {
+            $favoritosIds = $usuario->favoritos()
                 ->pluck('eventos.id')
                 ->map(fn ($id) => (int) $id)
                 ->all();
         }
 
-        return view('home', compact('eventos', 'categorias', 'ubicaciones', 'favoritosIds'));
+        /* Entradas activas del usuario (para MisTickets) */
+        $entradas = collect();
+        if ($usuario) {
+            $entradas = Entrada::with(['evento.portada', 'evento.categoria'])
+                ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
+                ->where('estado_entrada', 1)
+                ->orderBy('fecha_creacion', 'desc')
+                ->take(6)
+                ->get();
+        }
+
+        /* Moods estáticos (los mismos que el prototipo) */
+        $moods = [
+            ['id' => 'rave',      'emoji' => '🌀', 'label' => 'Rave hasta el amanecer'],
+            ['id' => 'indie',     'emoji' => '🎸', 'label' => 'Indie & cervezas'],
+            ['id' => 'perreo',    'emoji' => '🔥', 'label' => 'Perreo y reggaeton'],
+            ['id' => 'chill',     'emoji' => '🌅', 'label' => 'Chill, terraza, sunset'],
+            ['id' => 'discoteca', 'emoji' => '💋', 'label' => 'Discoteca pura'],
+            ['id' => 'concierto', 'emoji' => '🎤', 'label' => 'Concierto en pie'],
+        ];
+
+        /* Transformar eventos a array JS-friendly */
+        $todosEventos = $eventoFeatured
+            ? collect([$eventoFeatured])->merge($eventos)
+            : $eventos;
+
+        $ahora = now();
+        $eventosParaJs = $todosEventos->map(fn ($e) => [
+            'id'             => $e->id,
+            'titulo'         => $e->titulo,
+            'artista'        => $e->organizador?->empresa?->nombre ?? $e->organizador?->nombre_empresa ?? '',
+            'tagline'        => $e->tagline,
+            'fechaFmt'       => $e->fecha_fmt,
+            'hora'           => $e->hora,
+            'lugar'          => $e->ubicacion_nombre,
+            'ciudad'         => $e->ubicacion_nombre,
+            'coords'         => $e->coords,
+            'categoria'      => $e->categoria?->nombre ?? 'Evento',
+            'precio'         => $e->precio_formateado,
+            'cupos'          => $e->cupos_disponibles,
+            'img'            => $e->url_portada,
+            'featured'       => (bool) $e->featured,
+            'soldOut'        => $e->sell_out,
+            'estaOcurriendo' => $e->fecha_inicio <= $ahora && ($e->fecha_fin === null || $e->fecha_fin >= $ahora),
+            'haTerminado'    => $e->fecha_fin !== null && $e->fecha_fin < $ahora,
+            'color'          => '#a855f7',
+        ]);
+
+        return view('home', compact(
+            'eventoFeatured', 'eventos', 'entradas',
+            'categorias', 'ubicaciones', 'favoritosIds',
+            'moods', 'eventosParaJs'
+        ));
     }
 
     /**
@@ -119,10 +184,15 @@ class EventoController extends Controller
             $ofertas = $ofertasQuery->orderBy('fecha_creacion', 'desc')->get();
 
         } elseif ($categoriaId) {
-            // Filtrar eventos por categoría específica, sin ofertas
+            // Filtrar eventos por categoría — acepta ID numérico o nombre de categoría
             $eventosQuery = Evento::with(['categoria', 'portada', 'organizador.empresa'])
-                ->where('estado', 1)
-                ->where('categoria_evento_id', $categoriaId);
+                ->where('estado', 1);
+
+            if (is_numeric($categoriaId)) {
+                $eventosQuery->where('categoria_evento_id', $categoriaId);
+            } else {
+                $eventosQuery->whereHas('categoria', fn ($q) => $q->where('nombre', $categoriaId));
+            }
 
             if ($ubicacion) {
                 $eventosQuery->where('ubicacion_nombre', 'like', "%{$ubicacion}%");
@@ -148,20 +218,26 @@ class EventoController extends Controller
         }
 
         // --- Formatear eventos para JSON ---
-        $eventosData = $eventos->map(function ($evento) use ($favoritosIds) {
+        $ahora = now();
+        $eventosData = $eventos->map(function ($evento) use ($favoritosIds, $ahora) {
             return [
                 'id'               => $evento->id,
                 'tipo'             => 'evento',
                 'titulo'           => $evento->titulo,
+                /* Campos compatibles con vibez-home.js */
+                'img'              => $evento->url_portada,
+                'fechaFmt'         => $evento->fecha_fmt,
+                'hora'             => $evento->hora,
+                'lugar'            => $evento->ubicacion_nombre,
+                'precio'           => $evento->precio_formateado,
+                'categoria'        => $evento->categoria?->nombre ?? 'Evento',
+                'estaOcurriendo'   => $evento->fecha_inicio <= $ahora && ($evento->fecha_fin === null || $evento->fecha_fin >= $ahora),
+                'haTerminado'      => $evento->fecha_fin !== null && $evento->fecha_fin < $ahora,
+                /* Campos legacy (para compatibilidad con home.js antiguo) */
                 'fecha_inicio'     => $evento->fecha_inicio,
                 'ubicacion_nombre' => $evento->ubicacion_nombre,
-                'precio_base'      => $evento->precio_base,
-                'es_gratuito'      => $evento->es_gratuito,
                 'precio_formateado'=> $evento->precio_formateado,
-                'categoria'        => $evento->categoria?->nombre ?? 'Evento',
-                'portada'          => $evento->portada?->imagen_url
-                                       ?? "https://picsum.photos/seed/evento-{$evento->id}/600/400",
-                'organizador'      => $evento->organizador?->empresa?->nombre_empresa ?? 'Organizador',
+                'url_portada'      => $evento->url_portada,
                 'is_favorito'      => in_array((int) $evento->id, $favoritosIds, true),
             ];
         });
@@ -430,5 +506,59 @@ class EventoController extends Controller
         }
 
         return implode("\n", $lineas);
+    }
+
+    /**
+     * Página dedicada del mapa de eventos.
+     * Muestra un mapa Leaflet a pantalla completa con todos los eventos activos y no finalizados.
+     */
+    public function mapa()
+    {
+        $ahora = now();
+
+        $todosEventos = Evento::with(['categoria', 'portada'])
+            ->where('estado', 1)
+            ->where(function ($q) use ($ahora) {
+                /* Solo eventos que no han terminado aún */
+                $q->whereNull('fecha_fin')
+                  ->orWhere('fecha_fin', '>=', $ahora);
+            })
+            ->orderBy('fecha_inicio')
+            ->get();
+
+        $categorias = CategoriaEvento::where('estado', 1)->orderBy('nombre')->get();
+
+        $favoritosIds = [];
+        /** @var \App\Models\Usuario|null $usuario */
+        $usuario = Auth::user();
+        if ($usuario) {
+            $favoritosIds = $usuario->favoritos()
+                ->pluck('eventos.id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        $eventosParaJs = $todosEventos->map(fn ($e) => [
+            'id'             => $e->id,
+            'titulo'         => $e->titulo,
+            'artista'        => $e->organizador?->empresa?->nombre ?? $e->organizador?->nombre_empresa ?? '',
+            'tagline'        => $e->tagline,
+            'fechaFmt'       => $e->fecha_fmt,
+            'hora'           => $e->hora,
+            'lugar'          => $e->ubicacion_nombre,
+            'ciudad'         => $e->ubicacion_nombre,
+            'coords'         => $e->coords,
+            'categoria'      => $e->categoria?->nombre ?? 'Evento',
+            'precio'         => $e->precio_formateado,
+            'cupos'          => $e->cupos_disponibles,
+            'img'            => $e->url_portada,
+            'featured'       => (bool) $e->featured,
+            'soldOut'        => $e->sell_out,
+            'estaOcurriendo' => $e->fecha_inicio <= $ahora && ($e->fecha_fin === null || $e->fecha_fin >= $ahora),
+            'haTerminado'    => $e->fecha_fin !== null && $e->fecha_fin < $ahora,
+            'color'          => '#a855f7',
+        ]);
+
+        return view('mapa', compact('eventosParaJs', 'categorias', 'favoritosIds'));
     }
 }

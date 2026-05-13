@@ -1,82 +1,220 @@
+/* ── VIBEZ Empresa Candidaturas Ofertas — Dark theme ── */
+
+body { background: #07060c; }
+
+/* ── Hero ── */
 .cand-hero {
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1040 60%, #0f0f23 100%);
-    border-bottom: 1px solid rgba(139,92,246,0.2);
+    background: radial-gradient(circle at 70% 30%, rgba(168,85,247,0.22), transparent 60%), #0d0820;
+    border-bottom: 1px solid rgba(245,241,234,0.10);
 }
-.oferta-card {
-    background: #fff;
-    border: 1.5px solid rgba(26,26,46,0.08);
-    border-radius: 1.125rem;
-    padding: 1.4rem 1.5rem;
-    transition: border-color .18s, box-shadow .18s, transform .18s;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.cand-hero h1 {
+    font-family: 'Anton', sans-serif !important;
+    text-transform: uppercase !important;
+    letter-spacing: -0.005em !important;
+    line-height: 0.9 !important;
+    color: #f5f1ea !important;
 }
-.oferta-card:hover {
-    border-color: rgba(139,92,246,0.4);
-    box-shadow: 0 8px 28px rgba(139,92,246,0.1);
-    transform: translateY(-2px);
+.cand-hero p { color: rgba(245,241,234,0.55) !important; }
+.cand-hero a { color: rgba(245,241,234,0.55) !important; }
+.cand-hero a:hover { color: #f5f1ea !important; }
+
+/* ── Stats boxes ── */
+.stat-box {
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 18px 28px;
+    text-align: center;
 }
-.badge-estado {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.2rem 0.65rem;
-    border-radius: 999px;
+.stat-box p:first-child {
+    font-family: 'Anton', sans-serif !important;
+    font-size: 2.25rem !important;
+    color: #f5f1ea !important;
+    line-height: 1 !important;
 }
-.badge-activa   { background: #dcfce7; color: #15803d; }
-.badge-cerrada  { background: #f1f5f9; color: #64748b; }
-.badge-cands {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 0.25rem 0.7rem;
-    border-radius: 999px;
+.stat-box p:last-child {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+    color: rgba(245,241,234,0.55) !important;
 }
-.badge-cands-ok   { background: #ede9fe; color: #7c3aed; }
-.badge-cands-none { background: #f1f5f9; color: #94a3b8; }
+
+/* Total candidaturas stat — magenta */
+.stat-box:last-child p:first-child { color: #c084fc !important; }
+
+/* ── Sticky filter bar ── */
+.cand-hero + .sticky {
+    background: rgba(13,8,32,0.92) !important;
+    border-bottom-color: rgba(245,241,234,0.10) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(20px);
+}
+
+/* ── Filter buttons ── */
 .filtro-btn {
-    padding: 0.45rem 1rem;
-    border-radius: 0.65rem;
-    font-size: 0.82rem;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
     font-weight: 600;
-    border: 1.5px solid rgba(26,26,46,0.12);
-    background: #fff;
-    color: #1a1a2e;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 8px 14px;
+    background: transparent;
+    color: rgba(245,241,234,0.55);
+    border: 1px solid rgba(245,241,234,0.10);
     cursor: pointer;
-    transition: border-color .15s, background .15s;
     text-decoration: none;
     display: inline-block;
+    transition: color 0.15s, border-color 0.15s;
+    border-radius: 0;
 }
-.filtro-btn:hover  { border-color: #8b5cf6; background: #f5f3ff; }
-.filtro-btn.activo { border-color: #8b5cf6; background: #ede9fe; color: #6d28d9; }
+.filtro-btn:hover { color: #f5f1ea; border-color: rgba(245,241,234,0.3); }
+.filtro-btn.activo {
+    background: #a855f7;
+    color: #f5f1ea;
+    border-color: #a855f7;
+}
+
+/* ── Filter select ── */
 .filtro-select {
-    padding: 0.45rem 0.85rem;
-    border-radius: 0.65rem;
-    font-size: 0.82rem;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
     font-weight: 600;
-    border: 1.5px solid rgba(26,26,46,0.12);
-    background: #fff;
-    color: #1a1a2e;
-    outline: none;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    background: transparent;
+    color: #f5f1ea;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 8px 12px;
     cursor: pointer;
+    outline: none;
+    border-radius: 0;
 }
-.filtro-select:focus { border-color: #8b5cf6; }
+.filtro-select option { background: #0d0a18; color: #f5f1ea; }
+.filtro-select:focus { border-color: #a855f7; }
+
+/* ── Filter bar label ── */
+.cand-hero + .sticky label { color: rgba(245,241,234,0.55) !important; }
+.cand-hero + .sticky a { color: rgba(245,241,234,0.40) !important; }
+.cand-hero + .sticky a:hover { color: #f5f1ea !important; }
+
+/* ── Offer cards ── */
+.oferta-card {
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 24px;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.18s;
+}
+.oferta-card:hover {
+    border-color: rgba(168,85,247,0.5);
+    box-shadow: none;
+    transform: none;
+}
+.oferta-card h2 {
+    font-family: 'Anton', sans-serif !important;
+    font-size: 1.375rem !important;
+    color: #f5f1ea !important;
+    text-transform: uppercase !important;
+    letter-spacing: -0.005em !important;
+    line-height: 1 !important;
+}
+/* Category chip */
+.oferta-card .bg-purple-50 {
+    background: rgba(168,85,247,0.16) !important;
+    color: #c084fc !important;
+    border-radius: 0 !important;
+    font-family: 'Archivo Narrow', sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+    padding: 5px 10px !important;
+}
+/* Location text */
+.oferta-card .text-navy\/50 { color: rgba(245,241,234,0.55) !important; }
+.oferta-card .text-xs { color: rgba(245,241,234,0.55) !important; }
+/* Date / salary text */
+.oferta-card .text-navy\/40 { color: rgba(245,241,234,0.40) !important; }
+.oferta-card .text-green-600 { color: #34d399 !important; font-weight: 600 !important; }
+/* Separator */
+.oferta-card .border-navy\/6 { border-color: rgba(245,241,234,0.10) !important; }
+/* "Ver CVs" link */
+.oferta-card .text-purple-600 { color: #c084fc !important; }
+.oferta-card .text-purple-600:hover { color: #f5f1ea !important; }
+
+/* ── Status badges ── */
+.badge-estado {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 5px 10px;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.badge-activa {
+    background: rgba(52,211,153,0.15);
+    border: 1px solid rgba(52,211,153,0.4);
+    color: #34d399;
+}
+.badge-cerrada {
+    background: transparent;
+    border: 1px solid rgba(245,241,234,0.10);
+    color: rgba(245,241,234,0.55);
+}
+.badge-activa .rounded-full,
+.badge-cerrada .rounded-full { border-radius: 50%; }
+
+/* ── Candidature count badges ── */
+.badge-cands {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.badge-cands-ok { color: #c084fc; }
+.badge-cands-none { color: rgba(245,241,234,0.40); }
+
+/* ── Empty state ── */
 .empty-state {
     text-align: center;
     padding: 4rem 1rem;
-    color: rgba(26,26,46,0.4);
+    color: rgba(245,241,234,0.40);
 }
-.stat-box {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 0.875rem;
-    padding: 1rem 1.5rem;
-    text-align: center;
+.empty-state h3 { color: rgba(245,241,234,0.50) !important; }
+.empty-state p { color: rgba(245,241,234,0.35) !important; }
+.empty-state svg { color: rgba(245,241,234,0.20) !important; }
+.empty-state .text-navy\/60 { color: rgba(245,241,234,0.50) !important; }
+.empty-state .text-navy\/35 { color: rgba(245,241,234,0.35) !important; }
+.empty-state .bg-navy\/5 { background: rgba(245,241,234,0.05) !important; }
+
+/* ── Pagination ── */
+.page-link,
+nav[aria-label] span,
+nav[aria-label] a {
+    background: transparent !important;
+    border-color: rgba(245,241,234,0.10) !important;
+    color: rgba(245,241,234,0.55) !important;
+    border-radius: 0 !important;
+}
+nav[aria-label] a:hover { border-color: #a855f7 !important; color: #a855f7 !important; }
+nav[aria-label] [aria-current="page"] span {
+    background: #a855f7 !important;
+    color: #f5f1ea !important;
+    border-color: #a855f7 !important;
 }

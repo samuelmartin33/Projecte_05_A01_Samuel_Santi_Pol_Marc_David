@@ -179,6 +179,144 @@ function buscarAmigos(valor) {
  * @param {number}      receptorId - ID del usuario al que queremos añadir como amigo
  * @param {HTMLElement} btn        - Referencia al botón pulsado (para desactivarlo tras el envío)
  */
+/* ============================================================
+   MOOD — selección sin recarga de página
+   ============================================================ */
+
+/**
+ * Envía el mood elegido (o cadena vacía para borrarlo) al servidor via AJAX
+ * y actualiza la UI sin recargar la página.
+ *
+ * @param {string}           valor - Emoji + texto del mood, o '' para quitarlo
+ * @param {HTMLElement|null} btn   - Botón pulsado (para marcar activo), o null al quitar
+ */
+function seleccionarMood(valor, btn) {
+    fetch('/perfil/mood', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': getCsrf(),
+        },
+        body: JSON.stringify({ mood: valor }),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (!data.success) return;
+
+        // Actualizar estado visual de los botones del grid
+        document.querySelectorAll('.mood-opcion').forEach(function(b) {
+            b.classList.remove('mood-opcion--activo');
+        });
+        if (valor && btn) {
+            btn.classList.add('mood-opcion--activo');
+        }
+
+        // Mostrar u ocultar el badge del mood activo
+        var badge  = document.getElementById('mood-activo');
+        var texto  = document.getElementById('mood-activo-texto');
+        if (valor) {
+            texto.textContent  = valor;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        // Limpiar el área de mood personalizado (input + emoji seleccionado)
+        var inputPersonalizado = document.getElementById('mood-personalizado');
+        if (inputPersonalizado) inputPersonalizado.value = '';
+        _emojiPersonalizado = '';
+        var spanEmoji = document.getElementById('emoji-seleccionado');
+        if (spanEmoji) { spanEmoji.textContent = '🙂'; spanEmoji.style.opacity = '0.4'; }
+
+        // Actualizar el emoji en el badge del avatar y en el dropdown
+        var emoji    = valor ? ([...valor][0] || '') : '';
+        var navBadge = document.querySelector('.nav-mood-badge');
+        if (navBadge) {
+            if (emoji) {
+                navBadge.textContent   = emoji;
+                navBadge.style.display = '';
+            } else {
+                navBadge.style.display = 'none';
+            }
+        }
+        var dropdownMood = document.querySelector('.nav-dropdown-mood');
+        if (dropdownMood) {
+            dropdownMood.textContent   = emoji;
+            dropdownMood.style.display = emoji ? '' : 'none';
+        }
+
+        // Mostrar alerta inline durante 3 segundos
+        var alerta = document.getElementById('mood-alerta');
+        if (alerta) {
+            alerta.textContent  = data.message;
+            alerta.style.display = 'block';
+            setTimeout(function() { alerta.style.display = 'none'; }, 3000);
+        }
+    })
+    .catch(function() { /* fallo silencioso */ });
+}
+
+/**
+ * Combina el emoji seleccionado con el texto del input y lo envía via AJAX.
+ * El emoji es obligatorio.
+ */
+function enviarMoodPersonalizado() {
+    var input = document.getElementById('mood-personalizado');
+    var texto = input ? input.value.trim() : '';
+
+    if (!_emojiPersonalizado) {
+        var btn   = document.getElementById('btn-emoji-picker');
+        var aviso = document.getElementById('mood-emoji-aviso');
+        if (btn)   { btn.style.borderColor = '#f87171'; setTimeout(function () { btn.style.borderColor = 'rgba(124,58,237,0.3)'; }, 1500); }
+        if (aviso) { aviso.style.display = 'block'; setTimeout(function () { aviso.style.display = 'none'; }, 1500); }
+        return;
+    }
+
+    if (!texto) return;
+
+    seleccionarMood(_emojiPersonalizado + ' ' + texto, null);
+}
+
+/* ============================================================
+   EMOJI PICKER
+   ============================================================ */
+
+var _emojiPersonalizado = ''; // emoji seleccionado para el mood personalizado
+
+function toggleEmojiPicker(event) {
+    event.stopPropagation();
+    var panel = document.getElementById('emoji-picker-panel');
+    if (!panel) return;
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+/**
+ * Marca el emoji como seleccionado para el mood personalizado (no lo inserta en el input).
+ * El emoji se combinará con el texto del input al guardar.
+ *
+ * @param {string} emoji
+ */
+function insertarEmoji(emoji) {
+    _emojiPersonalizado = emoji;
+
+    var span = document.getElementById('emoji-seleccionado');
+    if (span) {
+        span.textContent  = emoji;
+        span.style.opacity = '1';
+    }
+
+    document.getElementById('emoji-picker-panel').style.display = 'none';
+    var input = document.getElementById('mood-personalizado');
+    if (input) input.focus();
+}
+
+// Cerrar el panel al hacer clic fuera de él
+document.addEventListener('click', function () {
+    var panel = document.getElementById('emoji-picker-panel');
+    if (panel) panel.style.display = 'none';
+});
+
 function enviarSolicitud(receptorId, btn) {
     // Deshabilitamos el botón inmediatamente para prevenir el doble envío:
     // si el usuario hace doble clic rápido, la segunda pulsación no tendrá efecto

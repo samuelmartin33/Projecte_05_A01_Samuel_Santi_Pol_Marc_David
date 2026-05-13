@@ -6,7 +6,9 @@
 <link rel="stylesheet" href="{{ asset('css/entradas-confirmacion.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 {{-- ════════ HERO DE ÉXITO ════════ --}}
 {{-- Cabecera verde que confirma visualmente que la compra fue correcta --}}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Crear cuenta</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body class="grain">
+
+<div class="auth-shell">
+
+  <!-- ═══ LEFT — Brand panel ═══ -->
+  <aside class="auth-side">
+    <div class="auth-side-watermark"><span>VBZ</span></div>
+
+    <div class="auth-side-top">
+      <a href="vibez-home.html" class="auth-logo">
+        <img src="assets/logo_vibez.png" alt="VIBEZ">
+        <span class="display">VIBEZ</span>
+      </a>
+      <a href="vibez-home.html" class="mono auth-back">← Volver al home</a>
+    </div>
+
+    <div class="auth-side-content">
+      <div class="mono auth-kicker">
+        <span class="kicker-line"></span>
+        Sé parte · Edición #428
+      </div>
+      <h1 class="display auth-side-title">
+        Bienvenido<br><em>a la lista</em>.
+      </h1>
+      <p class="auth-side-sub">
+        Crea tu pase VIBEZ y desbloquea entradas anticipadas, descuentos exclusivos y eventos solo para miembros.
+      </p>
+
+      <ul class="auth-side-bullets">
+        <li><span class="bullet-num">01</span> Pre-venta 48h antes que nadie</li>
+        <li><span class="bullet-num">02</span> Cupones y entradas con descuento</li>
+        <li><span class="bullet-num">03</span> QR digital · sin imprimir nada</li>
+        <li><span class="bullet-num">04</span> Bolsa de trabajo de la escena</li>
+      </ul>
+    </div>
+
+    <div class="auth-side-bottom mono">
+      VIBEZ · NIGHT EDITION 26 · BCN
+    </div>
+  </aside>
+
+  <!-- ═══ RIGHT — Form ═══ -->
+  <main class="auth-main">
+    <div class="auth-form-wrap auth-form-wide">
+
+      <div class="mono auth-step">02 · Registro</div>
+
+      <h2 class="display auth-title">
+        Crea tu <em>pase</em>.
+      </h2>
+      <p class="auth-sub">
+        ¿Ya tienes cuenta? <a href="vibez-login.html">Inicia sesión</a>.
+      </p>
+
+      <!-- Account type tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="setTab(this, 'usuario')">
+          <span class="auth-tab-num">01</span>
+          <span class="auth-tab-label">Soy raver</span>
+          <span class="auth-tab-sub">Compro entradas</span>
+        </button>
+        <button class="auth-tab" onclick="setTab(this, 'empresa')">
+          <span class="auth-tab-num">02</span>
+          <span class="auth-tab-label">Soy promotor</span>
+          <span class="auth-tab-sub">Organizo eventos</span>
+        </button>
+      </div>
+
+      <form class="auth-form" onsubmit="event.preventDefault(); document.getElementById('toast').classList.add('show'); setTimeout(()=>document.getElementById('toast').classList.remove('show'),2400);">
+
+        <div class="auth-grid-2">
+          <label class="auth-field">
+            <span class="auth-label mono">Nombre</span>
+            <input type="text" placeholder="Sofía" required>
+          </label>
+          <label class="auth-field">
+            <span class="auth-label mono">Apellido</span>
+            <input type="text" placeholder="García" required>
+          </label>
+        </div>
+
+        <label class="auth-field" id="empresa-field" style="display:none">
+          <span class="auth-label mono">Empresa / Sala</span>
+          <input type="text" placeholder="Razzmatazz S.L.">
+        </label>
+
+        <label class="auth-field">
+          <span class="auth-label mono">Email</span>
+          <input type="email" placeholder="tu@email.com" required>
+        </label>
+
+        <div class="auth-grid-2">
+          <label class="auth-field">
+            <span class="auth-label mono">Contraseña</span>
+            <input type="password" id="pw1" placeholder="••••••••••" required oninput="updateStrength(this.value)">
+          </label>
+          <label class="auth-field">
+            <span class="auth-label mono">Confirmar</span>
+            <input type="password" placeholder="••••••••••" required>
+          </label>
+        </div>
+
+        <div class="auth-strength">
+          <div class="auth-strength-track">
+            <div class="auth-strength-bar" id="strengthBar"></div>
+          </div>
+          <span class="mono auth-strength-label" id="strengthLabel">Débil</span>
+        </div>
+
+        <div class="auth-grid-2">
+          <label class="auth-field">
+            <span class="auth-label mono">Fecha de nacimiento</span>
+            <input type="date" required>
+          </label>
+          <label class="auth-field">
+            <span class="auth-label mono">Ciudad</span>
+            <select required>
+              <option value="">Elige una</option>
+              <option>Barcelona</option>
+              <option>Madrid</option>
+              <option>Valencia</option>
+              <option>Sevilla</option>
+              <option>Bilbao</option>
+              <option>Lisboa</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="auth-mood-pick">
+          <span class="auth-label mono">¿Qué te va?</span>
+          <div class="auth-mood-grid">
+            <label><input type="checkbox"><span>🌀 Techno</span></label>
+            <label><input type="checkbox"><span>💋 Disco</span></label>
+            <label><input type="checkbox"><span>🔥 Reggaeton</span></label>
+            <label><input type="checkbox"><span>🎸 Indie</span></label>
+            <label><input type="checkbox"><span>🎤 Conciertos</span></label>
+            <label><input type="checkbox"><span>🌅 Chill</span></label>
+          </div>
+        </div>
+
+        <label class="auth-check auth-check-tall">
+          <input type="checkbox" required>
+          <span class="auth-check-box"></span>
+          <span>Acepto los <a href="#">términos</a> y la <a href="#">política de privacidad</a>. Soy mayor de 16.</span>
+        </label>
+
+        <button type="submit" class="btn-primary auth-btn-main">
+          Crear mi pase VIBEZ →
+        </button>
+
+        <p class="auth-fineprint mono">
+          Verificaremos tu email. Empieza la fiesta inmediatamente.
+        </p>
+      </form>
+    </div>
+
+    <div class="deco-sticker deco-1">NEW · MEMBER</div>
+    <div class="deco-sticker deco-2">★ EDICIÓN 428</div>
+    <div class="deco-numbers">28<br>05<br>26</div>
+  </main>
+
+</div>
+
+<div id="toast" class="auth-toast">✓ Pase creado — Bienvenido a VIBEZ</div>
+
+<script>
+  function setTab(el, kind) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('empresa-field').style.display = kind === 'empresa' ? 'flex' : 'none';
+  }
+  function updateStrength(v) {
+    var score = 0;
+    if (v.length >= 6) score++;
+    if (v.length >= 10) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    var bar = document.getElementById('strengthBar');
+    var label = document.getElementById('strengthLabel');
+    var labels = ['Débil', 'Floja', 'Decente', 'Fuerte', 'Bestial'];
+    var pct = (score / 5) * 100;
+    bar.style.width = pct + '%';
+    label.textContent = labels[Math.max(0, score - 1)] || 'Débil';
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Panel Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<template id="__bundler_thumbnail" data-bg-color="#07060c">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c3aed"/>
+        <stop offset="100%" stop-color="#c084fc"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="#a855f7" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="800" fill="#07060c"/>
+    <circle cx="600" cy="400" r="380" fill="url(#glow)"/>
+    <text x="600" y="460" text-anchor="middle"
+          font-family="Anton, Impact, sans-serif"
+          font-size="240" fill="url(#g)"
+          letter-spacing="-4">VIBEZ</text>
+    <text x="600" y="540" text-anchor="middle"
+          font-family="Archivo Narrow, Arial Narrow, sans-serif"
+          font-size="32" fill="#f5f1ea" opacity="0.6"
+          letter-spacing="12">PANEL ADMIN</text>
+  </svg>
+</template>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07060c;
+  --bg-2: #0d0a18;
+  --bg-3: #14102a;
+  --ink: #f5f1ea;
+  --ink-dim: rgba(245,241,234,0.6);
+  --ink-faint: rgba(245,241,234,0.16);
+  --morado: #7c3aed;
+  --morado-2: #a855f7;
+  --morado-3: #c084fc;
+  --cream: #f5f1ea;
+  --line: rgba(245,241,234,0.1);
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Archivo', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.display { font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: -0.01em; line-height: 0.92; font-weight: 400; }
+.mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; }
+.narrow { font-family: 'Archivo Narrow', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Grain */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Background ambient orbs */
+.amb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+  animation: float-amb 18s ease-in-out infinite alternate;
+}
+.amb-1 { width: 500px; height: 500px; background: var(--morado); top: -120px; left: -150px; }
+.amb-2 { width: 380px; height: 380px; background: var(--morado-2); bottom: -100px; right: -80px; animation-delay: 3s; opacity: 0.25; }
+@keyframes float-amb {
+  from { transform: translate(0,0) scale(1); }
+  to { transform: translate(60px, 40px) scale(1.15); }
+}
+
+/* Layout */
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ SIDEBAR ═══ */
+.side {
+  background: rgba(13,10,24,0.85);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid var(--line);
+  padding: 24px 18px;
+  display: flex; flex-direction: column;
+  position: sticky; top: 0;
+  height: 100vh;
+}
+.side-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px 6px 6px;
+  background: linear-gradient(135deg, rgba(168,85,247,0.22), rgba(124,58,237,0.06));
+  border: 1px solid rgba(168,85,247,0.45);
+  border-radius: 999px;
+  margin-bottom: 4px;
+  text-decoration: none; color: var(--ink);
+  box-shadow: 0 0 24px rgba(168,85,247,0.3), inset 0 0 12px rgba(168,85,247,0.08);
+}
+.side-logo img {
+  height: 32px; width: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(168,85,247,0.7));
+}
+.side-logo span { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 0.04em; }
+.side-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--morado-3);
+  margin: 14px 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.side-badge::before { content: ''; width: 14px; height: 1px; background: var(--morado-2); }
+
+.nav-group { display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--ink-dim);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.18s ease;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid transparent;
+}
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; }
+.nav-item:hover {
+  background: rgba(168,85,247,0.08);
+  color: var(--ink);
+}
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(168,85,247,0.08));
+  border-color: rgba(168,85,247,0.4);
+  color: var(--ink);
+  box-shadow: 0 0 20px rgba(168,85,247,0.18), inset 0 0 14px rgba(168,85,247,0.06);
+}
+.nav-item.active svg { opacity: 1; color: var(--morado-2); }
+.nav-item .nav-count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: rgba(168,85,247,0.18);
+  border: 1px solid rgba(168,85,247,0.35);
+  color: var(--morado-3);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.side-divider {
+  height: 1px; background: var(--line);
+  margin: 18px 6px;
+}
+.side-foot {
+  margin-top: auto;
+  padding: 14px;
+  background: rgba(168,85,247,0.05);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.side-foot-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--morado), var(--morado-2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Anton', sans-serif;
+  color: var(--cream);
+  flex-shrink: 0;
+  box-shadow: 0 0 14px rgba(168,85,247,0.45);
+}
+.side-foot-name { font-size: 12px; font-weight: 700; }
+.side-foot-role { font-size: 10px; color: var(--morado-3); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ═══ MAIN ═══ */
+.main { padding: 24px 36px 60px; min-width: 0; }
+
+/* Topbar */
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 26px;
+  gap: 16px;
+}
+.topbar-search {
+  flex: 1;
+  max-width: 480px;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%;
+  background: rgba(13,10,24,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 11px 16px 11px 42px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+.topbar-search input::placeholder { color: var(--ink-dim); }
+.topbar-search input:focus {
+  border-color: var(--morado-2);
+  box-shadow: 0 0 0 3px rgba(168,85,247,0.18);
+  background: rgba(168,85,247,0.06);
+}
+.topbar-search svg {
+  position: absolute;
+  left: 14px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: var(--ink-dim);
+  pointer-events: none;
+}
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.icon-btn {
+  width: 40px; height: 40px;
+  background: rgba(13,10,24,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.18s;
+  position: relative;
+}
+.icon-btn:hover { color: var(--morado-2); border-color: rgba(168,85,247,0.4); transform: translateY(-2px); }
+.icon-btn svg { width: 16px; height: 16px; }
+.icon-btn .ping {
+  position: absolute; top: 8px; right: 8px;
+  width: 8px; height: 8px;
+  background: var(--morado-2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(168,85,247,0.3);
+  animation: ping 1.4s ease-in-out infinite;
+}
+@keyframes ping {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(168,85,247,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(168,85,247,0); }
+}
+
+/* Hero header */
+.hero {
+  background:
+    radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.4) 0%, transparent 55%),
+    linear-gradient(135deg, rgba(124,58,237,0.18), rgba(13,10,24,0.6));
+  border: 1px solid rgba(168,85,247,0.25);
+  border-radius: 24px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.5), transparent 70%);
+  top: -100px; right: -50px;
+  animation: float-amb 14s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.hero-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; position: relative; z-index: 1; }
+.hero-greet { font-size: 11px; color: var(--morado-3); margin-bottom: 8px; }
+.hero h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(36px, 5vw, 56px);
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 0.95;
+  text-shadow: 0 0 30px rgba(168,85,247,0.5);
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--morado-2);
+  font-family: 'Bebas Neue', sans-serif;
+}
+.hero-sub { font-size: 13px; color: var(--ink-dim); margin-top: 8px; max-width: 520px; }
+.hero-quick {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.btn-pri {
+  background: linear-gradient(135deg, var(--morado), var(--morado-2));
+  color: var(--cream);
+  border: none;
+  padding: 11px 22px;
+  border-radius: 999px;
+  font-family: 'Anton', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 22px rgba(168,85,247,0.45);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-pri:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(168,85,247,0.65); }
+.btn-pri svg { width: 14px; height: 14px; }
+.btn-ghost {
+  background: rgba(245,241,234,0.04);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 11px 20px;
+  border-radius: 999px;
+  font-family: 'Archivo Narrow', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-ghost:hover { border-color: var(--morado-2); color: var(--morado-3); background: rgba(168,85,247,0.06); }
+
+/* KPI grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: rgba(13,10,24,0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.kpi:hover {
+  border-color: rgba(168,85,247,0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.4), 0 0 30px rgba(168,85,247,0.12);
+}
+.kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--morado-2), transparent);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.kpi:hover::before { opacity: 1; }
+
+.kpi-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.kpi-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+.kpi-icon {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(124,58,237,0.08));
+  border: 1px solid rgba(168,85,247,0.35);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--morado-2);
+}
+.kpi-icon svg { width: 16px; height: 16px; }
+.kpi-value {
+  font-family: 'Anton', sans-serif;
+  font-size: 42px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+.kpi-foot { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.kpi-trend {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.kpi-trend.up { background: rgba(34,197,94,0.12); color: var(--good); border: 1px solid rgba(34,197,94,0.3); }
+.kpi-trend.down { background: rgba(239,68,68,0.12); color: var(--bad); border: 1px solid rgba(239,68,68,0.3); }
+.kpi-trend.flat { background: rgba(245,241,234,0.06); color: var(--ink-dim); border: 1px solid var(--line); }
+.kpi-foot-label { color: var(--ink-dim); font-size: 11px; }
+
+/* Sparkline */
+.spark {
+  position: absolute;
+  bottom: 14px; right: 14px;
+  width: 80px; height: 24px;
+  opacity: 0.7;
+}
+
+/* Two columns */
+.two-col {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1100px) { .two-col { grid-template-columns: 1fr; } }
+
+.card {
+  background: rgba(13,10,24,0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 24px;
+  position: relative;
+}
+.card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.card-title {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.card-sub { font-size: 11px; color: var(--ink-dim); margin-top: 2px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+
+.tabs { display: inline-flex; gap: 4px; padding: 4px; background: rgba(245,241,234,0.04); border: 1px solid var(--line); border-radius: 10px; }
+.tab {
+  background: transparent; border: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.tab:hover { color: var(--ink); }
+.tab.active {
+  background: linear-gradient(135deg, var(--morado), var(--morado-2));
+  color: var(--cream);
+  box-shadow: 0 4px 14px rgba(168,85,247,0.4);
+}
+
+/* Chart */
+.chart-wrap { position: relative; height: 240px; }
+.chart-grid {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.chart-grid-line {
+  height: 1px;
+  background: var(--line);
+  position: relative;
+}
+.chart-grid-line::before {
+  content: attr(data-val);
+  position: absolute;
+  left: -36px; top: -7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+}
+.chart-svg { position: absolute; inset: 0; padding-left: 6px; }
+.chart-x {
+  display: flex; justify-content: space-around;
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+  padding-left: 6px;
+}
+.chart-legend {
+  display: flex; gap: 14px; margin-top: 10px; padding-left: 6px;
+  font-size: 11px; color: var(--ink-dim); flex-wrap: wrap;
+}
+.chart-legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+
+/* Top events ranking */
+.rank-list { display: flex; flex-direction: column; gap: 10px; }
+.rank-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.18s;
+  cursor: pointer;
+}
+.rank-item:hover {
+  background: rgba(168,85,247,0.06);
+  border-color: rgba(168,85,247,0.25);
+}
+.rank-num {
+  font-family: 'Anton', sans-serif;
+  font-size: 28px;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--morado-2);
+  width: 40px;
+  text-align: center;
+  line-height: 1;
+}
+.rank-thumb {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+}
+.rank-info { flex: 1; min-width: 0; }
+.rank-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-top: 3px; }
+.rank-bar {
+  width: 80px; height: 4px;
+  background: rgba(245,241,234,0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rank-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--morado), var(--morado-2));
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(168,85,247,0.55);
+}
+.rank-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--morado-3); min-width: 36px; text-align: right; }
+
+/* Live activity feed */
+.live-feed { display: flex; flex-direction: column; gap: 0; }
+.live-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  animation: slide-in 0.4s ease both;
+}
+.live-row:last-child { border-bottom: 0; }
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.live-dot.purchase { background: var(--good); box-shadow: 0 0 10px rgba(34,197,94,0.7); }
+.live-dot.signup { background: var(--morado-2); box-shadow: 0 0 10px rgba(168,85,247,0.7); }
+.live-dot.event { background: var(--warn); box-shadow: 0 0 10px rgba(245,158,11,0.6); }
+.live-dot.refund { background: var(--bad); box-shadow: 0 0 10px rgba(239,68,68,0.6); }
+.live-text { flex: 1; font-size: 13px; line-height: 1.45; }
+.live-text strong { font-weight: 700; }
+.live-text .live-tag {
+  display: inline-block;
+  background: rgba(168,85,247,0.12);
+  color: var(--morado-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+.live-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+/* Three columns */
+.three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1100px) { .three-col { grid-template-columns: 1fr; } }
+
+/* Pending approvals */
+.pending-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px;
+  background: rgba(245,241,234,0.03);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: all 0.18s;
+}
+.pending-item:hover { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.05); }
+.pending-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--morado), var(--morado-2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Anton', sans-serif;
+  font-size: 14px;
+  color: var(--cream);
+  flex-shrink: 0;
+}
+.pending-info { flex: 1; min-width: 0; }
+.pending-name { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pending-sub { font-size: 11px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pending-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-mini {
+  width: 30px; height: 30px;
+  border: 1px solid var(--line);
+  background: rgba(245,241,234,0.04);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.btn-mini svg { width: 14px; height: 14px; }
+.btn-mini.ok { color: var(--good); border-color: rgba(34,197,94,0.3); }
+.btn-mini.ok:hover { background: rgba(34,197,94,0.15); border-color: var(--good); transform: scale(1.08); }
+.btn-mini.no { color: var(--bad); border-color: rgba(239,68,68,0.3); }
+.btn-mini.no:hover { background: rgba(239,68,68,0.15); border-color: var(--bad); transform: scale(1.08); }
+
+/* Donut */
+.donut-wrap { display: flex; align-items: center; justify-content: center; padding: 12px 0; }
+.donut { position: relative; }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.donut-num { font-family: 'Anton', sans-serif; font-size: 36px; line-height: 1; }
+.donut-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); margin-top: 4px; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; font-size: 12px; }
+.donut-legend-row { display: flex; align-items: center; justify-content: space-between; }
+.donut-legend-row .lbl { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); }
+.donut-legend-row .lbl .sw { width: 10px; height: 10px; border-radius: 3px; }
+.donut-legend-row .val { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+/* Table */
+.tbl-card { padding: 0; overflow: hidden; }
+.tbl-head { padding: 22px 24px 16px; }
+.tbl-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl thead th {
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  font-weight: 500;
+  padding: 12px 24px;
+  background: rgba(245,241,234,0.03);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.tbl tbody td {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.tbl tbody tr { transition: background 0.15s; cursor: pointer; }
+.tbl tbody tr:hover { background: rgba(168,85,247,0.06); }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl-evt { display: flex; align-items: center; gap: 12px; }
+.tbl-thumb { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--bg-2); }
+.tbl-name { font-weight: 700; }
+.tbl-org { font-size: 11px; color: var(--ink-dim); }
+.tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.tag.live { background: rgba(34,197,94,0.12); color: var(--good); border-color: rgba(34,197,94,0.3); }
+.tag.live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--good); animation: ping 1.4s infinite; }
+.tag.draft { background: rgba(245,241,234,0.06); color: var(--ink-dim); border-color: var(--line); }
+.tag.sold { background: rgba(168,85,247,0.15); color: var(--morado-3); border-color: rgba(168,85,247,0.4); }
+.tag.warn { background: rgba(245,158,11,0.12); color: var(--warn); border-color: rgba(245,158,11,0.3); }
+
+.cap-bar {
+  width: 100px;
+  height: 6px;
+  background: rgba(245,241,234,0.06);
+  border-radius: 999px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.cap-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--morado), var(--morado-2));
+  border-radius: 999px;
+  box-shadow: 0 0 6px rgba(168,85,247,0.5);
+}
+
+.row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translate(-50%, 80px);
+  opacity: 0;
+  background: var(--cream);
+  color: var(--bg);
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  z-index: 999;
+  font-size: 13px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transition: all 0.3s cubic-bezier(.2,.8,.2,1);
+}
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .side { position: relative; height: auto; flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 14px 18px; }
+  .side > .nav-group, .side > .side-divider, .side > .side-foot, .side > .side-badge { display: none; }
+  .main { padding: 18px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .topbar-search { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="amb amb-1"></div>
+<div class="amb amb-2"></div>
+
+<div class="shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="side">
+    <a href="#" class="side-logo">
+      <img src="assets/logo_vibez.png" alt="VIBEZ">
+      <span>VIBEZ</span>
+    </a>
+
+    <div class="side-badge">Panel · Admin</div>
+
+    <nav class="nav-group">
+      <a class="nav-item active" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Eventos
+        <span class="nav-count">128</span>
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuarios
+        <span class="nav-count">12.4k</span>
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M3 21h18"/><path d="M9 9h1m-1 4h1m4-4h1m-1 4h1"/></svg>
+        Empresas
+        <span class="nav-count">42</span>
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Pedidos
+        <span class="nav-count">8</span>
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pagos
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Cupones
+      </a>
+    </nav>
+
+    <div class="side-divider"></div>
+
+    <nav class="nav-group">
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Moderación
+      </a>
+      <a class="nav-item" onclick="setActive(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Ajustes
+      </a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="side-foot-avatar">SS</div>
+      <div>
+        <div class="side-foot-name">Samuel Santi</div>
+        <div class="side-foot-role">Super Admin</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar eventos, usuarios, empresas, pedidos…">
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" onclick="toast('Notificaciones')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="ping"></span>
+        </button>
+        <button class="icon-btn" onclick="toast('Modo claro / oscuro')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="toast('Exportar reporte')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-row">
+        <div>
+          <div class="mono hero-greet">▸ Lunes, 25 de mayo · 23:47</div>
+          <h1>Hola, Samuel.<br>La <em>noche</em> está caliente.</h1>
+          <p class="hero-sub">3 eventos sold-out esta semana, 8 candidaturas pendientes y la facturación va un 22% por encima del mes pasado.</p>
+        </div>
+        <div class="hero-quick">
+          <button class="btn-pri" onclick="toast('Nuevo evento')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo evento
+          </button>
+          <button class="btn-ghost" onclick="toast('Reporte semanal generado')">Reporte semanal</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-head">
+          <div class="kpi-label">Ingresos · 30d</div>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value display">€184.<small style="font-size:0.5em;color:var(--ink-dim)">2k</small></div>
+        <div class="kpi-foot">
+          <span class="kpi-trend up">↑ 22.4%</span>
+          <span class="kpi-foot-label">vs mes pasado</span>
+        </div>
+        <svg class="spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+          <polyline points="0,18 10,15 20,17 30,12 40,14 50,8 60,10 70,4 80,2" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div class="kpi-label">Entradas vendidas</div>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><line x1="13" y1="5" x2="13" y2="19"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value display">8,420</div>
+        <div class="kpi-foot">
+          <span class="kpi-trend up">↑ 14.8%</span>
+          <span class="kpi-foot-label">esta semana</span>
+        </div>
+        <svg class="spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+          <polyline points="0,16 10,18 20,12 30,14 40,8 50,10 60,5 70,8 80,3" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div class="kpi-label">Nuevos usuarios</div>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value display">1,284</div>
+        <div class="kpi-foot">
+          <span class="kpi-trend up">↑ 31.2%</span>
+          <span class="kpi-foot-label">últimos 7 días</span>
+        </div>
+        <svg class="spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+          <polyline points="0,20 10,17 20,18 30,14 40,12 50,10 60,7 70,5 80,2" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div class="kpi-label">Tasa conversión</div>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+        </div>
+        <div class="kpi-value display">6.84<small style="font-size:0.5em;color:var(--ink-dim)">%</small></div>
+        <div class="kpi-foot">
+          <span class="kpi-trend down">↓ 0.4%</span>
+          <span class="kpi-foot-label">objetivo: 7.5%</span>
+        </div>
+        <svg class="spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+          <polyline points="0,8 10,10 20,7 30,12 40,9 50,14 60,12 70,16 80,14" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Chart + ranking -->
+    <section class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="card-title">Ventas en directo</h3>
+            <div class="card-sub">Últimos 7 días · €/día</div>
+          </div>
+          <div class="tabs">
+            <button class="tab" onclick="setTab(this)">7d</button>
+            <button class="tab active" onclick="setTab(this)">30d</button>
+            <button class="tab" onclick="setTab(this)">90d</button>
+            <button class="tab" onclick="setTab(this)">Año</button>
+          </div>
+        </div>
+
+        <div class="chart-wrap" style="padding-left:36px">
+          <div class="chart-grid">
+            <div class="chart-grid-line" data-val="12k"></div>
+            <div class="chart-grid-line" data-val="9k"></div>
+            <div class="chart-grid-line" data-val="6k"></div>
+            <div class="chart-grid-line" data-val="3k"></div>
+            <div class="chart-grid-line" data-val="0"></div>
+          </div>
+          <svg class="chart-svg" viewBox="0 0 700 240" preserveAspectRatio="none" style="width:100%;height:100%">
+            <defs>
+              <linearGradient id="gradFill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#a855f7" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="gradLine" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stop-color="#7c3aed"/>
+                <stop offset="100%" stop-color="#c084fc"/>
+              </linearGradient>
+              <linearGradient id="gradFill2" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#f5f1ea" stop-opacity="0.18"/>
+                <stop offset="100%" stop-color="#f5f1ea" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Previous period (faded) -->
+            <path d="M0,160 C70,150 140,170 210,140 S350,120 420,135 S560,100 630,90 L700,80 L700,240 L0,240 Z" fill="url(#gradFill2)"/>
+            <path d="M0,160 C70,150 140,170 210,140 S350,120 420,135 S560,100 630,90 L700,80" fill="none" stroke="rgba(245,241,234,0.3)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <!-- This period -->
+            <path d="M0,180 C70,160 140,165 210,120 S350,100 420,80 S560,60 630,40 L700,20 L700,240 L0,240 Z" fill="url(#gradFill)"/>
+            <path d="M0,180 C70,160 140,165 210,120 S350,100 420,80 S560,60 630,40 L700,20" fill="none" stroke="url(#gradLine)" stroke-width="2.5"/>
+            <!-- Dots -->
+            <circle cx="0" cy="180" r="4" fill="#a855f7"/>
+            <circle cx="105" cy="155" r="4" fill="#a855f7"/>
+            <circle cx="210" cy="120" r="4" fill="#a855f7"/>
+            <circle cx="315" cy="105" r="4" fill="#a855f7"/>
+            <circle cx="420" cy="80" r="4" fill="#a855f7"/>
+            <circle cx="525" cy="62" r="4" fill="#a855f7"/>
+            <circle cx="630" cy="40" r="5" fill="#c084fc" stroke="#7c3aed" stroke-width="2"/>
+            <circle cx="700" cy="20" r="6" fill="#a855f7" stroke="#f5f1ea" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="chart-x">
+          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+        </div>
+        <div class="chart-legend">
+          <div><span class="swatch" style="background:#a855f7"></span>Esta semana · €11.420</div>
+          <div><span class="swatch" style="background:rgba(245,241,234,0.3)"></span>Anterior · €9.180</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="card-title">Top eventos</h3>
+            <div class="card-sub">Por ingresos · 30d</div>
+          </div>
+        </div>
+
+        <div class="rank-list">
+          <div class="rank-item">
+            <div class="rank-num">01</div>
+            <img class="rank-thumb" src="https://picsum.photos/seed/cdwitte/100" alt="">
+            <div class="rank-info">
+              <div class="rank-name">Charlotte de Witte · Razzmatazz</div>
+              <div class="rank-meta">9 May · €38.4k</div>
+            </div>
+            <div class="rank-bar"><div class="rank-bar-fill" style="width:100%"></div></div>
+            <div class="rank-pct">100%</div>
+          </div>
+          <div class="rank-item">
+            <div class="rank-num">02</div>
+            <img class="rank-thumb" src="https://picsum.photos/seed/primavera/100" alt="">
+            <div class="rank-info">
+              <div class="rank-name">Primavera Sound 2026 — Phase 3</div>
+              <div class="rank-meta">28 May · €31.8k</div>
+            </div>
+            <div class="rank-bar"><div class="rank-bar-fill" style="width:82%"></div></div>
+            <div class="rank-pct">82%</div>
+          </div>
+          <div class="rank-item">
+            <div class="rank-num">03</div>
+            <img class="rank-thumb" src="https://picsum.photos/seed/badbunny/100" alt="">
+            <div class="rank-info">
+              <div class="rank-name">Bad Bunny — Pacha BCN</div>
+              <div class="rank-meta">15 Jun · €27.2k</div>
+            </div>
+            <div class="rank-bar"><div class="rank-bar-fill" style="width:71%"></div></div>
+            <div class="rank-pct">71%</div>
+          </div>
+          <div class="rank-item">
+            <div class="rank-num">04</div>
+            <img class="rank-thumb" src="https://picsum.photos/seed/dixon/100" alt="">
+            <div class="rank-info">
+              <div class="rank-name">Dixon — Apolo Discotheque</div>
+              <div class="rank-meta">22 May · €18.6k</div>
+            </div>
+            <div class="rank-bar"><div class="rank-bar-fill" style="width:48%"></div></div>
+            <div class="rank-pct">48%</div>
+          </div>
+          <div class="rank-item">
+            <div class="rank-num">05</div>
+            <img class="rank-thumb" src="https://picsum.photos/seed/rosalia/100" alt="">
+            <div class="rank-info">
+              <div class="rank-name">Rosalía — Motomami World Tour</div>
+              <div class="rank-meta">12 Jul · €14.2k</div>
+            </div>
+            <div class="rank-bar"><div class="rank-bar-fill" style="width:37%"></div></div>
+            <div class="rank-pct">37%</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three columns: Live · Pending · Donut -->
+    <section class="three-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="card-title">En vivo ahora</h3>
+            <div class="card-sub">▸ Actividad · stream en tiempo real</div>
+          </div>
+        </div>
+        <div class="live-feed" id="liveFeed">
+          <div class="live-row">
+            <div class="live-dot purchase"></div>
+            <div class="live-text"><span class="live-tag">VENTA</span><strong>Marc R.</strong> compró <strong>2× Charlotte de Witte</strong></div>
+            <div class="live-time">12s</div>
+          </div>
+          <div class="live-row">
+            <div class="live-dot signup"></div>
+            <div class="live-text"><span class="live-tag">SIGNUP</span><strong>Ana M.</strong> creó cuenta desde Madrid</div>
+            <div class="live-time">38s</div>
+          </div>
+          <div class="live-row">
+            <div class="live-dot event"></div>
+            <div class="live-text"><span class="live-tag">EVENTO</span><strong>Razzmatazz</strong> publicó "Sundown Sessions"</div>
+            <div class="live-time">2m</div>
+          </div>
+          <div class="live-row">
+            <div class="live-dot purchase"></div>
+            <div class="live-text"><span class="live-tag">VENTA</span><strong>Pol C.</strong> compró <strong>1× Primavera Sound</strong></div>
+            <div class="live-time">3m</div>
+          </div>
+          <div class="live-row">
+            <div class="live-dot refund"></div>
+            <div class="live-text"><span class="live-tag">REEMBOLSO</span><strong>Sara L.</strong> solicitó devolución (#4821)</div>
+            <div class="live-time">5m</div>
+          </div>
+          <div class="live-row">
+            <div class="live-dot signup"></div>
+            <div class="live-text"><span class="live-tag">SIGNUP</span><strong>David P.</strong> + 12 más en Bilbao</div>
+            <div class="live-time">8m</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="card-title">Pendientes</h3>
+            <div class="card-sub">8 empresas por aprobar</div>
+          </div>
+        </div>
+        <div>
+          <div class="pending-item">
+            <div class="pending-avatar">RZ</div>
+            <div class="pending-info">
+              <div class="pending-name">Razzmatazz S.L.</div>
+              <div class="pending-sub">Sala · Barcelona · CIF B-12345678</div>
+            </div>
+            <div class="pending-actions">
+              <button class="btn-mini ok" onclick="toast('Empresa aprobada ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="btn-mini no" onclick="toast('Empresa rechazada')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-avatar">PA</div>
+            <div class="pending-info">
+              <div class="pending-name">Pacha Group</div>
+              <div class="pending-sub">Sala · Ibiza · CIF A-87654321</div>
+            </div>
+            <div class="pending-actions">
+              <button class="btn-mini ok" onclick="toast('Empresa aprobada ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="btn-mini no" onclick="toast('Empresa rechazada')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-avatar">SO</div>
+            <div class="pending-info">
+              <div class="pending-name">Sónar Festival</div>
+              <div class="pending-sub">Promotor · Barcelona</div>
+            </div>
+            <div class="pending-actions">
+              <button class="btn-mini ok" onclick="toast('Empresa aprobada ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="btn-mini no" onclick="toast('Empresa rechazada')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-avatar">AP</div>
+            <div class="pending-info">
+              <div class="pending-name">Apolo Discotheque</div>
+              <div class="pending-sub">Sala · Barcelona</div>
+            </div>
+            <div class="pending-actions">
+              <button class="btn-mini ok" onclick="toast('Empresa aprobada ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="btn-mini no" onclick="toast('Empresa rechazada')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-ghost" style="width:100%; justify-content:center; margin-top:10px" onclick="toast('Ver todas')">Ver las 8 pendientes →</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="card-title">Por categoría</h3>
+            <div class="card-sub">Eventos activos · 128 total</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut" style="width:160px;height:160px">
+            <svg width="160" height="160" viewBox="0 0 42 42">
+              <circle cx="21" cy="21" r="15.91" fill="none" stroke="rgba(245,241,234,0.06)" stroke-width="4"/>
+              <circle cx="21" cy="21" r="15.91" fill="none" stroke="#a855f7" stroke-width="4" stroke-dasharray="42 100" stroke-dashoffset="0" transform="rotate(-90 21 21)" stroke-linecap="round"/>
+              <circle cx="21" cy="21" r="15.91" fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="28 100" stroke-dashoffset="-42" transform="rotate(-90 21 21)" stroke-linecap="round"/>
+              <circle cx="21" cy="21" r="15.91" fill="none" stroke="#c084fc" stroke-width="4" stroke-dasharray="18 100" stroke-dashoffset="-70" transform="rotate(-90 21 21)" stroke-linecap="round"/>
+              <circle cx="21" cy="21" r="15.91" fill="none" stroke="#6b21a8" stroke-width="4" stroke-dasharray="12 100" stroke-dashoffset="-88" transform="rotate(-90 21 21)" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-num">128</div>
+              <div class="donut-lbl">Eventos</div>
+            </div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="donut-legend-row"><div class="lbl"><span class="sw" style="background:#a855f7"></span>Música</div><div class="val">54 · 42%</div></div>
+          <div class="donut-legend-row"><div class="lbl"><span class="sw" style="background:#7c3aed"></span>Festivales</div><div class="val">36 · 28%</div></div>
+          <div class="donut-legend-row"><div class="lbl"><span class="sw" style="background:#c084fc"></span>Conciertos</div><div class="val">23 · 18%</div></div>
+          <div class="donut-legend-row"><div class="lbl"><span class="sw" style="background:#6b21a8"></span>Otros</div><div class="val">15 · 12%</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent events table -->
+    <section class="card tbl-card">
+      <div class="tbl-head">
+        <div class="card-head" style="margin-bottom:0">
+          <div>
+            <h3 class="card-title">Eventos recientes</h3>
+            <div class="card-sub">Últimos publicados · gestionar y aprobar</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-ghost" onclick="toast('Filtros')">Filtros</button>
+            <button class="btn-pri" onclick="toast('Nuevo evento')">+ Crear</button>
+          </div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Evento</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Aforo</th>
+              <th>Ingresos</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="toast('Detalle de evento')">
+              <td>
+                <div class="tbl-evt">
+                  <img class="tbl-thumb" src="https://picsum.photos/seed/cdwitte/100" alt="">
+                  <div>
+                    <div class="tbl-name">Charlotte de Witte</div>
+                    <div class="tbl-org">Razzmatazz · Barcelona</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="mono" style="font-size:11px;color:var(--ink-dim)">09 MAY · 23:30</span></td>
+              <td><span class="tag live">En venta</span></td>
+              <td><span class="cap-bar"><span class="cap-fill" style="display:block;width:96%"></span></span><span class="mono" style="font-size:11px">96%</span></td>
+              <td><strong>€38.420</strong></td>
+              <td class="row-actions">
+                <button class="btn-mini ok" onclick="event.stopPropagation();toast('Editar')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr onclick="toast('Detalle de evento')">
+              <td>
+                <div class="tbl-evt">
+                  <img class="tbl-thumb" src="https://picsum.photos/seed/primavera/100" alt="">
+                  <div>
+                    <div class="tbl-name">Primavera Sound 2026 — Phase 3</div>
+                    <div class="tbl-org">Primavera Sound · Parc del Fòrum</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="mono" style="font-size:11px;color:var(--ink-dim)">28 MAY · 16:00</span></td>
+              <td><span class="tag sold">Sold-out</span></td>
+              <td><span class="cap-bar"><span class="cap-fill" style="display:block;width:100%"></span></span><span class="mono" style="font-size:11px">100%</span></td>
+              <td><strong>€31.800</strong></td>
+              <td class="row-actions">
+                <button class="btn-mini ok" onclick="event.stopPropagation();toast('Editar')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr onclick="toast('Detalle de evento')">
+              <td>
+                <div class="tbl-evt">
+                  <img class="tbl-thumb" src="https://picsum.photos/seed/badbunny/100" alt="">
+                  <div>
+                    <div class="tbl-name">Bad Bunny — Most Wanted Tour</div>
+                    <div class="tbl-org">Live Nation · Pacha BCN</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="mono" style="font-size:11px;color:var(--ink-dim)">15 JUN · 22:00</span></td>
+              <td><span class="tag live">En venta</span></td>
+              <td><span class="cap-bar"><span class="cap-fill" style="display:block;width:71%"></span></span><span class="mono" style="font-size:11px">71%</span></td>
+              <td><strong>€27.240</strong></td>
+              <td class="row-actions">
+                <button class="btn-mini ok" onclick="event.stopPropagation();toast('Editar')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr onclick="toast('Detalle de evento')">
+              <td>
+                <div class="tbl-evt">
+                  <img class="tbl-thumb" src="https://picsum.photos/seed/dixon/100" alt="">
+                  <div>
+                    <div class="tbl-name">Dixon — Innervisions Night</div>
+                    <div class="tbl-org">Apolo · Barcelona</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="mono" style="font-size:11px;color:var(--ink-dim)">22 MAY · 00:30</span></td>
+              <td><span class="tag warn">Pendiente</span></td>
+              <td><span class="cap-bar"><span class="cap-fill" style="display:block;width:48%"></span></span><span class="mono" style="font-size:11px">48%</span></td>
+              <td><strong>€18.620</strong></td>
+              <td class="row-actions">
+                <button class="btn-mini ok" onclick="event.stopPropagation();toast('Aprobar evento ✓')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr onclick="toast('Detalle de evento')">
+              <td>
+                <div class="tbl-evt">
+                  <img class="tbl-thumb" src="https://picsum.photos/seed/rosalia/100" alt="">
+                  <div>
+                    <div class="tbl-name">Rosalía — Motomami World Tour</div>
+                    <div class="tbl-org">Live Nation · Madrid</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="mono" style="font-size:11px;color:var(--ink-dim)">12 JUL · 21:00</span></td>
+              <td><span class="tag draft">Borrador</span></td>
+              <td><span class="cap-bar"><span class="cap-fill" style="display:block;width:0%"></span></span><span class="mono" style="font-size:11px">—</span></td>
+              <td><strong>—</strong></td>
+              <td class="row-actions">
+                <button class="btn-mini ok" onclick="event.stopPropagation();toast('Editar')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">✓ Acción realizada</div>
+
+<script>
+  function setActive(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function setTab(el) {
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  var toastTimer;
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = '✓ ' + msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+  }
+
+  /* Live feed: prepend a new row every ~6s */
+  var liveSamples = [
+    {cls: 'purchase', tag: 'VENTA', text: '<strong>Laura D.</strong> compró <strong>1× Sónar Day</strong>'},
+    {cls: 'signup', tag: 'SIGNUP', text: '<strong>Iván T.</strong> creó cuenta desde Valencia'},
+    {cls: 'event', tag: 'EVENTO', text: '<strong>Apolo</strong> programó "Sundown Sessions vol. 2"'},
+    {cls: 'purchase', tag: 'VENTA', text: '<strong>Clara M.</strong> compró <strong>4× Bad Bunny</strong>'},
+    {cls: 'refund', tag: 'REEMBOLSO', text: '<strong>Hugo R.</strong> solicitó devolución (#4830)'},
+    {cls: 'purchase', tag: 'VENTA', text: '<strong>Nora P.</strong> compró <strong>2× Dixon</strong>'},
+    {cls: 'signup', tag: 'SIGNUP', text: '<strong>+ 18 nuevos usuarios</strong> en los últimos 5 min'}
+  ];
+  function pushLive() {
+    var feed = document.getElementById('liveFeed');
+    if (!feed) return;
+    var s = liveSamples[Math.floor(Math.random() * liveSamples.length)];
+    var row = document.createElement('div');
+    row.className = 'live-row';
+    row.innerHTML = '<div class="live-dot ' + s.cls + '"></div>' +
+                    '<div class="live-text"><span class="live-tag">' + s.tag + '</span>' + s.text + '</div>' +
+                    '<div class="live-time">ahora</div>';
+    feed.insertBefore(row, feed.firstChild);
+    /* Trim to 8 */
+    while (feed.children.length > 8) feed.removeChild(feed.lastChild);
+  }
+  setInterval(pushLive, 6000);
+</script>
+
+</body>
+</html>
