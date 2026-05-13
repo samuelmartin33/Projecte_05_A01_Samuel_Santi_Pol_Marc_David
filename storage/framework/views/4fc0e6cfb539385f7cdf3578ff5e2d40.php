@@ -193,7 +193,6 @@
 
   </div>
 </header>
-<<<<<<< HEAD:storage/framework/views/8d9e9e3ec66a03e58ddcfc9fdb9c17c6.php
 
 <?php if(auth()->guard()->check()): ?>
 <script>
@@ -359,7 +358,4 @@ function solicitarPushPermiso(notificaciones, sinLeer) {
 })();
 </script>
 <?php endif; ?>
-<?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>
-=======
 <?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>
->>>>>>> 2fdba9955dd913f66498f330dbd980c97d71fc11:storage/framework/views/4fc0e6cfb539385f7cdf3578ff5e2d40.php
