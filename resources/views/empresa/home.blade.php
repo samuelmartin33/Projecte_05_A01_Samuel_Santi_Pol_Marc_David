@@ -10,6 +10,20 @@
 
 @include('partials.home.nav')
 
+{{-- Banner: perfil fiscal incompleto --}}
+@if($empresa && !$empresa->perfil_fiscal_completo)
+<div class="banner-fiscal-incompleto">
+    <span class="banner-fiscal-icon">⚠</span>
+    <div class="banner-fiscal-texto">
+        <strong>Completa tu perfil fiscal para poder publicar eventos</strong>
+        <p>Necesitamos tus datos legales y bancarios para gestionar los pagos de tus entradas.</p>
+    </div>
+    <a href="{{ route('empresa.perfil-fiscal') }}" class="banner-fiscal-btn">
+        Completar ahora →
+    </a>
+</div>
+@endif
+
 {{-- ════════════════════════════════════════════════════
      HERO — Panel de empresa (fondo oscuro como el resto del app)
 ════════════════════════════════════════════════════ --}}

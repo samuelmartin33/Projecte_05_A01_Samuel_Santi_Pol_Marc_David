@@ -409,13 +409,15 @@ function registrar(evento) {
         esValido = false;
     }
 
-    /* Validar segundo apellido */
-    if (!apellido2) {
-        mostrarErrorCampo('field-apellido2', 'error-apellido2', 'El segundo apellido es obligatorio');
-        esValido = false;
-    } else if (apellido2.length < 2) {
-        mostrarErrorCampo('field-apellido2', 'error-apellido2', 'Mínimo 2 caracteres');
-        esValido = false;
+    /* Validar segundo apellido — solo obligatorio para clientes */
+    if (tipoCuenta !== 'empresa') {
+        if (!apellido2) {
+            mostrarErrorCampo('field-apellido2', 'error-apellido2', 'El segundo apellido es obligatorio');
+            esValido = false;
+        } else if (apellido2.length < 2) {
+            mostrarErrorCampo('field-apellido2', 'error-apellido2', 'Mínimo 2 caracteres');
+            esValido = false;
+        }
     }
 
     /* Validar email */
@@ -445,11 +447,11 @@ function registrar(evento) {
         esValido = false;
     }
 
-    /* Validar fecha de nacimiento (mínimo 14 años) */
+    /* Validar fecha de nacimiento — mínimo 14 años solo para clientes */
     if (!fechaNacimiento) {
         mostrarErrorCampo('field-fecha_nacimiento', 'error-fecha_nacimiento', 'La fecha de nacimiento es obligatoria');
         esValido = false;
-    } else {
+    } else if (tipoCuenta !== 'empresa') {
         var hoy  = new Date();
         var nac  = new Date(fechaNacimiento);
         var edad = hoy.getFullYear() - nac.getFullYear() -
@@ -478,6 +480,29 @@ function registrar(evento) {
         esValido = false;
     }
 
+    /* Validar campos de empresa cuando corresponda */
+    if (tipoCuenta === 'empresa') {
+        var nombreEmpresaEl  = document.getElementById('nombre_empresa');
+        var nifCifEl         = document.getElementById('nif_cif');
+        var tipoPromotorEl   = document.getElementById('tipo_promotor');
+
+        if (!nombreEmpresaEl || !nombreEmpresaEl.value.trim()) {
+            mostrarErrorCampo('field-nombre_empresa', 'error-nombre_empresa', 'El nombre de empresa es obligatorio');
+            esValido = false;
+        }
+        if (!nifCifEl || !nifCifEl.value.trim()) {
+            mostrarErrorCampo('field-nif_cif', 'error-nif_cif', 'El NIF/CIF es obligatorio');
+            esValido = false;
+        } else if (!/^[A-Za-z0-9]{7,9}$/.test(nifCifEl.value.trim())) {
+            mostrarErrorCampo('field-nif_cif', 'error-nif_cif', 'Formato inválido (ej: B12345678)');
+            esValido = false;
+        }
+        if (!tipoPromotorEl || !tipoPromotorEl.value) {
+            mostrarErrorCampo('field-tipo_promotor', 'error-tipo_promotor', 'Selecciona el tipo de promotor');
+            esValido = false;
+        }
+    }
+
     if (!esValido) {
         sacudirElemento(formulario);
         return;
@@ -489,6 +514,32 @@ function registrar(evento) {
     /* querySelector solo para el meta CSRF — no tiene id asignable en el layout */
     var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    /* Construir cuerpo de la petición: campos comunes + empresa si aplica */
+    var cuerpo = {
+        nombre:                nombre,
+        apellido1:             apellido1,
+        apellido2:             apellido2,
+        email:                 email,
+        password:              contrasena,
+        password_confirmation: confirmacion,
+        fecha_nacimiento:      fechaNacimiento,
+        telefono:              telefono,
+        tipo_cuenta:           tipoCuenta,
+    };
+
+    if (tipoCuenta === 'empresa') {
+        var nombreEmpresaEl = document.getElementById('nombre_empresa');
+        var nifCifEl        = document.getElementById('nif_cif');
+        var tipoPromotorEl  = document.getElementById('tipo_promotor');
+        var descripcionEl   = document.getElementById('descripcion');
+        var sitioWebEl      = document.getElementById('sitio_web');
+        cuerpo.nombre_empresa = nombreEmpresaEl ? nombreEmpresaEl.value.trim() : '';
+        cuerpo.nif_cif        = nifCifEl        ? nifCifEl.value.trim()        : '';
+        cuerpo.tipo_promotor  = tipoPromotorEl  ? tipoPromotorEl.value         : '';
+        cuerpo.descripcion    = descripcionEl   ? descripcionEl.value.trim()   : '';
+        cuerpo.sitio_web      = sitioWebEl      ? sitioWebEl.value.trim()      : '';
+    }
+
     fetch('/api/register', {
         method:  'POST',
         headers: {
@@ -496,17 +547,7 @@ function registrar(evento) {
             'Accept':       'application/json',
             'X-CSRF-TOKEN': csrf,
         },
-        body: JSON.stringify({
-            nombre:                nombre,
-            apellido1:             apellido1,
-            apellido2:             apellido2,
-            email:                 email,
-            password:              contrasena,
-            password_confirmation: confirmacion,
-            fecha_nacimiento:      fechaNacimiento,
-            telefono:              telefono,
-            tipo_cuenta:           tipoCuenta,
-        }),
+        body: JSON.stringify(cuerpo),
     })
     .then(function (respuesta) { return respuesta.json(); })
     .then(function (datos) {

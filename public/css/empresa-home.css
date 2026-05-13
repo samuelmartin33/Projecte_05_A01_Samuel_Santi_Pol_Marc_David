@@ -3,6 +3,53 @@
 /* Page background override for empresa section */
 body { background: #07060c; }
 
+/* ── Banner: perfil fiscal incompleto ── */
+.banner-fiscal-incompleto {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 0 auto 0;
+    max-width: 1280px;
+    color: #fff;
+}
+.banner-fiscal-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+}
+.banner-fiscal-texto {
+    flex: 1;
+    font-family: 'Archivo Narrow', sans-serif;
+}
+.banner-fiscal-texto strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.banner-fiscal-texto p {
+    font-size: 13px;
+    opacity: 0.85;
+    margin: 0;
+}
+.banner-fiscal-btn {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-family: 'Anton', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background 0.2s;
+}
+.banner-fiscal-btn:hover { background: rgba(255,255,255,0.28); }
+
 /* ── Stats grid ── */
 .empresa-stats-grid {
     display: grid;
