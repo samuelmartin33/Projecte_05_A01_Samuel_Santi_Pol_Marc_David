@@ -9,6 +9,20 @@
 <?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 
+<?php if($empresa && !$empresa->perfil_fiscal_completo): ?>
+<div class="banner-fiscal-incompleto">
+    <span class="banner-fiscal-icon">⚠</span>
+    <div class="banner-fiscal-texto">
+        <strong>Completa tu perfil fiscal para poder publicar eventos</strong>
+        <p>Necesitamos tus datos legales y bancarios para gestionar los pagos de tus entradas.</p>
+    </div>
+    <a href="<?php echo e(route('empresa.perfil-fiscal')); ?>" class="banner-fiscal-btn">
+        Completar ahora →
+    </a>
+</div>
+<?php endif; ?>
+
+
 <section class="hero-home">
     <div class="hero-particula hero-particula-1"></div>
     <div class="hero-particula hero-particula-2"></div>
@@ -304,4 +318,4 @@
 
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/home.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/home.blade.php ENDPATH**/ ?>

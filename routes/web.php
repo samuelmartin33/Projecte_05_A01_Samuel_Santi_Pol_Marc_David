@@ -37,6 +37,7 @@ use App\Http\Controllers\Empresa\CandidaturasController;
 use App\Http\Controllers\Empresa\ValidacionQRController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
+use App\Http\Controllers\Empresa\PerfilFiscalController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -158,6 +159,12 @@ Route::middleware('auth')->prefix('empresa/eventos')->name('empresa.eventos.')->
     Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
 });
 
+/* — Perfil fiscal de empresa (Fase 2 onboarding) — */
+Route::middleware('auth')->group(function () {
+    Route::get('/empresa/perfil-fiscal',  [PerfilFiscalController::class, 'show'])->name('empresa.perfil-fiscal');
+    Route::post('/empresa/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('empresa.perfil-fiscal.update');
+});
+
 /* — Ofertas de trabajo (empresa): crear y publicar ofertas — */
 Route::middleware('auth')->prefix('empresa/ofertas')->name('empresa.ofertas.')->group(function () {
     Route::get('/crear', [EmpresaOfertasController::class, 'create'])->name('create');
@@ -251,6 +258,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     /* Rutas de gestión de empresas */
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
          ->name('admin.empresas.index');
+    Route::get('/admin/empresas/{id}', [AdminEmpresaController::class, 'show'])
+         ->name('admin.empresas.show');
     Route::post('/admin/empresas/{id}/aprobar', [AdminEmpresaController::class, 'aprobar'])
          ->name('admin.empresas.aprobar');
     Route::post('/admin/empresas/{id}/rechazar', [AdminEmpresaController::class, 'rechazar'])

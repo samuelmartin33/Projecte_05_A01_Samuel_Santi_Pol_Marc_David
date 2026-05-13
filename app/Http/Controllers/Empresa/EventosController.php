@@ -88,6 +88,13 @@ class EventosController extends Controller
      */
     public function create(): View
     {
+        // Bloquear si el perfil fiscal no está completo
+        $empresa = Auth::user()->empresa;
+        if (! $empresa || ! $empresa->perfil_fiscal_completo) {
+            return redirect()->route('empresa.perfil-fiscal')
+                ->with('warning', 'Debes completar tu perfil fiscal antes de publicar eventos.');
+        }
+
         $categorias = CategoriaEvento::where('estado', 1)
             ->orderBy('nombre')
             ->get();
@@ -101,6 +108,13 @@ class EventosController extends Controller
      */
     public function store(Request $request)
     {
+        // Bloquear si el perfil fiscal no está completo
+        $empresa = Auth::user()->empresa;
+        if (! $empresa || ! $empresa->perfil_fiscal_completo) {
+            return redirect()->route('empresa.perfil-fiscal')
+                ->with('warning', 'Debes completar tu perfil fiscal antes de publicar eventos.');
+        }
+
         $organizador = $this->obtenerOrganizador();
 
         $validated = $request->validate([

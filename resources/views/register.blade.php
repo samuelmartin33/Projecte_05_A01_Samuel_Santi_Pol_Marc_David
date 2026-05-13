@@ -304,16 +304,76 @@
                     <span class="field-error" id="error-tipo_cuenta" role="alert"></span>
                     <p id="hint-tipo_cuenta" style="font-family:'Archivo',sans-serif;font-size:12px;margin-top:-4px;min-height:18px;color:rgba(245,241,234,0.45)"></p>
 
-                    {{-- Campo empresa/sala: solo visible para promotores --}}
-                    <div class="auth-field" id="empresa-field-wrap" style="display:none">
-                        <label class="auth-label" for="nombre_empresa">Empresa / Sala</label>
-                        <input
-                            type="text"
-                            id="nombre_empresa"
-                            name="nombre_empresa"
-                            placeholder="Razzmatazz S.L."
-                            autocomplete="organization"
-                        >
+                    {{-- Campos empresa: solo visibles para promotores --}}
+                    <div id="empresa-field-wrap" style="display:none">
+
+                        {{-- Nombre empresa --}}
+                        <div class="auth-field" id="field-nombre_empresa" style="margin-bottom:16px">
+                            <label class="auth-label" for="nombre_empresa">Empresa / Sala</label>
+                            <input
+                                type="text"
+                                id="nombre_empresa"
+                                name="nombre_empresa"
+                                placeholder="Razzmatazz S.L."
+                                autocomplete="organization"
+                            >
+                            <span class="field-error" id="error-nombre_empresa" role="alert"></span>
+                        </div>
+
+                        {{-- NIF / CIF --}}
+                        <div class="auth-field" id="field-nif_cif" style="margin-bottom:16px">
+                            <label class="auth-label" for="nif_cif">NIF / CIF</label>
+                            <input
+                                type="text"
+                                id="nif_cif"
+                                name="nif_cif"
+                                placeholder="B12345678"
+                                maxlength="9"
+                                oninput="this.value=this.value.toUpperCase()"
+                                onblur="validarNifCif()"
+                            >
+                            <span class="field-error" id="error-nif_cif" role="alert"></span>
+                        </div>
+
+                        {{-- Tipo de promotor --}}
+                        <div class="auth-field" id="field-tipo_promotor" style="margin-bottom:16px">
+                            <label class="auth-label" for="tipo_promotor">Tipo de promotor</label>
+                            <select id="tipo_promotor" name="tipo_promotor" onblur="validarTipoPromotor()">
+                                <option value="" disabled selected hidden>Selecciona una opción</option>
+                                <option value="sala_club">Sala / Club nocturno</option>
+                                <option value="promotora">Promotora de eventos</option>
+                                <option value="festival">Festival</option>
+                                <option value="artista">Artista / DJ</option>
+                                <option value="autonomo">Autónomo</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                            <span class="field-error" id="error-tipo_promotor" role="alert"></span>
+                        </div>
+
+                        {{-- Descripción (opcional) --}}
+                        <div class="auth-field" style="margin-bottom:16px">
+                            <label class="auth-label" for="descripcion">Descripción <span style="opacity:.5;font-size:11px">(opcional)</span></label>
+                            <textarea
+                                id="descripcion"
+                                name="descripcion"
+                                placeholder="Breve descripción de vuestra empresa y tipo de eventos que organizáis"
+                                maxlength="500"
+                                rows="3"
+                                style="width:100%;resize:vertical;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:10px 14px;color:var(--ink);font-family:'Archivo Narrow',sans-serif;font-size:14px;"
+                            ></textarea>
+                        </div>
+
+                        {{-- Sitio web (opcional) --}}
+                        <div class="auth-field" style="margin-bottom:0">
+                            <label class="auth-label" for="sitio_web">Sitio web <span style="opacity:.5;font-size:11px">(opcional)</span></label>
+                            <input
+                                type="url"
+                                id="sitio_web"
+                                name="sitio_web"
+                                placeholder="https://vuestra-web.com"
+                            >
+                        </div>
+
                     </div>
 
                     {{-- Géneros musicales — chips opcionales --}}
@@ -394,9 +454,41 @@
             select.value = tipo;
             cambiarTipoCuenta(select);
 
-            /* Mostrar campo empresa solo para promotores */
+            var esEmpresa = tipo === 'empresa';
+
+            /* Mostrar/ocultar bloque campos empresa */
             var empresaWrap = document.getElementById('empresa-field-wrap');
-            if (empresaWrap) empresaWrap.style.display = tipo === 'empresa' ? 'flex' : 'none';
+            if (empresaWrap) empresaWrap.style.display = esEmpresa ? 'block' : 'none';
+
+            /* Ocultar segundo apellido para empresas (no requerido) */
+            var campoApellido2 = document.getElementById('field-apellido2');
+            if (campoApellido2) campoApellido2.style.display = esEmpresa ? 'none' : 'flex';
+
+            /* Ocultar géneros musicales cuando es promotor (no relevante para empresas) */
+            var moodPick = document.querySelector('.auth-mood-pick');
+            if (moodPick) moodPick.style.display = esEmpresa ? 'none' : 'block';
+        }
+
+        /* Valida el campo NIF/CIF */
+        function validarNifCif() {
+            var campo = document.getElementById('nif_cif');
+            var error = document.getElementById('error-nif_cif');
+            if (!campo || !error) return true;
+            var val = campo.value.trim();
+            if (!val) { error.textContent = 'El NIF/CIF es obligatorio'; return false; }
+            if (!/^[A-Za-z0-9]{7,9}$/.test(val)) { error.textContent = 'Formato inválido (ej: B12345678)'; return false; }
+            error.textContent = '';
+            return true;
+        }
+
+        /* Valida el select tipo_promotor */
+        function validarTipoPromotor() {
+            var campo = document.getElementById('tipo_promotor');
+            var error = document.getElementById('error-tipo_promotor');
+            if (!campo || !error) return true;
+            if (!campo.value) { error.textContent = 'Selecciona el tipo de promotor'; return false; }
+            error.textContent = '';
+            return true;
         }
 
         /* Barra de fortaleza de la contraseña */
