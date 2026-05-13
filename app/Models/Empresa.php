@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * Modelo Empresa — Representa una empresa registrada en la plataforma VIBEZ.
@@ -59,19 +60,73 @@ class Empresa extends Model
     // Lista blanca de campos asignables masivamente con create() o fill().
     // Protege contra Mass Assignment: solo se asignan los campos listados.
     protected $fillable = [
-        'usuario_id',        // vincula la empresa a su usuario propietario
-        'nombre_empresa',    // nombre comercial/marca
-        'razon_social',      // nombre legal (Registro Mercantil)
-        'nif_cif',           // identificador fiscal único
-        'descripcion',       // descripción pública de la empresa
-        'logo_url',          // URL del logotipo
-        'sitio_web',         // web corporativa
-        'telefono_contacto', // teléfono de contacto
-        'direccion',         // dirección física o fiscal
-        'estado',            // 1=activa, 0=inactiva
+        'usuario_id',
+        'nombre_empresa',
+        'razon_social',
+        'nif_cif',
+        'descripcion',
+        'logo_url',
+        'sitio_web',
+        'telefono_contacto',
+        'direccion',
+        'estado',
+        // Campos fiscales añadidos en migración 2026_05_12
+        'tipo_promotor',
+        'tipo_empresa',
+        'ciudad',
+        'codigo_postal',
+        'provincia',
+        'pais',
+        'email_facturacion',
+        'iban',
+        'titular_cuenta',
+        'perfil_fiscal_completo',
         'fecha_creacion',
         'fecha_actualizacion',
     ];
+
+    /* ——— Accessor / Mutator para IBAN (siempre cifrado en BD) ——— */
+
+    /**
+     * Al guardar el IBAN lo cifra con la clave APP_KEY de Laravel.
+     * Así nunca se almacena en texto plano en la base de datos.
+     */
+    public function setIbanAttribute(?string $value): void
+    {
+        $this->attributes['iban'] = $value ? Crypt::encryptString($value) : null;
+    }
+
+    /**
+     * Al leer el IBAN lo descifra. Si el valor está corrupto o vacío devuelve null.
+     */
+    public function getIbanAttribute(?string $value): ?string
+    {
+        if (! $value) return null;
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /* ——— Métodos de negocio ——— */
+
+    /**
+     * Comprueba si el perfil fiscal está completamente relleno.
+     * Se usa para decidir si la empresa puede publicar eventos o necesita completar datos.
+     *
+     * @return bool  true si todos los campos fiscales y bancarios están presentes.
+     */
+    public function esFiscalCompleto(): bool
+    {
+        return ! empty($this->razon_social)
+            && ! empty($this->nif_cif)
+            && ! empty($this->ciudad)
+            && ! empty($this->codigo_postal)
+            && ! empty($this->provincia)
+            && ! empty($this->iban)
+            && ! empty($this->titular_cuenta);
+    }
 
     /* ——— Relaciones Eloquent ——— */
 

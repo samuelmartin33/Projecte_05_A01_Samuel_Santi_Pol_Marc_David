@@ -240,7 +240,7 @@
     <div class="proof-text">
         <div class="mono" style="color:var(--morado-3);font-size:11px;margin-bottom:14px;display:inline-block">▸ Únete a la lista</div>
         <h2>La <em>escena</em> ya está dentro.</h2>
-        <p>Más de 12.000 ravers, 42 promotores y 1.200 eventos al mes. VIBEZ es la plataforma que mueve la noche de Iberia.</p>
+        <p>Más de <?php echo e(number_format($statRavers, 0, ',', '.')); ?> ravers, <?php echo e($statPromotores); ?> promotores y <?php echo e($statEventos); ?> eventos activos. VIBEZ es la plataforma que mueve la noche de Iberia.</p>
         <a href="<?php echo e(route('register')); ?>" class="btn-pri big">
             Quiero entrar
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
@@ -251,20 +251,20 @@
     </div>
     <div class="proof-stats">
         <div class="stat-card">
-            <div class="stat-num">12k+</div>
+            <div class="stat-num" data-target="<?php echo e($statRavers); ?>" data-suffix="">0</div>
             <div class="stat-lbl">Ravers activos</div>
         </div>
         <div class="stat-card">
-            <div class="stat-num">1.2k</div>
-            <div class="stat-lbl">Eventos / mes</div>
+            <div class="stat-num" data-target="<?php echo e($statEventos); ?>" data-suffix="">0</div>
+            <div class="stat-lbl">Eventos activos</div>
         </div>
         <div class="stat-card">
-            <div class="stat-num">42</div>
+            <div class="stat-num" data-target="<?php echo e($statPromotores); ?>" data-suffix="">0</div>
             <div class="stat-lbl">Promotores</div>
         </div>
         <div class="stat-card">
-            <div class="stat-num">98%</div>
-            <div class="stat-lbl">Devolución 24h</div>
+            <div class="stat-num" data-target="<?php echo e($statSatisf); ?>" data-suffix="%">0</div>
+            <div class="stat-lbl">Satisfacción</div>
         </div>
     </div>
 </section>
@@ -324,6 +324,43 @@
     </div>
 </footer>
 
+<script>
+function animarContadores() {
+    var els = document.querySelectorAll('.stat-num[data-target]');
+    for (var i = 0; i < els.length; i++) {
+        (function(el) {
+            var target  = parseInt(el.getAttribute('data-target'), 10);
+            var suffix  = el.getAttribute('data-suffix') || '';
+            var duration = 1600;
+            var steps    = 60;
+            var stepTime = duration / steps;
+            var current  = 0;
+            var increment = target / steps;
+            var timer = setInterval(function() {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                el.textContent = Math.floor(current).toLocaleString('es-ES') + suffix;
+            }, stepTime);
+        })(els[i]);
+    }
+}
+
+/* Lanzar cuando el elemento proof entra en pantalla */
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            animarContadores();
+            observer.disconnect();
+        }
+    });
+}, { threshold: 0.3 });
+
+var proofSection = document.querySelector('.proof-stats');
+if (proofSection) observer.observe(proofSection);
+</script>
 </body>
 </html>
 <?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/welcome.blade.php ENDPATH**/ ?>

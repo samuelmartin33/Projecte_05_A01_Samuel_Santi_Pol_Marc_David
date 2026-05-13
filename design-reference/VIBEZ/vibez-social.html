@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>VIBEZ — Social</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vibez-shared.css">
+<style>
+  /* STORIES ring */
+  .stories { display: flex; gap: 18px; overflow-x: auto; padding: 4px 2px 18px; }
+  .story { flex: 0 0 84px; text-align: center; cursor: pointer; }
+  .story-ring { width: 76px; height: 76px; border-radius: 50%; padding: 3px; background: conic-gradient(from 180deg, var(--magenta), var(--morado), var(--magenta-2), var(--magenta)); margin: 0 auto 8px; transition: transform 0.25s; }
+  .story:hover .story-ring { transform: scale(1.06); }
+  .story-ring.seen { background: var(--ink-faint); }
+  .story-ring.you { background: linear-gradient(135deg, var(--cream), var(--cream)); }
+  .story-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg); }
+  .story-name { font-family: 'Archivo Narrow'; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
+  .story .you-add { width: 100%; height: 100%; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--magenta); font-family: 'Anton'; font-size: 32px; line-height: 1; }
+
+  /* POST */
+  .post { background: rgba(13,10,24,0.5); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; margin-bottom: 22px; transition: border-color 0.25s; }
+  .post:hover { border-color: rgba(168,85,247,0.35); }
+  .post-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; }
+  .post-user { display: flex; align-items: center; gap: 12px; }
+  .post-user .av { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--morado), var(--magenta)); display: flex; align-items: center; justify-content: center; font-family: 'Anton'; color: var(--cream); font-size: 14px; }
+  .post-user .nm { font-family: 'Archivo Narrow'; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; }
+  .post-user .meta { font-family: 'Archivo Narrow'; font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.14em; margin-top: 2px; }
+  .post-img { position: relative; aspect-ratio: 4/5; overflow: hidden; max-height: 720px; }
+  .post-img img { width: 100%; height: 100%; object-fit: cover; }
+  .post-evento-tag { position: absolute; bottom: 14px; left: 14px; display: inline-flex; align-items: center; gap: 8px; background: rgba(7,6,12,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(168,85,247,0.4); border-radius: 999px; padding: 8px 14px; font-family: 'Archivo Narrow'; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--cream); }
+  .post-evento-tag .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--magenta); animation: pulse-dot 1.6s ease-in-out infinite; }
+  .post-actions { display: flex; gap: 20px; padding: 14px 20px; align-items: center; }
+  .pa-btn { background: transparent; border: none; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: 'Archivo Narrow'; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .pa-btn:hover { color: var(--magenta-2); }
+  .pa-btn.liked { color: var(--magenta); }
+  .post-caption { padding: 0 20px 18px; font-family: 'Archivo Narrow'; font-size: 14px; line-height: 1.5; }
+  .post-caption strong { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .post-caption .tag { color: var(--magenta-2); }
+
+  /* Crews */
+  .crew { display: flex; align-items: center; gap: 16px; padding: 16px; background: rgba(13,10,24,0.4); border: 1px solid var(--line); border-radius: 14px; }
+  .crew-avatars { display: flex; }
+  .crew-avatars span { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--morado), var(--magenta)); display: flex; align-items: center; justify-content: center; font-family: 'Anton'; color: var(--cream); font-size: 12px; border: 2px solid var(--bg); margin-left: -10px; }
+  .crew-avatars span:first-child { margin-left: 0; }
+  .crew h4 { font-family: 'Anton'; font-size: 18px; margin: 0 0 4px; }
+  .crew p { font-family: 'Archivo Narrow'; font-size: 11px; color: var(--ink-dim); margin: 0; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* Layout sidebar */
+  .social-layout { display: grid; grid-template-columns: 1fr 360px; gap: 32px; max-width: 1480px; margin: 0 auto; padding: 0 48px; }
+  .side-card { background: rgba(13,10,24,0.5); border: 1px solid var(--line); border-radius: 18px; padding: 24px; margin-bottom: 22px; position: sticky; top: 100px; }
+  .side-card + .side-card { position: static; }
+  .side-card h3 { font-family: 'Anton'; font-size: 22px; margin: 0 0 18px; text-transform: uppercase; }
+
+  .trend-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .trend-item:last-child { border-bottom: none; }
+  .trend-rank { font-family: 'Anton'; font-size: 28px; color: transparent; -webkit-text-stroke: 1.5px var(--ink-faint); width: 36px; }
+  .trend-item.hot .trend-rank { -webkit-text-stroke: 0; color: var(--magenta); }
+  .trend-evt { flex: 1; }
+  .trend-evt .nm { font-family: 'Archivo Narrow'; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+  .trend-evt .m { font-family: 'Archivo Narrow'; font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.14em; margin-top: 3px; }
+
+  @media (max-width: 980px) {
+    .social-layout { grid-template-columns: 1fr; padding: 0 20px; }
+    .side-card { position: static; }
+  }
+</style>
+</head>
+<body class="grain">
+
+<header class="v-nav">
+  <div class="v-nav-inner">
+    <a href="vibez-home.html" class="v-nav-logo"><img src="assets/logo_vibez.png" alt=""><span>VIBEZ</span></a>
+    <nav class="v-nav-links">
+      <a href="vibez-home.html">Para ti</a>
+      <a href="vibez-tickets.html">Mis tickets</a>
+      <a href="vibez-home.html">Esta noche</a>
+      <a href="vibez-bolsa.html">Bolsa</a>
+      <a href="vibez-social.html" class="active">Social</a>
+    </nav>
+    <div class="v-nav-right">
+      <button class="v-nav-bell"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
+      <button class="v-nav-avatar"><span class="av">SM</span><span class="nm">Samuel</span></button>
+    </div>
+  </div>
+</header>
+
+<section class="v-hero" style="padding-bottom:30px">
+  <div class="v-hero-inner">
+    <div class="s-kicker">VIBEZ Tribe · 142 amigos en línea</div>
+    <h1>Tu <em>tribu</em><br>en vivo.</h1>
+    <p class="sub">Quién va a dónde, qué se está liando, cuál es el plan. La nightlife se vive mejor en grupo.</p>
+  </div>
+</section>
+
+<!-- STORIES -->
+<section class="section tight" style="padding-top:0">
+  <div class="stories no-scrollbar">
+    <div class="story" onclick="alert('Crear story')">
+      <div class="story-ring you"><div class="you-add">+</div></div>
+      <div class="story-name">Tu story</div>
+    </div>
+    <div class="story"><div class="story-ring"><img src="https://i.pravatar.cc/100?img=12" alt=""></div><div class="story-name">@laura.b</div></div>
+    <div class="story"><div class="story-ring"><img src="https://i.pravatar.cc/100?img=33" alt=""></div><div class="story-name">@dani_r</div></div>
+    <div class="story"><div class="story-ring"><img src="https://i.pravatar.cc/100?img=47" alt=""></div><div class="story-name">@xeneize</div></div>
+    <div class="story"><div class="story-ring"><img src="https://i.pravatar.cc/100?img=23" alt=""></div><div class="story-name">@martabcn</div></div>
+    <div class="story"><div class="story-ring"><img src="https://i.pravatar.cc/100?img=68" alt=""></div><div class="story-name">@elraval</div></div>
+    <div class="story"><div class="story-ring seen"><img src="https://i.pravatar.cc/100?img=55" alt=""></div><div class="story-name">@izimine</div></div>
+    <div class="story"><div class="story-ring seen"><img src="https://i.pravatar.cc/100?img=14" alt=""></div><div class="story-name">@oriol_dj</div></div>
+    <div class="story"><div class="story-ring seen"><img src="https://i.pravatar.cc/100?img=8" alt=""></div><div class="story-name">@nurianit</div></div>
+  </div>
+</section>
+
+<!-- LAYOUT -->
+<div class="social-layout">
+  <!-- FEED -->
+  <main>
+    <article class="post">
+      <div class="post-head">
+        <div class="post-user">
+          <span class="av">LB</span>
+          <div><div class="nm">@laura.b</div><div class="meta">hace 12 min · Razzmatazz</div></div>
+        </div>
+        <button class="pa-btn">···</button>
+      </div>
+      <div class="post-img">
+        <img src="https://picsum.photos/seed/vibez-techno-1/1400/1750" alt="">
+        <a href="vibez-home.html" class="post-evento-tag"><span class="dot"></span>EN AMNESIA × FELICIDAD · ahora</a>
+      </div>
+      <div class="post-actions">
+        <button class="pa-btn liked" onclick="this.classList.toggle('liked')">♥ 247</button>
+        <button class="pa-btn">💬 32</button>
+        <button class="pa-btn">↗ Compartir</button>
+        <button class="pa-btn" style="margin-left:auto">★ Guardar</button>
+      </div>
+      <div class="post-caption">
+        <strong>@laura.b</strong> charlotte ha venido a romper la pista 🌀 nada como un B2B inesperado a las 03:00. <span class="tag">#amnesiaxfelicidad</span> <span class="tag">#bcnnights</span>
+      </div>
+    </article>
+
+    <article class="post">
+      <div class="post-head">
+        <div class="post-user">
+          <span class="av" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)">DR</span>
+          <div><div class="nm">@dani_r</div><div class="meta">hace 1h · Apolo</div></div>
+        </div>
+        <button class="pa-btn">···</button>
+      </div>
+      <div class="post-img" style="aspect-ratio:1/1">
+        <img src="https://picsum.photos/seed/vibez-italo-5/1400/1400" alt="">
+        <a href="#" class="post-evento-tag">📍 NOCHE ÍTALO DISCO</a>
+      </div>
+      <div class="post-actions">
+        <button class="pa-btn" onclick="this.classList.toggle('liked')">♥ 132</button>
+        <button class="pa-btn">💬 18</button>
+        <button class="pa-btn">↗ Compartir</button>
+      </div>
+      <div class="post-caption">
+        <strong>@dani_r</strong> el bakalao no muere, solo cambia de discoteca 💋
+      </div>
+    </article>
+
+    <article class="post">
+      <div class="post-head">
+        <div class="post-user">
+          <span class="av" style="background:linear-gradient(135deg,#ec4899,#a855f7)">MB</span>
+          <div><div class="nm">@martabcn</div><div class="meta">hace 3h · Parc del Fòrum</div></div>
+        </div>
+        <button class="pa-btn">···</button>
+      </div>
+      <div class="post-img" style="aspect-ratio:3/4">
+        <img src="https://picsum.photos/seed/vibez-festival-2/1400/1750" alt="">
+        <a href="#" class="post-evento-tag"><span class="dot"></span>Primavera Sound · día 2</a>
+      </div>
+      <div class="post-actions">
+        <button class="pa-btn" onclick="this.classList.toggle('liked')">♥ 1.2K</button>
+        <button class="pa-btn">💬 87</button>
+        <button class="pa-btn">↗ Compartir</button>
+        <button class="pa-btn" style="margin-left:auto">★ Guardar</button>
+      </div>
+      <div class="post-caption">
+        <strong>@martabcn</strong> hoy lcd soundsystem y mañana morir. <span class="tag">#primavera2026</span>
+      </div>
+    </article>
+
+    <article class="post">
+      <div class="post-head">
+        <div class="post-user">
+          <span class="av" style="background:linear-gradient(135deg,#22d3ee,#a855f7)">OD</span>
+          <div><div class="nm">@oriol_dj</div><div class="meta">hace 6h · Industria</div></div>
+        </div>
+        <button class="pa-btn">···</button>
+      </div>
+      <div class="post-img" style="aspect-ratio:4/5">
+        <img src="https://picsum.photos/seed/vibez-club-3/1400/1750" alt="">
+      </div>
+      <div class="post-actions">
+        <button class="pa-btn" onclick="this.classList.toggle('liked')">♥ 86</button>
+        <button class="pa-btn">💬 9</button>
+        <button class="pa-btn">↗ Compartir</button>
+      </div>
+      <div class="post-caption">
+        <strong>@oriol_dj</strong> preview del set del sábado · tech house + breaks · si vienes te invito a un chupito 🍻
+      </div>
+    </article>
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="side-card">
+      <h3>Crews <em style="color:var(--magenta);font-family:'Bebas Neue';font-style:italic">activos</em></h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="crew">
+          <div class="crew-avatars"><span>SM</span><span style="background:linear-gradient(135deg,#ec4899,#a855f7)">LB</span><span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)">DR</span><span style="background:linear-gradient(135deg,#22d3ee,#a855f7)">+5</span></div>
+          <div><h4>Los del jueves</h4><p>8 miembros · va a Razzmatazz hoy</p></div>
+        </div>
+        <div class="crew">
+          <div class="crew-avatars"><span style="background:linear-gradient(135deg,#f59e0b,#ef4444)">MB</span><span style="background:linear-gradient(135deg,#22d3ee,#a855f7)">OR</span><span>+3</span></div>
+          <div><h4>Primavera Squad</h4><p>5 miembros · planea Primavera Sound</p></div>
+        </div>
+        <div class="crew">
+          <div class="crew-avatars"><span style="background:linear-gradient(135deg,#10b981,#a855f7)">NN</span><span style="background:linear-gradient(135deg,#a855f7,#ec4899)">XN</span></div>
+          <div><h4>Bakalao FC</h4><p>2 miembros · italo disco only</p></div>
+        </div>
+      </div>
+      <button class="btn-ghost" style="width:100%;padding:14px;border-radius:999px;font-size:12px;margin-top:18px">+ Crear crew</button>
+    </div>
+
+    <div class="side-card">
+      <h3>Trending <em style="color:var(--magenta);font-family:'Bebas Neue';font-style:italic">esta noche</em></h3>
+      <div>
+        <div class="trend-item hot"><div class="trend-rank">01</div><div class="trend-evt"><div class="nm">Amnesia × Felicidad</div><div class="m">🔥 432 personas hablando</div></div></div>
+        <div class="trend-item hot"><div class="trend-rank">02</div><div class="trend-evt"><div class="nm">Bad Bunny · Pacha</div><div class="m">🔥 287 hablando</div></div></div>
+        <div class="trend-item"><div class="trend-rank">03</div><div class="trend-evt"><div class="nm">Noche Ítalo Disco · Apolo</div><div class="m">194 hablando</div></div></div>
+        <div class="trend-item"><div class="trend-rank">04</div><div class="trend-evt"><div class="nm">Primavera Sound</div><div class="m">156 hablando</div></div></div>
+        <div class="trend-item"><div class="trend-rank">05</div><div class="trend-evt"><div class="nm">Jazz Casa Fuster</div><div class="m">82 hablando</div></div></div>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <h3>Sugeridos para <em style="color:var(--magenta);font-family:'Bebas Neue';font-style:italic">seguir</em></h3>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="https://i.pravatar.cc/100?img=68" style="width:42px;height:42px;border-radius:50%;object-fit:cover" alt="">
+          <div style="flex:1"><div style="font-family:'Archivo Narrow';font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:12px">@elraval</div><div style="font-family:'Archivo Narrow';font-size:10px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.14em">12 amigos en común</div></div>
+          <button class="btn-primary" style="padding:8px 14px;border-radius:999px;font-size:10px">Seguir</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="https://i.pravatar.cc/100?img=14" style="width:42px;height:42px;border-radius:50%;object-fit:cover" alt="">
+          <div style="flex:1"><div style="font-family:'Archivo Narrow';font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:12px">@oriol_dj</div><div style="font-family:'Archivo Narrow';font-size:10px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.14em">DJ residente · Apolo</div></div>
+          <button class="btn-primary" style="padding:8px 14px;border-radius:999px;font-size:10px">Seguir</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="https://i.pravatar.cc/100?img=23" style="width:42px;height:42px;border-radius:50%;object-fit:cover" alt="">
+          <div style="flex:1"><div style="font-family:'Archivo Narrow';font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:12px">@martabcn</div><div style="font-family:'Archivo Narrow';font-size:10px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.14em">Primavera Sound · día 2</div></div>
+          <button class="btn-primary" style="padding:8px 14px;border-radius:999px;font-size:10px">Seguir</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="v-foot">
+  <div class="v-foot-inner">
+    <div class="v-foot-big">LA NOCHE · <em>EN GRUPO</em></div>
+    <div class="v-foot-bottom">
+      <div>© 2026 VIBEZ · Barcelona</div>
+      <div>Términos · Privacidad · Contacto</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

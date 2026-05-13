@@ -6,7 +6,23 @@
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
+
+{{-- Banner: perfil fiscal incompleto --}}
+@if($empresa && !$empresa->perfil_fiscal_completo)
+<div class="banner-fiscal-incompleto">
+    <span class="banner-fiscal-icon">⚠</span>
+    <div class="banner-fiscal-texto">
+        <strong>Completa tu perfil fiscal para poder publicar eventos</strong>
+        <p>Necesitamos tus datos legales y bancarios para gestionar los pagos de tus entradas.</p>
+    </div>
+    <a href="{{ route('empresa.perfil-fiscal') }}" class="banner-fiscal-btn">
+        Completar ahora →
+    </a>
+</div>
+@endif
 
 {{-- ════════════════════════════════════════════════════
      HERO — Panel de empresa (fondo oscuro como el resto del app)
@@ -293,6 +309,16 @@
             </div>
             <h3 class="accion-titulo">Revisar Currículums</h3>
             <p class="accion-desc">Ver todos los candidatos postulados a tus ofertas de trabajo.</p>
+        </a>
+
+        <a href="{{ route('empresa.validacion.index') }}" class="accion-card">
+            <div class="accion-icono" style="background:linear-gradient(135deg,#059669,#10b981);">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                </svg>
+            </div>
+            <h3 class="accion-titulo">Validar entradas QR</h3>
+            <p class="accion-desc">Escanea los QR de los asistentes para validar su acceso al evento.</p>
         </a>
         @endif
     </div>

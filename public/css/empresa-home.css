@@ -1,210 +1,340 @@
-/* ── Stats ── */
-.empresa-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 2.5rem;
-}
-.empresa-stat-card {
-    background: white;
-    border: 1px solid #ede9fe;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.empresa-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(124,58,237,0.12);
-}
-.empresa-stat-numero {
-    font-size: 2.2rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1.1;
-}
-.empresa-stat-label {
-    color: rgba(15,23,42,0.45);
-    font-size: 0.82rem;
-    font-weight: 600;
-    margin-top: 0.35rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
+/* ── VIBEZ Empresa Home — Dark theme ── */
 
-/* ── Info Card ── */
-.empresa-info-card {
-    background: white;
-    border: 1px solid #ede9fe;
-    border-radius: 1.25rem;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.empresa-info-row {
+/* Page background override for empresa section */
+body { background: #07060c; }
+
+/* ── Banner: perfil fiscal incompleto ── */
+.banner-fiscal-incompleto {
     display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid #f0eeff;
-    font-size: 0.9rem;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 0 auto 0;
+    max-width: 1280px;
+    color: #fff;
 }
-.empresa-info-row:last-child { border-bottom: none; }
-.empresa-info-label {
-    color: rgba(15,23,42,0.4);
-    min-width: 130px;
-    font-weight: 600;
+.banner-fiscal-icon {
+    font-size: 22px;
     flex-shrink: 0;
 }
-.empresa-info-value { color: var(--navy); }
+.banner-fiscal-texto {
+    flex: 1;
+    font-family: 'Archivo Narrow', sans-serif;
+}
+.banner-fiscal-texto strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.banner-fiscal-texto p {
+    font-size: 13px;
+    opacity: 0.85;
+    margin: 0;
+}
+.banner-fiscal-btn {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-family: 'Anton', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background 0.2s;
+}
+.banner-fiscal-btn:hover { background: rgba(255,255,255,0.28); }
 
-/* ── Section Titles ── */
+/* ── Stats grid ── */
+.empresa-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid rgba(245,241,234,0.10);
+    margin-bottom: 2.5rem;
+}
+@media (max-width: 640px) {
+    .empresa-stats-grid { grid-template-columns: 1fr; }
+}
+.empresa-stat-card {
+    background: #0d0a18;
+    padding: 28px 24px;
+    border-right: 1px solid rgba(245,241,234,0.10);
+}
+.empresa-stat-card:last-child { border-right: none; }
+@media (max-width: 640px) {
+    .empresa-stat-card { border-right: none; border-bottom: 1px solid rgba(245,241,234,0.10); }
+    .empresa-stat-card:last-child { border-bottom: none; }
+}
+.empresa-stat-numero {
+    font-family: 'Anton', sans-serif;
+    font-size: 4.5rem;
+    color: #f5f1ea;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+}
+.empresa-stat-label {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.55);
+    margin-top: 10px;
+}
+
+/* ── Info card ── */
+.empresa-info-card {
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 24px;
+    margin-bottom: 2rem;
+}
+.empresa-info-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 14px 0;
+    border-bottom: 1px dashed rgba(245,241,234,0.10);
+}
+.empresa-info-row:last-child { border-bottom: none; }
+@media (max-width: 640px) {
+    .empresa-info-row { grid-template-columns: 1fr; gap: 4px; }
+}
+.empresa-info-label {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.55);
+    flex-shrink: 0;
+}
+.empresa-info-value {
+    color: #f5f1ea;
+    font-size: 0.9375rem;
+}
+
+/* ── Section titles ── */
 .seccion-empresa-titulo {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--navy);
-    margin-bottom: 0.4rem;
+    gap: 10px;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.75rem;
+    color: #f5f1ea;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.9;
+    margin-bottom: 4px;
 }
-.seccion-empresa-titulo svg { color: var(--morado); flex-shrink: 0; }
+.seccion-empresa-titulo svg { color: #c084fc; flex-shrink: 0; }
 .seccion-empresa-sub {
-    color: rgba(15,23,42,0.45);
-    font-size: 0.85rem;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.55);
     margin-bottom: 1.25rem;
 }
 
-/* ── Evento Mini Cards ── */
+/* ── Event mini cards ── */
 .evento-mini-card {
-    background: white;
-    border: 1px solid #ede9fe;
-    border-radius: 1.25rem;
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: border-color 0.2s;
 }
-.evento-mini-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(124,58,237,0.12);
+.evento-mini-card:hover { border-color: rgba(168,85,247,0.5); }
+.evento-mini-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+    filter: saturate(0.85) brightness(0.95);
 }
-.evento-mini-img { width: 100%; height: 140px; object-fit: cover; }
-.evento-mini-body { padding: 1rem 1.15rem; }
+.evento-mini-body { padding: 18px; }
 .evento-mini-titulo {
-    color: var(--navy);
-    font-weight: 700;
-    font-size: 0.95rem;
-    margin-bottom: 0.3rem;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.375rem;
+    color: #f5f1ea;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.9;
+    margin-bottom: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .evento-mini-meta {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #c084fc;
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    color: rgba(15,23,42,0.45);
-    font-size: 0.8rem;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.25rem;
 }
-.evento-mini-meta svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--morado); }
+.evento-mini-meta svg { color: #c084fc; width: 14px; height: 14px; flex-shrink: 0; }
 
-/* ── Trabajador Cards ── */
+/* ── Worker cards ── */
 .trabajador-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    background: white;
-    border: 1px solid #ede9fe;
-    border-radius: 1rem;
-    padding: 1rem 1.25rem;
-    transition: box-shadow 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    gap: 14px;
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 18px;
+    transition: border-color 0.2s;
 }
-.trabajador-card:hover { box-shadow: 0 6px 24px rgba(124,58,237,0.1); }
+.trabajador-card:hover { border-color: rgba(168,85,247,0.4); }
 .trabajador-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
+    width: 48px; height: 48px; border-radius: 50%;
     background: linear-gradient(135deg, #7c3aed, #a855f7);
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; overflow: hidden;
+    font-family: 'Anton', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: #f5f1ea;
+    flex-shrink: 0; overflow: hidden;
 }
 .trabajador-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.trabajador-nombre { color: var(--navy); font-weight: 700; font-size: 0.92rem; }
-.trabajador-email { color: rgba(15,23,42,0.4); font-size: 0.8rem; }
+.trabajador-nombre { color: #f5f1ea; font-weight: 700; font-size: 0.875rem; margin: 0; }
+.trabajador-email {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    color: rgba(245,241,234,0.55);
+    margin: 4px 0 0;
+    text-transform: lowercase;
+    letter-spacing: 0;
+}
 
-/* ── Action Cards ── */
+/* ── Action cards ── */
 .accion-card {
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 24px;
     display: block;
-    background: white;
-    border: 1.5px solid #ede9fe;
-    border-radius: 1.25rem;
-    padding: 1.5rem;
     text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    color: inherit;
+    transition: border-color 0.2s;
 }
-.accion-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 32px rgba(124,58,237,0.12);
-    border-color: var(--morado-claro);
-}
+.accion-card:hover { border-color: rgba(168,85,247,0.5); }
 .accion-icono {
-    width: 48px; height: 48px; border-radius: 14px;
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: #a855f7;
 }
-.accion-icono svg { width: 24px; height: 24px; color: white; }
-.accion-titulo { color: var(--navy); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem; }
-.accion-desc { color: rgba(15,23,42,0.5); font-size: 0.85rem; }
+.accion-icono svg { width: 20px; height: 20px; color: #07060c; }
+.accion-titulo {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.25rem;
+    color: #f5f1ea;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.9;
+    margin: 0 0 6px;
+}
+.accion-desc { color: rgba(245,241,234,0.55); font-size: 0.8125rem; line-height: 1.5; margin: 0; }
 
-/* ── Botón Crear Evento ── */
+/* ── Primary button ── */
 .btn-crear-evento {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.85rem 1.8rem;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    color: #fff; font-weight: 800; font-size: 0.95rem;
-    border: none; border-radius: 0.85rem; cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.15s, box-shadow 0.2s;
-    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
-}
-.btn-crear-evento:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 28px rgba(124,58,237,0.5);
-}
-.btn-crear-evento svg { width: 20px; height: 20px; }
-
-/* ── Empty State ── */
-.empty-state {
-    text-align: center; padding: 2.5rem 1rem;
-}
-.empty-state svg { width: 48px; height: 48px; margin: 0 auto 0.75rem; opacity: 0.35; color: var(--morado); }
-.empty-state .empty-titulo { font-weight: 700; color: rgba(15,23,42,0.5); margin-bottom: 0.3rem; }
-.empty-state .empty-desc { color: rgba(15,23,42,0.35); font-size: 0.9rem; }
-
-/* ── Botón eliminar evento ── */
-.btn-eliminar-evento {
+    font-family: 'Anton', sans-serif;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    padding: 12px 22px;
+    background: #a855f7;
+    color: #f5f1ea;
+    border: none;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 8px;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.btn-crear-evento:hover { background: #c084fc; color: #07060c; }
+.btn-crear-evento svg { width: 16px; height: 16px; }
+
+/* ── Empty state ── */
+.empty-state { text-align: center; padding: 2.5rem 1rem; }
+.empty-state svg { width: 48px; height: 48px; margin: 0 auto 0.75rem; opacity: 0.35; color: #a855f7; }
+.empty-titulo { font-weight: 700; color: rgba(245,241,234,0.5); margin-bottom: 0.3rem; }
+.empty-desc { color: rgba(245,241,234,0.35); font-size: 0.9rem; }
+
+/* ── Delete event button ── */
+.btn-eliminar-evento {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     width: 100%;
     justify-content: center;
-    padding: 0.5rem 0.75rem;
+    padding: 8px 12px;
     background: transparent;
-    border: 1.5px solid #fecaca;
-    color: #dc2626;
-    font-size: 0.78rem;
-    font-weight: 700;
-    border-radius: 0.6rem;
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.3);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, border-color 0.15s;
 }
-.btn-eliminar-evento:hover {
-    background: #fef2f2;
-    border-color: #dc2626;
+.btn-eliminar-evento:hover { background: rgba(239,68,68,0.1); border-color: #f87171; }
+
+/* ── Event card actions divider ── */
+.evento-mini-card .border-dashed,
+.evento-mini-card [style*="border-top"] {
+    border-color: rgba(245,241,234,0.10) !important;
+}
+
+/* Override event category badge inline styles */
+.evento-mini-body span[style*="background:#ede9fe"] {
+    background: rgba(168,85,247,0.16) !important;
+    color: #c084fc !important;
+    border-radius: 0 !important;
+    font-family: 'Archivo Narrow', sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+}
+
+/* Override hero action button for ofertas (green accent) */
+.btn-crear-evento[style*="059669"],
+.btn-crear-evento[style*="10b981"] {
+    background: #34d399 !important;
+    color: #07060c !important;
+}
+.btn-crear-evento[style*="059669"]:hover,
+.btn-crear-evento[style*="10b981"]:hover {
+    background: #6ee7b7 !important;
+}
+
+/* Override accion-icono for green variant */
+.accion-card .accion-icono[style*="059669"],
+.accion-card .accion-icono[style*="10b981"] {
+    background: #34d399 !important;
+}
+
+/* Ensure section text overrides layout defaults */
+.seccion-empresa-titulo a,
+.seccion-empresa-titulo a:hover {
+    color: #a855f7;
+    text-decoration: underline;
 }

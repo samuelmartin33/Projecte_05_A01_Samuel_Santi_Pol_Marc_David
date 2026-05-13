@@ -288,16 +288,31 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        // Detectar tipo de cuenta antes de validar para aplicar reglas distintas
+        $esEmpresa = $request->input('tipo_cuenta') === 'empresa';
+
         $validated = $request->validate([
             'nombre'                => ['required', 'string', 'min:2', 'max:100'],
             'apellido1'             => ['required', 'string', 'min:2', 'max:150'],
-            'apellido2'             => ['required', 'string', 'min:2', 'max:150'],
+            // Segundo apellido solo obligatorio para clientes
+            'apellido2'             => $esEmpresa
+                                        ? ['nullable', 'string', 'max:150']
+                                        : ['required', 'string', 'min:2', 'max:150'],
             'email'                 => ['required', 'email', 'unique:usuarios,email'],
             'password'              => ['required', 'min:8', 'confirmed'],
             'password_confirmation' => ['required'],
-            'fecha_nacimiento'      => ['required', 'date', 'before:-14 years'],
+            // Mínimo de edad (14 años) solo para clientes; para empresa solo fecha válida
+            'fecha_nacimiento'      => $esEmpresa
+                                        ? ['required', 'date']
+                                        : ['required', 'date', 'before:-14 years'],
             'telefono'              => ['required', 'string', 'max:20', 'regex:/^\+?[\d\s\-]{7,20}$/'],
             'tipo_cuenta'           => ['required', 'in:cliente,empresa'],
+            // Campos exclusivos para cuentas de empresa
+            'nombre_empresa'        => ['required_if:tipo_cuenta,empresa', 'nullable', 'string', 'max:200'],
+            'nif_cif'               => ['required_if:tipo_cuenta,empresa', 'nullable', 'string', 'max:20', 'regex:/^[A-Za-z0-9]{7,9}$/'],
+            'tipo_promotor'         => ['required_if:tipo_cuenta,empresa', 'nullable', 'in:sala_club,promotora,festival,artista,autonomo,otro'],
+            'descripcion'           => ['nullable', 'string', 'max:500'],
+            'sitio_web'             => ['nullable', 'url', 'max:500'],
         ], [
             'nombre.required'                => 'El nombre es obligatorio',
             'nombre.min'                     => 'El nombre debe tener al menos 2 caracteres',
@@ -319,12 +334,15 @@ class AuthController extends Controller
             'telefono.regex'                 => 'Introduce un teléfono válido',
             'tipo_cuenta.required'           => 'Selecciona el tipo de cuenta',
             'tipo_cuenta.in'                 => 'Tipo de cuenta no válido',
+            'nombre_empresa.required_if'     => 'El nombre de empresa es obligatorio',
+            'nif_cif.required_if'            => 'El NIF/CIF es obligatorio para empresas',
+            'nif_cif.regex'                  => 'El NIF/CIF no tiene el formato correcto (ej: B12345678)',
+            'tipo_promotor.required_if'      => 'Selecciona el tipo de promotor',
+            'tipo_promotor.in'               => 'Tipo de promotor no válido',
+            'sitio_web.url'                  => 'El sitio web debe ser una URL válida',
         ]);
 
-        $ahora     = now();
-        // Variable booleana que determina si el usuario se registra como empresa.
-        // Controla el flujo bifurcado de verificación más abajo.
-        $esEmpresa = $validated['tipo_cuenta'] === 'empresa';
+        $ahora = now();
 
         // Creamos el usuario. La columna email_verificado y estado_registro
         // se asignan de forma diferente según si es empresa o cliente.
@@ -361,7 +379,31 @@ class AuthController extends Controller
             ], 201);
         }
 
-        // Flujo EMPRESA: sin auto-login, la cuenta queda en espera de aprobación.
+        // Notificar a todos los admins de la nueva solicitud de empresa
+        \App\Models\Notificacion::notificarAdmins(
+            \App\Models\Notificacion::EMPRESA_REGISTRO,
+            'Nueva solicitud de empresa',
+            "«{$validated['nombre_empresa']}» solicita unirse a VIBEZ. Revisa y aprueba.",
+            route('admin.empresas.show', $usuario->id)
+        );
+
+        // Flujo EMPRESA: crear registro en tabla empresas con los datos del formulario.
+        // El perfil fiscal quedará incompleto (perfil_fiscal_completo=false) hasta que
+        // el promotor rellene los datos bancarios y legales en su panel.
+        \App\Models\Empresa::create([
+            'usuario_id'             => $usuario->id,
+            'nombre_empresa'         => $validated['nombre_empresa'],
+            'nif_cif'                => $validated['nif_cif'],
+            'tipo_promotor'          => $validated['tipo_promotor'],
+            'descripcion'            => $validated['descripcion'] ?? null,
+            'sitio_web'              => $validated['sitio_web'] ?? null,
+            'perfil_fiscal_completo' => false,
+            'estado'                 => 1,
+            'fecha_creacion'         => $ahora,
+            'fecha_actualizacion'    => $ahora,
+        ]);
+
+        // Sin auto-login: la cuenta queda en espera de aprobación del administrador.
         return response()->json([
             'success' => true,
             'status'  => 'pending',

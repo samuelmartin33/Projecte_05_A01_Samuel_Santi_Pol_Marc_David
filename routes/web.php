@@ -34,13 +34,17 @@ use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
+use App\Http\Controllers\Empresa\ValidacionQRController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
+use App\Http\Controllers\Empresa\PerfilFiscalController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
 use App\Models\CategoriaEvento;
+use App\Models\Usuario;
+use App\Models\Empresa;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +81,13 @@ Route::get('/', function () {
         ])
         ->values();
 
-    return view('welcome', compact('eventos', 'categorias', 'eventosMapa'));
+    /* Estadísticas reales para la sección proof */
+    $statRavers     = Usuario::where('es_admin', 0)->where('estado', 1)->count();
+    $statEventos    = Evento::where('estado', 1)->count();
+    $statPromotores = Empresa::where('estado', 1)->count();
+    $statSatisf     = 98;
+
+    return view('welcome', compact('eventos', 'categorias', 'eventosMapa', 'statRavers', 'statEventos', 'statPromotores', 'statSatisf'));
 })->name('welcome');
 
 // --- Detalle de un evento específico ---
@@ -103,6 +113,20 @@ Route::post('/trabajos/{id}/postular-archivo', [PublicEventoController::class, '
 // --- API AJAX: filtrar eventos y ofertas (responde JSON) ---
 Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
     ->name('api.filtrar');
+
+// --- Mapa de eventos a pantalla completa ---
+Route::get('/mapa', [PublicEventoController::class, 'mapa'])
+    ->name('mapa');
+
+// --- Páginas estáticas del footer ---
+Route::view('/quienes-somos',  'static.quienes-somos')->name('quienes-somos');
+Route::view('/manifiesto',     'static.manifiesto')->name('manifiesto');
+Route::view('/prensa',         'static.prensa')->name('prensa');
+Route::view('/contacto',       'static.contacto')->name('contacto');
+Route::view('/privacidad',     'static.privacidad')->name('privacidad');
+Route::view('/cookies',        'static.cookies')->name('cookies');
+Route::view('/terminos',       'static.terminos')->name('terminos');
+Route::view('/devoluciones',   'static.devoluciones')->name('devoluciones');
 
 // --- Página completa de Bolsa de Trabajo ---
 Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
@@ -133,6 +157,12 @@ Route::middleware('auth')->prefix('empresa/eventos')->name('empresa.eventos.')->
     Route::get('/crear', [EmpresaEventosController::class, 'create'])->name('create');
     Route::post('/',     [EmpresaEventosController::class, 'store'])->name('store');
     Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
+});
+
+/* — Perfil fiscal de empresa (Fase 2 onboarding) — */
+Route::middleware('auth')->group(function () {
+    Route::get('/empresa/perfil-fiscal',  [PerfilFiscalController::class, 'show'])->name('empresa.perfil-fiscal');
+    Route::post('/empresa/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('empresa.perfil-fiscal.update');
 });
 
 /* — Ofertas de trabajo (empresa): crear y publicar ofertas — */
@@ -166,6 +196,12 @@ Route::middleware('auth')->prefix('empresa/candidaturas')->name('empresa.candida
     Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])
          ->where('ofertaId', '[0-9]+')
          ->name('cerrar-oferta');
+});
+
+/* — Validación QR de entradas (empresa) — */
+Route::middleware('auth')->prefix('empresa/validacion')->name('empresa.validacion.')->group(function () {
+    Route::get('/',        [ValidacionQRController::class, 'index'])->name('index');
+    Route::post('/validar',[ValidacionQRController::class, 'validar'])->name('validar');
 });
 
 /* — Perfil de usuario — */
@@ -222,6 +258,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     /* Rutas de gestión de empresas */
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
          ->name('admin.empresas.index');
+    Route::get('/admin/empresas/{id}', [AdminEmpresaController::class, 'show'])
+         ->name('admin.empresas.show');
     Route::post('/admin/empresas/{id}/aprobar', [AdminEmpresaController::class, 'aprobar'])
          ->name('admin.empresas.aprobar');
     Route::post('/admin/empresas/{id}/rechazar', [AdminEmpresaController::class, 'rechazar'])

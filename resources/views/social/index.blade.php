@@ -1,9 +1,26 @@
 @extends('layouts.app')
 
-@section('title', 'Social')
+@section('title', 'Social — VIBEZ')
 
-@section('contenido')
+{{-- Usamos @section('content') como la home para activar el modo oscuro completo --}}
+@section('content')
 
+{{-- ── Estilos base (dark theme) ── --}}
+<link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+<link rel="stylesheet" href="{{ asset('css/social.css') }}">
+
+{{-- El nav home mide aprox. 94px; ajustamos la altura del wrapper social --}}
+<style>
+  .soc                                { height: calc(100vh - 94px); }
+  @media (min-width: 900px)           { .soc { height: calc(100vh - 94px); } }
+</style>
+
+{{-- ════ NAV ════ --}}
+@include('partials.home.nav')
+
+{{-- ════════════════════════════════════════════════════
+     WRAPPER PRINCIPAL
+════════════════════════════════════════════════════ --}}
 <div class="soc" id="soc">
 
     {{-- ══════════════════════════════════════
@@ -11,32 +28,177 @@
          ══════════════════════════════════════ --}}
     <div class="soc-panel activo" id="panel-feed">
 
-        <header class="soc-topbar">
-            <h1 class="soc-topbar-titulo">Social</h1>
-            <button class="soc-topbar-btn" id="btn-nueva-pub" style="display:none"
-                    onclick="abrirModalPublicacion()" title="Nueva publicación">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m-4-4h8"/>
-                </svg>
-            </button>
-        </header>
+        {{-- btn-nueva-pub oculto: JS lo muestra/oculta según eventos disponibles --}}
+        <button id="btn-nueva-pub" style="display:none" onclick="abrirModalPublicacion()"></button>
 
         <div class="soc-scroll" id="feed-scroll">
-            <div id="feed-lista"></div>
 
-            <div id="feed-cargando" class="soc-spinner-wrap">
-                <div class="soc-spinner"></div>
+            {{-- ── HERO ── --}}
+            <div class="soc-hero-mini">
+                <p class="soc-hero-kicker">VIBEZ Tribe · tu comunidad</p>
+                <h1 class="soc-hero-titulo">Tu <em>tribu</em><br>en vivo.</h1>
+                <p class="soc-hero-sub">Quién va a dónde, qué se está liando, cuál es el plan. La nightlife se vive mejor en grupo.</p>
             </div>
 
-            <p class="soc-vacio" id="feed-vacio" style="display:none">
-                Aún no hay publicaciones.<br>¡Sé el primero en compartir un evento!
-            </p>
+            {{-- ── STORIES ── --}}
+            <div class="soc-stories-row no-scrollbar">
+                @php $u = Auth::user(); @endphp
+                <div class="soc-story" onclick="abrirModalPublicacion()" title="Publicar">
+                    <div class="soc-story-ring soc-story-ring--you">
+                        <div class="soc-story-av-you">+</div>
+                    </div>
+                    <div class="soc-story-name">Tu story</div>
+                </div>
+                @foreach([['AM','@amigo1'],['XR','@xavi.r'],['LG','@laura.g'],['PB','@pablo_b'],['NF','@nuria_f'],['DR','@dani_r']] as [$ini,$handle])
+                <div class="soc-story">
+                    <div class="soc-story-ring">
+                        <div class="soc-story-av">{{ $ini }}</div>
+                    </div>
+                    <div class="soc-story-name">{{ $handle }}</div>
+                </div>
+                @endforeach
+            </div>
 
-            <p class="soc-cargar-mas" id="feed-cargar-mas" style="display:none"
-               onclick="cargarMasPosts()">Cargar más publicaciones</p>
+            {{-- ── FEED + SIDEBAR ── --}}
+            <div class="soc-feed-layout">
+
+                {{-- COLUMNA FEED --}}
+                <div class="soc-feed-col">
+                    <div id="feed-lista"></div>
+
+                    <div id="feed-cargando" class="soc-spinner-wrap">
+                        <div class="soc-spinner"></div>
+                    </div>
+
+                    <p class="soc-vacio" id="feed-vacio" style="display:none">
+                        Aún no hay publicaciones de los eventos a los que has asistido.<br>¡Sé el primero!
+                    </p>
+
+                    <p class="soc-cargar-mas" id="feed-cargar-mas" style="display:none"
+                       onclick="cargarMasPosts()">Cargar más publicaciones</p>
+                </div>
+
+                {{-- SIDEBAR DERECHO (solo desktop) --}}
+                <aside class="soc-sidebar-right">
+
+                    {{-- Crews activos --}}
+                    <div class="soc-side-card">
+                        <h3 class="soc-side-title">Crews <em>activos</em></h3>
+                        <div style="display:flex;flex-direction:column;gap:12px">
+                            <div class="soc-crew">
+                                <div class="soc-crew-avatars">
+                                    <span>SM</span>
+                                    <span style="background:linear-gradient(135deg,#ec4899,#a855f7)">LB</span>
+                                    <span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)">DR</span>
+                                    <span>+5</span>
+                                </div>
+                                <div>
+                                    <h4 class="soc-crew-name">Los del jueves</h4>
+                                    <p class="soc-crew-meta">8 miembros · va a Razzmatazz hoy</p>
+                                </div>
+                            </div>
+                            <div class="soc-crew">
+                                <div class="soc-crew-avatars">
+                                    <span style="background:linear-gradient(135deg,#f59e0b,#ef4444)">MB</span>
+                                    <span style="background:linear-gradient(135deg,#22d3ee,#a855f7)">OR</span>
+                                    <span>+3</span>
+                                </div>
+                                <div>
+                                    <h4 class="soc-crew-name">Primavera Squad</h4>
+                                    <p class="soc-crew-meta">5 miembros · planea Primavera Sound</p>
+                                </div>
+                            </div>
+                            <div class="soc-crew">
+                                <div class="soc-crew-avatars">
+                                    <span style="background:linear-gradient(135deg,#10b981,#a855f7)">NN</span>
+                                    <span style="background:linear-gradient(135deg,#a855f7,#ec4899)">XN</span>
+                                </div>
+                                <div>
+                                    <h4 class="soc-crew-name">Bakalao FC</h4>
+                                    <p class="soc-crew-meta">2 miembros · italo disco only</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="soc-side-btn-ghost" style="margin-top:18px">+ Crear crew</button>
+                    </div>
+
+                    {{-- Trending esta noche --}}
+                    <div class="soc-side-card">
+                        <h3 class="soc-side-title">Trending <em>esta noche</em></h3>
+                        <div>
+                            <div class="soc-trend soc-trend--hot">
+                                <div class="soc-trend-rank">01</div>
+                                <div class="soc-trend-info">
+                                    <div class="soc-trend-name">Amnesia × Felicidad</div>
+                                    <div class="soc-trend-meta">🔥 432 personas hablando</div>
+                                </div>
+                            </div>
+                            <div class="soc-trend soc-trend--hot">
+                                <div class="soc-trend-rank">02</div>
+                                <div class="soc-trend-info">
+                                    <div class="soc-trend-name">Bad Bunny · Pacha</div>
+                                    <div class="soc-trend-meta">🔥 287 hablando</div>
+                                </div>
+                            </div>
+                            <div class="soc-trend">
+                                <div class="soc-trend-rank">03</div>
+                                <div class="soc-trend-info">
+                                    <div class="soc-trend-name">Noche Ítalo Disco · Apolo</div>
+                                    <div class="soc-trend-meta">194 hablando</div>
+                                </div>
+                            </div>
+                            <div class="soc-trend">
+                                <div class="soc-trend-rank">04</div>
+                                <div class="soc-trend-info">
+                                    <div class="soc-trend-name">Primavera Sound</div>
+                                    <div class="soc-trend-meta">156 hablando</div>
+                                </div>
+                            </div>
+                            <div class="soc-trend">
+                                <div class="soc-trend-rank">05</div>
+                                <div class="soc-trend-info">
+                                    <div class="soc-trend-name">Jazz Casa Fuster</div>
+                                    <div class="soc-trend-meta">82 hablando</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Sugeridos para seguir --}}
+                    <div class="soc-side-card">
+                        <h3 class="soc-side-title">Sugeridos para <em>seguir</em></h3>
+                        <div style="display:flex;flex-direction:column;gap:2px">
+                            <div class="soc-sugerido">
+                                <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#22d3ee,#a855f7)">ER</div>
+                                <div class="soc-sugerido-info">
+                                    <div class="soc-sugerido-nombre">@elraval</div>
+                                    <div class="soc-sugerido-meta">12 amigos en común</div>
+                                </div>
+                                <button class="soc-side-btn-pri">Seguir</button>
+                            </div>
+                            <div class="soc-sugerido">
+                                <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">OD</div>
+                                <div class="soc-sugerido-info">
+                                    <div class="soc-sugerido-nombre">@oriol_dj</div>
+                                    <div class="soc-sugerido-meta">DJ residente · Apolo</div>
+                                </div>
+                                <button class="soc-side-btn-pri">Seguir</button>
+                            </div>
+                            <div class="soc-sugerido">
+                                <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#ec4899,#a855f7)">MB</div>
+                                <div class="soc-sugerido-info">
+                                    <div class="soc-sugerido-nombre">@martabcn</div>
+                                    <div class="soc-sugerido-meta">Primavera Sound · día 2</div>
+                                </div>
+                                <button class="soc-side-btn-pri">Seguir</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </aside>
+            </div>
+
         </div>
-
     </div>
 
     {{-- ══════════════════════════════════════
@@ -44,14 +206,12 @@
          ══════════════════════════════════════ --}}
     <div class="soc-panel" id="panel-chats">
 
-        {{-- En desktop: columna izquierda (header + lista). En móvil: display:contents (transparente) --}}
         <div class="chats-col-izq">
 
             <header class="soc-topbar">
                 <h1 class="soc-topbar-titulo">Mensajes</h1>
             </header>
 
-            {{-- Sub-vista: lista de conversaciones --}}
             <div class="soc-subpanel activo" id="chats-lista-view">
                 <div id="lista-chats" class="soc-list">
                     <div id="skeleton-chats">
@@ -62,12 +222,10 @@
                 </div>
             </div>
 
-        </div>{{-- /chats-col-izq --}}
+        </div>
 
-        {{-- Sub-vista: chat abierto --}}
         <div class="soc-subpanel" id="chats-ventana-view">
 
-            {{-- Estado vacío: visible en desktop cuando no hay chat seleccionado --}}
             <div class="soc-chat-empty" id="chat-vacio-desktop">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -124,14 +282,12 @@
 
         <div class="soc-scroll">
 
-            {{-- Solicitudes pendientes --}}
             <div id="seccion-solicitudes" style="display:none">
                 <p class="soc-section-label">Solicitudes recibidas</p>
                 <div id="lista-solicitudes"></div>
                 <div class="soc-divider"></div>
             </div>
 
-            {{-- Lista de amigos --}}
             <p class="soc-section-label">Mis amigos</p>
             <div id="lista-amigos" class="soc-list">
                 <div id="skeleton-amigos">
@@ -144,11 +300,10 @@
     </div>
 
     {{-- ══════════════════════════════════════
-         BOTTOM NAVIGATION
+         BOTTOM NAVIGATION / SIDEBAR
          ══════════════════════════════════════ --}}
     <nav class="soc-bottom-nav">
 
-        {{-- Cabecera del sidebar (solo visible en desktop) --}}
         <div class="soc-sidebar-header">
             <span class="soc-sidebar-titulo">VIBEZ <span>Social</span></span>
         </div>
@@ -216,6 +371,13 @@
                           placeholder="Cuenta cómo fue el evento…"
                           maxlength="1000" rows="3"></textarea>
 
+                {{-- ── Visibilidad ── --}}
+                <label class="soc-field-label">¿Quién puede verlo?</label>
+                <select id="pub-select-visibilidad" class="soc-select">
+                    <option value="1">🌍 Todos</option>
+                    <option value="2">🔒 Solo mis amigos</option>
+                </select>
+
                 <label class="soc-field-label">Fotos * (mínimo 1, máximo 10)</label>
                 <div class="soc-upload-area"
                      onclick="document.getElementById('pub-input-fotos').click()">
@@ -278,15 +440,10 @@
 
 </div>{{-- /soc --}}
 
-@endsection
-
-@section('extra-css')
-<link rel="stylesheet" href="{{ asset('css/social.css') }}">
-@endsection
-
-@section('scripts')
+{{-- ── Scripts ── --}}
 <script>
     window.miUsuarioId = {{ Auth::id() }};
 </script>
 <script src="{{ asset('js/social.js') }}"></script>
+
 @endsection

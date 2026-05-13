@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Amigo;
 use App\Models\Entrada;
 use App\Models\EventoPost;
 use App\Models\EventoPostComentario;
@@ -23,6 +24,24 @@ class EventoPostController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
 
+        $eventoIds = Entrada::where('estado_entrada', 2)
+            ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
+            ->pluck('evento_id')
+            ->unique()
+            ->values();
+
+        /* IDs de amigos aceptados para filtrar posts de "solo amigos" */
+        $amigoIds = Amigo::where('estado', 1)
+            ->where(fn ($q) => $q
+                ->where('solicitante_id', $usuario->id)
+                ->orWhere('receptor_id', $usuario->id))
+            ->get()
+            ->map(fn ($a) => $a->solicitante_id === $usuario->id
+                ? $a->receptor_id
+                : $a->solicitante_id)
+            ->values()
+            ->toArray();
+
         $pagina    = max(1, (int) $request->get('pagina', 1));
         $porPagina = 15;
 
@@ -34,6 +53,16 @@ class EventoPostController extends Controller
                 'comentarios.usuario:id,nombre,apellido1,foto_url',
             ])
             ->where('estado', 1)
+            ->whereIn('evento_id', $eventoIds)
+            ->where(function ($q) use ($usuario, $amigoIds) {
+                /* Posts públicos siempre visibles; posts de solo amigos solo si eres el autor o amigo */
+                $q->where('visibilidad', 1)
+                  ->orWhere(fn ($q2) => $q2
+                      ->where('visibilidad', 2)
+                      ->where(fn ($q3) => $q3
+                          ->where('usuario_id', $usuario->id)
+                          ->orWhereIn('usuario_id', $amigoIds)));
+            })
             ->when($request->filled('evento_id'), fn ($q) => $q->where('evento_id', (int) $request->evento_id))
             ->orderByDesc('fecha_creacion');
 
@@ -60,6 +89,7 @@ class EventoPostController extends Controller
         $request->validate([
             'evento_id'   => ['required', 'integer', 'exists:eventos,id'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
+            'visibilidad' => ['nullable', 'integer', 'in:1,2'],
             'imagenes'    => ['required', 'array', 'min:1', 'max:10'],
             'imagenes.*'  => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
@@ -88,6 +118,7 @@ class EventoPostController extends Controller
                 'evento_id'           => $eventoId,
                 'descripcion'         => $request->descripcion ? trim($request->descripcion) : null,
                 'estado'              => 1,
+                'visibilidad'         => (int) ($request->visibilidad ?? 1),
                 'fecha_creacion'      => $ahora,
                 'fecha_actualizacion' => $ahora,
             ]);
@@ -276,6 +307,7 @@ class EventoPostController extends Controller
         return [
             'id'                  => $post->id,
             'descripcion'         => $post->descripcion,
+            'visibilidad'         => (int) $post->visibilidad,
             'fecha'               => $post->fecha_creacion,
             'evento'              => [
                 'id'     => $post->evento->id,

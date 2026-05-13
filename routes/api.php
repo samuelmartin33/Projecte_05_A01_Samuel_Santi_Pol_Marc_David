@@ -18,6 +18,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventoPostController;
 use App\Http\Controllers\FavoritoController;
 use App\Http\Controllers\EntradaController;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,11 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // Búsqueda dinámica de amigos y envío de solicitud
 // Usan AJAX porque los resultados se muestran sin recargar la página
 Route::middleware('auth')->group(function () {
+    // Notificaciones internas — campanita del nav
+    Route::get('/notificaciones',              [NotificacionController::class, 'index'])->name('api.notificaciones');
+    Route::post('/notificaciones/leer-todas',  [NotificacionController::class, 'leerTodas'])->name('api.notificaciones.leer-todas');
+    Route::post('/notificaciones/{id}/leer',   [NotificacionController::class, 'leer'])->name('api.notificaciones.leer');
+
     Route::get('/amigos/buscar',    [PerfilController::class, 'buscarUsuarios'])->name('api.amigos.buscar');
     Route::post('/amigos/solicitud', [PerfilController::class, 'enviarSolicitud'])->name('api.amigos.solicitud');
     Route::post('/favoritos/toggle', [FavoritoController::class, 'toggle'])->name('api.favoritos.toggle');

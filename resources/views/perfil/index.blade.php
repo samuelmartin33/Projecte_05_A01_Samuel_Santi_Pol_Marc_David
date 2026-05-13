@@ -6,7 +6,9 @@
 <link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 {{-- ════════════════════════════════════════════════════
      HERO DE PERFIL

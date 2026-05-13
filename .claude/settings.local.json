@@ -22,7 +22,10 @@
       "Bash(Measure-Object -Line)",
       "Bash(Get-ChildItem \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\database\\\\seeders\\\\\" -Name)",
       "Bash(Get-ChildItem -Path . -Recurse -Filter \"*.php\")",
-      "Bash(Get-ChildItem -Path \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\" -Recurse -Directory -Name)"
+      "Bash(Get-ChildItem -Path \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\" -Recurse -Directory -Name)",
+      "Bash(dir \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\storage\\\\framework\\\\views\")",
+      "Bash(dir \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\storage\")",
+      "Bash(Test-Path \"c:\\\\wamp64\\\\www\\\\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\\\\storage\\\\framework\\\\views\")"
     ]
   }
 }

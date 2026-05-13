@@ -6,7 +6,9 @@
 <link rel="stylesheet" href="{{ asset('css/empresa-candidaturas-detalle.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+@include('partials.home.nav')
 
 {{-- ══ Hero ══ --}}
 <section class="cand-hero">
@@ -95,7 +97,7 @@
         '4' => ['label' => 'Rechazados',      'color' => 'text-red-500'],
     ];
 @endphp
-<div class="sticky top-16 z-30 bg-white border-b border-navy/8 shadow-sm">
+<div class="sticky top-16 z-30" style="background:rgba(13,8,32,0.92);border-bottom:1px solid rgba(245,241,234,0.10);backdrop-filter:blur(20px);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div class="flex flex-wrap items-center gap-2">
 
@@ -147,32 +149,32 @@ $candidaturasJson = $candidaturas->map(function($c) {
 
     @if($candidaturas->isEmpty())
         <div class="text-center py-20">
-            <div class="w-16 h-16 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-navy/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-16 h-16 flex items-center justify-center mx-auto mb-4" style="background:rgba(245,241,234,0.05);">
+                <svg class="w-8 h-8" style="color:rgba(245,241,234,0.20);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
             </div>
-            <h3 class="text-navy/50 font-bold text-lg">Sin candidaturas
+            <h3 class="font-bold text-lg" style="color:rgba(245,241,234,0.50);">Sin candidaturas
                 @if(request('estado')) en este estado @endif
             </h3>
-            <p class="text-navy/30 text-sm mt-1">Cuando alguien se postule aparecerá aquí.</p>
+            <p class="text-sm mt-1" style="color:rgba(245,241,234,0.30);">Cuando alguien se postule aparecerá aquí.</p>
             @if(request('estado'))
                 <a href="{{ route('empresa.candidaturas.detalle', $oferta->id) }}"
-                   class="mt-4 inline-block text-purple-600 text-sm font-semibold hover:underline">
+                   class="mt-4 inline-block text-sm font-semibold hover:underline" style="color:#c084fc;">
                     Ver todas las candidaturas
                 </a>
             @endif
         </div>
     @else
 
-        <div class="bg-white rounded-2xl border border-navy/8 overflow-hidden shadow-sm">
+        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.10);overflow:hidden;">
 
             {{-- Cabecera de tabla --}}
-            <div class="grid grid-cols-[2.5rem_1fr_auto] gap-4 px-5 py-3 bg-navy/3 border-b border-navy/8">
+            <div class="grid grid-cols-[2.5rem_1fr_auto] gap-4 px-5 py-3" style="background:rgba(168,85,247,0.06);border-bottom:1px solid rgba(245,241,234,0.10);">
                 <div></div>
-                <p class="text-xs font-700 text-navy/40 uppercase tracking-wider font-bold">Candidato</p>
-                <p class="text-xs font-700 text-navy/40 uppercase tracking-wider font-bold">Acciones</p>
+                <p class="text-xs uppercase tracking-wider font-bold" style="color:rgba(245,241,234,0.40);font-family:'Archivo Narrow',sans-serif;letter-spacing:0.16em;">Candidato</p>
+                <p class="text-xs uppercase tracking-wider font-bold" style="color:rgba(245,241,234,0.40);font-family:'Archivo Narrow',sans-serif;letter-spacing:0.16em;">Acciones</p>
             </div>
 
             @foreach($candidaturas as $cand)
@@ -184,7 +186,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
                 {{-- Info candidato --}}
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-0.5">
-                        <span class="font-bold text-navy text-sm">{{ $cand->nombreCompleto() }}</span>
+                        <span class="font-bold text-sm" style="color:#f5f1ea;">{{ $cand->nombreCompleto() }}</span>
 
                         {{-- Estado badge (se actualiza via JS) --}}
                         <span id="badge-{{ $cand->id }}" class="estado-badge {{ $cand->estadoClases() }}">
@@ -202,7 +204,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
                         @endif
                     </div>
 
-                    <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-navy/45">
+                    <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs" style="color:rgba(245,241,234,0.45);">
                         @if($cand->email_candidato)
                             <span class="flex items-center gap-1">
                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -241,7 +243,8 @@ $candidaturasJson = $candidaturas->map(function($c) {
                     {{-- Ver CV --}}
                     <button onclick="verCv({{ $cand->id }})"
                             title="Ver CV completo"
-                            class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 flex items-center justify-center transition-colors">
+                            class="w-8 h-8 flex items-center justify-center transition-colors"
+                            style="background:rgba(168,85,247,0.18);border:1px solid rgba(168,85,247,0.4);color:#c084fc;">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -254,7 +257,8 @@ $candidaturasJson = $candidaturas->map(function($c) {
                     @if($cand->tieneArchivo())
                         <a href="{{ route('empresa.candidaturas.descargar', $cand->id) }}"
                            title="Descargar CV"
-                           class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center transition-colors">
+                           class="w-8 h-8 flex items-center justify-center transition-colors"
+                           style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.4);color:#34d399;">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -280,12 +284,12 @@ $candidaturasJson = $candidaturas->map(function($c) {
 <div id="cv-overlay" class="cv-modal-overlay" onclick="cerrarCvModal(event)">
     <div class="cv-modal" id="cv-modal-box">
         {{-- Header --}}
-        <div class="flex items-center justify-between px-5 py-4 border-b border-navy/8 flex-shrink-0">
+        <div class="flex items-center justify-between px-5 py-4 flex-shrink-0" style="border-bottom:1px solid rgba(245,241,234,0.10);">
             <div>
-                <h3 class="font-black text-navy text-lg" id="cv-modal-nombre">CV Candidato</h3>
-                <p class="text-navy/40 text-xs" id="cv-modal-sub"></p>
+                <h3 class="font-black text-lg" id="cv-modal-nombre" style="color:#f5f1ea;font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:-0.005em;">CV Candidato</h3>
+                <p class="text-xs" id="cv-modal-sub" style="color:rgba(245,241,234,0.40);"></p>
             </div>
-            <button onclick="cerrarCvModalBtn()" class="text-navy/30 hover:text-navy transition-colors">
+            <button onclick="cerrarCvModalBtn()" style="color:rgba(245,241,234,0.30);" class="transition-colors hover:text-white">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -301,11 +305,11 @@ $candidaturasJson = $candidaturas->map(function($c) {
         <div id="cv-content" class="cv-modal-body hidden"></div>
 
         {{-- Footer --}}
-        <div class="flex gap-2 px-5 py-3 border-t border-navy/8 flex-shrink-0">
-            <a id="cv-download-btn" href="#" class="hidden btn-comprar text-sm px-4 py-2 rounded-lg font-semibold">
+        <div class="flex gap-2 px-5 py-3 flex-shrink-0" style="border-top:1px solid rgba(245,241,234,0.10);">
+            <a id="cv-download-btn" href="#" class="hidden text-sm font-semibold" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.4);color:#34d399;padding:8px 14px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.16em;font-size:0.6875rem;">
                 Descargar PDF
             </a>
-            <button onclick="cerrarCvModalBtn()" class="ml-auto text-sm px-4 py-2 text-navy/40 hover:text-navy transition-colors font-medium">
+            <button onclick="cerrarCvModalBtn()" class="ml-auto text-sm px-4 py-2 transition-colors font-medium" style="color:rgba(245,241,234,0.40);">
                 Cerrar
             </button>
         </div>
