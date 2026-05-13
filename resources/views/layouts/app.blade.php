@@ -75,6 +75,11 @@
                               {{ request()->routeIs('empresa.candidaturas.*') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Candidaturas
                     </a>
+                    <a href="{{ route('empresa.facturacion.index') }}"
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('empresa.facturacion.*') ? 'text-white' : 'text-white/60 hover:text-white' }}">
+                        Administración
+                    </a>
                 @else
                     <a href="{{ route('home') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
@@ -179,6 +184,13 @@
                                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                     Revisar Currículums
+                                </a>
+                                <a href="{{ route('empresa.facturacion.index') }}" class="nav-dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                    Facturación
                                 </a>
                             @else
                                 {{-- Mis entradas (solo usuarios normales) --}}
@@ -302,6 +314,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 Candidaturas
+            </a>
+            <a href="{{ route('empresa.facturacion.index') }}"
+               class="nav-movil-link {{ request()->routeIs('empresa.facturacion.*') ? 'nav-movil-activo' : '' }}"
+               onclick="cerrarMenuMovil()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Facturación
             </a>
         @else
             {{-- Usuarios y visitantes: explorar, bolsa y social --}}

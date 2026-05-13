@@ -40,12 +40,19 @@
         <?php
           $esAdmin   = Auth::user()->es_admin;
           $esEmpresa = Auth::user()->isEmpresa();
-          if ($esEmpresa) {
+          $esPortero = Auth::user()->isPortero();
+          if ($esPortero) {
             $navLinks = [
-              ['Panel',        route('empresa.home'),                 'empresa.home'],
-              ['Candidaturas', route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
-              ['Crear evento', route('empresa.eventos.create'),       'empresa.eventos.create'],
-              ['Crear oferta', route('empresa.ofertas.create'),       'empresa.ofertas.create'],
+              ['Validación QR', route('empresa.validacion.index'), 'empresa.validacion.*'],
+            ];
+          } elseif ($esEmpresa) {
+            $navLinks = [
+              ['Panel',          route('empresa.home'),                 'empresa.home'],
+              ['Equipo',         route('empresa.equipo.index'),         'empresa.equipo.*'],
+              ['Candidaturas',   route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
+              ['Administración', route('empresa.facturacion.index'),    'empresa.facturacion.*'],
+              ['Crear evento',   route('empresa.eventos.create'),       'empresa.eventos.create'],
+              ['Crear oferta',   route('empresa.ofertas.create'),       'empresa.ofertas.create'],
             ];
           } else {
             $navLinks = array_filter([
@@ -127,12 +134,19 @@
 
         
         <div id="navDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.95);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:14px;padding:8px;min-width:220px;box-shadow:0 20px 50px rgba(0,0,0,0.5);z-index:100;">
-          <?php if($esEmpresa): ?>
+          <?php if($esPortero): ?>
+            <a href="<?php echo e(route('empresa.validacion.index')); ?>" onclick="document.getElementById('navDropdown').style.display='none'"
+               style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+              Validación QR
+            </a>
+          <?php elseif($esEmpresa): ?>
             <?php $__currentLoopData = [
-              ['Mi empresa',    route('empresa.home')],
-              ['Candidaturas',  route('empresa.candidaturas.ofertas')],
-              ['Crear evento',  route('empresa.eventos.create')],
-              ['Crear oferta',  route('empresa.ofertas.create')],
+              ['Mi empresa',      route('empresa.home')],
+              ['Equipo',          route('empresa.equipo.index')],
+              ['Candidaturas',    route('empresa.candidaturas.ofertas')],
+              ['Administración',  route('empresa.facturacion.index')],
+              ['Crear evento',    route('empresa.eventos.create')],
+              ['Crear oferta',    route('empresa.ofertas.create')],
             ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$item, $url]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
               <a href="<?php echo e($url); ?>" onclick="document.getElementById('navDropdown').style.display='none'"
                  style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
@@ -179,6 +193,7 @@
 
   </div>
 </header>
+<<<<<<< HEAD:storage/framework/views/8d9e9e3ec66a03e58ddcfc9fdb9c17c6.php
 
 <?php if(auth()->guard()->check()): ?>
 <script>
@@ -345,3 +360,6 @@ function solicitarPushPermiso(notificaciones, sinLeer) {
 </script>
 <?php endif; ?>
 <?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>
+=======
+<?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/nav.blade.php ENDPATH**/ ?>
+>>>>>>> 2fdba9955dd913f66498f330dbd980c97d71fc11:storage/framework/views/4fc0e6cfb539385f7cdf3578ff5e2d40.php

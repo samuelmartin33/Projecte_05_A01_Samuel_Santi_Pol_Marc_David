@@ -150,6 +150,16 @@ class Evento extends Model
         return $this->hasMany(EventoImagen::class, 'evento_id');
     }
 
+    public function entradas()
+    {
+        return $this->hasMany(\App\Models\Entrada::class, 'evento_id');
+    }
+
+    public function facturaEvento()
+    {
+        return $this->hasOne(\App\Models\FacturaEvento::class, 'evento_id');
+    }
+
     /**
      * Relación HasOne filtrada: la imagen de portada del evento.
      *

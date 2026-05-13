@@ -14,10 +14,10 @@
 </head>
 <body style="margin:0;padding:0;background-color:#0f0d1e;">
 
-@php
+<?php
   $primerEvento = $pedido->entradas->first()?->evento;
   $usuario      = $pedido->usuario;
-@endphp
+?>
 
 <!-- Wrapper -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0f0d1e;">
@@ -48,7 +48,7 @@
               ¡Compra confirmada!
             </h1>
             <p style="margin:0;font-size:15px;color:rgba(148,163,184,0.9);">
-              Hola <strong style="color:#a78bfa;">{{ $usuario->nombre }}</strong>, aquí tienes tus entradas.
+              Hola <strong style="color:#a78bfa;"><?php echo e($usuario->nombre); ?></strong>, aquí tienes tus entradas.
             </p>
           </td>
         </tr>
@@ -61,7 +61,7 @@
               <tr>
                 <td style="padding:20px 24px;">
 
-                  @if($primerEvento)
+                  <?php if($primerEvento): ?>
                   <!-- Nombre del evento -->
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
                     <tr>
@@ -69,17 +69,18 @@
                         <div style="width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:10px;"></div>
                       </td>
                       <td style="padding-left:12px;">
-                        <div style="font-size:16px;font-weight:700;color:#f1f5f9;">{{ $primerEvento->titulo }}</div>
+                        <div style="font-size:16px;font-weight:700;color:#f1f5f9;"><?php echo e($primerEvento->titulo); ?></div>
                         <div style="font-size:13px;color:#a78bfa;margin-top:2px;">
-                          {{ \Carbon\Carbon::parse($primerEvento->fecha_inicio)->locale('es')->isoFormat('D [de] MMMM [de] YYYY, HH:mm') }}
+                          <?php echo e(\Carbon\Carbon::parse($primerEvento->fecha_inicio)->locale('es')->isoFormat('D [de] MMMM [de] YYYY, HH:mm')); ?>
+
                         </div>
-                        @if($primerEvento->ubicacion_nombre)
-                        <div style="font-size:12px;color:#64748b;margin-top:2px;">📍 {{ $primerEvento->ubicacion_nombre }}</div>
-                        @endif
+                        <?php if($primerEvento->ubicacion_nombre): ?>
+                        <div style="font-size:12px;color:#64748b;margin-top:2px;">📍 <?php echo e($primerEvento->ubicacion_nombre); ?></div>
+                        <?php endif; ?>
                       </td>
                     </tr>
                   </table>
-                  @endif
+                  <?php endif; ?>
 
                   <!-- Separador -->
                   <div style="border-top:1px solid rgba(139,92,246,0.15);margin-bottom:14px;"></div>
@@ -88,14 +89,15 @@
                   <table width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       <td style="font-size:13px;color:#94a3b8;">
-                        Pedido #{{ $pedido->id }} · {{ $pedido->entradas->count() }} entrada{{ $pedido->entradas->count() !== 1 ? 's' : '' }}
+                        Pedido #<?php echo e($pedido->id); ?> · <?php echo e($pedido->entradas->count()); ?> entrada<?php echo e($pedido->entradas->count() !== 1 ? 's' : ''); ?>
+
                       </td>
                       <td align="right">
-                        @if($pedido->total_final == 0)
+                        <?php if($pedido->total_final == 0): ?>
                           <span style="font-size:18px;font-weight:900;color:#10b981;">GRATIS</span>
-                        @else
-                          <span style="font-size:18px;font-weight:900;color:#a78bfa;">{{ number_format($pedido->total_final, 2) }} €</span>
-                        @endif
+                        <?php else: ?>
+                          <span style="font-size:18px;font-weight:900;color:#a78bfa;"><?php echo e(number_format($pedido->total_final, 2)); ?> €</span>
+                        <?php endif; ?>
                       </td>
                     </tr>
                   </table>
@@ -110,14 +112,14 @@
         <tr>
           <td style="background:#13102a;padding:0 40px 8px;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
             <div style="font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;">
-              Tus entradas ({{ $pedido->entradas->count() }})
+              Tus entradas (<?php echo e($pedido->entradas->count()); ?>)
             </div>
           </td>
         </tr>
 
-        @foreach($pedido->entradas as $i => $entrada)
+        <?php $__currentLoopData = $pedido->entradas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $entrada): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <tr>
-          <td style="background:#13102a;padding:0 40px {{ $loop->last ? '36px' : '0' }};border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
+          <td style="background:#13102a;padding:0 40px <?php echo e($loop->last ? '36px' : '0'); ?>;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
 
             <table width="100%" cellpadding="0" cellspacing="0" border="0"
                    style="background:#1a1535;border:1px solid rgba(139,92,246,0.2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
@@ -128,17 +130,18 @@
                   <table width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       <td>
-                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Entrada #{{ $i + 1 }}</div>
+                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Entrada #<?php echo e($i + 1); ?></div>
                         <div style="font-size:11px;color:#475569;font-family:monospace;margin-top:4px;word-break:break-all;">
-                          {{ $entrada->codigo_qr }}
+                          <?php echo e($entrada->codigo_qr); ?>
+
                         </div>
                       </td>
                       <td align="right" valign="top" style="padding-left:12px;white-space:nowrap;">
-                        @if($entrada->precio_pagado == 0)
+                        <?php if($entrada->precio_pagado == 0): ?>
                           <span style="font-size:15px;font-weight:700;color:#10b981;">GRATIS</span>
-                        @else
-                          <span style="font-size:15px;font-weight:700;color:#a78bfa;">{{ number_format($entrada->precio_pagado, 2) }} €</span>
-                        @endif
+                        <?php else: ?>
+                          <span style="font-size:15px;font-weight:700;color:#a78bfa;"><?php echo e(number_format($entrada->precio_pagado, 2)); ?> €</span>
+                        <?php endif; ?>
                       </td>
                     </tr>
                   </table>
@@ -148,18 +151,19 @@
               <!-- QR Code -->
               <tr>
                 <td align="center" style="padding:24px;">
-                  @if(!empty($qrImages[$entrada->id]))
+                  <?php if(!empty($qrImages[$entrada->id])): ?>
                     <div style="display:inline-block;padding:12px;background:#ffffff;border-radius:12px;">
-                      <img src="{{ $message->embedData($qrImages[$entrada->id], 'qr-'.$entrada->id.'.png', 'image/png') }}"
+                      <img src="<?php echo e($message->embedData($qrImages[$entrada->id], 'qr-'.$entrada->id.'.png', 'image/png')); ?>"
                            width="200" height="200"
-                           alt="QR Entrada #{{ $i + 1 }}"
+                           alt="QR Entrada #<?php echo e($i + 1); ?>"
                            style="display:block;">
                     </div>
-                  @else
+                  <?php else: ?>
                     <div style="background:#1e293b;border-radius:12px;padding:24px;text-align:center;color:#64748b;font-size:13px;">
-                      QR no disponible — muestra el código: {{ $entrada->codigo_qr }}
+                      QR no disponible — muestra el código: <?php echo e($entrada->codigo_qr); ?>
+
                     </div>
-                  @endif
+                  <?php endif; ?>
                   <div style="font-size:12px;color:#64748b;margin-top:10px;">
                     Presenta este QR en la entrada del evento
                   </div>
@@ -169,7 +173,7 @@
             </table>
           </td>
         </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
         <!-- ── AVISO ── -->
         <tr>
@@ -191,7 +195,7 @@
         <!-- ── BOTÓN VER ENTRADAS ── -->
         <tr>
           <td style="background:#13102a;padding:0 40px 36px;text-align:center;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
-            <a href="{{ url('/mis-entradas') }}"
+            <a href="<?php echo e(url('/mis-entradas')); ?>"
                style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:10px;">
               Ver mis entradas
             </a>
@@ -204,7 +208,7 @@
             <div style="font-size:18px;font-weight:900;color:#4c1d95;letter-spacing:0.06em;margin-bottom:8px;">VIBEZ</div>
             <div style="font-size:12px;color:#334155;line-height:1.7;">
               Este correo fue enviado automáticamente. Por favor, no respondas a este mensaje.<br>
-              © {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes.
+              © <?php echo e(date('Y')); ?> VIBEZ — Plataforma de eventos para jóvenes.
             </div>
           </td>
         </tr>
@@ -219,3 +223,4 @@
 
 </body>
 </html>
+<?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/emails/entrada-comprada.blade.php ENDPATH**/ ?>
