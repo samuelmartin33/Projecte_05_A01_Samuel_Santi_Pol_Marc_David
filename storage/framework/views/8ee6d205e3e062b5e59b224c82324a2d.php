@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('titulo', 'Validar entradas QR — ' . $empresa->nombre_empresa); ?>
 
-@section('titulo', 'Validar entradas QR — ' . $empresa->nombre_empresa)
-
-@push('estilos')
+<?php $__env->startPush('estilos'); ?>
 <style>
 /* ── VIBEZ Validación QR ── */
 body { background: #07060c; }
@@ -378,15 +376,15 @@ body { background: #07060c; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-@include('partials.home.nav')
+<?php echo $__env->make('partials.home.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="validacion-wrapper">
 
-    {{-- Hero --}}
+    
     <div class="validacion-hero">
         <div style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:rgba(124,58,237,0.2);border-radius:50%;margin-bottom:0.875rem;">
             <svg style="width:28px;height:28px;color:#a78bfa" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
@@ -394,11 +392,11 @@ body { background: #07060c; }
             </svg>
         </div>
         <h1>Validar entradas QR</h1>
-        <p>{{ $empresa->nombre_empresa }} · Escanea o introduce el código para validar el acceso</p>
+        <p><?php echo e($empresa->nombre_empresa); ?> · Escanea o introduce el código para validar el acceso</p>
     </div>
 
-    {{-- Selector de evento (opcional, solo para referencia visual) --}}
-    @if($eventos->count() > 1)
+    
+    <?php if($eventos->count() > 1): ?>
     <div class="evento-selector">
         <label>Evento a validar</label>
         <input type="hidden" id="filtro-evento" value="">
@@ -409,15 +407,15 @@ body { background: #07060c; }
             </div>
             <div class="ev-csel-menu">
                 <div class="ev-csel-opt sel" data-val="">— Todos los eventos activos —</div>
-                @foreach($eventos as $ev)
-                    <div class="ev-csel-opt" data-val="{{ $ev->id }}">{{ $ev->titulo }}</div>
-                @endforeach
+                <?php $__currentLoopData = $eventos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ev): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <div class="ev-csel-opt" data-val="<?php echo e($ev->id); ?>"><?php echo e($ev->titulo); ?></div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Pestañas de modo --}}
+    
     <div class="modo-tabs">
         <button class="modo-tab activo" id="tab-camara" onclick="cambiarModo('camara')">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -434,12 +432,12 @@ body { background: #07060c; }
         </button>
     </div>
 
-    {{-- Panel cámara --}}
+    
     <div class="panel-camara" id="panel-camara">
         <div id="qr-reader"></div>
     </div>
 
-    {{-- Panel manual --}}
+    
     <div class="panel-manual" id="panel-manual">
         <div class="manual-form">
             <label for="input-qr">Apunta aquí con el lector o escribe el código</label>
@@ -458,7 +456,7 @@ body { background: #07060c; }
         </div>
     </div>
 
-    {{-- Resultado --}}
+    
     <div class="resultado-card" id="resultado-card">
         <div class="resultado-icono" id="resultado-icono"></div>
         <p class="resultado-titulo" id="resultado-titulo"></p>
@@ -466,19 +464,19 @@ body { background: #07060c; }
         <p class="resultado-error-msg" id="resultado-msg"></p>
     </div>
 
-    {{-- Historial de escaneos de esta sesión --}}
+    
     <p class="historial-titulo" id="historial-label" style="display:none">Escaneos de esta sesión</p>
     <div class="historial-lista" id="historial-lista"></div>
 
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 var csrfToken      = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-var validarUrl     = '{{ route('empresa.validacion.validar') }}';
+var validarUrl     = '<?php echo e(route('empresa.validacion.validar')); ?>';
 var escaneando     = false;
 var cooldown       = false;
 var historial      = [];
@@ -755,4 +753,6 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/validacion/index.blade.php ENDPATH**/ ?>

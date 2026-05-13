@@ -20,10 +20,16 @@ class Organizador extends Model
     protected $fillable = [
         'usuario_id',
         'empresa_id',
+        'rol',
         'estado',
         'fecha_creacion',
         'fecha_actualizacion',
     ];
+
+    public function isPortero(): bool
+    {
+        return $this->rol === 'portero';
+    }
 
     public function usuario(): BelongsTo
     {

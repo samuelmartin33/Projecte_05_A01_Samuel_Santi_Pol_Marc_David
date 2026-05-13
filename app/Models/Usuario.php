@@ -254,6 +254,12 @@ class Usuario extends Authenticatable
             && (int) $this->organizador->estado === 1;
     }
 
+    public function isPortero(): bool
+    {
+        return $this->isOrganizador()
+            && $this->organizador->rol === 'portero';
+    }
+
     /**
      * Devuelve true si el usuario representa a una empresa.
      *

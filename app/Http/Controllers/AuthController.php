@@ -95,6 +95,11 @@ class AuthController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
 
+        // Portero: solo puede acceder a validación de QR
+        if ($usuario && $usuario->isPortero()) {
+            return redirect()->route('empresa.validacion.index');
+        }
+
         // Las empresas no ven la home pública — redirigir a su panel
         if ($usuario && $usuario->isEmpresa()) {
             return redirect()->route('empresa.home');
