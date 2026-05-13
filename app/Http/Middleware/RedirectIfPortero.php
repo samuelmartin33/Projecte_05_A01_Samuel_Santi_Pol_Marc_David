@@ -17,7 +17,7 @@ class RedirectIfPortero
     {
         $user = $request->user();
 
-        if ($user && $user->isPortero() && !$request->routeIs('empresa.validacion.*')) {
+        if ($user && $user->isPortero() && !$request->routeIs('empresa.validacion.*', 'api.logout')) {
             return redirect()->route('empresa.validacion.index');
         }
 
