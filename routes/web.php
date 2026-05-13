@@ -229,6 +229,9 @@ Route::middleware('auth')->group(function () {
     // Formulario de mood/estado de ánimo (POST simple)
     Route::post('/perfil/mood', [PerfilController::class, 'actualizarMood'])->name('perfil.mood');
 
+     // Página de favoritos: muestra solo los eventos marcados como favoritos
+     Route::get('/perfil/favoritos', [PerfilController::class, 'favoritos'])->name('perfil.favoritos');
+
     // Aceptar / rechazar solicitudes de amistad (botones de formulario)
     Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
     Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
