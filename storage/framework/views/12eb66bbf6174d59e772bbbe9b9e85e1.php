@@ -363,8 +363,4 @@ if (proofSection) observer.observe(proofSection);
 </script>
 </body>
 </html>
-<<<<<<<< HEAD:storage/framework/views/fae0da3d1a1193e38ce8e9ba45e50d20.php
-<?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/welcome.blade.php ENDPATH**/ ?>
-========
 <?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/welcome.blade.php ENDPATH**/ ?>
->>>>>>>> 2fdba9955dd913f66498f330dbd980c97d71fc11:storage/framework/views/12eb66bbf6174d59e772bbbe9b9e85e1.php

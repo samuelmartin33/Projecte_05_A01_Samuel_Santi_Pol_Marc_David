@@ -329,8 +329,4 @@
 
 <?php $__env->stopSection(); ?>
 
-<<<<<<<< HEAD:storage/framework/views/d139227566e43fe918c43c98aff96b45.php
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/home.blade.php ENDPATH**/ ?>
-========
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\LARAVEL\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/empresa/home.blade.php ENDPATH**/ ?>
->>>>>>>> 2fdba9955dd913f66498f330dbd980c97d71fc11:storage/framework/views/35fbf4013d01edaafcc00e81db367b1b.php

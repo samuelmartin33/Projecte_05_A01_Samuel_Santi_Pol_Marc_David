@@ -320,6 +320,19 @@
                             <span class="field-error" id="error-nombre_empresa" role="alert"></span>
                         </div>
 
+                        {{-- Razón social (nombre legal oficial) --}}
+                        <div class="auth-field" id="field-razon_social" style="margin-bottom:16px">
+                            <label class="auth-label" for="razon_social">Razón social <span style="opacity:.5;font-size:11px">(opcional)</span></label>
+                            <input
+                                type="text"
+                                id="razon_social"
+                                name="razon_social"
+                                placeholder="Vibez Events, S.L."
+                                autocomplete="organization"
+                            >
+                            <span class="field-error" id="error-razon_social" role="alert"></span>
+                        </div>
+
                         {{-- NIF / CIF --}}
                         <div class="auth-field" id="field-nif_cif" style="margin-bottom:16px">
                             <label class="auth-label" for="nif_cif">NIF / CIF</label>
@@ -337,17 +350,36 @@
 
                         {{-- Tipo de promotor --}}
                         <div class="auth-field" id="field-tipo_promotor" style="margin-bottom:16px">
-                            <label class="auth-label" for="tipo_promotor">Tipo de promotor</label>
-                            <select id="tipo_promotor" name="tipo_promotor" onblur="validarTipoPromotor()">
-                                <option value="" disabled selected hidden>Selecciona una opción</option>
-                                <option value="sala_club">Sala / Club nocturno</option>
-                                <option value="promotora">Promotora de eventos</option>
-                                <option value="festival">Festival</option>
-                                <option value="artista">Artista / DJ</option>
-                                <option value="autonomo">Autónomo</option>
-                                <option value="otro">Otro</option>
-                            </select>
+                            <label class="auth-label">Tipo de promotor</label>
+                            <input type="hidden" id="tipo_promotor" name="tipo_promotor">
+                            <div class="tp-csel" id="tp-csel">
+                                <div class="tp-csel-trigger" id="tp-csel-trigger" onclick="toggleTpCsel()">
+                                    <span id="tp-csel-label">Selecciona una opción</span>
+                                    <span class="tp-csel-arrow" id="tp-csel-arrow">▾</span>
+                                </div>
+                                <ul class="tp-csel-menu" id="tp-csel-menu">
+                                    <li class="tp-csel-opt" onclick="pickTpCsel('sala_club','Sala / Club nocturno')">Sala / Club nocturno</li>
+                                    <li class="tp-csel-opt" onclick="pickTpCsel('promotora','Promotora de eventos')">Promotora de eventos</li>
+                                    <li class="tp-csel-opt" onclick="pickTpCsel('festival','Festival')">Festival</li>
+                                    <li class="tp-csel-opt" onclick="pickTpCsel('artista','Artista / DJ')">Artista / DJ</li>
+                                    <li class="tp-csel-opt" onclick="pickTpCsel('autonomo','Autónomo')">Autónomo</li>
+                                    <li class="tp-csel-opt" onclick="pickTpCsel('otro','Otro')">Otro</li>
+                                </ul>
+                            </div>
                             <span class="field-error" id="error-tipo_promotor" role="alert"></span>
+                        </div>
+
+                        {{-- Teléfono de empresa --}}
+                        <div class="auth-field" id="field-telefono_empresa" style="margin-bottom:16px">
+                            <label class="auth-label" for="telefono_empresa">Teléfono de empresa <span style="opacity:.5;font-size:11px">(opcional)</span></label>
+                            <input
+                                type="tel"
+                                id="telefono_empresa"
+                                name="telefono_empresa"
+                                placeholder="+34 900 000 000"
+                                onblur="validarTelefonoEmpresa()"
+                            >
+                            <span class="field-error" id="error-telefono_empresa" role="alert"></span>
                         </div>
 
                         {{-- Descripción (opcional) --}}
@@ -481,7 +513,40 @@
             return true;
         }
 
-        /* Valida el select tipo_promotor */
+        /* Custom dropdown — tipo promotor */
+        function toggleTpCsel() {
+            var menu    = document.getElementById('tp-csel-menu');
+            var trigger = document.getElementById('tp-csel-trigger');
+            var arrow   = document.getElementById('tp-csel-arrow');
+            var open    = menu.classList.contains('tp-csel-open');
+            menu.classList.toggle('tp-csel-open', !open);
+            trigger.classList.toggle('tp-csel-active', !open);
+            arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+        function pickTpCsel(val, label) {
+            document.getElementById('tipo_promotor').value = val;
+            document.getElementById('tp-csel-label').textContent = label;
+            document.getElementById('tp-csel-label').style.color = '';
+            var menu    = document.getElementById('tp-csel-menu');
+            var trigger = document.getElementById('tp-csel-trigger');
+            var arrow   = document.getElementById('tp-csel-arrow');
+            menu.classList.remove('tp-csel-open');
+            trigger.classList.remove('tp-csel-active');
+            arrow.style.transform = 'rotate(0deg)';
+            var error = document.getElementById('error-tipo_promotor');
+            if (error) error.textContent = '';
+        }
+        document.onclick = function(e) {
+            var csel = document.getElementById('tp-csel');
+            if (csel && !csel.contains(e.target)) {
+                var menu    = document.getElementById('tp-csel-menu');
+                var trigger = document.getElementById('tp-csel-trigger');
+                var arrow   = document.getElementById('tp-csel-arrow');
+                if (menu) { menu.classList.remove('tp-csel-open'); trigger.classList.remove('tp-csel-active'); arrow.style.transform = 'rotate(0deg)'; }
+            }
+        };
+
+        /* Valida el dropdown tipo_promotor */
         function validarTipoPromotor() {
             var campo = document.getElementById('tipo_promotor');
             var error = document.getElementById('error-tipo_promotor');
