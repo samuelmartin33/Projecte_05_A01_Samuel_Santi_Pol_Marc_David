@@ -150,7 +150,7 @@
                 <td align="center" style="padding:24px;">
                   @if(!empty($qrImages[$entrada->id]))
                     <div style="display:inline-block;padding:12px;background:#ffffff;border-radius:12px;">
-                      <img src="{{ $qrImages[$entrada->id] }}"
+                      <img src="{{ $message->embedData($qrImages[$entrada->id], 'qr-'.$entrada->id.'.png', 'image/png') }}"
                            width="200" height="200"
                            alt="QR Entrada #{{ $i + 1 }}"
                            style="display:block;">

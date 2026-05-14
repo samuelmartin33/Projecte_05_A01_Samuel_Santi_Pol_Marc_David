@@ -3,12 +3,14 @@
 namespace App\Mail;
 
 use App\Models\Pedido;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -47,7 +49,7 @@ class EntradaComprada extends Mailable
                     ->margin(8)
                     ->build();
 
-                $qrImages[$entrada->id] = 'data:image/png;base64,' . base64_encode($result->getString());
+                $qrImages[$entrada->id] = $result->getString();
             } catch (\Throwable) {
                 $qrImages[$entrada->id] = null;
             }
@@ -57,5 +59,18 @@ class EntradaComprada extends Mailable
             view: 'emails.entrada-comprada',
             with: ['qrImages' => $qrImages],
         );
+    }
+
+    public function attachments(): array
+    {
+        $pdf = Pdf::loadView('emails.factura-compra-pdf', ['pedido' => $this->pedido])
+            ->setPaper('A4', 'portrait');
+
+        $filename = 'factura-vibez-' . str_pad($this->pedido->id, 6, '0', STR_PAD_LEFT) . '.pdf';
+
+        return [
+            Attachment::fromData(fn () => $pdf->output(), $filename)
+                ->withMime('application/pdf'),
+        ];
     }
 }

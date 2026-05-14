@@ -41,7 +41,7 @@ use App\Http\Controllers\Empresa\ValidacionQRController;
 use App\Http\Controllers\Empresa\FacturacionController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
-use App\Http\Controllers\Empresa\PerfilFiscalController;
+use App\Http\Controllers\Empresa\EquipoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -160,63 +160,47 @@ Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
      ->middleware('auth')
      ->name('empresa.home');
 
-/* — Eventos de empresa: crear y eliminar eventos (auth requerido) — */
-Route::middleware('auth')->prefix('empresa/eventos')->name('empresa.eventos.')->group(function () {
+/* — Eventos de empresa: crear y eliminar eventos (auth requerido, bloqueado a porteros) — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/eventos')->name('empresa.eventos.')->group(function () {
     Route::get('/crear', [EmpresaEventosController::class, 'create'])->name('create');
     Route::post('/',     [EmpresaEventosController::class, 'store'])->name('store');
     Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
 });
 
-/* — Perfil fiscal de empresa (Fase 2 onboarding) — */
-Route::middleware('auth')->group(function () {
-    Route::get('/empresa/perfil-fiscal',  [PerfilFiscalController::class, 'show'])->name('empresa.perfil-fiscal');
-    Route::post('/empresa/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('empresa.perfil-fiscal.update');
-});
-
-/* — Ofertas de trabajo (empresa): crear y publicar ofertas — */
-Route::middleware('auth')->prefix('empresa/ofertas')->name('empresa.ofertas.')->group(function () {
+/* — Ofertas de trabajo (empresa) — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/ofertas')->name('empresa.ofertas.')->group(function () {
     Route::get('/crear', [EmpresaOfertasController::class, 'create'])->name('create');
     Route::post('/',     [EmpresaOfertasController::class, 'store'])->name('store');
 });
 
-/* — Sección de candidaturas (empresa): auth requerido; el controlador verifica rol empresa — */
-Route::middleware('auth')->prefix('empresa/candidaturas')->name('empresa.candidaturas.')->group(function () {
-    // Lista de ofertas propias con conteo de candidatos
-    Route::get('/',                              [CandidaturasController::class, 'ofertas'])
-         ->name('ofertas');
-
-    // Lista de CVs recibidos para una oferta concreta
-    Route::get('/{ofertaId}',                    [CandidaturasController::class, 'candidaturas'])
-         ->where('ofertaId', '[0-9]+')
-         ->name('detalle');
-
-    // AJAX: cambiar estado de una candidatura
-    Route::patch('/{candidaturaId}/estado',      [CandidaturasController::class, 'actualizarEstado'])
-         ->where('candidaturaId', '[0-9]+')
-         ->name('estado');
-
-    // Descargar PDF/DOC del candidato
-    Route::get('/{candidaturaId}/descargar',     [CandidaturasController::class, 'descargarCv'])
-         ->where('candidaturaId', '[0-9]+')
-         ->name('descargar');
-
-    // Cerrar / reabrir una oferta
-    Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])
-         ->where('ofertaId', '[0-9]+')
-         ->name('cerrar-oferta');
+/* — Candidaturas (empresa) — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/candidaturas')->name('empresa.candidaturas.')->group(function () {
+    Route::get('/',                              [CandidaturasController::class, 'ofertas'])->name('ofertas');
+    Route::get('/{ofertaId}',                    [CandidaturasController::class, 'candidaturas'])->where('ofertaId', '[0-9]+')->name('detalle');
+    Route::patch('/{candidaturaId}/estado',      [CandidaturasController::class, 'actualizarEstado'])->where('candidaturaId', '[0-9]+')->name('estado');
+    Route::get('/{candidaturaId}/descargar',     [CandidaturasController::class, 'descargarCv'])->where('candidaturaId', '[0-9]+')->name('descargar');
+    Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])->where('ofertaId', '[0-9]+')->name('cerrar-oferta');
 });
 
-/* — Validación QR de entradas (empresa) — */
+/* — Validación QR (accesible también a porteros) — */
 Route::middleware('auth')->prefix('empresa/validacion')->name('empresa.validacion.')->group(function () {
-    Route::get('/',        [ValidacionQRController::class, 'index'])->name('index');
-    Route::post('/validar',[ValidacionQRController::class, 'validar'])->name('validar');
+    Route::get('/',         [ValidacionQRController::class, 'index'])->name('index');
+    Route::post('/validar', [ValidacionQRController::class, 'validar'])->name('validar');
 });
 
 /* — Facturación de empresa — */
-Route::middleware('auth')->prefix('empresa/facturacion')->name('empresa.facturacion.')->group(function () {
-    Route::get('/',                                [FacturacionController::class, 'index'])       ->name('index');
-    Route::get('/{factura}/descargar',             [FacturacionController::class, 'descargar'])   ->name('descargar');
-    Route::get('/evento/{evento}/generar-pdf',     [FacturacionController::class, 'generarPdf'])  ->name('generar-pdf');
+Route::middleware(['auth','no-portero'])->prefix('empresa/facturacion')->name('empresa.facturacion.')->group(function () {
+    Route::get('/',                            [FacturacionController::class, 'index'])     ->name('index');
+    Route::get('/{factura}/descargar',         [FacturacionController::class, 'descargar']) ->name('descargar');
+    Route::get('/evento/{evento}/generar-pdf', [FacturacionController::class, 'generarPdf'])->name('generar-pdf');
+});
+
+/* — Equipo de empresa: gestión de usuarios y roles — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empresa.equipo.')->group(function () {
+    Route::get('/',              [EquipoController::class, 'index'])->name('index');
+    Route::post('/',             [EquipoController::class, 'store'])->name('store');
+    Route::patch('/{organizador}/rol', [EquipoController::class, 'cambiarRol'])->name('rol');
+    Route::delete('/{organizador}',    [EquipoController::class, 'destroy'])->name('destroy');
 });
 
 /* — Perfil de usuario — */
@@ -276,8 +260,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     /* Rutas de gestión de empresas */
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
          ->name('admin.empresas.index');
-    Route::get('/admin/empresas/{id}', [AdminEmpresaController::class, 'show'])
-         ->name('admin.empresas.show');
     Route::post('/admin/empresas/{id}/aprobar', [AdminEmpresaController::class, 'aprobar'])
          ->name('admin.empresas.aprobar');
     Route::post('/admin/empresas/{id}/rechazar', [AdminEmpresaController::class, 'rechazar'])

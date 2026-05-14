@@ -100,25 +100,29 @@ body { background: #07060c; }
     color: rgba(245,241,234,0.55);
     margin-bottom: 8px;
 }
-.evento-selector select {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1.5px solid rgba(245,241,234,0.18);
-    color: #f5f1ea;
-    padding: 6px 24px 6px 0;
-    font-family: 'Archivo', sans-serif;
-    font-size: 1rem;
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-    outline: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 4px center;
+.ev-csel { position:relative; width:100%; }
+.ev-csel-trigger {
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:transparent; border:none; border-bottom:1.5px solid rgba(245,241,234,0.18);
+    color:#f5f1ea; padding:6px 4px 6px 0;
+    font-family:'Archivo',sans-serif; font-size:1rem;
+    cursor:pointer; user-select:none; transition:border-color 0.15s; width:100%;
 }
-.evento-selector select option { background: #0d0a18; color: #f5f1ea; }
-.evento-selector select:focus { border-bottom-color: #a855f7; }
+.ev-csel.open .ev-csel-trigger { border-bottom-color:#a855f7; }
+.ev-csel-arrow { width:12px;height:12px;flex-shrink:0;color:#c084fc;transition:transform 0.15s; }
+.ev-csel.open .ev-csel-arrow { transform:rotate(180deg); }
+.ev-csel-menu {
+    display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:200;
+    background:#0d0a18; border:1px solid rgba(168,85,247,0.30);
+    max-height:220px; overflow-y:auto;
+}
+.ev-csel.open .ev-csel-menu { display:block; }
+.ev-csel-opt {
+    padding:10px 14px; font-family:'Archivo',sans-serif; font-size:0.9rem;
+    color:rgba(245,241,234,0.65); cursor:pointer; transition:background 0.12s;
+}
+.ev-csel-opt:hover { background:rgba(168,85,247,0.12); color:#f5f1ea; }
+.ev-csel-opt.sel { background:rgba(168,85,247,0.18); color:#c084fc; font-weight:600; }
 
 /* ── Pestañas modo ── */
 .modo-tabs {
@@ -396,13 +400,20 @@ body { background: #07060c; }
     {{-- Selector de evento (opcional, solo para referencia visual) --}}
     @if($eventos->count() > 1)
     <div class="evento-selector">
-        <label for="filtro-evento">Evento a validar</label>
-        <select id="filtro-evento">
-            <option value="">— Todos los eventos activos —</option>
-            @foreach($eventos as $ev)
-                <option value="{{ $ev->id }}">{{ $ev->titulo }}</option>
-            @endforeach
-        </select>
+        <label>Evento a validar</label>
+        <input type="hidden" id="filtro-evento" value="">
+        <div class="ev-csel" id="ev-csel-main">
+            <div class="ev-csel-trigger" onclick="toggleEvCsel()">
+                <span id="ev-csel-label">— Todos los eventos activos —</span>
+                <svg class="ev-csel-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="ev-csel-menu">
+                <div class="ev-csel-opt sel" data-val="">— Todos los eventos activos —</div>
+                @foreach($eventos as $ev)
+                    <div class="ev-csel-opt" data-val="{{ $ev->id }}">{{ $ev->titulo }}</div>
+                @endforeach
+            </div>
+        </div>
     </div>
     @endif
 
@@ -722,5 +733,26 @@ function svgX() {
 function svgWarn() {
     return '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>';
 }
+
+// Custom evento selector
+function toggleEvCsel() {
+    document.getElementById('ev-csel-main').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+    var opt = e.target.closest('.ev-csel-opt');
+    if (opt) {
+        var cs = opt.closest('.ev-csel');
+        var val = opt.dataset.val;
+        cs.querySelectorAll('.ev-csel-opt').forEach(function(o) { o.classList.toggle('sel', o.dataset.val === val); });
+        document.getElementById('ev-csel-label').textContent = opt.textContent.trim();
+        document.getElementById('filtro-evento').value = val;
+        cs.classList.remove('open');
+        return;
+    }
+    if (!e.target.closest('.ev-csel')) {
+        var el = document.getElementById('ev-csel-main');
+        if (el) el.classList.remove('open');
+    }
+});
 </script>
 @endpush
