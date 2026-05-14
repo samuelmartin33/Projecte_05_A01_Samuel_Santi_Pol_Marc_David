@@ -260,6 +260,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     /* Rutas de gestión de empresas */
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
          ->name('admin.empresas.index');
+    Route::get('/admin/empresas/{id}', [AdminEmpresaController::class, 'show'])
+         ->where('id', '[0-9]+')
+         ->name('admin.empresas.show');
     Route::post('/admin/empresas/{id}/aprobar', [AdminEmpresaController::class, 'aprobar'])
          ->name('admin.empresas.aprobar');
     Route::post('/admin/empresas/{id}/rechazar', [AdminEmpresaController::class, 'rechazar'])
