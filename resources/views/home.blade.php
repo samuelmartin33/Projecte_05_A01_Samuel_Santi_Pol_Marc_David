@@ -81,10 +81,6 @@
      SECCIONES SOLO PARA USUARIOS AUTENTICADOS
 ════════════════════════════════════════════════════ --}}
 @auth
-  @if(isset($entradas) && count($entradas))
-    @include('partials.home.mis-tickets', ['entradas' => $entradas])
-  @endif
-
   {{-- Para Ti: slider de recomendados --}}
   @include('partials.home.para-ti', [
     'user'    => Auth::user(),
@@ -149,27 +145,6 @@
   'totalEventos'  => count($eventosParaJs ?? []),
   'eventosParaJs' => $eventosParaJs ?? [],
 ])
-
-{{-- ════════════════════════════════════════════════════
-     CTA — ¿Organizas eventos?
-════════════════════════════════════════════════════ --}}
-<section style="padding:120px 48px 40px;max-width:1480px;margin:100px auto 0;text-align:center;border-top:1px solid var(--line);">
-  <div class="mono" style="font-size:11px;color:var(--magenta);margin-bottom:18px;">
-    ¿Organizas eventos?
-  </div>
-  <h2 class="display" style="font-size:clamp(56px,9vw,160px);margin:0;line-height:0.85;">
-    Pon tu sala<br>
-    <em style="font-style:italic;color:var(--magenta);font-family:'Bebas Neue',sans-serif;">en el mapa</em>.
-  </h2>
-  <p style="font-family:'Archivo Narrow',sans-serif;font-size:18px;color:var(--ink-dim);max-width:560px;margin:24px auto 32px;text-transform:uppercase;letter-spacing:0.08em;">
-    Crea tu cuenta de empresa, publica eventos, vende entradas con QR, y recluta staff.
-    Sin comisión los primeros 30 días.
-  </p>
-  <a href="{{ route('register') }}?tipo=empresa&origen=home" class="btn-primary"
-     style="padding:20px 40px;border-radius:999px;font-size:18px;text-decoration:none;display:inline-block;">
-    Soy promotor →
-  </a>
-</section>
 
 {{-- ════════════════════════════════════════════════════
      FOOTER

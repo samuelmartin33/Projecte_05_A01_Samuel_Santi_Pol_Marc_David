@@ -6,7 +6,7 @@
 
   <div class="modal-card detail-modal"
        onclick="event.stopPropagation()"
-       style="position:fixed;inset:5% 8%;background:var(--bg);border:1px solid var(--line);overflow:auto;display:grid;grid-template-columns:1.2fr 1fr;">
+       style="position:fixed;inset:5% 8%;z-index:10000;background:var(--bg);border:1px solid var(--line);overflow:auto;display:grid;grid-template-columns:1.2fr 1fr;">
 
     {{-- Columna izquierda: imagen --}}
     <div style="position:relative;overflow:hidden;min-height:520px;">
