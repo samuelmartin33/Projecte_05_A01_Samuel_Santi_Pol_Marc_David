@@ -336,6 +336,18 @@ function validarTelefono() {
     }
 }
 
+/** Valida el teléfono de empresa (campo opcional — solo si se ha rellenado). */
+function validarTelefonoEmpresa() {
+    var campo = document.getElementById('telefono_empresa');
+    var error = document.getElementById('error-telefono_empresa');
+    if (!campo || !error) return;
+    limpiarErrorCampo('field-telefono_empresa', 'error-telefono_empresa');
+    var valor = campo.value.trim();
+    if (valor && !/^\+?[\d\s\-]{7,20}$/.test(valor)) {
+        mostrarErrorCampo('field-telefono_empresa', 'error-telefono_empresa', 'Introduce un teléfono válido');
+    }
+}
+
 /** Valida el tipo de cuenta al cambiar la selección. */
 function validarTipoCuenta() {
     var tipoCuenta = document.getElementById('tipo_cuenta').value;
@@ -501,6 +513,15 @@ function registrar(evento) {
             mostrarErrorCampo('field-tipo_promotor', 'error-tipo_promotor', 'Selecciona el tipo de promotor');
             esValido = false;
         }
+
+        /* Teléfono empresa es opcional, pero si se rellena debe tener formato válido */
+        var telefonoEmpresaEl = document.getElementById('telefono_empresa');
+        if (telefonoEmpresaEl && telefonoEmpresaEl.value.trim()) {
+            if (!/^\+?[\d\s\-]{7,20}$/.test(telefonoEmpresaEl.value.trim())) {
+                mostrarErrorCampo('field-telefono_empresa', 'error-telefono_empresa', 'Introduce un teléfono válido');
+                esValido = false;
+            }
+        }
     }
 
     if (!esValido) {
@@ -528,16 +549,20 @@ function registrar(evento) {
     };
 
     if (tipoCuenta === 'empresa') {
-        var nombreEmpresaEl = document.getElementById('nombre_empresa');
-        var nifCifEl        = document.getElementById('nif_cif');
-        var tipoPromotorEl  = document.getElementById('tipo_promotor');
-        var descripcionEl   = document.getElementById('descripcion');
-        var sitioWebEl      = document.getElementById('sitio_web');
-        cuerpo.nombre_empresa = nombreEmpresaEl ? nombreEmpresaEl.value.trim() : '';
-        cuerpo.nif_cif        = nifCifEl        ? nifCifEl.value.trim()        : '';
-        cuerpo.tipo_promotor  = tipoPromotorEl  ? tipoPromotorEl.value         : '';
-        cuerpo.descripcion    = descripcionEl   ? descripcionEl.value.trim()   : '';
-        cuerpo.sitio_web      = sitioWebEl      ? sitioWebEl.value.trim()      : '';
+        var nombreEmpresaEl   = document.getElementById('nombre_empresa');
+        var razonSocialEl     = document.getElementById('razon_social');
+        var nifCifEl          = document.getElementById('nif_cif');
+        var tipoPromotorEl    = document.getElementById('tipo_promotor');
+        var telefonoEmpresaEl = document.getElementById('telefono_empresa');
+        var descripcionEl     = document.getElementById('descripcion');
+        var sitioWebEl        = document.getElementById('sitio_web');
+        cuerpo.nombre_empresa   = nombreEmpresaEl   ? nombreEmpresaEl.value.trim()   : '';
+        cuerpo.razon_social     = razonSocialEl     ? razonSocialEl.value.trim()     : '';
+        cuerpo.nif_cif          = nifCifEl          ? nifCifEl.value.trim()          : '';
+        cuerpo.tipo_promotor    = tipoPromotorEl    ? tipoPromotorEl.value           : '';
+        cuerpo.telefono_empresa = telefonoEmpresaEl ? telefonoEmpresaEl.value.trim() : '';
+        cuerpo.descripcion      = descripcionEl     ? descripcionEl.value.trim()     : '';
+        cuerpo.sitio_web        = sitioWebEl        ? sitioWebEl.value.trim()        : '';
     }
 
     fetch('/api/register', {

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NuevaEmpresaMailable;
 use App\Models\Usuario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Http\Controllers\EventoController;
@@ -314,8 +317,10 @@ class AuthController extends Controller
             'tipo_cuenta'           => ['required', 'in:cliente,empresa'],
             // Campos exclusivos para cuentas de empresa
             'nombre_empresa'        => ['required_if:tipo_cuenta,empresa', 'nullable', 'string', 'max:200'],
+            'razon_social'          => ['nullable', 'string', 'max:300'],
             'nif_cif'               => ['required_if:tipo_cuenta,empresa', 'nullable', 'string', 'max:20', 'regex:/^[A-Za-z0-9]{7,9}$/'],
             'tipo_promotor'         => ['required_if:tipo_cuenta,empresa', 'nullable', 'in:sala_club,promotora,festival,artista,autonomo,otro'],
+            'telefono_empresa'      => ['nullable', 'string', 'max:20', 'regex:/^\+?[\d\s\-]{7,20}$/'],
             'descripcion'           => ['nullable', 'string', 'max:500'],
             'sitio_web'             => ['nullable', 'url', 'max:500'],
         ], [
@@ -384,29 +389,41 @@ class AuthController extends Controller
             ], 201);
         }
 
-        // Notificar a todos los admins de la nueva solicitud de empresa
-        \App\Models\Notificacion::notificarAdmins(
-            \App\Models\Notificacion::EMPRESA_REGISTRO,
-            'Nueva solicitud de empresa',
-            "«{$validated['nombre_empresa']}» solicita unirse a VIBEZ. Revisa y aprueba.",
-            route('admin.empresas.show', $usuario->id)
-        );
-
         // Flujo EMPRESA: crear registro en tabla empresas con los datos del formulario.
-        // El perfil fiscal quedará incompleto (perfil_fiscal_completo=false) hasta que
-        // el promotor rellene los datos bancarios y legales en su panel.
-        \App\Models\Empresa::create([
-            'usuario_id'             => $usuario->id,
-            'nombre_empresa'         => $validated['nombre_empresa'],
-            'nif_cif'                => $validated['nif_cif'],
-            'tipo_promotor'          => $validated['tipo_promotor'],
-            'descripcion'            => $validated['descripcion'] ?? null,
-            'sitio_web'              => $validated['sitio_web'] ?? null,
-            'perfil_fiscal_completo' => false,
-            'estado'                 => 1,
-            'fecha_creacion'         => $ahora,
-            'fecha_actualizacion'    => $ahora,
+        $empresa = \App\Models\Empresa::create([
+            'usuario_id'               => $usuario->id,
+            'nombre_empresa'           => $validated['nombre_empresa'],
+            'razon_social'             => $validated['razon_social'] ?? null,
+            'nif_cif'                  => $validated['nif_cif'],
+            'tipo_promotor'            => $validated['tipo_promotor'],
+            'telefono_empresa'         => $validated['telefono_empresa'] ?? null,
+            'descripcion'              => $validated['descripcion'] ?? null,
+            'sitio_web'                => $validated['sitio_web'] ?? null,
+            'perfil_fiscal_completo'   => false,
+            'stripe_onboarding_status' => 'pending',
+            'estado'                   => 1,
+            'fecha_creacion'           => $ahora,
+            'fecha_actualizacion'      => $ahora,
         ]);
+
+        // Notificación interna a todos los admins (después de crear la empresa)
+        try {
+            \App\Models\Notificacion::notificarAdmins(
+                \App\Models\Notificacion::EMPRESA_REGISTRO,
+                'Nueva solicitud de empresa',
+                "«{$validated['nombre_empresa']}» solicita unirse a VIBEZ. Revisa y aprueba.",
+                route('admin.empresas.show', $usuario->id)
+            );
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo crear notificación de nueva empresa: ' . $e->getMessage());
+        }
+
+        // Email al administrador de Vibez avisando de la nueva solicitud
+        try {
+            Mail::to(config('mail.from.address'))->send(new NuevaEmpresaMailable($usuario, $empresa));
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo enviar email de nueva empresa al admin: ' . $e->getMessage());
+        }
 
         // Sin auto-login: la cuenta queda en espera de aprobación del administrador.
         return response()->json([
