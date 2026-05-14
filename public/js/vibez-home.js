@@ -171,6 +171,11 @@ function vibezOpenModal(eventoId) {
     var qty = document.getElementById('modal-cantidad');
     if (qty) qty.value = 1;
 
+    /* Resetear campo de cupón al abrir nuevo modal */
+    var cuponInput = document.getElementById('modal-cupon-codigo');
+    if (cuponInput) { cuponInput.value = ''; cuponInput.style.borderColor = ''; }
+    if (typeof vibezResetCupon === 'function') vibezResetCupon();
+
     var modal = document.getElementById('vibez-detail-modal');
     if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 }
@@ -188,6 +193,8 @@ function vibezBuy(eventoId) {
     }
     var qtyEl    = document.getElementById('modal-cantidad');
     var cantidad = qtyEl ? parseInt(qtyEl.value) || 1 : 1;
+    var cuponEl  = document.getElementById('modal-cupon-codigo');
+    var codigoCupon = cuponEl ? cuponEl.value.trim() : '';
     var btn      = document.getElementById('modal-comprar');
     if (btn) { btn.textContent = 'Procesando…'; btn.disabled = true; }
 
@@ -195,7 +202,7 @@ function vibezBuy(eventoId) {
     fetch('/api/entradas/comprar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
-        body: JSON.stringify({ evento_id: eventoId, cantidad: cantidad })
+        body: JSON.stringify({ evento_id: eventoId, cantidad: cantidad, cupon_codigo: codigoCupon })
     })
     .then(function (r) { return r.json(); })
     .then(function (data) {
