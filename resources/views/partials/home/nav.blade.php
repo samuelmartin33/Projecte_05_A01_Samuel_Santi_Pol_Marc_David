@@ -154,7 +154,7 @@
             @foreach([
               ['Mi perfil',   route('perfil')],
               ['Mis tickets', route('entradas.mis-entradas')],
-              ['Favoritos',   route('perfil')],
+              ['Favoritos',   route('perfil.favoritos')],
             ] as [$item, $url])
               <a href="{{ $url }}" onclick="document.getElementById('navDropdown').style.display='none'"
                  style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">

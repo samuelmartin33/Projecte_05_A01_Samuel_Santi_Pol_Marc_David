@@ -86,6 +86,11 @@
                               {{ request()->routeIs('home') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Explorar
                     </a>
+                    <a href="{{ route('cupones.index') }}"
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('cupones.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
+                        Cupones
+                    </a>
                     <a href="{{ route('trabajos.index') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
                               {{ request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
@@ -105,6 +110,11 @@
             {{-- Botones acción --}}
             <div class="flex items-center gap-3">
                 @guest
+                    <a href="{{ route('cupones.index') }}"
+                       class="font-mono text-xs uppercase tracking-widest
+                              text-white/65 hover:text-white transition-colors duration-100">
+                        Cupones
+                    </a>
                     <a href="{{ route('login') }}"
                        class="hidden sm:block font-mono text-xs uppercase tracking-widest
                               text-white/65 hover:text-white transition-colors duration-100">

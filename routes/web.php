@@ -33,6 +33,8 @@ use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
 use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\FacturacionEventoController;
+use App\Http\Controllers\Admin\CuponController as AdminCuponController;
+use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
 use App\Http\Controllers\Empresa\ValidacionQRController;
@@ -131,6 +133,10 @@ Route::view('/cookies',        'static.cookies')->name('cookies');
 Route::view('/terminos',       'static.terminos')->name('terminos');
 Route::view('/devoluciones',   'static.devoluciones')->name('devoluciones');
 
+// --- Página pública de cupones ---
+Route::get('/cupones', [CuponController::class, 'index'])
+    ->name('cupones.index');
+
 // --- Página completa de Bolsa de Trabajo ---
 Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
     ->name('trabajos.index');
@@ -227,6 +233,9 @@ Route::middleware('auth')->group(function () {
     // Formulario de mood/estado de ánimo (POST simple)
     Route::post('/perfil/mood', [PerfilController::class, 'actualizarMood'])->name('perfil.mood');
 
+     // Página de favoritos: muestra solo los eventos marcados como favoritos
+     Route::get('/perfil/favoritos', [PerfilController::class, 'favoritos'])->name('perfil.favoritos');
+
     // Aceptar / rechazar solicitudes de amistad (botones de formulario)
     Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
     Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
@@ -259,6 +268,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
          ->name('admin.empresas.index');
     Route::get('/admin/empresas/{id}', [AdminEmpresaController::class, 'show'])
+         ->where('id', '[0-9]+')
          ->name('admin.empresas.show');
     Route::post('/admin/empresas/{id}/aprobar', [AdminEmpresaController::class, 'aprobar'])
          ->name('admin.empresas.aprobar');
@@ -310,6 +320,20 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.pagos.update');
     Route::delete('/admin/pagos/{pago}', [AdminPagoController::class, 'destroy'])
          ->name('admin.pagos.destroy');
+
+    /* Rutas de gestión de cupones */
+    Route::get('/admin/cupones', [AdminCuponController::class, 'index'])
+         ->name('admin.cupones.index');
+    Route::get('/admin/cupones/crear', [AdminCuponController::class, 'create'])
+         ->name('admin.cupones.create');
+    Route::post('/admin/cupones', [AdminCuponController::class, 'store'])
+         ->name('admin.cupones.store');
+    Route::get('/admin/cupones/{id}/editar', [AdminCuponController::class, 'edit'])
+         ->name('admin.cupones.edit');
+    Route::put('/admin/cupones/{id}', [AdminCuponController::class, 'update'])
+         ->name('admin.cupones.update');
+    Route::delete('/admin/cupones/{id}', [AdminCuponController::class, 'destroy'])
+         ->name('admin.cupones.destroy');
 
     /* Facturación por evento */
     Route::prefix('admin/facturacion')->name('admin.facturacion.')->group(function () {

@@ -132,17 +132,15 @@
         <section class="card admin-panel-section">
             <div class="panel-header"><h2>Acciones</h2></div>
             <div style="display:flex;gap:12px;padding:12px 0 4px;">
-                <form method="POST" action="{{ route('admin.empresas.aprobar', $usuario->id) }}">
+                <form method="POST" action="{{ route('admin.empresas.aprobar', $usuario->id) }}" class="js-confirm-empresa" data-action-label="aprobar" data-empresa="{{ $usuario->nombre }} {{ $usuario->apellido1 }}">
                     @csrf
-                    <button type="submit" class="btn btn-success"
-                        onclick="return confirm('¿Aprobar la cuenta de {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}?')">
+                    <button type="submit" class="btn btn-success">
                         ✔ Aprobar empresa
                     </button>
                 </form>
-                <form method="POST" action="{{ route('admin.empresas.rechazar', $usuario->id) }}">
+                <form method="POST" action="{{ route('admin.empresas.rechazar', $usuario->id) }}" class="js-confirm-empresa" data-action-label="rechazar" data-empresa="{{ $usuario->nombre }} {{ $usuario->apellido1 }}">
                     @csrf
-                    <button type="submit" class="btn btn-danger"
-                        onclick="return confirm('¿Rechazar la solicitud de {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}?')">
+                    <button type="submit" class="btn btn-danger">
                         ✖ Rechazar solicitud
                     </button>
                 </form>
@@ -150,4 +148,29 @@
         </section>
     @endif
 
+<script>
+document.querySelectorAll('.js-confirm-empresa').forEach((form) => {
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const actionLabel = form.dataset.actionLabel;
+        const empresa = form.dataset.empresa;
+        const isApprove = actionLabel === 'aprobar';
+
+        const result = await Swal.fire({
+            title: isApprove ? '¿Aprobar empresa?' : '¿Rechazar solicitud?',
+            html: `Empresa: <strong>${empresa}</strong>`,
+            icon: isApprove ? 'question' : 'warning',
+            showCancelButton: true,
+            confirmButtonText: isApprove ? 'Sí, aprobar' : 'Sí, rechazar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: isApprove ? '#059669' : '#dc2626',
+        });
+
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+});
+</script>
 @endsection

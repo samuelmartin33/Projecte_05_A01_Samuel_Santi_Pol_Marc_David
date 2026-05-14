@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Amigo;
 use App\Models\Usuario;
+use App\Models\CategoriaEvento;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -50,6 +51,33 @@ class PerfilController extends Controller
             });
 
         return view('perfil.index', compact('usuario', 'solicitudesPendientes', 'amigos'));
+    }
+
+    /**
+     * Muestra la página de favoritos del usuario autenticado.
+     * Reutiliza el grid de eventos y pasa únicamente los eventos marcados como favoritos.
+     */
+    public function favoritos(): View
+    {
+        /** @var Usuario $usuario */
+        $usuario = Auth::user();
+
+        // Eventos marcados como favoritos (pivot.estado = 1)
+        $eventos = $usuario->favoritos()
+            ->with(['categoria', 'portada'])
+            ->orderBy('fecha_inicio', 'asc')
+            ->get();
+
+        $categorias = CategoriaEvento::where('estado', 1)->orderBy('nombre')->get();
+
+        $favoritosIds = $eventos->pluck('id')->map(fn($v) => (int) $v)->toArray();
+
+        return view('perfil.favoritos', [
+            'usuario' => $usuario,
+            'eventos' => $eventos,
+            'categorias' => $categorias,
+            'favoritosIds' => $favoritosIds,
+        ]);
     }
 
     /* ============================================================
