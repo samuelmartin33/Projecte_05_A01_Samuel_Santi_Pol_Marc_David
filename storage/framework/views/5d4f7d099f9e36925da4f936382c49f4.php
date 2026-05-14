@@ -3,33 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>VIBEZ — Bienvenido</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo_vibez.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/logo_vibez.png')); ?>">
 
-    {{-- Fuentes editoriales VIBEZ --}}
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    {{-- Estilos landing pública --}}
-    <link rel="stylesheet" href="{{ asset('css/vibez-welcome.css') }}">
+    
+    <link rel="stylesheet" href="<?php echo e(asset('css/vibez-welcome.css')); ?>">
 </head>
 <body>
 
-{{-- ════════════════════════════════════════════════════
-     ORBS DE AMBIENTE — decoración fija de fondo
-════════════════════════════════════════════════════ --}}
+
 <div class="amb amb-1" aria-hidden="true"></div>
 <div class="amb amb-2" aria-hidden="true"></div>
 <div class="amb amb-3" aria-hidden="true"></div>
 
-{{-- ════════════════════════════════════════════════════
-     NAV — barra superior sticky
-════════════════════════════════════════════════════ --}}
+
 <header class="nav">
-    <a href="{{ route('welcome') }}" class="logo" aria-label="VIBEZ — Inicio">
-        <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ">
+    <a href="<?php echo e(route('welcome')); ?>" class="logo" aria-label="VIBEZ — Inicio">
+        <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
         <span>VIBEZ</span>
     </a>
 
@@ -39,13 +35,13 @@
     </nav>
 
     <div class="nav-cta">
-        @auth
-            <a href="{{ Auth::user()->isEmpresa() ? route('empresa.home') : route('home') }}"
+        <?php if(auth()->guard()->check()): ?>
+            <a href="<?php echo e(Auth::user()->isEmpresa() ? route('empresa.home') : route('home')); ?>"
                class="btn-pri">Mi cuenta</a>
-        @else
-            <a href="{{ route('login') }}" class="btn-ghost">Entrar</a>
-            <a href="{{ route('register') }}" class="btn-pri">Crear cuenta</a>
-        @endauth
+        <?php else: ?>
+            <a href="<?php echo e(route('login')); ?>" class="btn-ghost">Entrar</a>
+            <a href="<?php echo e(route('register')); ?>" class="btn-pri">Crear cuenta</a>
+        <?php endif; ?>
         <button class="burger"
                 onclick="document.getElementById('menu-movil').classList.add('open')"
                 aria-label="Abrir menú" aria-expanded="false">
@@ -58,9 +54,7 @@
     </div>
 </header>
 
-{{-- ════════════════════════════════════════════════════
-     MENÚ MÓVIL — panel full-screen
-════════════════════════════════════════════════════ --}}
+
 <div class="mobile-menu" id="menu-movil" role="dialog" aria-modal="true" aria-label="Menú de navegación">
     <button class="close"
             onclick="document.getElementById('menu-movil').classList.remove('open')"
@@ -73,94 +67,90 @@
     <a href="#features" onclick="document.getElementById('menu-movil').classList.remove('open')">Cómo funciona</a>
     <a href="#showcase" onclick="document.getElementById('menu-movil').classList.remove('open')">Eventos</a>
     <div class="actions">
-        @auth
-            <a href="{{ Auth::user()->isEmpresa() ? route('empresa.home') : route('home') }}"
+        <?php if(auth()->guard()->check()): ?>
+            <a href="<?php echo e(Auth::user()->isEmpresa() ? route('empresa.home') : route('home')); ?>"
                class="btn-pri">Mi cuenta</a>
-        @else
-            <a href="{{ route('login') }}" class="btn-ghost">Entrar</a>
-            <a href="{{ route('register') }}" class="btn-pri">Crear cuenta</a>
-        @endauth
+        <?php else: ?>
+            <a href="<?php echo e(route('login')); ?>" class="btn-ghost">Entrar</a>
+            <a href="<?php echo e(route('register')); ?>" class="btn-pri">Crear cuenta</a>
+        <?php endif; ?>
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     HERO — titular gigante + cards editoriales rotadas
-════════════════════════════════════════════════════ --}}
+
 <section class="hero">
 
-    {{-- Columna izquierda: texto --}}
+    
     <div>
-        <div class="mono hero-kicker">▸ Edición #428 · {{ now()->locale('es')->isoFormat('MMMM YYYY') }}</div>
+        <div class="mono hero-kicker">▸ Edición #428 · <?php echo e(now()->locale('es')->isoFormat('MMMM YYYY')); ?></div>
         <h1>Esta noche<br><em>se rompe</em>.</h1>
         <p class="hero-sub">
             Eventos, fiestas, conciertos y festivales — todo lo que vive tu escena en un solo sitio.
             Compra entradas, descubre tu próxima noche y entra a la lista VIP.
         </p>
         <div class="hero-actions">
-            <a href="{{ route('register') }}" class="btn-pri big">
+            <a href="<?php echo e(route('register')); ?>" class="btn-pri big">
                 Crear cuenta
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"/>
                     <polyline points="12 5 19 12 12 19"/>
                 </svg>
             </a>
-            <a href="{{ route('login') }}" class="btn-ghost">Ya tengo cuenta</a>
+            <a href="<?php echo e(route('login')); ?>" class="btn-ghost">Ya tengo cuenta</a>
             <div class="hero-stat">
-                <div class="num">{{ $eventos->count() > 0 ? $eventos->count() : '12k' }}+</div>
+                <div class="num"><?php echo e($eventos->count() > 0 ? $eventos->count() : '12k'); ?>+</div>
                 <div>eventos<br>disponibles</div>
             </div>
         </div>
     </div>
 
-    {{-- Columna derecha: cards de eventos rotadas --}}
+    
     <div class="hero-vis" aria-hidden="true">
-        <div class="hero-vis-sticker">★ NEW · {{ date('Y') }}</div>
+        <div class="hero-vis-sticker">★ NEW · <?php echo e(date('Y')); ?></div>
 
-        {{-- Card 1 (grande, inclinada a la derecha) --}}
+        
         <div class="hero-card hero-card-1">
-            @if($eventos->count() > 0)
-                <img src="{{ $eventos[0]->url_portada ?? 'https://picsum.photos/seed/welcome-1/600/760' }}"
-                     alt="{{ $eventos[0]->titulo }}"
+            <?php if($eventos->count() > 0): ?>
+                <img src="<?php echo e($eventos[0]->url_portada ?? 'https://picsum.photos/seed/welcome-1/600/760'); ?>"
+                     alt="<?php echo e($eventos[0]->titulo); ?>"
                      onerror="this.src='https://picsum.photos/seed/welcome-1/600/760'">
-                <div class="hero-card-overlay"><span>{{ $eventos[0]->titulo }}</span></div>
-            @else
+                <div class="hero-card-overlay"><span><?php echo e($eventos[0]->titulo); ?></span></div>
+            <?php else: ?>
                 <img src="https://picsum.photos/seed/welcome-1/600/760" alt="">
                 <div class="hero-card-overlay"><span>Charlotte de Witte</span></div>
-            @endif
+            <?php endif; ?>
         </div>
 
-        {{-- Card 2 (mediana, inclinada a la izquierda) --}}
+        
         <div class="hero-card hero-card-2">
-            @if($eventos->count() > 1)
-                <img src="{{ $eventos[1]->url_portada ?? 'https://picsum.photos/seed/welcome-2/500/620' }}"
-                     alt="{{ $eventos[1]->titulo }}"
+            <?php if($eventos->count() > 1): ?>
+                <img src="<?php echo e($eventos[1]->url_portada ?? 'https://picsum.photos/seed/welcome-2/500/620'); ?>"
+                     alt="<?php echo e($eventos[1]->titulo); ?>"
                      onerror="this.src='https://picsum.photos/seed/welcome-2/500/620'">
-                <div class="hero-card-overlay"><span>{{ $eventos[1]->titulo }}</span></div>
-            @else
+                <div class="hero-card-overlay"><span><?php echo e($eventos[1]->titulo); ?></span></div>
+            <?php else: ?>
                 <img src="https://picsum.photos/seed/welcome-2/500/620" alt="">
                 <div class="hero-card-overlay"><span>Primavera Sound</span></div>
-            @endif
+            <?php endif; ?>
         </div>
 
-        {{-- Card 3 (pequeña, esquina inferior izquierda) --}}
+        
         <div class="hero-card hero-card-3">
-            @if($eventos->count() > 2)
-                <img src="{{ $eventos[2]->url_portada ?? 'https://picsum.photos/seed/welcome-3/360/440' }}"
-                     alt="{{ $eventos[2]->titulo }}"
+            <?php if($eventos->count() > 2): ?>
+                <img src="<?php echo e($eventos[2]->url_portada ?? 'https://picsum.photos/seed/welcome-3/360/440'); ?>"
+                     alt="<?php echo e($eventos[2]->titulo); ?>"
                      onerror="this.src='https://picsum.photos/seed/welcome-3/360/440'">
-                <div class="hero-card-overlay"><span>{{ $eventos[2]->titulo }}</span></div>
-            @else
+                <div class="hero-card-overlay"><span><?php echo e($eventos[2]->titulo); ?></span></div>
+            <?php else: ?>
                 <img src="https://picsum.photos/seed/welcome-3/360/440" alt="">
                 <div class="hero-card-overlay"><span>Pacha · BCN</span></div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     MARQUEE — banda animada de texto
-════════════════════════════════════════════════════ --}}
+
 <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
         <span>Esta noche se rompe<span class="star">✦</span></span>
@@ -174,9 +164,7 @@
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     FEATURES — cómo funciona VIBEZ (3 cards numeradas)
-════════════════════════════════════════════════════ --}}
+
 <section class="features" id="features">
     <div class="section-head">
         <div class="mono">▸ Cómo funciona</div>
@@ -201,60 +189,57 @@
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     SHOWCASE — grid de 4 eventos esta semana
-════════════════════════════════════════════════════ --}}
+
 <section class="showcase" id="showcase">
     <div class="section-head">
         <div class="mono">▸ Esta semana</div>
         <h2>Lo que <em>todos</em> escuchan</h2>
     </div>
     <div class="show-grid">
-        @forelse($eventos->take(4) as $evento)
-            <a href="{{ route('eventos.detalle', $evento->id) }}" class="show-card">
+        <?php $__empty_1 = true; $__currentLoopData = $eventos->take(4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $evento): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <a href="<?php echo e(route('eventos.detalle', $evento->id)); ?>" class="show-card">
                 <img
-                    src="{{ $evento->url_portada }}"
-                    alt="{{ $evento->titulo }}"
-                    onerror="this.src='https://picsum.photos/seed/show-{{ $evento->id }}/400/520'"
+                    src="<?php echo e($evento->url_portada); ?>"
+                    alt="<?php echo e($evento->titulo); ?>"
+                    onerror="this.src='https://picsum.photos/seed/show-<?php echo e($evento->id); ?>/400/520'"
                 >
                 <div class="show-info">
                     <div class="city">
-                        {{ $evento->ubicacion_nombre ?? 'BCN' }} · {{ $evento->fecha_inicio->locale('es')->isoFormat('D MMM') }}
+                        <?php echo e($evento->ubicacion_nombre ?? 'BCN'); ?> · <?php echo e($evento->fecha_inicio->locale('es')->isoFormat('D MMM')); ?>
+
                     </div>
-                    <div class="name">{{ $evento->titulo }}</div>
+                    <div class="name"><?php echo e($evento->titulo); ?></div>
                 </div>
             </a>
-        @empty
-            {{-- Fallback con datos editoriales si no hay eventos en BD --}}
-            <a href="{{ route('register') }}" class="show-card">
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+            
+            <a href="<?php echo e(route('register')); ?>" class="show-card">
                 <img src="https://picsum.photos/seed/show-1/400/520" alt="">
                 <div class="show-info"><div class="city">BCN · 09 May</div><div class="name">Charlotte de Witte</div></div>
             </a>
-            <a href="{{ route('register') }}" class="show-card">
+            <a href="<?php echo e(route('register')); ?>" class="show-card">
                 <img src="https://picsum.photos/seed/show-2/400/520" alt="">
                 <div class="show-info"><div class="city">BCN · 28 May</div><div class="name">Primavera Sound</div></div>
             </a>
-            <a href="{{ route('register') }}" class="show-card">
+            <a href="<?php echo e(route('register')); ?>" class="show-card">
                 <img src="https://picsum.photos/seed/show-3/400/520" alt="">
                 <div class="show-info"><div class="city">IBZ · 15 Jun</div><div class="name">Bad Bunny</div></div>
             </a>
-            <a href="{{ route('register') }}" class="show-card">
+            <a href="<?php echo e(route('register')); ?>" class="show-card">
                 <img src="https://picsum.photos/seed/show-4/400/520" alt="">
                 <div class="show-info"><div class="city">BCN · 22 May</div><div class="name">Dixon · Apolo</div></div>
             </a>
-        @endforelse
+        <?php endif; ?>
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     PROOF — estadísticas + CTA social
-════════════════════════════════════════════════════ --}}
+
 <section class="proof">
     <div class="proof-text">
         <div class="mono" style="color:var(--morado-3);font-size:11px;margin-bottom:14px;display:inline-block">▸ Únete a la lista</div>
         <h2>La <em>escena</em> ya está dentro.</h2>
-        <p>Más de {{ number_format($statRavers, 0, ',', '.') }} ravers, {{ $statPromotores }} promotores y {{ $statEventos }} eventos activos. VIBEZ es la plataforma que mueve la noche de Iberia.</p>
-        <a href="{{ route('register') }}" class="btn-pri big">
+        <p>Más de <?php echo e(number_format($statRavers, 0, ',', '.')); ?> ravers, <?php echo e($statPromotores); ?> promotores y <?php echo e($statEventos); ?> eventos activos. VIBEZ es la plataforma que mueve la noche de Iberia.</p>
+        <a href="<?php echo e(route('register')); ?>" class="btn-pri big">
             Quiero entrar
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12"/>
@@ -264,50 +249,46 @@
     </div>
     <div class="proof-stats">
         <div class="stat-card">
-            <div class="stat-num" data-target="{{ $statRavers }}" data-suffix="">0</div>
+            <div class="stat-num" data-target="<?php echo e($statRavers); ?>" data-suffix="">0</div>
             <div class="stat-lbl">Ravers activos</div>
         </div>
         <div class="stat-card">
-            <div class="stat-num" data-target="{{ $statEventos }}" data-suffix="">0</div>
+            <div class="stat-num" data-target="<?php echo e($statEventos); ?>" data-suffix="">0</div>
             <div class="stat-lbl">Eventos activos</div>
         </div>
         <div class="stat-card">
-            <div class="stat-num" data-target="{{ $statPromotores }}" data-suffix="">0</div>
+            <div class="stat-num" data-target="<?php echo e($statPromotores); ?>" data-suffix="">0</div>
             <div class="stat-lbl">Promotores</div>
         </div>
         <div class="stat-card">
-            <div class="stat-num" data-target="{{ $statSatisf }}" data-suffix="%">0</div>
+            <div class="stat-num" data-target="<?php echo e($statSatisf); ?>" data-suffix="%">0</div>
             <div class="stat-lbl">Satisfacción</div>
         </div>
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     FINAL CTA — llamada gigante al registro
-════════════════════════════════════════════════════ --}}
+
 <section class="final">
     <h2>La noche<br>te <em>espera</em>.</h2>
     <p>Crea tu pase VIBEZ en 30 segundos. Sin spam, sin compromisos. Solo música.</p>
     <div class="final-actions">
-        <a href="{{ route('register') }}" class="btn-pri big">
+        <a href="<?php echo e(route('register')); ?>" class="btn-pri big">
             Crear mi pase
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12"/>
                 <polyline points="12 5 19 12 12 19"/>
             </svg>
         </a>
-        <a href="{{ route('login') }}" class="btn-ghost">Ya tengo cuenta</a>
+        <a href="<?php echo e(route('login')); ?>" class="btn-ghost">Ya tengo cuenta</a>
     </div>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     FOOTER — multicolumna editorial
-════════════════════════════════════════════════════ --}}
+
 <footer>
     <div class="foot-row">
         <div>
-            <a href="{{ route('welcome') }}" class="logo" style="display:inline-flex;margin-bottom:14px;">
-                <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ">
+            <a href="<?php echo e(route('welcome')); ?>" class="logo" style="display:inline-flex;margin-bottom:14px;">
+                <img src="<?php echo e(asset('images/logo_vibez_white.png')); ?>" alt="VIBEZ">
                 <span>VIBEZ</span>
             </a>
             <p style="color:var(--ink-dim);font-size:13px;line-height:1.5;max-width:320px;">
@@ -316,10 +297,10 @@
         </div>
         <div>
             <h4>Plataforma</h4>
-            <a href="{{ route('home') }}">Explorar</a>
-            <a href="{{ route('trabajos.index') }}">Bolsa de trabajo</a>
-            <a href="{{ route('register') }}">Crear cuenta</a>
-            <a href="{{ route('login') }}">Entrar</a>
+            <a href="<?php echo e(route('home')); ?>">Explorar</a>
+            <a href="<?php echo e(route('trabajos.index')); ?>">Bolsa de trabajo</a>
+            <a href="<?php echo e(route('register')); ?>">Crear cuenta</a>
+            <a href="<?php echo e(route('login')); ?>">Entrar</a>
         </div>
         <div>
             <h4>Empresa</h4>
@@ -336,7 +317,7 @@
         </div>
     </div>
     <div class="foot-bottom">
-        <span>© {{ date('Y') }} VIBEZ · BCN</span>
+        <span>© <?php echo e(date('Y')); ?> VIBEZ · BCN</span>
         <span>Edición 428 · Made for ravers</span>
     </div>
 </footer>
@@ -380,3 +361,4 @@ if (proofSection) observer.observe(proofSection);
 </script>
 </body>
 </html>
+<?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/welcome.blade.php ENDPATH**/ ?>

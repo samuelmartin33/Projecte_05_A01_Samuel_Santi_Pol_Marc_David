@@ -225,7 +225,7 @@ body[data-hero="split"] .hero-split { display: grid; }
   position: fixed; inset: 0;
   background: rgba(7,6,12,0.85);
   backdrop-filter: blur(20px);
-  z-index: 200;
+  z-index: 9999;
   animation: fadeIn 0.25s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

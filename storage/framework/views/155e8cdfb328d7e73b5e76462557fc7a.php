@@ -1,4 +1,4 @@
-{{-- Modal de detalle de evento. Oculto por defecto, rellenado por vibez-home.js --}}
+
 <div id="vibez-detail-modal"
      class="modal-back"
      style="display:none;align-items:center;justify-content:center;"
@@ -8,7 +8,7 @@
        onclick="event.stopPropagation()"
        style="position:fixed;inset:5% 8%;z-index:10000;background:var(--bg);border:1px solid var(--line);overflow:auto;display:grid;grid-template-columns:1.2fr 1fr;">
 
-    {{-- Columna izquierda: imagen --}}
+    
     <div style="position:relative;overflow:hidden;min-height:520px;">
       <img id="modal-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;filter:contrast(1.05) saturate(1.1) brightness(0.85);">
       <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(7,6,12,0.7));"></div>
@@ -17,7 +17,7 @@
         ×
       </button>
       <div style="position:absolute;bottom:28px;left:28px;right:28px;">
-        {{-- Badge en curso --}}
+        
         <div id="modal-en-curso"
              style="display:none;align-items:center;gap:6px;background:var(--magenta);color:var(--cream);padding:5px 12px;border-radius:999px;font-family:'Archivo Narrow',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;width:fit-content;">
           <span class="pulse-dot" style="width:7px;height:7px;border-radius:50%;background:var(--cream);"></span>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    {{-- Columna derecha: info + compra --}}
+    
     <div style="padding:48px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;">
 
       <div>
@@ -40,26 +40,26 @@
          style="font-family:'Archivo Narrow',sans-serif;font-size:17px;color:var(--cream);font-style:italic;margin:0;border-left:2px solid var(--magenta);padding-left:14px;"></p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:16px;border-top:1px solid var(--line);">
-        @foreach([['modal-fecha','Fecha'],['modal-hora','Hora'],['modal-lugar','Sala'],['modal-ciudad','Ciudad']] as [$elId, $label])
+        <?php $__currentLoopData = [['modal-fecha','Fecha'],['modal-hora','Hora'],['modal-lugar','Sala'],['modal-ciudad','Ciudad']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$elId, $label]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
           <div>
-            <div class="mono" style="font-size:10px;color:var(--ink-dim);margin-bottom:4px;">{{ $label }}</div>
-            <div id="{{ $elId }}" style="font-size:14px;font-weight:600;"></div>
+            <div class="mono" style="font-size:10px;color:var(--ink-dim);margin-bottom:4px;"><?php echo e($label); ?></div>
+            <div id="<?php echo e($elId); ?>" style="font-size:14px;font-weight:600;"></div>
           </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <div>
           <div class="mono" style="font-size:10px;color:var(--ink-dim);margin-bottom:4px;">Disponibilidad</div>
           <div id="modal-cupos" style="font-size:14px;font-weight:600;"></div>
         </div>
       </div>
 
-      {{-- Precio + cantidad + comprar --}}
+      
       <div style="margin-top:auto;padding-top:20px;border-top:1px solid var(--line);">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;">
           <span class="mono" style="font-size:11px;color:var(--ink-dim);">Precio por entrada</span>
           <span id="modal-precio" class="display" style="font-size:52px;color:var(--magenta);"></span>
         </div>
 
-        {{-- Selector de cantidad --}}
+        
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
           <span class="mono" style="font-size:11px;color:var(--ink-dim);">Cantidad</span>
           <div style="display:flex;align-items:center;gap:0;border:1px solid var(--line);">
@@ -97,3 +97,4 @@ function vibezCantidad(delta) {
   el.value = Math.min(10, Math.max(1, v));
 }
 </script>
+<?php /**PATH C:\wamp64\www\DAW2\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/detail-modal.blade.php ENDPATH**/ ?>
