@@ -55,10 +55,10 @@
                     </td>
                     <td data-label="Acciones" class="acciones">
                         <a class="btn btn-secondary" href="{{ route('admin.usuarios.edit', $usuario) }}">Editar</a>
-                        <form method="POST" action="{{ route('admin.usuarios.destroy', $usuario) }}" class="delete-form">
+                        <form method="POST" action="{{ route('admin.usuarios.destroy', $usuario) }}" class="delete-form" data-confirm-msg="¿Eliminar a {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}?">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Eliminar a {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}?')">Eliminar</button>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
                     </td>
                 </tr>

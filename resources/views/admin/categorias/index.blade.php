@@ -35,10 +35,10 @@
                         <td data-label="Estado"><span class="estado {{ $cat->estado ? 'activo' : 'inactivo' }}">{{ $cat->estado ? 'Activo' : 'Inactivo' }}</span></td>
                         <td data-label="Acciones" class="acciones">
                             <a class="btn btn-secondary" href="{{ route('admin.categorias.edit', $cat) }}">Editar</a>
-                            <form method="POST" action="{{ route('admin.categorias.destroy', $cat) }}" class="delete-form" style="display:inline-block">
+                            <form method="POST" action="{{ route('admin.categorias.destroy', $cat) }}" class="delete-form" style="display:inline-block" data-confirm-msg="¿Eliminar esta categoría?">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Eliminar esta categoría?')">Eliminar</button>
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
                             </form>
                         </td>
                     </tr>

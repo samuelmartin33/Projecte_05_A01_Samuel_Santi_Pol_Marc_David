@@ -91,7 +91,7 @@
                             <form method="POST"
                                   action="{{ route('admin.cupones.destroy', $cupon->id) }}"
                                   class="delete-form"
-                                  onsubmit="return confirm('¿Eliminar el cupón {{ $cupon->codigo }}?')">
+                                  data-confirm-msg="¿Eliminar el cupón {{ $cupon->codigo }}?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Eliminar</button>

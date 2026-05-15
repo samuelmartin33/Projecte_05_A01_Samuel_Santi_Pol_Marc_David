@@ -46,10 +46,10 @@
                             </td>
                             <td data-label="Acciones" class="actions-cell">
                                 <a class="btn btn-secondary" href="{{ route('admin.pagos.edit', $pago) }}">Editar</a>
-                                <form method="POST" action="{{ route('admin.pagos.destroy', $pago) }}" style="display:inline;">
+                                <form method="POST" action="{{ route('admin.pagos.destroy', $pago) }}" style="display:inline;" class="delete-form" data-confirm-msg="¿Eliminar el pago #{{ $pago->id }}?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Eliminar el pago #{{ $pago->id }}?')">Eliminar</button>
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
                                 </form>
                             </td>
                         </tr>
