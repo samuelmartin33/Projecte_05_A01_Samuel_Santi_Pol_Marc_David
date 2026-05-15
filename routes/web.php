@@ -40,6 +40,7 @@ use App\Http\Controllers\Empresa\FacturacionController;
 use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\Empresa\EquipoController;
+use App\Http\Controllers\Empresa\PerfilFiscalController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -187,6 +188,12 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/facturacion')->name('e
     Route::get('/',                            [FacturacionController::class, 'index'])     ->name('index');
     Route::get('/{factura}/descargar',         [FacturacionController::class, 'descargar']) ->name('descargar');
     Route::get('/evento/{evento}/generar-pdf', [FacturacionController::class, 'generarPdf'])->name('generar-pdf');
+});
+
+/* — Perfil fiscal de empresa — */
+Route::middleware(['auth','no-portero'])->group(function () {
+    Route::get('/empresa/perfil-fiscal',  [PerfilFiscalController::class, 'show'])  ->name('empresa.perfil-fiscal');
+    Route::post('/empresa/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('empresa.perfil-fiscal.update');
 });
 
 /* — Equipo de empresa: gestión de usuarios y roles — */
