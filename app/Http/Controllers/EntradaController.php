@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EntradaComprada;
+use App\Models\Cupon;
+use App\Models\CuponUso;
 use App\Models\Entrada;
 use App\Models\Evento;
 use App\Models\Pedido;
@@ -75,16 +77,18 @@ class EntradaController extends Controller
         // 'exists:eventos,id' comprueba que el evento_id existe en la tabla 'eventos'.
         // 'min:1' y 'max:10' limitan la compra a un rango razonable por petición.
         $request->validate([
-            'evento_id' => ['required', 'integer', 'exists:eventos,id'],
-            'cantidad'  => ['required', 'integer', 'min:1', 'max:10'],
+            'evento_id'     => ['required', 'integer', 'exists:eventos,id'],
+            'cantidad'      => ['required', 'integer', 'min:1', 'max:10'],
+            'cupon_codigo'  => ['nullable', 'string', 'max:50'],
         ], [
             'evento_id.exists' => 'El evento no existe.',
             'cantidad.min'     => 'Debes seleccionar al menos 1 entrada.',
             'cantidad.max'     => 'No puedes comprar más de 10 entradas a la vez.',
         ]);
 
-        $eventoId = (int) $request->evento_id;
-        $cantidad = (int) $request->cantidad;
+        $eventoId     = (int) $request->evento_id;
+        $cantidad     = (int) $request->cantidad;
+        $cuponCodigo  = $request->cupon_codigo ? strtoupper(trim($request->cupon_codigo)) : null;
 
         // findOrFail lanza una excepción 404 si el evento no existe o no está activo
         // (estado = 1 significa que el evento está publicado y disponible).
@@ -100,30 +104,71 @@ class EntradaController extends Controller
             ], 422);
         }
 
+        // --- Validar cupón si se ha enviado uno ---
+        $cupon           = null;
+        $totalDescuento  = 0.00;
+
+        if ($cuponCodigo) {
+            $cupon = Cupon::with('eventos')->where('codigo', $cuponCodigo)->first();
+
+            if (!$cupon || !$cupon->is_valido) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón introducido no es válido o ha expirado.',
+                ], 422);
+            }
+
+            if (!$cupon->aplicaAEvento($eventoId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este cupón no es válido para este evento.',
+                ], 422);
+            }
+
+            // Verificar límite por usuario
+            if ($cupon->limite_usos_por_usuario !== null) {
+                $usosDelUsuario = $cupon->usosDeUsuario(Auth::id());
+                if ($usosDelUsuario >= $cupon->limite_usos_por_usuario) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Ya has usado este cupón el máximo de veces permitido.',
+                    ], 422);
+                }
+            }
+        }
+
         try {
             // DB::transaction() garantiza atomicidad: las tres operaciones dentro
             // (crear Pedido, crear Entradas, incrementar aforo) se ejecutan como
             // una unidad. Si cualquiera falla, todas se revierten automáticamente.
-            $pedido = DB::transaction(function () use ($evento, $cantidad) {
+            $pedido = DB::transaction(function () use ($evento, $cantidad, $cupon) {
                 $ahora = now();
-                // Calculamos el total con dos decimales para evitar errores de coma flotante.
-                $total = round($evento->precio_base * $cantidad, 2);
+                // Precio base antes de descuento
+                $totalBruto      = round($evento->precio_base * $cantidad, 2);
+                $totalDescuento  = 0.00;
+                $totalFinal      = $totalBruto;
 
-                // Creamos el registro principal del pedido.
-                // Auth::id() devuelve el ID del usuario con sesión activa.
+                // Aplicar descuento del cupón (porcentaje)
+                if ($cupon) {
+                    $totalDescuento = round($totalBruto * ($cupon->valor_descuento / 100), 2);
+                    $totalFinal     = round($totalBruto - $totalDescuento, 2);
+                }
+
+                // Precio unitario con descuento aplicado
+                $precioUnitarioPagado = $cantidad > 0
+                    ? round($totalFinal / $cantidad, 2)
+                    : 0;
+
                 $pedido = Pedido::create([
                     'usuario_id'          => Auth::id(),
-                    'total'               => $total,
-                    'total_descuento'     => 0.00,
-                    'total_final'         => $total,
+                    'total'               => $totalBruto,
+                    'total_descuento'     => $totalDescuento,
+                    'total_final'         => $totalFinal,
                     'estado'              => 1,
                     'fecha_creacion'      => $ahora,
                     'fecha_actualizacion' => $ahora,
                 ]);
 
-                // Creamos una fila en 'entradas' por cada unidad comprada.
-                // Str::uuid()->toString() genera un código QR único e irrepetible
-                // para cada entrada (identificador único universal, UUID v4).
                 for ($i = 0; $i < $cantidad; $i++) {
                     Entrada::create([
                         'pedido_id'           => $pedido->id,
@@ -131,17 +176,29 @@ class EntradaController extends Controller
                         'estado_entrada'      => 1,
                         'codigo_qr'           => Str::uuid()->toString(),
                         'precio_unitario'     => $evento->precio_base,
-                        'precio_pagado'       => $evento->precio_base,
+                        'precio_pagado'       => $precioUnitarioPagado,
                         'estado'              => 1,
                         'fecha_creacion'      => $ahora,
                         'fecha_actualizacion' => $ahora,
                     ]);
                 }
 
-                // Incrementamos el contador de aforo del evento en una sola
-                // sentencia SQL atómica (UPDATE eventos SET aforo_actual = aforo_actual + N)
-                // para evitar condiciones de carrera si dos usuarios compran a la vez.
                 $evento->increment('aforo_actual', $cantidad);
+
+                // Registrar el uso del cupón
+                if ($cupon) {
+                    CuponUso::create([
+                        'cupon_id'            => $cupon->id,
+                        'pedido_id'           => $pedido->id,
+                        'descuento_aplicado'  => $totalDescuento,
+                        'estado'              => 1,
+                        'fecha_creacion'      => $ahora,
+                        'fecha_actualizacion' => null,
+                    ]);
+
+                    // Incrementar contador de usos del cupón
+                    $cupon->increment('usos_actuales');
+                }
 
                 return $pedido;
             });

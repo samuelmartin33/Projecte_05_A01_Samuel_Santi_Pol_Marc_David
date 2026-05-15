@@ -32,29 +32,29 @@ var AdminEventos = {
         var i = 0;
 
         while (i < formularios.length) {
-            formularios[i].onsubmit = function () {
+            formularios[i].onsubmit = function (e) {
+                e.preventDefault(); // Detener el envío estándar
                 var formulario = this;
+                var msg = formulario.getAttribute('data-confirm-msg') || 'Esta accion no se puede deshacer.';
 
                 if (window.Swal && typeof window.Swal.fire === 'function') {
                     window.Swal.fire({
-                        title: 'Eliminar evento',
-                        text: 'Esta accion no se puede deshacer.',
+                        title: 'Confirmar eliminación',
+                        text: msg,
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Si, eliminar',
-                        cancelButtonText: 'Cancelar',
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d'
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
                     }).then(function (result) {
                         if (result.isConfirmed) {
                             formulario.submit();
                         }
                     });
-
-                    return false;
+                } else {
+                    if (window.confirm(msg)) {
+                        formulario.submit();
+                    }
                 }
-
-                return window.confirm('Estas seguro de eliminar este evento?');
             };
             i = i + 1;
         }

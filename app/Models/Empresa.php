@@ -81,6 +81,13 @@ class Empresa extends Model
         'iban',
         'titular_cuenta',
         'perfil_fiscal_completo',
+        // Campos Stripe Connect (integración marketplace, fase futura)
+        'telefono_empresa',
+        'stripe_account_id',
+        'stripe_onboarding_status',
+        'stripe_charges_enabled',
+        'stripe_payouts_enabled',
+        'stripe_details_submitted',
         'fecha_creacion',
         'fecha_actualizacion',
     ];

@@ -107,7 +107,8 @@
                         <form method="POST"
                               action="{{ route('admin.facturacion.anular', $factura) }}"
                               style="display:inline-block;margin-left:6px;"
-                              onsubmit="return confirm('¿Anular la factura {{ $factura->numero_factura }}?\nEl evento quedará disponible para re-facturar.')">
+                              class="delete-form"
+                              data-confirm-msg="¿Anular la factura {{ $factura->numero_factura }}? El evento quedará disponible para re-facturar.">
                             @csrf @method('PATCH')
                             <button type="submit"
                                     class="btn-action"

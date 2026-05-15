@@ -36,7 +36,6 @@
     <nav class="nav-links" aria-label="Navegación principal">
         <a href="#features">Cómo funciona</a>
         <a href="#showcase">Eventos</a>
-        <a href="{{ route('trabajos.index') }}">Bolsa de trabajo</a>
     </nav>
 
     <div class="nav-cta">
@@ -73,7 +72,6 @@
     </button>
     <a href="#features" onclick="document.getElementById('menu-movil').classList.remove('open')">Cómo funciona</a>
     <a href="#showcase" onclick="document.getElementById('menu-movil').classList.remove('open')">Eventos</a>
-    <a href="{{ route('trabajos.index') }}" onclick="document.getElementById('menu-movil').classList.remove('open')">Bolsa de trabajo</a>
     <div class="actions">
         @auth
             <a href="{{ Auth::user()->isEmpresa() ? route('empresa.home') : route('home') }}"

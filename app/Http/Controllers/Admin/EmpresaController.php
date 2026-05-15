@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BienvenidaMail;
+use App\Mail\RechazoMail;
 use App\Models\Empresa;
 use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 /**
@@ -55,14 +59,25 @@ class EmpresaController extends Controller
             'fecha_actualizacion' => now(),
         ]);
 
-        // Notificar al promotor que su cuenta está activa y debe completar el perfil fiscal
-        \App\Models\Notificacion::crear(
-            $usuario->id,
-            \App\Models\Notificacion::PERFIL_FISCAL,
-            '¡Cuenta aprobada! Completa tu perfil fiscal',
-            'Ya puedes acceder a VIBEZ. Rellena tus datos legales y bancarios para publicar eventos.',
-            route('empresa.perfil-fiscal')
-        );
+        // Notificación interna (campana) al representante
+        try {
+            \App\Models\Notificacion::crear(
+                $usuario->id,
+                \App\Models\Notificacion::PERFIL_FISCAL,
+                '¡Cuenta aprobada! Completa tu perfil fiscal',
+                'Ya puedes acceder a VIBEZ. Rellena tus datos legales y bancarios para publicar eventos.',
+                route('empresa.perfil-fiscal')
+            );
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo crear notificación de aprobación: ' . $e->getMessage());
+        }
+
+        // Email de bienvenida al representante de la empresa
+        try {
+            Mail::to($usuario->email)->send(new BienvenidaMail($usuario));
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo enviar email de bienvenida a empresa: ' . $e->getMessage());
+        }
 
         return redirect()->route('admin.empresas.index')
             ->with('success', "Empresa de {$usuario->nombre} {$usuario->apellido1} aprobada correctamente.");
@@ -80,13 +95,24 @@ class EmpresaController extends Controller
             'fecha_actualizacion' => now(),
         ]);
 
-        // Notificar al promotor del rechazo
-        \App\Models\Notificacion::crear(
-            $usuario->id,
-            \App\Models\Notificacion::EMPRESA_RECHAZADA,
-            'Solicitud de empresa rechazada',
-            'Tu solicitud no ha sido aprobada. Contacta con soporte para más información.'
-        );
+        // Notificación interna (campana) al representante
+        try {
+            \App\Models\Notificacion::crear(
+                $usuario->id,
+                \App\Models\Notificacion::EMPRESA_RECHAZADA,
+                'Solicitud de empresa rechazada',
+                'Tu solicitud no ha sido aprobada. Contacta con soporte para más información.'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo crear notificación de rechazo: ' . $e->getMessage());
+        }
+
+        // Email de rechazo al representante de la empresa
+        try {
+            Mail::to($usuario->email)->send(new RechazoMail($usuario));
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo enviar email de rechazo a empresa: ' . $e->getMessage());
+        }
 
         return redirect()->route('admin.empresas.index')
             ->with('error', "Solicitud de {$usuario->nombre} {$usuario->apellido1} rechazada.");
