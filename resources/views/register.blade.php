@@ -409,23 +409,13 @@
                     </div>
 
                     {{-- Géneros musicales — chips opcionales --}}
-                    <div class="auth-mood-pick">
-                        <span class="auth-label mono">¿Qué te va?</span>
-                        <div class="auth-mood-grid">
-                            <label><input type="checkbox" name="musica[]" value="techno"><span>🌀 Techno</span></label>
-                            <label><input type="checkbox" name="musica[]" value="disco"><span>💋 Disco</span></label>
-                            <label><input type="checkbox" name="musica[]" value="reggaeton"><span>🔥 Reggaeton</span></label>
-                            <label><input type="checkbox" name="musica[]" value="indie"><span>🎸 Indie</span></label>
-                            <label><input type="checkbox" name="musica[]" value="conciertos"><span>🎤 Conciertos</span></label>
-                            <label><input type="checkbox" name="musica[]" value="chill"><span>🌅 Chill</span></label>
-                        </div>
-                    </div>
+                    
 
                     {{-- Aceptar términos --}}
                     <label class="auth-check auth-check-tall">
                         <input type="checkbox" name="acepta_terminos" required>
                         <span class="auth-check-box"></span>
-                        <span>Acepto los <a href="#">Términos de uso</a> y la <a href="#">Política de privacidad</a>. Soy mayor de 16 años.</span>
+                        <span>Acepto los <a href="{{ route('terminos') }}">Términos de uso</a> y la <a href="{{ route('privacidad') }}">Política de privacidad</a>. Soy mayor de 16 años.</span>
                     </label>
 
                     {{-- Fila botones (id="btnRow" usado por JS en estado pendiente) --}}
