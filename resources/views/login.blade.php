@@ -133,7 +133,7 @@
                             <span class="auth-check-box"></span>
                             <span>Recuérdame 30 días</span>
                         </label>
-                        <a href="#" class="auth-link-small">¿Olvidaste tu contraseña?</a>
+                        <a href="{{ route('password.request') }}" class="auth-link-small">¿Olvidaste tu contraseña?</a>
                     </div>
 
                     {{-- Botón de envío --}}
@@ -170,7 +170,7 @@
             </div>
 
             <p class="auth-fineprint mono">
-                Al entrar aceptas nuestros <a href="#">Términos</a> y la <a href="#">Política de privacidad</a>
+                Al entrar aceptas nuestros <a href="{{ route('terminos') }}">Términos</a> y la <a href="{{ route('privacidad') }}">Política de privacidad</a>
             </p>
 
         </div>{{-- /auth-form-wrap --}}
