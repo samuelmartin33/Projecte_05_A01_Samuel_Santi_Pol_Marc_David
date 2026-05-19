@@ -1,4 +1,4 @@
-<section style="padding:90px 48px 0;max-width:1480px;margin:0 auto;" class="map-section">
+<section style="padding:90px 48px 0;max-width:1480px;margin:0 auto;position:relative;z-index:1;" class="map-section">
 
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;gap:20px;flex-wrap:wrap;">
     <div>

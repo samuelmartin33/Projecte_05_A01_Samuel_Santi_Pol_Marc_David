@@ -83,6 +83,11 @@
                               <?php echo e(request()->routeIs('home') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
                         Explorar
                     </a>
+                    <a href="<?php echo e(route('cupones.index')); ?>"
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              <?php echo e(request()->routeIs('cupones.index') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
+                        Cupones
+                    </a>
                     <a href="<?php echo e(route('trabajos.index')); ?>"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
                               <?php echo e(request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white'); ?>">
@@ -102,6 +107,11 @@
             
             <div class="flex items-center gap-3">
                 <?php if(auth()->guard()->guest()): ?>
+                    <a href="<?php echo e(route('cupones.index')); ?>"
+                       class="font-mono text-xs uppercase tracking-widest
+                              text-white/65 hover:text-white transition-colors duration-100">
+                        Cupones
+                    </a>
                     <a href="<?php echo e(route('login')); ?>"
                        class="hidden sm:block font-mono text-xs uppercase tracking-widest
                               text-white/65 hover:text-white transition-colors duration-100">

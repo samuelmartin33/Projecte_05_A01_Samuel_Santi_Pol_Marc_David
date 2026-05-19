@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('titulo', 'Bolsa de Trabajo'); ?>
 
 <?php $__env->startPush('estilos'); ?>
@@ -249,26 +251,6 @@
 
     </div>
 </div>
-</section>
-
-
-<section class="relative overflow-hidden" style="padding:80px 0;margin-top:0;background:linear-gradient(160deg,#130228 0%,#1a0f35 50%,#0e0722 100%);">
-    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(124,58,237,0.18) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
-    <div class="max-w-3xl mx-auto px-6 text-center relative" style="z-index:1">
-        <p class="mono" style="font-size:10px;color:rgba(245,241,234,0.35);margin-bottom:16px;">— Para organizadores</p>
-        <h2 class="display" style="font-size:clamp(2.5rem,5vw,5rem);color:var(--ink);line-height:0.88;">
-            ¿Organizas<br><em style="font-style:italic;color:var(--magenta);font-family:'Bebas Neue',sans-serif;">eventos?</em>
-        </h2>
-        <p style="font-family:'Archivo Narrow',sans-serif;font-size:15px;color:var(--ink-dim);margin-top:24px;margin-bottom:32px;max-width:28rem;margin-left:auto;margin-right:auto;line-height:1.65;text-transform:uppercase;letter-spacing:0.08em;">
-            Publica tus ofertas de trabajo y encuentra al equipo perfecto para tus festivales, conciertos y eventos.
-        </p>
-        <a href="<?php echo e(route('home')); ?>"
-           style="display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(245,241,234,0.35);color:var(--ink);padding:14px 32px;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.18em;text-decoration:none;transition:border-color 0.2s,background 0.2s;"
-           onmouseover="this.style.borderColor='rgba(168,85,247,0.6)';this.style.background='rgba(168,85,247,0.08)'"
-           onmouseout="this.style.borderColor='rgba(245,241,234,0.35)';this.style.background='transparent'">
-            Explorar la plataforma →
-        </a>
-    </div>
 </section>
 
 <?php $__env->stopSection(); ?>

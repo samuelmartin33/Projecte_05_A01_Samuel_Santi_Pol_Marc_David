@@ -6,7 +6,7 @@
 
   <div class="modal-card detail-modal"
        onclick="event.stopPropagation()"
-       style="position:fixed;inset:5% 8%;background:var(--bg);border:1px solid var(--line);overflow:auto;display:grid;grid-template-columns:1.2fr 1fr;">
+       style="position:fixed;inset:5% 8%;z-index:10000;background:var(--bg);border:1px solid var(--line);overflow:auto;display:grid;grid-template-columns:1.2fr 1fr;">
 
     
     <div style="position:relative;overflow:hidden;min-height:520px;">
@@ -72,6 +72,55 @@
           </div>
         </div>
 
+        
+        <div id="modal-cupon-wrap" style="margin-bottom:14px;">
+          <div style="display:flex;gap:8px;align-items:stretch;">
+            <input id="modal-cupon-codigo"
+                   type="text"
+                   placeholder="Código de cupón (opcional)"
+                   maxlength="50"
+                   style="flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--line);color:var(--ink);
+                          font-family:'Archivo Narrow',sans-serif;font-size:13px;padding:10px 14px;
+                          border-radius:0;letter-spacing:0.08em;text-transform:uppercase;outline:none;
+                          transition:border-color 0.2s;"
+                   oninput="vibezResetCupon()"
+                   onfocus="this.style.borderColor='rgba(168,85,247,0.5)'"
+                   onblur="this.style.borderColor='var(--line)'">
+            <button onclick="vibezValidarCupon()"
+                    id="btn-aplicar-cupon"
+                    style="background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.35);
+                           color:#a855f7;padding:10px 16px;cursor:pointer;
+                           font-family:'Archivo Narrow',sans-serif;font-size:11px;font-weight:700;
+                           text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;
+                           transition:all 0.18s;border-radius:0;"
+                    onmouseover="this.style.background='rgba(124,58,237,0.35)'"
+                    onmouseout="this.style.background='rgba(124,58,237,0.2)'">
+              Aplicar
+            </button>
+          </div>
+          <div id="modal-cupon-msg"
+               style="font-family:'Archivo Narrow',sans-serif;font-size:11px;
+                      margin-top:6px;display:none;letter-spacing:0.06em;"></div>
+          
+          <div id="modal-cupon-resumen"
+               style="display:none;margin-top:10px;padding:10px 14px;
+                      background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
+                      font-family:'Archivo Narrow',sans-serif;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;color:rgba(245,241,234,0.5);">
+              <span>Precio original:</span>
+              <span id="modal-precio-original">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;color:#4ade80;margin-top:4px;font-weight:700;">
+              <span>Cupón aplicado:</span>
+              <span id="modal-ahorro">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;color:#f5f1ea;margin-top:4px;font-weight:800;font-size:14px;">
+              <span>Total:</span>
+              <span id="modal-precio-final">—</span>
+            </div>
+          </div>
+        </div>
+
         <button id="modal-comprar"
                 class="btn-primary"
                 onclick="vibezBuy(this.dataset.eventoId)"
@@ -95,6 +144,91 @@ function vibezCantidad(delta) {
   if (!el) return;
   var v = parseInt(el.value) + delta;
   el.value = Math.min(10, Math.max(1, v));
+  // Recalcular precio si hay cupón activo
+  if (window._cuponActivo) {
+    _vibezAplicarDescuentoUI(window._cuponActivo.valor_descuento);
+  }
+}
+
+/* Validación AJAX del cupón */
+function vibezValidarCupon() {
+  var codigoEl = document.getElementById('modal-cupon-codigo');
+  var msgEl    = document.getElementById('modal-cupon-msg');
+  var btnEl    = document.getElementById('btn-aplicar-cupon');
+  var eventoId = (document.getElementById('modal-comprar') || {}).dataset.eventoId;
+
+  if (!codigoEl || !codigoEl.value.trim()) return;
+  if (!eventoId) return;
+
+  var codigo = codigoEl.value.trim().toUpperCase();
+  if (btnEl) { btnEl.textContent = '...'; btnEl.disabled = true; }
+
+  var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+  fetch('/api/cupones/validar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+    body: JSON.stringify({ codigo: codigo, evento_id: parseInt(eventoId) })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (btnEl) { btnEl.textContent = 'Aplicar'; btnEl.disabled = false; }
+    if (msgEl) {
+      msgEl.style.display = 'block';
+      msgEl.textContent   = data.message || '';
+      msgEl.style.color   = data.valid ? '#4ade80' : '#fca5a5';
+    }
+    if (data.valid) {
+      window._cuponActivo = data;
+      codigoEl.style.borderColor = 'rgba(34,197,94,0.5)';
+      _vibezAplicarDescuentoUI(data.valor_descuento);
+    } else {
+      window._cuponActivo = null;
+      _vibezOcultarDescuentoUI();
+    }
+  })
+  .catch(function() {
+    if (btnEl) { btnEl.textContent = 'Aplicar'; btnEl.disabled = false; }
+    if (msgEl) { msgEl.style.display='block'; msgEl.textContent='Error de conexión.'; msgEl.style.color='#fca5a5'; }
+  });
+}
+
+function _vibezAplicarDescuentoUI(pct) {
+  var qtyEl    = document.getElementById('modal-cantidad');
+  var resumen  = document.getElementById('modal-cupon-resumen');
+  var precioEl = document.getElementById('modal-precio');
+  var origEl   = document.getElementById('modal-precio-original');
+  var ahorroEl = document.getElementById('modal-ahorro');
+  var finalEl  = document.getElementById('modal-precio-final');
+  if (!resumen || !precioEl) return;
+
+  var precioTexto = precioEl.textContent.trim();
+  var cantidad    = qtyEl ? parseInt(qtyEl.value) || 1 : 1;
+  // Extraer número del precio (ej: "15 €" o "Gratis")
+  var match = precioTexto.match(/([\d.,]+)/);
+  if (!match) return;
+  var pUnit   = parseFloat(match[1].replace(',', '.'));
+  var total   = pUnit * cantidad;
+  var dto     = Math.round(total * (pct / 100) * 100) / 100;
+  var fin     = Math.round((total - dto) * 100) / 100;
+
+  if (origEl)  origEl.textContent  = total.toFixed(2) + ' €';
+  if (ahorroEl) ahorroEl.textContent = '-' + dto.toFixed(2) + ' € (' + pct + '%)';
+  if (finalEl)  finalEl.textContent  = fin.toFixed(2) + ' €';
+  resumen.style.display = 'block';
+}
+
+function _vibezOcultarDescuentoUI() {
+  var resumen = document.getElementById('modal-cupon-resumen');
+  if (resumen) resumen.style.display = 'none';
+}
+
+function vibezResetCupon() {
+  window._cuponActivo = null;
+  var msgEl   = document.getElementById('modal-cupon-msg');
+  var codigoEl = document.getElementById('modal-cupon-codigo');
+  if (msgEl)    { msgEl.style.display = 'none'; msgEl.textContent = ''; }
+  if (codigoEl) { codigoEl.style.borderColor = 'var(--line)'; }
+  _vibezOcultarDescuentoUI();
 }
 </script>
 <?php /**PATH C:\wamp64\www\DAW2\proyectos\Projecte_05_A01_Samuel_Santi_Pol_Marc_David\resources\views/partials/home/detail-modal.blade.php ENDPATH**/ ?>
