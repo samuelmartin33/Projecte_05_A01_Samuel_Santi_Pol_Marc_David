@@ -24,12 +24,6 @@ class EventoPostController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
 
-        $eventoIds = Entrada::where('estado_entrada', 2)
-            ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
-            ->pluck('evento_id')
-            ->unique()
-            ->values();
-
         /* IDs de amigos aceptados para filtrar posts de "solo amigos" */
         $amigoIds = Amigo::where('estado', 1)
             ->where(fn ($q) => $q
@@ -53,9 +47,8 @@ class EventoPostController extends Controller
                 'comentarios.usuario:id,nombre,apellido1,foto_url',
             ])
             ->where('estado', 1)
-            ->whereIn('evento_id', $eventoIds)
             ->where(function ($q) use ($usuario, $amigoIds) {
-                /* Posts públicos siempre visibles; posts de solo amigos solo si eres el autor o amigo */
+                /* Posts públicos visibles para todos; posts de solo amigos solo si eres el autor o amigo */
                 $q->where('visibilidad', 1)
                   ->orWhere(fn ($q2) => $q2
                       ->where('visibilidad', 2)
@@ -99,7 +92,7 @@ class EventoPostController extends Controller
         $eventoId = (int) $request->evento_id;
 
         $asistio = Entrada::where('evento_id', $eventoId)
-            ->where('estado_entrada', 2)
+            ->whereIn('estado_entrada', [1, 2])
             ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
             ->exists();
 
@@ -226,7 +219,7 @@ class EventoPostController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
 
-        $eventos = Entrada::where('estado_entrada', 2)
+        $eventos = Entrada::whereIn('estado_entrada', [1, 2])
             ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
             ->with('evento:id,titulo')
             ->get()

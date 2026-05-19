@@ -329,10 +329,10 @@
         </div>
         <div>
             <h4>Legal</h4>
-            <a href="#">Términos</a>
-            <a href="#">Privacidad</a>
-            <a href="#">Cookies</a>
-            <a href="#">Devoluciones</a>
+            <a href="{{ route('terminos') }}">Términos</a>
+            <a href="{{ route('privacidad') }}">Privacidad</a>
+            <a href="{{ route('cookies') }}">Cookies</a>
+            <a href="{{ route('devoluciones') }}">Devoluciones</a>
         </div>
     </div>
     <div class="foot-bottom">

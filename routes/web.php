@@ -151,6 +151,14 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
 
+/* — Recuperación de contraseña (solo invitados) — */
+Route::middleware('guest')->group(function () {
+    Route::get('/forgot-password',         [\App\Http\Controllers\PasswordResetController::class, 'showForgotForm'])->name('password.request');
+    Route::post('/forgot-password',        [\App\Http\Controllers\PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}',  [\App\Http\Controllers\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password',         [\App\Http\Controllers\PasswordResetController::class, 'resetPassword'])->name('password.update');
+});
+
 /* — Home de usuario: protegido por middleware auth — */
 Route::get('/home', [AuthController::class, 'showHome'])
      ->middleware('auth')

@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="{{ asset('css/app-static.css') }}">
     <link rel="stylesheet" href="{{ asset('css/vibez.css') }}">
 
-    @if (request()->routeIs('login') || request()->routeIs('register'))
+    @if (request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.*'))
         <link rel="stylesheet" href="{{ asset('css/auth-vibez.css') }}">
     @endif
 
@@ -425,7 +425,7 @@
                 <nav class="flex flex-wrap gap-6 sm:gap-8 font-mono text-xs uppercase tracking-widest text-paper/35">
                     <a href="{{ route('home') }}" class="hover:text-paper transition-colors duration-100">Explorar</a>
                     <a href="{{ route('trabajos.index') }}" class="hover:text-paper transition-colors duration-100">Trabajo</a>
-                    <a href="#" class="hover:text-paper transition-colors duration-100">Privacidad</a>
+                    <a href="{{ route('privacidad') }}" class="hover:text-paper transition-colors duration-100">Privacidad</a>
                     <a href="#" class="hover:text-paper transition-colors duration-100">Contacto</a>
                 </nav>
             </div>
