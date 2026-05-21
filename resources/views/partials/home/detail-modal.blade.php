@@ -33,7 +33,21 @@
 
       <div>
         <div class="mono" style="font-size:11px;color:var(--ink-dim);margin-bottom:6px;">Artistas / Organizador</div>
-        <p id="modal-artista" style="font-size:17px;margin:0;font-weight:600;"></p>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <p id="modal-artista" style="font-size:17px;margin:0;font-weight:600;"></p>
+          @auth
+            @if(!Auth::user()->isAdmin() && !Auth::user()->isEmpresa())
+              <button id="modal-btn-seguir"
+                      style="display:none;align-items:center;gap:6px;padding:6px 14px;border:1.5px solid rgba(168,85,247,0.6);background:transparent;color:#a855f7;font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;transition:background 0.18s,color 0.18s;white-space:nowrap;flex-shrink:0;"
+                      onclick="vibezToggleSeguirModal(this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
+                <span id="modal-btn-seguir-texto">Seguir</span>
+              </button>
+            @endif
+          @endauth
+        </div>
       </div>
 
       <p id="modal-tagline"

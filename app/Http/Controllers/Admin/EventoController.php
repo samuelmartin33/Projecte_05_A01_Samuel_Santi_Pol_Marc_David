@@ -36,10 +36,13 @@ class EventoController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatedData($request);
+        $categorias = $data['categorias'];
+        unset($data['categorias']);
         $data['fecha_creacion'] = now();
         $data['fecha_actualizacion'] = null;
 
-        Evento::create($data);
+        $evento = Evento::create($data);
+        $evento->categorias()->sync($categorias);
 
         return redirect()
             ->route('admin.eventos.index')
@@ -58,9 +61,12 @@ class EventoController extends Controller
     public function update(Request $request, Evento $evento): RedirectResponse
     {
         $data = $this->validatedData($request);
+        $categorias = $data['categorias'];
+        unset($data['categorias']);
         $data['fecha_actualizacion'] = now();
 
         $evento->update($data);
+        $evento->categorias()->sync($categorias);
 
         return redirect()
             ->route('admin.eventos.index')
@@ -79,28 +85,30 @@ class EventoController extends Controller
     private function validatedData(Request $request): array
     {
         $data = $request->validate([
-            'organizador_id' => ['required', 'integer', 'exists:organizadores,id'],
-            'categoria_evento_id' => ['required', 'integer', 'exists:categorias_evento,id'],
-            'tipo_evento' => ['required', 'integer', 'in:1,2'],
-            'titulo' => ['required', 'string', 'max:300'],
-            'descripcion' => ['nullable', 'string'],
-            'fecha_inicio' => ['required', 'date'],
-            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
-            'ubicacion_nombre' => ['nullable', 'string', 'max:300'],
-            'ubicacion_direccion' => ['nullable', 'string', 'max:500'],
-            'latitud' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitud' => ['nullable', 'numeric', 'between:-180,180'],
-            'precio_base' => ['required', 'numeric', 'min:0'],
-            'aforo_maximo' => ['nullable', 'integer', 'min:1'],
-            'aforo_actual' => ['required', 'integer', 'min:0'],
-            'edad_minima' => ['nullable', 'integer', 'between:0,120'],
-            'es_gratuito' => ['nullable', 'boolean'],
-            'url_externa' => ['nullable', 'url', 'max:500'],
-            'estado' => ['required', 'integer', 'in:0,1'],
+            'organizador_id'     => ['required', 'integer', 'exists:organizadores,id'],
+            'categorias'         => ['required', 'array', 'min:1'],
+            'categorias.*'       => ['integer', 'exists:categorias_evento,id'],
+            'tipo_evento'        => ['required', 'integer', 'in:1,2'],
+            'titulo'             => ['required', 'string', 'max:300'],
+            'descripcion'        => ['nullable', 'string'],
+            'fecha_inicio'       => ['required', 'date'],
+            'fecha_fin'          => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'ubicacion_nombre'   => ['nullable', 'string', 'max:300'],
+            'ubicacion_direccion'=> ['nullable', 'string', 'max:500'],
+            'latitud'            => ['nullable', 'numeric', 'between:-90,90'],
+            'longitud'           => ['nullable', 'numeric', 'between:-180,180'],
+            'precio_base'        => ['required', 'numeric', 'min:0'],
+            'aforo_maximo'       => ['nullable', 'integer', 'min:1'],
+            'aforo_actual'       => ['required', 'integer', 'min:0'],
+            'edad_minima'        => ['nullable', 'integer', 'between:0,120'],
+            'es_gratuito'        => ['nullable', 'boolean'],
+            'url_externa'        => ['nullable', 'url', 'max:500'],
+            'estado'             => ['required', 'integer', 'in:0,1'],
         ]);
 
-        $data['es_gratuito'] = $request->boolean('es_gratuito') ? 1 : 0;
-        $data['precio_base'] = $data['es_gratuito'] ? 0 : $data['precio_base'];
+        $data['es_gratuito']        = $request->boolean('es_gratuito') ? 1 : 0;
+        $data['precio_base']        = $data['es_gratuito'] ? 0 : $data['precio_base'];
+        $data['categoria_evento_id'] = $data['categorias'][0];
 
         return $data;
     }

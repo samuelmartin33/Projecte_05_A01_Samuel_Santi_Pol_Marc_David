@@ -86,6 +86,15 @@
     'user'    => Auth::user(),
     'eventos' => $eventos->take(6),
   ])
+
+  {{-- De tus promotoras: solo si el usuario sigue alguna y hay eventos --}}
+  @if(isset($eventosPromotor) && $eventosPromotor->isNotEmpty())
+  @include('partials.home.promotoras-seguidas', [
+    'eventosPromotor' => $eventosPromotor,
+    'seguimientosIds' => $seguimientosIds ?? [],
+    'favoritosIds'    => $favoritosIds ?? [],
+  ])
+  @endif
 @endauth
 
 {{-- ════════════════════════════════════════════════════

@@ -50,7 +50,17 @@ class PerfilController extends Controller
                     : $rel->solicitante;
             });
 
-        return view('perfil.index', compact('usuario', 'solicitudesPendientes', 'amigos'));
+        // Promotoras que sigue el usuario con sus próximos eventos
+        $promotoras = $usuario->seguimientos()
+            ->with(['eventos' => function ($q) {
+                $q->where('estado', 1)
+                  ->where('fecha_inicio', '>=', now())
+                  ->orderBy('fecha_inicio')
+                  ->limit(2);
+            }])
+            ->get();
+
+        return view('perfil.index', compact('usuario', 'solicitudesPendientes', 'amigos', 'promotoras'));
     }
 
     /**

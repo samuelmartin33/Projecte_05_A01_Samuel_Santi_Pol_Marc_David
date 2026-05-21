@@ -243,25 +243,31 @@
                       placeholder="Describe tu evento: qué van a encontrar los asistentes, artistas, actividades...">{{ old('descripcion') }}</textarea>
         </div>
 
-        <div class="form-grupo-doble">
-            <div>
-                <label class="form-label">Categoría <span class="form-required">*</span></label>
-                <select name="categoria_evento_id" class="form-select">
-                    <option value="">Selecciona categoría</option>
-                    @foreach ($categorias as $cat)
-                        <option value="{{ $cat->id }}" @selected(old('categoria_evento_id') == $cat->id)>
-                            {{ $cat->nombre }}
-                        </option>
-                    @endforeach
-                </select>
+        <div class="form-grupo">
+            <label class="form-label">Categorías <span class="form-required">*</span> <span style="color:rgba(245,241,234,0.3);font-size:0.5rem;">Puedes seleccionar varias</span></label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+                @foreach ($categorias as $cat)
+                    @php $checked = is_array(old('categorias')) && in_array($cat->id, old('categorias')); @endphp
+                    <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid {{ $checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)' }};cursor:pointer;transition:border-color 0.15s;user-select:none;"
+                           onmouseenter="this.style.borderColor='rgba(168,85,247,0.5)'"
+                           onmouseleave="this.style.borderColor=this.querySelector('input').checked?'rgba(168,85,247,0.7)':'rgba(245,241,234,0.14)'"
+                           onclick="actualizarBordeCat(this)">
+                        <input type="checkbox" name="categorias[]" value="{{ $cat->id }}"
+                               style="accent-color:#a855f7;width:14px;height:14px;"
+                               @checked($checked)>
+                        <span style="font-family:'Archivo Narrow',sans-serif;font-size:13px;color:#f5f1ea;">{{ $cat->nombre }}</span>
+                    </label>
+                @endforeach
             </div>
-            <div>
-                <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
-                <select name="tipo_evento" class="form-select">
-                    <option value="1" @selected(old('tipo_evento', 1) == 1)>Presencial</option>
-                    <option value="2" @selected(old('tipo_evento') == 2)>Online</option>
-                </select>
-            </div>
+            @error('categorias') <p style="color:#f87171;font-size:11px;margin-top:6px;">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="form-grupo">
+            <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
+            <select name="tipo_evento" class="form-select">
+                <option value="1" @selected(old('tipo_evento', 1) == 1)>Presencial</option>
+                <option value="2" @selected(old('tipo_evento') == 2)>Online</option>
+            </select>
         </div>
 
         <hr class="form-divider">
@@ -424,6 +430,11 @@
 
 @push('scripts')
 <script>
+function actualizarBordeCat(label) {
+    var input = label.querySelector('input');
+    label.style.borderColor = input.checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)';
+}
+
 function togglePrecio() {
     var checkbox = document.getElementById('es_gratuito');
     var precioWrap = document.getElementById('precio-wrap');

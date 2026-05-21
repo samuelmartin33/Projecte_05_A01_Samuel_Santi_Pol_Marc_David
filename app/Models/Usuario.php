@@ -192,6 +192,16 @@ class Usuario extends Authenticatable
             ->withPivot(['estado', 'fecha_creacion', 'fecha_actualizacion']);
     }
 
+    /**
+     * Empresas/promotoras que este usuario sigue.
+     * Acceso: $usuario->seguimientos  →  colección de objetos Empresa.
+     */
+    public function seguimientos(): BelongsToMany
+    {
+        return $this->belongsToMany(Empresa::class, 'seguimientos_empresa', 'usuario_id', 'empresa_id')
+            ->withPivot('fecha_creacion');
+    }
+
     /* ——— Helpers de rol ——— */
 
     /**

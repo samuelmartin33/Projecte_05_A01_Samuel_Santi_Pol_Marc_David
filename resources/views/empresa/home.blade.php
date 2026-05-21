@@ -321,6 +321,16 @@
             <p class="accion-desc">Ver todos los candidatos postulados a tus ofertas de trabajo.</p>
         </a>
 
+        <a href="{{ route('empresa.cupones.index') }}" class="accion-card">
+            <div class="accion-icono" style="background:linear-gradient(135deg,#d97706,#f59e0b);">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+            </div>
+            <h3 class="accion-titulo">Mis cupones</h3>
+            <p class="accion-desc">Crea y gestiona los cupones de descuento de tu empresa.</p>
+        </a>
+
         <a href="{{ route('empresa.validacion.index') }}" class="accion-card">
             <div class="accion-icono" style="background:linear-gradient(135deg,#059669,#10b981);">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
