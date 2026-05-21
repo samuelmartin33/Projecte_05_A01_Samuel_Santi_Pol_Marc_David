@@ -107,18 +107,19 @@ class Evento extends Model
         return $this->belongsTo(CategoriaEvento::class, 'categoria_evento_id');
     }
 
-    /**
-     * Alias del método categoria() para mayor legibilidad en el código.
-     *
-     * Permite acceder a la misma relación con dos nombres:
-     *   $evento->categoria        (nombre corto)
-     *   $evento->categoriaEvento  (nombre descriptivo)
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function categoriaEvento()
     {
         return $this->categoria();
+    }
+
+    public function categorias()
+    {
+        return $this->belongsToMany(
+            CategoriaEvento::class,
+            'evento_categoria',
+            'evento_id',
+            'categoria_evento_id'
+        );
     }
 
     /**

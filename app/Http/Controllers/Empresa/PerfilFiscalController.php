@@ -48,6 +48,8 @@ class PerfilFiscalController extends Controller
                 ->with('error', 'No se encontró el perfil de empresa.');
         }
 
+        $request->merge(['iban' => strtoupper(str_replace(' ', '', $request->input('iban', '')))]);
+
         $validated = $request->validate([
             'razon_social'       => ['required', 'string', 'max:300'],
             'nif_cif'            => ['required', 'string', 'max:20', 'regex:/^[A-Za-z0-9]{7,9}$/'],

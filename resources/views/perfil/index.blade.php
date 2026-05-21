@@ -151,6 +151,54 @@
             </form>
         </div>
 
+        {{-- ══ TARJETA: Promotoras que sigues ══ --}}
+        <div class="perfil-card">
+            <h2 class="perfil-card-titulo">Promotoras que sigues</h2>
+            <p class="perfil-card-sub">Sigue a promotoras desde la ficha de cualquier evento</p>
+
+            @if($promotoras->isEmpty())
+                <p style="color:rgba(245,241,234,0.4);font-size:0.9rem;margin-top:1rem;">
+                    Aún no sigues ninguna promotora. Entra en un evento y pulsa "Seguir".
+                </p>
+            @else
+                <div style="display:flex;flex-direction:column;gap:16px;margin-top:1rem;">
+                    @foreach($promotoras as $empresa)
+                    <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);">
+                        {{-- Logo --}}
+                        <div style="width:44px;height:44px;flex-shrink:0;border-radius:50%;overflow:hidden;background:#a855f7;display:flex;align-items:center;justify-content:center;">
+                            @if($empresa->logo_url)
+                                <img src="{{ $empresa->logo_url }}" alt="{{ $empresa->nombre_empresa }}" style="width:100%;height:100%;object-fit:cover;">
+                            @else
+                                <span style="font-weight:900;color:#fff;font-size:1rem;">{{ strtoupper(substr($empresa->nombre_empresa,0,1)) }}</span>
+                            @endif
+                        </div>
+
+                        {{-- Info --}}
+                        <div style="flex:1;min-width:0;">
+                            <p style="font-weight:700;color:#f5f1ea;margin:0;font-size:0.95rem;">{{ $empresa->nombre_empresa }}</p>
+                            @if($empresa->descripcion)
+                                <p style="color:rgba(245,241,234,0.5);font-size:0.78rem;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $empresa->descripcion }}</p>
+                            @endif
+                            @if($empresa->eventos->isNotEmpty())
+                                <p style="color:#a855f7;font-size:0.75rem;margin:4px 0 0;">
+                                    Próximo: {{ $empresa->eventos->first()->titulo }}
+                                    · {{ $empresa->eventos->first()->fecha_fmt }}
+                                </p>
+                            @endif
+                        </div>
+
+                        {{-- Botón dejar de seguir --}}
+                        <button class="btn-seguir-perfil siguiendo"
+                                data-empresa-id="{{ $empresa->id }}"
+                                onclick="toggleSeguirPerfil(this)">
+                            Siguiendo
+                        </button>
+                    </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         {{-- ══ TARJETA: Estado de ánimo ══ --}}
         <div class="perfil-card">
             <h2 class="perfil-card-titulo">Mi estado de ánimo</h2>
@@ -216,4 +264,52 @@
 
 @section('scripts')
     <script src="{{ asset('js/perfil.js') }}"></script>
+    <style>
+    .btn-seguir-perfil {
+        padding: 6px 14px;
+        border: 1.5px solid rgba(168,85,247,0.6);
+        background: rgba(168,85,247,0.15);
+        color: #e9d5ff;
+        font-family: 'Syne', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: background 0.18s, opacity 0.18s;
+    }
+    .btn-seguir-perfil:hover { background: rgba(220,38,38,0.15); border-color: #ef4444; color: #fca5a5; }
+    .btn-seguir-perfil.cargando { opacity: 0.5; pointer-events: none; }
+    </style>
+    <script>
+    async function toggleSeguirPerfil(btn) {
+        const empresaId = btn.dataset.empresaId;
+        btn.classList.add('cargando');
+        try {
+            const res = await fetch(`/api/seguimientos/${empresaId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+            });
+            const data = await res.json();
+            if (data.success && !data.siguiendo) {
+                // Animar y quitar la fila
+                const fila = btn.closest('div[style*="display:flex"]');
+                if (fila) {
+                    fila.style.transition = 'opacity 0.3s';
+                    fila.style.opacity = '0';
+                    setTimeout(() => fila.remove(), 300);
+                }
+            }
+        } catch (e) {
+            console.error('Error al dejar de seguir', e);
+        } finally {
+            btn.classList.remove('cargando');
+        }
+    }
+    </script>
 @endsection

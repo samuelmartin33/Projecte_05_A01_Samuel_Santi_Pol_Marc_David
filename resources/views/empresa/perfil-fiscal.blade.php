@@ -43,7 +43,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('empresa.perfil-fiscal.update') }}" novalidate>
+    <form method="POST" action="{{ route('empresa.perfil-fiscal.guardar') }}" novalidate>
         @csrf
 
         {{-- ═══════════════════════════════════

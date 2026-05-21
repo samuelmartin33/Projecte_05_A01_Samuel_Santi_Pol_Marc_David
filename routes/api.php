@@ -21,6 +21,7 @@ use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/amigos/buscar',    [PerfilController::class, 'buscarUsuarios'])->name('api.amigos.buscar');
     Route::post('/amigos/solicitud', [PerfilController::class, 'enviarSolicitud'])->name('api.amigos.solicitud');
     Route::post('/favoritos/toggle', [FavoritoController::class, 'toggle'])->name('api.favoritos.toggle');
+
+    // Seguimiento de promotoras
+    Route::get('/seguimientos/ids',                    [SeguimientoController::class, 'misSeguidosIds'])->name('api.seguimientos.ids');
+    Route::get('/seguimientos/promotoras',             [SeguimientoController::class, 'misPromotoras'])->name('api.seguimientos.promotoras');
+    Route::post('/seguimientos/{empresa}/toggle',      [SeguimientoController::class, 'toggle'])->name('api.seguimientos.toggle');
 
     // Compra de entradas
     Route::post('/entradas/comprar', [EntradaController::class, 'comprar'])->name('api.entradas.comprar');

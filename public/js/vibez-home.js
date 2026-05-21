@@ -176,8 +176,65 @@ function vibezOpenModal(eventoId) {
     if (cuponInput) { cuponInput.value = ''; cuponInput.style.borderColor = ''; }
     if (typeof vibezResetCupon === 'function') vibezResetCupon();
 
+    /* Botón seguir promotora */
+    var btnSeguir = document.getElementById('modal-btn-seguir');
+    var btnSeguirTxt = document.getElementById('modal-btn-seguir-texto');
+    if (btnSeguir) {
+        if (e.empresa_id) {
+            var isSiguiendo = (window.SEGUIMIENTOS_IDS || []).includes(e.empresa_id);
+            btnSeguir.dataset.empresaId = e.empresa_id;
+            btnSeguir.style.display = 'inline-flex';
+            if (isSiguiendo) {
+                btnSeguir.style.background = 'rgba(168,85,247,0.2)';
+                btnSeguir.style.borderColor = '#a855f7';
+                btnSeguir.style.color = '#e9d5ff';
+            } else {
+                btnSeguir.style.background = 'transparent';
+                btnSeguir.style.borderColor = 'rgba(168,85,247,0.6)';
+                btnSeguir.style.color = '#a855f7';
+            }
+            if (btnSeguirTxt) btnSeguirTxt.textContent = isSiguiendo ? 'Siguiendo' : 'Seguir';
+        } else {
+            btnSeguir.style.display = 'none';
+        }
+    }
+
     var modal = document.getElementById('vibez-detail-modal');
     if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+
+function vibezToggleSeguirModal(btn) {
+    var empresaId = parseInt(btn.dataset.empresaId);
+    if (!empresaId) return;
+    var txt = document.getElementById('modal-btn-seguir-texto');
+    btn.style.opacity = '0.6';
+    btn.style.pointerEvents = 'none';
+    var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+    fetch('/api/seguimientos/' + empresaId + '/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
+        var ahora = data.siguiendo;
+        if (txt) txt.textContent = ahora ? 'Siguiendo' : 'Seguir';
+        btn.style.background   = ahora ? 'rgba(168,85,247,0.2)' : 'transparent';
+        btn.style.borderColor  = ahora ? '#a855f7' : 'rgba(168,85,247,0.6)';
+        btn.style.color        = ahora ? '#e9d5ff' : '#a855f7';
+        /* Sincronizar array global */
+        var ids = window.SEGUIMIENTOS_IDS || [];
+        if (ahora) { if (!ids.includes(empresaId)) ids.push(empresaId); }
+        else { window.SEGUIMIENTOS_IDS = ids.filter(function (id) { return id !== empresaId; }); }
+        /* Sincronizar botones de grid */
+        document.querySelectorAll('.btn-seguir-home[data-empresa-id="' + empresaId + '"]').forEach(function (b) {
+            b.classList.toggle('siguiendo', ahora);
+            var s = b.querySelector('.seguir-texto');
+            if (s) s.textContent = ahora ? 'Siguiendo' : 'Seguir';
+        });
+    })
+    .catch(function () { btn.style.opacity = ''; btn.style.pointerEvents = ''; });
 }
 
 function vibezCloseModal() {

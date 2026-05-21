@@ -65,9 +65,9 @@
             <span class="font-mono text-xs tracking-widest text-paper/40">
                 {{ $fecha }}
             </span>
-            @if($evento->categoria)
+            @if($evento->categorias->isNotEmpty())
                 <span class="font-mono text-xs uppercase tracking-widest text-lilac">
-                    {{ $evento->categoria->nombre }}
+                    {{ $evento->categorias->pluck('nombre')->join(' · ') }}
                 </span>
             @endif
         </div>
