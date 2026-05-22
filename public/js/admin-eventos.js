@@ -19,8 +19,8 @@ var AdminEventos = {
             toggle.setAttribute('aria-expanded', isOpen);
         };
 
-        document.onclick = function (e) {
-            if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+        document.onclick = function (eventoClic) {
+            if (!toggle.contains(eventoClic.target) && !menu.contains(eventoClic.target)) {
                 menu.classList.remove('open');
                 toggle.setAttribute('aria-expanded', 'false');
             }
@@ -28,35 +28,35 @@ var AdminEventos = {
     },
 
     configurarConfirmacionBorrado: function () {
-        var formularios = document.querySelectorAll('.delete-form');
-        var i = 0;
+        var formularios = document.getElementsByClassName('delete-form');
+        var indiceFormulario = 0;
 
-        while (i < formularios.length) {
-            formularios[i].onsubmit = function (e) {
-                e.preventDefault(); // Detener el envío estándar
+        while (indiceFormulario < formularios.length) {
+            formularios[indiceFormulario].onsubmit = function (eventoEnvio) {
+                eventoEnvio.preventDefault(); // Detener el envío estándar
                 var formulario = this;
-                var msg = formulario.getAttribute('data-confirm-msg') || 'Esta accion no se puede deshacer.';
+                var mensajeConfirmacion = formulario.getAttribute('data-confirm-msg') || 'Esta accion no se puede deshacer.';
 
                 if (window.Swal && typeof window.Swal.fire === 'function') {
                     window.Swal.fire({
                         title: 'Confirmar eliminación',
-                        text: msg,
+                        text: mensajeConfirmacion,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar'
-                    }).then(function (result) {
-                        if (result.isConfirmed) {
+                    }).then(function (resultado) {
+                        if (resultado.isConfirmed) {
                             formulario.submit();
                         }
                     });
                 } else {
-                    if (window.confirm(msg)) {
+                    if (window.confirm(mensajeConfirmacion)) {
                         formulario.submit();
                     }
                 }
             };
-            i = i + 1;
+            indiceFormulario = indiceFormulario + 1;
         }
     },
 

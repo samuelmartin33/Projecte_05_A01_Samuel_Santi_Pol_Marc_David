@@ -125,29 +125,5 @@
             </div>
         @endif
     </section>
-<script>
-document.querySelectorAll('.js-confirm-empresa').forEach((form) => {
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const actionLabel = form.dataset.actionLabel;
-        const empresa = form.dataset.empresa;
-        const isApprove = actionLabel === 'aprobar';
-
-        const result = await Swal.fire({
-            title: isApprove ? '¿Aprobar empresa?' : '¿Rechazar solicitud?',
-            html: `Empresa: <strong>${empresa}</strong>`,
-            icon: isApprove ? 'question' : 'warning',
-            showCancelButton: true,
-            confirmButtonText: isApprove ? 'Sí, aprobar' : 'Sí, rechazar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: isApprove ? '#059669' : '#dc2626',
-        });
-
-        if (result.isConfirmed) {
-            form.submit();
-        }
-    });
-});
-</script>
+<script src="{{ asset('js/admin-empresas.js') }}"></script>
 @endsection

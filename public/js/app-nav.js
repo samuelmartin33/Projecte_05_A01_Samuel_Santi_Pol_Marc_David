@@ -41,8 +41,8 @@ function toggleMenuMovil() {
         // aria-expanded informa a lectores de pantalla que el menú está abierto
         btn.setAttribute('aria-expanded', 'true');
         // Intercambiamos el icono de las tres rayas por la X de cierre
-        btn.querySelector('.icono-ham').style.display = 'none';
-        btn.querySelector('.icono-x').style.display   = 'block';
+        btn.getElementsByClassName('icono-ham')[0].style.display = 'none';
+        btn.getElementsByClassName('icono-x')[0].style.display   = 'block';
         // Bloqueamos el scroll del fondo para que el panel sea el único contenido interactivo
         document.body.style.overflow = 'hidden';
     }
@@ -62,16 +62,16 @@ function cerrarMenuMovil() {
     if (btn) {
         btn.setAttribute('aria-expanded', 'false');
         // Volvemos al icono hamburguesa (tres rayas)
-        btn.querySelector('.icono-ham').style.display = 'block';
-        btn.querySelector('.icono-x').style.display   = 'none';
+        btn.getElementsByClassName('icono-ham')[0].style.display = 'block';
+        btn.getElementsByClassName('icono-x')[0].style.display   = 'none';
     }
     // Restauramos el scroll que habíamos bloqueado al abrir el panel
     document.body.style.overflow = '';
 }
 
 // Cerramos el menú móvil al pulsar Escape, igual que en los diálogos nativos del navegador
-document.onkeydown = function (e) {
-    if (e.key === 'Escape') cerrarMenuMovil();
+document.onkeydown = function (eventoTeclado) {
+    if (eventoTeclado.key === 'Escape') cerrarMenuMovil();
 };
 
 // IIFE (Immediately Invoked Function Expression): la función se ejecuta de inmediato
@@ -86,7 +86,7 @@ document.onkeydown = function (e) {
      */
     function refrescarBadgeSocial() {
         fetch('/api/social/contador', { headers: { 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
+            .then(function (respuesta) { return respuesta.json(); })
             .then(function (resp) {
                 if (!resp.exito) return;
                 var badge = document.getElementById('nav-badge-social');
@@ -151,16 +151,16 @@ function toggleNavDropdown() {
 // Guardamos el handler anterior de document.onclick (si lo hubiera) para no sobreescribirlo.
 // Así respetamos el patrón de composición: varios scripts pueden registrar clicks en el documento.
 var anteriorClickDocumento = document.onclick;
-document.onclick = function(e) {
+document.onclick = function(eventoClic) {
     // Ejecutamos cualquier listener previo que hubiera registrado otro script
     if (typeof anteriorClickDocumento === 'function') {
-        anteriorClickDocumento(e);
+        anteriorClickDocumento(eventoClic);
     }
 
     // Si el clic ocurrió FUERA del contenedor del avatar, cerramos el dropdown.
     // wrapper.contains(e.target) devuelve true si el clic fue dentro del propio avatar o el dropdown.
     var wrapper = document.getElementById('navAvatarWrapper');
-    if (wrapper && !wrapper.contains(e.target)) {
+    if (wrapper && !wrapper.contains(eventoClic.target)) {
         var dropdown = document.getElementById('navDropdown');
         var btn      = document.getElementById('navAvatarBtn');
         if (dropdown) dropdown.style.display = 'none';
@@ -176,7 +176,15 @@ document.onclick = function(e) {
 function cerrarSesion() {
     // El token CSRF protege contra ataques de tipo Cross-Site Request Forgery.
     // Laravel lo valida en el servidor y rechaza peticiones sin él.
-    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     fetch('/api/logout', {
         method: 'POST',

@@ -41,7 +41,15 @@ window.onGoogleLibraryLoad = function () {
 window.handleGoogleCredential = async function (response) {
     const alertEl = document.getElementById('alert-global');
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const metadatos = document.getElementsByTagName('meta');
+        let csrfToken = '';
+
+        for (let indice = 0; indice < metadatos.length; indice++) {
+            if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+                csrfToken = metadatos[indice].getAttribute('content');
+                break;
+            }
+        }
         const res = await fetch('/api/auth/google', {
             method: 'POST',
             headers: {
@@ -73,15 +81,15 @@ window.handleGoogleCredential = async function (response) {
    ============================================================ */
 const submitBtn = document.getElementById('submitBtn');
 
-submitBtn.onclick = function (e) {
+submitBtn.onclick = function (eventoClic) {
     const rect   = this.getBoundingClientRect();
     const size   = Math.max(rect.width, rect.height);
-    const x      = e.clientX - rect.left - size / 2;
-    const y      = e.clientY - rect.top  - size / 2;
+    const posicionX = eventoClic.clientX - rect.left - size / 2;
+    const posicionY = eventoClic.clientY - rect.top  - size / 2;
 
     const ripple = document.createElement('span');
     ripple.classList.add('ripple');
-    ripple.style.cssText = `width:${size}px; height:${size}px; left:${x}px; top:${y}px`;
+    ripple.style.cssText = `width:${size}px; height:${size}px; left:${posicionX}px; top:${posicionY}px`;
     this.appendChild(ripple);
     setTimeout(() => ripple.remove(), 700);
 };
@@ -149,8 +157,8 @@ document.getElementById('tipo_cuenta').onchange = function () {
 /* ============================================================
    SUBMIT
    ============================================================ */
-document.getElementById('registerForm').onsubmit = async function (e) {
-    e.preventDefault();
+document.getElementById('registerForm').onsubmit = async function (eventoEnvio) {
+    eventoEnvio.preventDefault();
 
     const nombre               = document.getElementById('nombre').value.trim();
     const apellido1            = document.getElementById('apellido1').value.trim();
@@ -262,7 +270,15 @@ document.getElementById('registerForm').onsubmit = async function (e) {
     submitBtn.classList.add('loading');
 
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const metadatos = document.getElementsByTagName('meta');
+        let csrfToken = '';
+
+        for (let indice = 0; indice < metadatos.length; indice++) {
+            if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+                csrfToken = metadatos[indice].getAttribute('content');
+                break;
+            }
+        }
 
         const response = await fetch('/api/register', {
             method: 'POST',
@@ -296,7 +312,10 @@ document.getElementById('registerForm').onsubmit = async function (e) {
         if (data.success && data.status === 'pending') {
             submitBtn.classList.remove('loading');
             document.getElementById('registerForm').style.display = 'none';
-            document.querySelector('.btn-row')?.remove();
+            const filaBotones = document.getElementsByClassName('btn-row')[0];
+            if (filaBotones) {
+                filaBotones.remove();
+            }
 
             const pending = document.createElement('div');
             pending.innerHTML = `
@@ -316,7 +335,10 @@ document.getElementById('registerForm').onsubmit = async function (e) {
                     <a href="/login" class="pending-back-link">← Volver al login</a>
                 </div>
             `;
-            document.querySelector('.form-header').replaceWith(pending);
+            const encabezadoFormulario = document.getElementsByClassName('form-header')[0];
+            if (encabezadoFormulario) {
+                encabezadoFormulario.replaceWith(pending);
+            }
 
         } else {
             submitBtn.classList.remove('loading');

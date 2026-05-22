@@ -3,7 +3,7 @@
  * Validación y envío del formulario de inicio de sesión.
  *
  * Reglas del proyecto:
- *   - Sin addEventListener (conexión via atributos onsubmit/onclick del blade)
+ *   - Eventos directos desde atributos onsubmit/onclick del blade
  *   - Solo getElementById para acceder al DOM
  *   - Variables y comentarios en castellano
  */
@@ -20,8 +20,8 @@ function togglePassword(inputId, boton) {
     var campo     = document.getElementById(inputId);
     var mostrando = campo.type === 'text';
     campo.type    = mostrando ? 'password' : 'text';
-    boton.querySelector('.eye-open').style.display   = mostrando ? ''     : 'none';
-    boton.querySelector('.eye-closed').style.display = mostrando ? 'none' : '';
+    boton.getElementsByClassName('eye-open')[0].style.display   = mostrando ? ''     : 'none';
+    boton.getElementsByClassName('eye-closed')[0].style.display = mostrando ? 'none' : '';
     boton.setAttribute('aria-label', mostrando ? 'Mostrar contraseña' : 'Ocultar contraseña');
 }
 
@@ -177,8 +177,15 @@ function iniciarSesion(evento) {
 
     boton.classList.add('loading');
 
-    /* querySelector solo para el meta CSRF — no tiene id asignable en el layout */
-    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     fetch('/api/login', {
         method:  'POST',
@@ -218,11 +225,11 @@ function iniciarSesion(evento) {
             /* Errores de campo individuales (de validación PHP) */
             if (datos.errors) {
                 var claves = Object.keys(datos.errors);
-                for (var i = 0; i < claves.length; i++) {
+                for (var indiceClave = 0; indiceClave < claves.length; indiceClave++) {
                     mostrarErrorCampo(
-                        'field-' + claves[i],
-                        'error-' + claves[i],
-                        datos.errors[claves[i]][0]
+                        'field-' + claves[indiceClave],
+                        'error-' + claves[indiceClave],
+                        datos.errors[claves[indiceClave]][0]
                     );
                 }
             }

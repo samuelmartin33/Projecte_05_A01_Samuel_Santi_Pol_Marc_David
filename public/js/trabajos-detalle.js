@@ -1,6 +1,18 @@
 // Interacciones del detalle de una oferta de trabajo.
 var _ofertaActual = null;
 
+function obtenerTokenCsrf() {
+    var metadatos = document.getElementsByTagName('meta');
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            return metadatos[indice].getAttribute('content');
+        }
+    }
+
+    return '';
+}
+
 function abrirPostulacion(ofertaId) {
     _ofertaActual = ofertaId;
     document.getElementById('oferta-id-form').value    = ofertaId;
@@ -33,10 +45,10 @@ function mostrarSubirArchivo() { _mostrarModal('modal-archivo'); }
 function volverAEleccion()     { _mostrarModal('modal-eleccion'); }
 
 function agregarExperiencia() {
-    var tpl   = document.querySelector('#exp-container .exp-item');
+    var tpl   = document.getElementById('exp-container').getElementsByClassName('exp-item')[0];
     var clone = tpl.cloneNode(true);
-    clone.querySelectorAll('input, textarea').forEach(function(el) { el.value = ''; });
-    if (!clone.querySelector('.btn-eliminar-item')) {
+    Array.from(clone.getElementsByTagName('input')).concat(Array.from(clone.getElementsByTagName('textarea'))).forEach(function(el) { el.value = ''; });
+    if (!clone.getElementsByClassName('btn-eliminar-item')[0]) {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn-eliminar-item';
@@ -49,10 +61,10 @@ function agregarExperiencia() {
 }
 
 function agregarFormacion() {
-    var tpl   = document.querySelector('#edu-container .edu-item');
+    var tpl   = document.getElementById('edu-container').getElementsByClassName('edu-item')[0];
     var clone = tpl.cloneNode(true);
-    clone.querySelectorAll('input').forEach(function(el) { el.value = ''; });
-    if (!clone.querySelector('.btn-eliminar-item')) {
+    Array.from(clone.getElementsByTagName('input')).forEach(function(el) { el.value = ''; });
+    if (!clone.getElementsByClassName('btn-eliminar-item')[0]) {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn-eliminar-item';
@@ -106,8 +118,8 @@ function _erroresValidacion(data) {
     return data.message || 'Error al enviar. Revisa los campos e inténtalo de nuevo.';
 }
 
-document.getElementById('form-cv').onsubmit = async function(e) {
-    e.preventDefault();
+document.getElementById('form-cv').onsubmit = async function(eventoEnvio) {
+    eventoEnvio.preventDefault();
     var btn = document.getElementById('btn-enviar-cv');
     btn.disabled = true;
     btn.textContent = 'Enviando...';
@@ -116,7 +128,7 @@ document.getElementById('form-cv').onsubmit = async function(e) {
         var res = await fetch('/trabajos/' + _ofertaActual + '/postular', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-CSRF-TOKEN': obtenerTokenCsrf(),
                 'Accept': 'application/json',
             },
             body: new FormData(this),
@@ -136,8 +148,8 @@ document.getElementById('form-cv').onsubmit = async function(e) {
     }
 };
 
-document.getElementById('form-archivo').onsubmit = async function(e) {
-    e.preventDefault();
+document.getElementById('form-archivo').onsubmit = async function(eventoEnvio) {
+    eventoEnvio.preventDefault();
     var fileInput = document.getElementById('cv-file-input');
     if (!fileInput.files.length) {
         alert('Por favor, selecciona un archivo CV antes de enviar.');
@@ -151,7 +163,7 @@ document.getElementById('form-archivo').onsubmit = async function(e) {
         var res = await fetch('/trabajos/' + _ofertaActual + '/postular-archivo', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-CSRF-TOKEN': obtenerTokenCsrf(),
                 'Accept': 'application/json',
             },
             body: new FormData(this),
