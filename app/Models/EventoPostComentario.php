@@ -11,6 +11,7 @@ class EventoPostComentario extends Model
 
     protected $fillable = [
         'evento_post_id',
+        'padre_id',
         'usuario_id',
         'contenido',
         'estado',
@@ -31,5 +32,21 @@ class EventoPostComentario extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    /**
+     * Respuestas directas a este comentario (un nivel de profundidad).
+     */
+    public function respuestas()
+    {
+        return $this->hasMany(EventoPostComentario::class, 'padre_id')
+                    ->with('usuario:id,nombre,apellido1,foto_url')
+                    ->where('estado', 1)
+                    ->orderBy('fecha_creacion');
+    }
+
+    public function padre()
+    {
+        return $this->belongsTo(EventoPostComentario::class, 'padre_id');
     }
 }

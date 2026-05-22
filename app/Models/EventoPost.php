@@ -41,7 +41,10 @@ class EventoPost extends Model
 
     public function comentarios()
     {
-        return $this->hasMany(EventoPostComentario::class, 'evento_post_id')->orderBy('fecha_creacion');
+        // Solo comentarios raíz (sin padre); las respuestas se cargan desde EventoPostComentario
+        return $this->hasMany(EventoPostComentario::class, 'evento_post_id')
+                    ->whereNull('padre_id')
+                    ->orderBy('fecha_creacion');
     }
 
     public function likes()

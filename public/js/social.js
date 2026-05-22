@@ -23,6 +23,12 @@ var likeEnProceso = {};
 
 var temporizadorBusqueda = null;
 
+var historialHistorias  = [];  // grupos de historias cargados [{ usuario, historias }]
+var visorGrupoIdx       = 0;   // índice del grupo actual en el visor
+var visorHistoriaIdx    = 0;   // índice de la historia dentro del grupo
+var visorTimer          = null; // setTimeout del avance automático
+var eventoFiltroActual  = null; // id del evento actualmente filtrado
+
 var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 /* ============================================================
@@ -67,6 +73,8 @@ function irA(panel) {
         cargarSolicitudes();
     } else if (panel === 'feed') {
         iniciarFeed();
+    } else if (panel === 'eventos') {
+        cargarEventosConContenido();
     }
 }
 
@@ -84,6 +92,7 @@ function iniciarFeed() {
 
     cargarEventosAsistidos();
     cargarFeedPosts(1);
+    cargarHistorias();
 }
 
 function cargarEventosAsistidos() {
@@ -94,19 +103,30 @@ function cargarEventosAsistidos() {
     .then(function (respuesta) {
         pubEventosAsistidos = respuesta.datos || [];
 
-        var btnNuevaPub  = document.getElementById('btn-nueva-pub');
-        var selectModal  = document.getElementById('pub-select-evento');
+        // Los botones se muestran siempre (el post no requiere evento)
+        var acciones = document.getElementById('topbar-acciones-feed');
+        if (acciones) {
+            acciones.style.display = 'flex';
+        }
 
-        if (pubEventosAsistidos.length > 0) {
-            if (btnNuevaPub)  btnNuevaPub.style.display = 'flex';
-
-            var opcionesHtml = '<option value="">Selecciona un evento…</option>';
+        // Rellenar select del modal de publicación
+        var selectModal = document.getElementById('pub-select-evento');
+        if (selectModal) {
+            var optsPost = '<option value="">Sin etiqueta</option>';
             pubEventosAsistidos.forEach(function (ev) {
-                opcionesHtml += '<option value="' + ev.id + '">' + escaparHtml(ev.titulo) + '</option>';
+                optsPost += '<option value="' + ev.id + '">' + escaparHtml(ev.titulo) + '</option>';
             });
-            if (selectModal) selectModal.innerHTML = opcionesHtml;
-        } else {
-            if (btnNuevaPub) btnNuevaPub.style.display = 'none';
+            selectModal.innerHTML = optsPost;
+        }
+
+        // Rellenar select del modal de historia
+        var selectHist = document.getElementById('hist-select-evento');
+        if (selectHist) {
+            var optsHist = '<option value="">Sin etiqueta</option>';
+            pubEventosAsistidos.forEach(function (ev) {
+                optsHist += '<option value="' + ev.id + '">' + escaparHtml(ev.titulo) + '</option>';
+            });
+            selectHist.innerHTML = optsHist;
         }
     })
     .catch(function () {});
@@ -164,7 +184,10 @@ function cargarMasPosts() {
 function renderizarPost(post) {
     var avatarHtml    = construirAvatar(post.autor.foto_url, post.autor.nombre, post.autor.apellido1, 'sm');
     var autorNombre   = escaparHtml(post.autor.nombre + ' ' + post.autor.apellido1);
-    var eventoLabel   = escaparHtml(post.evento.titulo);
+    var eventoLabel   = post.evento ? escaparHtml(post.evento.titulo) : '';
+    var eventoTagHtml = post.evento
+        ? '<span class="post-evento-tag" onclick="irAFiltroEvento(' + post.evento.id + ')">🎫 ' + eventoLabel + '</span>'
+        : '';
     var fechaLabel    = formatearFechaRelativa(post.fecha);
     var visiBadge     = post.visibilidad === 2
         ? '<span style="font-size:0.6rem;color:rgba(245,241,234,0.35);margin-left:4px;" title="Solo amigos">🔒</span>'
@@ -217,7 +240,7 @@ function renderizarPost(post) {
          +       '<div class="post-avatar">' + avatarHtml + '</div>'
          +       '<div class="post-head-meta">'
          +         '<span class="post-autor">' + autorNombre + visiBadge + '</span>'
-         +         '<span class="post-evento-tag">' + eventoLabel + '</span>'
+         +         eventoTagHtml
          +       '</div>'
          +     '</div>'
          +   '</div>'
@@ -389,10 +412,37 @@ function toggleLike(postId) {
 function renderizarComentario(c) {
     var autor = escaparHtml(c.autor.nombre + ' ' + c.autor.apellido1);
     var hora  = formatearHora(c.fecha);
+
+    // Renderizar respuestas ya existentes
+    var respuestasHtml = '';
+    if (c.respuestas && c.respuestas.length > 0) {
+        c.respuestas.forEach(function (r) {
+            var rAutor = escaparHtml(r.autor.nombre + ' ' + r.autor.apellido1);
+            respuestasHtml += '<div class="post-comment-reply">'
+                + '<p><strong>' + rAutor + '</strong> ' + escaparHtml(r.contenido) + '</p>'
+                + '<p class="post-comment-time">' + formatearHora(r.fecha) + '</p>'
+                + '</div>';
+        });
+    }
+
     return '<div class="post-comment" id="pub-com-' + c.id + '">'
          +   '<div class="post-comment-body">'
-         +     '<p><strong>' + autor + '</strong>' + escaparHtml(c.contenido) + '</p>'
-         +     '<p class="post-comment-time">' + hora + '</p>'
+         +     '<p><strong>' + autor + '</strong> ' + escaparHtml(c.contenido) + '</p>'
+         +     '<div style="display:flex;align-items:center;gap:4px;">'
+         +       '<p class="post-comment-time">' + hora + '</p>'
+         +       '<button class="post-comment-responder"'
+         +         ' onclick="mostrarInputRespuesta(' + c.id + ')">Responder</button>'
+         +     '</div>'
+         +   '</div>'
+         +   '<div class="post-comment-replies" id="replies-' + c.id + '">' + respuestasHtml + '</div>'
+         +   '<div id="reply-input-wrap-' + c.id + '" style="display:none">'
+         +     '<div class="post-reply-input-wrap">'
+         +       '<input type="text" class="post-reply-input" id="reply-input-' + c.id + '"'
+         +         ' placeholder="Responde a ' + autor + '…" maxlength="500"'
+         +         ' onkeydown="manejarTeclaRespuesta(event,' + c.id + ')">'
+         +       '<button class="post-btn-comentar"'
+         +         ' onclick="enviarRespuesta(' + c.id + ')">OK</button>'
+         +     '</div>'
          +   '</div>'
          + '</div>';
 }
@@ -459,6 +509,10 @@ function abrirModalPublicacion() {
     document.getElementById('pub-select-visibilidad').value       = '1';
     document.getElementById('pub-input-fotos').value              = '';
     document.getElementById('pub-preview-grid').innerHTML         = '';
+    var label = document.getElementById('pub-upload-label');
+    if (label) label.textContent = 'Haz clic o arrastra tus fotos aquí';
+    var area  = document.getElementById('pub-upload-area');
+    if (area) area.classList.remove('con-fotos');
     var btn = document.getElementById('pub-btn-publicar');
     btn.disabled    = false;
     btn.textContent = 'Publicar';
@@ -469,10 +523,25 @@ function cerrarModalPublicacion() {
 }
 
 function previsualizarFotos(input) {
-    var grid     = document.getElementById('pub-preview-grid');
+    var grid   = document.getElementById('pub-preview-grid');
+    var label  = document.getElementById('pub-upload-label');
+    var area   = document.getElementById('pub-upload-area');
     grid.innerHTML = '';
-    Array.from(input.files).slice(0, 10).forEach(function (file) {
-        var reader   = new FileReader();
+
+    var archivos = Array.from(input.files).slice(0, 10);
+
+    if (archivos.length === 0) {
+        if (label) label.textContent = 'Haz clic o arrastra tus fotos aquí';
+        if (area) area.classList.remove('con-fotos');
+        return;
+    }
+
+    // Actualizar texto del área con el conteo
+    if (label) label.textContent = archivos.length + (archivos.length === 1 ? ' foto seleccionada' : ' fotos seleccionadas');
+    if (area) area.classList.add('con-fotos');
+
+    archivos.forEach(function (file) {
+        var reader = new FileReader();
         reader.onload = function (e) {
             grid.insertAdjacentHTML('beforeend',
                 '<div class="soc-preview-thumb"><img src="' + e.target.result + '" alt="preview"></div>'
@@ -482,13 +551,36 @@ function previsualizarFotos(input) {
     });
 }
 
+// Gestiona el drop de archivos sobre el área de upload
+function soltar(event) {
+    event.preventDefault();
+    var area  = document.getElementById('pub-upload-area');
+    var input = document.getElementById('pub-input-fotos');
+    area.classList.remove('dragover');
+
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+        // Asignar los archivos al input para que publicarPost() los lea
+        try {
+            // DataTransfer permite reemplazar la propiedad files del input
+            var dt = new DataTransfer();
+            Array.from(event.dataTransfer.files).slice(0, 10).forEach(function (f) {
+                if (f.type.match(/^image\//)) dt.items.add(f);
+            });
+            input.files = dt.files;
+            previsualizarFotos(input);
+        } catch (e) {
+            // Fallback para navegadores sin soporte DataTransfer
+            alert('Usa el botón para seleccionar las fotos en este navegador.');
+        }
+    }
+}
+
 function publicarPost() {
     var eventoId     = document.getElementById('pub-select-evento').value;
     var descripcion  = document.getElementById('pub-textarea-desc').value.trim();
     var visibilidad  = document.getElementById('pub-select-visibilidad').value || '1';
     var inputFotos   = document.getElementById('pub-input-fotos');
 
-    if (!eventoId) { alert('Selecciona un evento.'); return; }
     if (!inputFotos.files || inputFotos.files.length === 0) {
         alert('Añade al menos una foto.');
         return;
@@ -499,7 +591,7 @@ function publicarPost() {
     btn.textContent = 'Publicando…';
 
     var formData = new FormData();
-    formData.append('evento_id', eventoId);
+    if (eventoId) formData.append('evento_id', eventoId);
     formData.append('visibilidad', visibilidad);
     if (descripcion) formData.append('descripcion', descripcion);
     Array.from(inputFotos.files).slice(0, 10).forEach(function (file, i) {
@@ -1184,4 +1276,521 @@ function manejarTeclaEnvio(event) {
         event.preventDefault();
         enviarMensaje();
     }
+}
+
+/* ============================================================
+   RESPUESTAS A COMENTARIOS
+   ============================================================ */
+
+function mostrarInputRespuesta(comentarioId) {
+    // Ocultar otros inputs de respuesta abiertos
+    document.querySelectorAll('[id^="reply-input-wrap-"]').forEach(function (el) {
+        el.style.display = 'none';
+    });
+    var wrap = document.getElementById('reply-input-wrap-' + comentarioId);
+    if (wrap) {
+        wrap.style.display = 'block';
+        var input = document.getElementById('reply-input-' + comentarioId);
+        if (input) input.focus();
+    }
+}
+
+function enviarRespuesta(comentarioPadreId) {
+    var inputEl   = document.getElementById('reply-input-' + comentarioPadreId);
+    var contenido = inputEl ? inputEl.value.trim() : '';
+    if (!contenido) return;
+
+    // Subir hasta .post-card para obtener el postId
+    var comentarioEl = document.getElementById('pub-com-' + comentarioPadreId);
+    var postCard     = comentarioEl ? comentarioEl.closest('.post-card') : null;
+    var postId       = postCard ? postCard.dataset.postId : null;
+    if (!postId) return;
+
+    inputEl.disabled = true;
+
+    fetch('/api/social/posts/' + postId + '/comentarios', {
+        method:  'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+        body: JSON.stringify({ contenido: contenido, padre_id: comentarioPadreId }),
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        inputEl.disabled = false;
+        inputEl.value    = '';
+        if (respuesta.exito) {
+            var r     = respuesta.datos;
+            var autor = escaparHtml(r.autor.nombre + ' ' + r.autor.apellido1);
+            var html  = '<div class="post-comment-reply">'
+                      + '<p><strong>' + autor + '</strong> ' + escaparHtml(r.contenido) + '</p>'
+                      + '<p class="post-comment-time">' + formatearHora(r.fecha) + '</p>'
+                      + '</div>';
+            var repliesEl = document.getElementById('replies-' + comentarioPadreId);
+            if (repliesEl) repliesEl.insertAdjacentHTML('beforeend', html);
+            var wrap = document.getElementById('reply-input-wrap-' + comentarioPadreId);
+            if (wrap) wrap.style.display = 'none';
+        }
+    })
+    .catch(function () { inputEl.disabled = false; });
+}
+
+function manejarTeclaRespuesta(event, comentarioId) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        enviarRespuesta(comentarioId);
+    }
+}
+
+/* ============================================================
+   HISTORIAS — carga y barra
+   ============================================================ */
+
+function cargarHistorias() {
+    fetch('/api/social/historias', { headers: { 'Accept': 'application/json' } })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (!respuesta.exito) return;
+        historialHistorias = respuesta.datos || [];
+        renderizarBarraHistorias('historias-barra');
+    })
+    .catch(function () {});
+}
+
+function renderizarBarraHistorias(contenedorId) {
+    var barra = document.getElementById(contenedorId);
+    if (!barra) return;
+    barra.innerHTML = '';
+
+    // Primer círculo: "Tu historia" (abre modal para crear)
+    var yoHtml = '<div class="historia-circulo historia-circulo-yo"'
+               + ' onclick="abrirModalHistoria()" title="Añadir historia">'
+               + '  <div class="historia-circulo-ring">'
+               + '    <div class="historia-circulo-iniciales">+</div>'
+               + '  </div>'
+               + '  <span class="historia-circulo-nombre">Tu historia</span>'
+               + '</div>';
+    barra.insertAdjacentHTML('beforeend', yoHtml);
+
+    // Un círculo por grupo de amigos
+    historialHistorias.forEach(function (grupo, grupoIdx) {
+        if (grupo.es_mio) return; // ya está representado por "Tu historia"
+        var todasVistas = grupo.historias.every(function (h) { return h.ha_visto; });
+        var u    = grupo.usuario;
+        var img  = u.foto_url
+            ? '<img class="historia-circulo-img" src="' + escaparHtml(u.foto_url) + '" alt="">'
+            : '<div class="historia-circulo-iniciales">'
+              + escaparHtml((u.nombre ? u.nombre[0] : '') + (u.apellido1 ? u.apellido1[0] : ''))
+              + '</div>';
+        var html = '<div class="historia-circulo' + (todasVistas ? ' visto' : '') + '"'
+                 + ' onclick="abrirVisorHistorias(' + grupoIdx + ')" title="' + escaparHtml(u.nombre) + '">'
+                 + '  <div class="historia-circulo-ring">' + img + '</div>'
+                 + '  <span class="historia-circulo-nombre">' + escaparHtml(u.nombre) + '</span>'
+                 + '</div>';
+        barra.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+/* ── Modal de nueva historia ── */
+
+function abrirModalHistoria() {
+    document.getElementById('hist-modal-overlay').style.display = 'flex';
+    document.getElementById('hist-input-texto').value   = '';
+    document.getElementById('hist-select-evento').value = '';
+    document.getElementById('hist-input-foto').value    = '';
+    document.getElementById('hist-preview-wrap').style.display = 'none';
+    document.getElementById('hist-upload-area').style.display  = 'flex';
+    var btn = document.getElementById('hist-btn-publicar');
+    btn.disabled    = false;
+    btn.textContent = 'Compartir';
+}
+
+function cerrarModalHistoria() {
+    document.getElementById('hist-modal-overlay').style.display = 'none';
+}
+
+function previsualizarHistoria(input) {
+    if (!input.files || !input.files[0]) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('hist-preview-img').src             = e.target.result;
+        document.getElementById('hist-preview-wrap').style.display  = 'block';
+        document.getElementById('hist-upload-area').style.display   = 'none';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+function publicarHistoria() {
+    var inputFoto = document.getElementById('hist-input-foto');
+    if (!inputFoto.files || !inputFoto.files[0]) {
+        alert('Selecciona una foto para tu historia.');
+        return;
+    }
+    var btn = document.getElementById('hist-btn-publicar');
+    btn.disabled    = true;
+    btn.textContent = 'Publicando…';
+
+    var formData = new FormData();
+    formData.append('foto', inputFoto.files[0]);
+    var texto    = document.getElementById('hist-input-texto').value.trim();
+    var eventoId = document.getElementById('hist-select-evento').value;
+    if (texto)    formData.append('texto', texto);
+    if (eventoId) formData.append('evento_id', eventoId);
+
+    fetch('/api/social/historias', {
+        method:  'POST',
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body:    formData,
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        btn.disabled    = false;
+        btn.textContent = 'Compartir';
+        if (respuesta.exito) {
+            cerrarModalHistoria();
+            cargarHistorias();
+        } else {
+            alert(respuesta.mensaje || 'No se pudo publicar.');
+        }
+    })
+    .catch(function () {
+        btn.disabled    = false;
+        btn.textContent = 'Compartir';
+        alert('Error al publicar la historia.');
+    });
+}
+
+/* ── Visor de historias ── */
+
+function abrirVisorHistorias(grupoIdx) {
+    if (!historialHistorias[grupoIdx]) return;
+    visorGrupoIdx    = grupoIdx;
+    visorHistoriaIdx = 0;
+    document.getElementById('visor-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    mostrarHistoriaActual();
+}
+
+function cerrarVisorHistorias() {
+    clearTimeout(visorTimer);
+    document.getElementById('visor-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function mostrarHistoriaActual() {
+    clearTimeout(visorTimer);
+    var grupo    = historialHistorias[visorGrupoIdx];
+    var historia = grupo ? grupo.historias[visorHistoriaIdx] : null;
+    if (!historia) { cerrarVisorHistorias(); return; }
+
+    document.getElementById('visor-foto').src = historia.media_url;
+
+    var u = grupo.usuario;
+    var avatarHtml = construirAvatar(u.foto_url, u.nombre, u.apellido1, 'sm');
+    document.getElementById('visor-autor').innerHTML =
+        '<div>' + avatarHtml + '</div>'
+      + '<div>'
+      + '  <div class="visor-autor-nombre">' + escaparHtml(u.nombre + ' ' + (u.apellido1 || '')) + '</div>'
+      + '  <div class="visor-autor-tiempo">' + formatearFechaRelativa(historia.fecha_creacion) + '</div>'
+      + '</div>';
+
+    var tagEl = document.getElementById('visor-evento-tag');
+    if (historia.evento) {
+        tagEl.textContent   = '🎫 ' + historia.evento.titulo;
+        tagEl.style.display = 'inline-block';
+    } else {
+        tagEl.style.display = 'none';
+    }
+
+    var textoEl = document.getElementById('visor-texto');
+    if (historia.texto) {
+        textoEl.textContent   = historia.texto;
+        textoEl.style.display = 'block';
+    } else {
+        textoEl.style.display = 'none';
+    }
+
+    // Barra de progreso
+    var total    = grupo.historias.length;
+    var progHtml = '';
+    for (var i = 0; i < total; i++) {
+        var cls = i < visorHistoriaIdx ? 'completo' : (i === visorHistoriaIdx ? 'activo' : '');
+        progHtml += '<div class="visor-progress-seg ' + cls + '">'
+                  + '<div class="visor-progress-seg-fill"></div>'
+                  + '</div>';
+    }
+    document.getElementById('visor-progress').innerHTML = progHtml;
+
+    // Disparar animación CSS del segmento activo
+    var segActivo = document.querySelector('.visor-progress-seg.activo .visor-progress-seg-fill');
+    if (segActivo) {
+        segActivo.style.transition = 'none';
+        segActivo.style.width      = '0%';
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                segActivo.style.transition = 'width 5s linear';
+                segActivo.style.width      = '100%';
+            });
+        });
+    }
+
+    // Registrar vista en el servidor
+    fetch('/api/social/historias/' + historia.id + '/vista', {
+        method:  'POST',
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+    }).catch(function () {});
+
+    // Avance automático a los 5 segundos
+    visorTimer = setTimeout(visorSiguiente, 5000);
+}
+
+function visorSiguiente() {
+    clearTimeout(visorTimer);
+    var grupo = historialHistorias[visorGrupoIdx];
+    if (!grupo) { cerrarVisorHistorias(); return; }
+
+    visorHistoriaIdx++;
+    if (visorHistoriaIdx >= grupo.historias.length) {
+        visorGrupoIdx++;
+        visorHistoriaIdx = 0;
+        if (visorGrupoIdx >= historialHistorias.length) {
+            cerrarVisorHistorias();
+            return;
+        }
+    }
+    mostrarHistoriaActual();
+}
+
+function visorAnterior() {
+    clearTimeout(visorTimer);
+    visorHistoriaIdx--;
+    if (visorHistoriaIdx < 0) {
+        visorGrupoIdx--;
+        if (visorGrupoIdx < 0) {
+            // Ya estamos en la primera historia del primer grupo
+            visorGrupoIdx    = 0;
+            visorHistoriaIdx = 0;
+        } else {
+            var grupoAnterior = historialHistorias[visorGrupoIdx];
+            visorHistoriaIdx  = grupoAnterior ? grupoAnterior.historias.length - 1 : 0;
+        }
+    }
+    mostrarHistoriaActual();
+}
+
+/* ============================================================
+   PANEL EVENTOS — filtro por evento
+   ============================================================ */
+
+function cargarEventosConContenido() {
+    var lista    = document.getElementById('lista-eventos-contenido');
+    var skeleton = document.getElementById('skeleton-eventos');
+    var vacio    = document.getElementById('eventos-vacio');
+
+    if (skeleton) skeleton.style.display = 'block';
+    if (vacio)    vacio.style.display    = 'none';
+
+    fetch('/api/social/eventos-con-contenido', {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (skeleton) skeleton.style.display = 'none';
+
+        if (!respuesta.exito || !respuesta.datos.length) {
+            if (vacio) vacio.style.display = 'block';
+            return;
+        }
+
+        var html = '';
+        respuesta.datos.forEach(function (ev) {
+            var portada = ev.portada_url
+                ? '<img class="evento-filtro-portada" src="' + escaparHtml(ev.portada_url) + '" alt="">'
+                : '<div class="evento-filtro-portada" style="background:rgba(124,58,237,0.15)"></div>';
+            var meta = [];
+            if (ev.total_posts     > 0) meta.push(ev.total_posts     + ' publicaciones');
+            if (ev.total_historias > 0) meta.push(ev.total_historias + ' historias');
+
+            html += '<div class="evento-filtro-card" onclick="abrirFiltroEvento(' + ev.id + ',\'' + escaparTexto(ev.titulo) + '\')">'
+                  + portada
+                  + '<div class="evento-filtro-info">'
+                  +   '<div class="evento-filtro-titulo">' + escaparHtml(ev.titulo) + '</div>'
+                  +   '<div class="evento-filtro-meta">' + escaparHtml(meta.join(' · ')) + '</div>'
+                  + '</div>'
+                  + '<div class="evento-filtro-arrow">'
+                  +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
+                  +     '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>'
+                  +   '</svg>'
+                  + '</div>'
+                  + '</div>';
+        });
+
+        if (lista) lista.innerHTML = html;
+    })
+    .catch(function () {
+        if (skeleton) skeleton.style.display = 'none';
+        if (vacio)    vacio.style.display    = 'block';
+    });
+}
+
+function abrirFiltroEvento(eventoId, titulo) {
+    eventoFiltroActual = eventoId;
+
+    // Actualizar título del topbar
+    var tituloEl = document.getElementById('titulo-panel-eventos');
+    if (tituloEl) tituloEl.textContent = titulo || 'Evento';
+
+    // Mostrar botón volver, ocultar listado, mostrar detalle
+    var btnVolver = document.getElementById('btn-volver-eventos');
+    if (btnVolver) btnVolver.style.display = 'flex';
+
+    document.getElementById('eventos-lista-view').classList.remove('activo');
+    document.getElementById('eventos-detalle-view').classList.add('activo');
+
+    // Cargar contenido del evento
+    cargarFeedPorEvento(eventoId);
+}
+
+function irAFiltroEvento(eventoId) {
+    // Navegar al panel de eventos y abrir el filtro del evento indicado
+    irA('eventos');
+    // Pequeño delay para que el panel esté activo antes de abrir el detalle
+    setTimeout(function () {
+        var evento = null;
+        // Buscar el titulo en la lista ya cargada si existe
+        var card = document.querySelector('.evento-filtro-card[onclick*="' + eventoId + '"]');
+        var titulo = card
+            ? card.querySelector('.evento-filtro-titulo').textContent
+            : 'Evento';
+        abrirFiltroEvento(eventoId, titulo);
+    }, 100);
+}
+
+function volverListadoEventos() {
+    eventoFiltroActual = null;
+
+    var btnVolver = document.getElementById('btn-volver-eventos');
+    if (btnVolver) btnVolver.style.display = 'none';
+
+    var tituloEl = document.getElementById('titulo-panel-eventos');
+    if (tituloEl) tituloEl.textContent = 'Por evento';
+
+    document.getElementById('eventos-detalle-view').classList.remove('activo');
+    document.getElementById('eventos-lista-view').classList.add('activo');
+}
+
+function cargarFeedPorEvento(eventoId) {
+    var postsEl    = document.getElementById('eventos-detalle-posts');
+    var barraEl    = document.getElementById('historias-evento-barra');
+    var cargandoEl = document.getElementById('eventos-detalle-cargando');
+    var vacioEl    = document.getElementById('eventos-detalle-vacio');
+
+    if (postsEl)    postsEl.innerHTML    = '';
+    if (barraEl)    barraEl.innerHTML    = '';
+    if (vacioEl)    vacioEl.style.display    = 'none';
+    if (cargandoEl) cargandoEl.style.display = 'flex';
+
+    fetch('/api/social/evento/' + eventoId, {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (cargandoEl) cargandoEl.style.display = 'none';
+
+        if (!respuesta.exito) {
+            if (vacioEl) vacioEl.style.display = 'block';
+            return;
+        }
+
+        // Renderizar historias del evento en la barra
+        if (barraEl && respuesta.historias && respuesta.historias.length > 0) {
+            var histHtml = '';
+            respuesta.historias.forEach(function (h, idx) {
+                var u   = h.usuario;
+                var img = u.foto_url
+                    ? '<img class="historia-circulo-img" src="' + escaparHtml(u.foto_url) + '" alt="">'
+                    : '<div class="historia-circulo-iniciales">'
+                      + escaparHtml((u.nombre ? u.nombre[0] : '') + (u.apellido1 ? u.apellido1[0] : ''))
+                      + '</div>';
+                histHtml += '<div class="historia-circulo"'
+                          + ' onclick="abrirVisorDesdeEvento(' + idx + ',\'' + eventoId + '\')">'
+                          + '  <div class="historia-circulo-ring">' + img + '</div>'
+                          + '  <span class="historia-circulo-nombre">' + escaparHtml(u.nombre) + '</span>'
+                          + '</div>';
+            });
+            barraEl.innerHTML = histHtml;
+
+            // Guardar las historias del evento para el visor
+            window._historiasEvento = respuesta.historias;
+        }
+
+        // Renderizar posts
+        if (!respuesta.posts || respuesta.posts.length === 0) {
+            if (vacioEl) vacioEl.style.display = 'block';
+            return;
+        }
+
+        var html = '';
+        respuesta.posts.forEach(function (post) {
+            html += renderizarPost(post);
+        });
+        if (postsEl) {
+            postsEl.innerHTML = html;
+            // Inicializar carruseles
+            respuesta.posts.forEach(function (post) {
+                if (post.imagenes && post.imagenes.length > 1) {
+                    inicializarTouchCarrusel(post.id);
+                }
+            });
+        }
+    })
+    .catch(function () {
+        if (cargandoEl) cargandoEl.style.display = 'none';
+        if (vacioEl)    vacioEl.style.display    = 'block';
+    });
+}
+
+function abrirVisorDesdeEvento(idx) {
+    // Construir grupos temporales para el visor a partir de las historias del evento
+    var historias = window._historiasEvento || [];
+    if (!historias[idx]) return;
+
+    // Agrupar por usuario para el visor
+    var grupos = [];
+    var mapa   = {};
+    historias.forEach(function (h) {
+        var uid = h.usuario.id;
+        if (!mapa[uid]) {
+            mapa[uid] = grupos.length;
+            grupos.push({ usuario: h.usuario, es_mio: false, historias: [] });
+        }
+        grupos[mapa[uid]].historias.push(h);
+    });
+
+    // Guardar en historialHistorias temporal y abrir visor
+    var backupHistorial = historialHistorias;
+    historialHistorias  = grupos;
+
+    // Encontrar el grupo que contiene la historia en idx
+    var grupoTarget  = 0;
+    var contadorHist = 0;
+    for (var g = 0; g < grupos.length; g++) {
+        if (contadorHist + grupos[g].historias.length > idx) {
+            grupoTarget = g;
+            break;
+        }
+        contadorHist += grupos[g].historias.length;
+    }
+
+    abrirVisorHistorias(grupoTarget);
+
+    // Restaurar historialHistorias al cerrar
+    var origCerrar = cerrarVisorHistorias;
+    cerrarVisorHistorias = function () {
+        origCerrar();
+        historialHistorias  = backupHistorial;
+        cerrarVisorHistorias = origCerrar;
+    };
 }

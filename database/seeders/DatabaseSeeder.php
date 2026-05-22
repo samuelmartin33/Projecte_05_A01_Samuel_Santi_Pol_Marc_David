@@ -47,11 +47,13 @@ class DatabaseSeeder extends Seeder
         $this->call(CandidaturasTrabajoSeeder::class);
         $this->call(ValoracionesTrabajoSeeder::class);
 
-        // Social
+        // Social — amistades, publicaciones e historias
         $this->call(SeguimientosSeeder::class);
+        $this->call(AmigosSeeder::class);
         $this->call(EventoPostsSeeder::class);
+        $this->call(HistoriasSeeder::class);
 
-        // Mensajería
+        // Mensajería — chats y mensajes directos
         $this->call(ChatsSeeder::class);
         $this->call(MensajesSeeder::class);
 

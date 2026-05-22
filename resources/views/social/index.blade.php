@@ -28,8 +28,33 @@
          ══════════════════════════════════════ --}}
     <div class="soc-panel activo" id="panel-feed">
 
-        {{-- btn-nueva-pub oculto: JS lo muestra/oculta según eventos disponibles --}}
-        <button id="btn-nueva-pub" style="display:none" onclick="abrirModalPublicacion()"></button>
+        {{-- Topbar con botones de acción --}}
+        <header class="soc-topbar">
+            <h1 class="soc-topbar-titulo">VIBEZ</h1>
+            {{-- Botones de acción: siempre visibles para usuarios autenticados --}}
+            <div class="soc-topbar-acciones" id="topbar-acciones-feed" style="display:flex">
+
+                {{-- Botón nueva historia --}}
+                <button class="soc-topbar-btn" id="btn-nueva-historia"
+                        onclick="abrirModalHistoria()" title="Nueva historia">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <circle cx="12" cy="13" r="3"/>
+                    </svg>
+                </button>
+
+                {{-- Botón nuevo post --}}
+                <button class="soc-topbar-btn" id="btn-nueva-pub"
+                        onclick="abrirModalPublicacion()" title="Nueva publicación">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="3"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m-4-4h8"/>
+                    </svg>
+                </button>
+
+            </div>
+        </header>
 
         <div class="soc-scroll" id="feed-scroll">
 
@@ -40,23 +65,17 @@
                 <p class="soc-hero-sub">Quién va a dónde, qué se está liando, cuál es el plan. La nightlife se vive mejor en grupo.</p>
             </div>
 
-            {{-- ── STORIES ── --}}
-            <div class="soc-stories-row no-scrollbar">
-                @php $u = Auth::user(); @endphp
-                <div class="soc-story" onclick="abrirModalPublicacion()" title="Publicar">
-                    <div class="soc-story-ring soc-story-ring--you">
-                        <div class="soc-story-av-you">+</div>
-                    </div>
-                    <div class="soc-story-name">Tu story</div>
+            {{-- ── BARRA DE HISTORIAS (renderizada por JS) ── --}}
+            <div class="historias-barra" id="historias-barra">
+                <div class="historia-circulo historia-circulo-skeleton">
+                    <div class="historia-circulo-ring"></div>
                 </div>
-                @foreach([['AM','@amigo1'],['XR','@xavi.r'],['LG','@laura.g'],['PB','@pablo_b'],['NF','@nuria_f'],['DR','@dani_r']] as [$ini,$handle])
-                <div class="soc-story">
-                    <div class="soc-story-ring">
-                        <div class="soc-story-av">{{ $ini }}</div>
-                    </div>
-                    <div class="soc-story-name">{{ $handle }}</div>
+                <div class="historia-circulo historia-circulo-skeleton">
+                    <div class="historia-circulo-ring"></div>
                 </div>
-                @endforeach
+                <div class="historia-circulo historia-circulo-skeleton">
+                    <div class="historia-circulo-ring"></div>
+                </div>
             </div>
 
             {{-- ── FEED + SIDEBAR ── --}}
@@ -300,6 +319,55 @@
     </div>
 
     {{-- ══════════════════════════════════════
+         PANEL: Por evento
+         ══════════════════════════════════════ --}}
+    <div class="soc-panel" id="panel-eventos">
+
+        <header class="soc-topbar">
+            <button class="soc-btn-volver" id="btn-volver-eventos" style="display:none"
+                    onclick="volverListadoEventos()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h1 class="soc-topbar-titulo" id="titulo-panel-eventos">Por evento</h1>
+        </header>
+
+        {{-- Sub-panel: listado de eventos con contenido --}}
+        <div class="soc-subpanel activo" id="eventos-lista-view">
+            <div class="soc-scroll">
+                <p class="soc-section-label">Tus eventos con contenido</p>
+                <div id="lista-eventos-contenido" class="soc-list">
+                    <div id="skeleton-eventos">
+                        <div class="soc-skeleton"></div>
+                        <div class="soc-skeleton"></div>
+                    </div>
+                </div>
+                <p class="soc-vacio" id="eventos-vacio" style="display:none">
+                    Aún no hay publicaciones o historias en tus eventos.
+                </p>
+            </div>
+        </div>
+
+        {{-- Sub-panel: detalle filtrado por un evento concreto --}}
+        <div class="soc-subpanel" id="eventos-detalle-view">
+            <div class="soc-scroll" id="eventos-detalle-scroll">
+                {{-- Historias del evento --}}
+                <div class="historias-barra" id="historias-evento-barra"></div>
+                {{-- Posts del evento --}}
+                <div id="eventos-detalle-posts"></div>
+                <div class="soc-spinner-wrap" id="eventos-detalle-cargando" style="display:none">
+                    <div class="soc-spinner"></div>
+                </div>
+                <p class="soc-vacio" id="eventos-detalle-vacio" style="display:none">
+                    No hay publicaciones para este evento todavía.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- ══════════════════════════════════════
          BOTTOM NAVIGATION / SIDEBAR
          ══════════════════════════════════════ --}}
     <nav class="soc-bottom-nav">
@@ -318,6 +386,16 @@
                 </svg>
             </div>
             <span class="soc-nav-label">Publicaciones</span>
+        </button>
+
+        <button class="soc-nav-btn" onclick="irA('eventos')" id="nav-btn-eventos">
+            <div class="soc-nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M15 5v2m-6-2v2M5 9h14M3 7h18v14a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                </svg>
+            </div>
+            <span class="soc-nav-label">Eventos</span>
         </button>
 
         <button class="soc-nav-btn" onclick="irA('chats')" id="nav-btn-chats">
@@ -361,9 +439,9 @@
             </div>
 
             <div class="soc-modal-body">
-                <label class="soc-field-label">Evento *</label>
+                <label class="soc-field-label">Etiquetar evento (opcional)</label>
                 <select id="pub-select-evento" class="soc-select">
-                    <option value="">Selecciona un evento…</option>
+                    <option value="">Sin etiqueta</option>
                 </select>
 
                 <label class="soc-field-label">Descripción (opcional)</label>
@@ -379,15 +457,18 @@
                 </select>
 
                 <label class="soc-field-label">Fotos * (mínimo 1, máximo 10)</label>
-                <div class="soc-upload-area"
-                     onclick="document.getElementById('pub-input-fotos').click()">
+                <div class="soc-upload-area" id="pub-upload-area"
+                     onclick="document.getElementById('pub-input-fotos').click()"
+                     ondragover="event.preventDefault(); this.classList.add('dragover')"
+                     ondragleave="this.classList.remove('dragover')"
+                     ondrop="soltar(event)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <p>Haz clic o arrastra tus fotos aquí</p>
+                    <p id="pub-upload-label">Haz clic o arrastra tus fotos aquí</p>
                 </div>
-                <input type="file" id="pub-input-fotos" accept="image/*" multiple style="display:none"
+                <input type="file" id="pub-input-fotos" accept="image/jpeg,image/png,image/webp" multiple style="display:none"
                        onchange="previsualizarFotos(this)">
                 <div class="soc-preview-grid" id="pub-preview-grid"></div>
             </div>
@@ -396,6 +477,65 @@
                 <button class="soc-btn-secondary" onclick="cerrarModalPublicacion()">Cancelar</button>
                 <button class="soc-btn-primary" id="pub-btn-publicar" onclick="publicarPost()">
                     Publicar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- ══════════════════════════════════════
+         MODAL: Nueva historia
+         ══════════════════════════════════════ --}}
+    <div class="soc-modal-overlay" id="hist-modal-overlay" style="display:none"
+         onclick="cerrarModalHistoria()">
+        <div class="soc-modal" onclick="event.stopPropagation()">
+
+            <div class="soc-modal-head">
+                <h3 class="soc-modal-titulo">Nueva historia</h3>
+                <button class="soc-modal-cerrar" onclick="cerrarModalHistoria()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="soc-modal-body">
+
+                {{-- Preview de la foto --}}
+                <div class="hist-preview-wrap" id="hist-preview-wrap" style="display:none">
+                    <img id="hist-preview-img" src="" alt="Preview">
+                </div>
+
+                {{-- Upload --}}
+                <div class="soc-upload-area" id="hist-upload-area"
+                     onclick="document.getElementById('hist-input-foto').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <circle cx="12" cy="13" r="3"/>
+                    </svg>
+                    <p>Haz clic para añadir una foto</p>
+                </div>
+                <input type="file" id="hist-input-foto" accept="image/*" style="display:none"
+                       onchange="previsualizarHistoria(this)">
+
+                {{-- Texto opcional --}}
+                <label class="soc-field-label">Texto (opcional)</label>
+                <input type="text" id="hist-input-texto" class="soc-select"
+                       placeholder="Escribe algo…" maxlength="200">
+
+                {{-- Etiquetar evento --}}
+                <label class="soc-field-label">Etiquetar evento (opcional)</label>
+                <select id="hist-select-evento" class="soc-select">
+                    <option value="">Sin etiqueta</option>
+                </select>
+
+            </div>
+
+            <div class="soc-modal-foot">
+                <button class="soc-btn-secondary" onclick="cerrarModalHistoria()">Cancelar</button>
+                <button class="soc-btn-primary" id="hist-btn-publicar" onclick="publicarHistoria()">
+                    Compartir
                 </button>
             </div>
 
@@ -436,6 +576,39 @@
             </div>
 
         </div>
+    </div>
+
+    {{-- ══════════════════════════════════════
+         VISOR DE HISTORIAS (fullscreen overlay)
+         ══════════════════════════════════════ --}}
+    <div class="visor-overlay" id="visor-overlay" style="display:none">
+
+        {{-- Barra de progreso (1 segmento por historia del grupo actual) --}}
+        <div class="visor-progress" id="visor-progress"></div>
+
+        {{-- Cabecera: avatar + nombre + evento + cerrar --}}
+        <div class="visor-head">
+            <div class="visor-autor" id="visor-autor"></div>
+            <div class="visor-evento-tag" id="visor-evento-tag" style="display:none"></div>
+            <button class="visor-cerrar" onclick="cerrarVisorHistorias()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Foto central --}}
+        <div class="visor-foto-wrap" id="visor-foto-wrap">
+            <img id="visor-foto" src="" alt="">
+        </div>
+
+        {{-- Texto opcional encima de la foto --}}
+        <div class="visor-texto" id="visor-texto" style="display:none"></div>
+
+        {{-- Zonas de toque para navegar --}}
+        <div class="visor-zona-izq" onclick="visorAnterior()"></div>
+        <div class="visor-zona-der" onclick="visorSiguiente()"></div>
+
     </div>
 
 </div>{{-- /soc --}}
