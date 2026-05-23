@@ -121,7 +121,8 @@ class EventosController extends Controller
         $validated = $request->validate([
             'titulo'              => ['required', 'string', 'max:300'],
             'descripcion'         => ['nullable', 'string', 'max:5000'],
-            'categoria_evento_id' => ['required', 'integer', 'exists:categorias_evento,id'],
+            'categorias'          => ['required', 'array', 'min:1'],
+            'categorias.*'        => ['integer', 'exists:categorias_evento,id'],
             'tipo_evento'         => ['required', 'integer', 'in:1,2'],
             'fecha_inicio'        => ['required', 'date', 'after_or_equal:today'],
             'fecha_fin'           => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
@@ -136,27 +137,28 @@ class EventosController extends Controller
             'url_externa'         => ['nullable', 'url', 'max:500'],
             'imagen_portada'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
         ], [
-            'titulo.required'              => 'El título del evento es obligatorio.',
-            'titulo.max'                   => 'El título no puede superar los 300 caracteres.',
-            'categoria_evento_id.required' => 'Selecciona una categoría.',
-            'categoria_evento_id.exists'   => 'La categoría seleccionada no es válida.',
-            'tipo_evento.required'         => 'Selecciona el tipo de evento.',
-            'fecha_inicio.required'        => 'La fecha de inicio es obligatoria.',
-            'fecha_inicio.after_or_equal'  => 'La fecha de inicio no puede ser anterior a hoy.',
-            'fecha_fin.after_or_equal'     => 'La fecha de fin debe ser posterior a la de inicio.',
-            'ubicacion_nombre.required'    => 'El nombre del lugar es obligatorio.',
-            'precio_base.required'         => 'Indica el precio (0 si es gratuito).',
-            'imagen_portada.image'         => 'El archivo debe ser una imagen.',
-            'imagen_portada.mimes'         => 'Formatos permitidos: JPG, PNG, WebP, GIF.',
-            'imagen_portada.max'           => 'La imagen no puede superar los 5 MB.',
-            'precio_base.min'              => 'El precio no puede ser negativo.',
+            'titulo.required'        => 'El título del evento es obligatorio.',
+            'titulo.max'             => 'El título no puede superar los 300 caracteres.',
+            'categorias.required'    => 'Selecciona al menos una categoría.',
+            'categorias.min'         => 'Selecciona al menos una categoría.',
+            'categorias.*.exists'    => 'Una de las categorías seleccionadas no es válida.',
+            'tipo_evento.required'   => 'Selecciona el tipo de evento.',
+            'fecha_inicio.required'  => 'La fecha de inicio es obligatoria.',
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
+            'fecha_fin.after_or_equal'    => 'La fecha de fin debe ser posterior a la de inicio.',
+            'ubicacion_nombre.required'   => 'El nombre del lugar es obligatorio.',
+            'precio_base.required'        => 'Indica el precio (0 si es gratuito).',
+            'imagen_portada.image'        => 'El archivo debe ser una imagen.',
+            'imagen_portada.mimes'        => 'Formatos permitidos: JPG, PNG, WebP, GIF.',
+            'imagen_portada.max'          => 'La imagen no puede superar los 5 MB.',
+            'precio_base.min'             => 'El precio no puede ser negativo.',
         ]);
 
         $esGratuito = $request->boolean('es_gratuito');
 
         $evento = Evento::create([
             'organizador_id'      => $organizador->id,
-            'categoria_evento_id' => $validated['categoria_evento_id'],
+            'categoria_evento_id' => $validated['categorias'][0],
             'tipo_evento'         => $validated['tipo_evento'],
             'titulo'              => $validated['titulo'],
             'descripcion'         => $validated['descripcion'] ?? null,
@@ -176,6 +178,8 @@ class EventosController extends Controller
             'fecha_creacion'      => now(),
             'fecha_actualizacion' => null,
         ]);
+
+        $evento->categorias()->sync($validated['categorias']);
 
         // Guardar imagen de portada si se subió un archivo
         if ($request->hasFile('imagen_portada')) {

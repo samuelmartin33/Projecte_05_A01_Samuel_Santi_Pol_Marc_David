@@ -302,49 +302,31 @@
                       placeholder="Describe tu evento: qué van a encontrar los asistentes, artistas, actividades...">{{ old('descripcion') }}</textarea>
         </div>
 
-        @php
-            $catActual   = old('categoria_evento_id', '');
-            $catLabel    = 'Selecciona categoría';
-            foreach ($categorias as $_c) { if ($_c->id == $catActual) { $catLabel = $_c->nombre; break; } }
-            $tipoEvActual = (string) old('tipo_evento', '1');
-            $tipoEvLabel  = $tipoEvActual === '2' ? 'Online' : 'Presencial';
-        @endphp
+        <div class="form-grupo">
+            <label class="form-label">Categorías <span class="form-required">*</span> <span style="color:rgba(245,241,234,0.3);font-size:0.5rem;">Puedes seleccionar varias</span></label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+                @foreach ($categorias as $cat)
+                    @php $checked = is_array(old('categorias')) && in_array($cat->id, old('categorias')); @endphp
+                    <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid {{ $checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)' }};cursor:pointer;transition:border-color 0.15s;user-select:none;"
+                           onmouseenter="this.style.borderColor='rgba(168,85,247,0.5)'"
+                           onmouseleave="this.style.borderColor=this.querySelector('input').checked?'rgba(168,85,247,0.7)':'rgba(245,241,234,0.14)'"
+                           onclick="actualizarBordeCat(this)">
+                        <input type="checkbox" name="categorias[]" value="{{ $cat->id }}"
+                               style="accent-color:#a855f7;width:14px;height:14px;"
+                               @checked($checked)>
+                        <span style="font-family:'Archivo Narrow',sans-serif;font-size:13px;color:#f5f1ea;">{{ $cat->nombre }}</span>
+                    </label>
+                @endforeach
+            </div>
+            @error('categorias') <p style="color:#f87171;font-size:11px;margin-top:6px;">{{ $message }}</p> @enderror
+        </div>
 
-        <div class="form-grupo-doble">
-            <div>
-                <label class="form-label">Categoría <span class="form-required">*</span></label>
-                <input type="hidden" id="categoria_evento_id" name="categoria_evento_id" value="{{ $catActual }}">
-                <div class="ev-csel" id="ev-csel-cat">
-                    <div class="ev-csel-trigger" onclick="toggleEvCsel('ev-csel-cat')">
-                        <span id="ev-csel-cat-label" class="{{ $catActual ? '' : 'ev-csel-placeholder' }}">{{ $catLabel }}</span>
-                        <span class="ev-csel-arrow">▾</span>
-                    </div>
-                    <ul class="ev-csel-menu">
-                        @foreach ($categorias as $cat)
-                            <li class="ev-csel-opt {{ $catActual == $cat->id ? 'selected' : '' }}"
-                                onclick="pickEvCsel('ev-csel-cat','categoria_evento_id','{{ $cat->id }}','{{ addslashes($cat->nombre) }}')">
-                                {{ $cat->nombre }}
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
-                <input type="hidden" id="tipo_evento" name="tipo_evento" value="{{ $tipoEvActual }}">
-                <div class="ev-csel" id="ev-csel-tipo">
-                    <div class="ev-csel-trigger" onclick="toggleEvCsel('ev-csel-tipo')">
-                        <span id="ev-csel-tipo-label">{{ $tipoEvLabel }}</span>
-                        <span class="ev-csel-arrow">▾</span>
-                    </div>
-                    <ul class="ev-csel-menu">
-                        <li class="ev-csel-opt {{ $tipoEvActual === '1' ? 'selected' : '' }}"
-                            onclick="pickEvCsel('ev-csel-tipo','tipo_evento','1','Presencial')">Presencial</li>
-                        <li class="ev-csel-opt {{ $tipoEvActual === '2' ? 'selected' : '' }}"
-                            onclick="pickEvCsel('ev-csel-tipo','tipo_evento','2','Online')">Online</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="form-grupo">
+            <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
+            <select name="tipo_evento" class="form-select">
+                <option value="1" @selected(old('tipo_evento', 1) == 1)>Presencial</option>
+                <option value="2" @selected(old('tipo_evento') == 2)>Online</option>
+            </select>
         </div>
 
         <hr class="form-divider">
@@ -534,31 +516,10 @@ if (fpInicio.selectedDates[0]) {
     fpFin.set('minDate', fpInicio.selectedDates[0]);
 }
 
-// ── Custom selects ────────────────────────────────────────────────────────────
-function toggleEvCsel(id) {
-    var el = document.getElementById(id);
-    var isOpen = el.classList.contains('open');
-    document.querySelectorAll('.ev-csel').forEach(function(c) { c.classList.remove('open'); });
-    if (!isOpen) el.classList.add('open');
+function actualizarBordeCat(label) {
+    var input = label.querySelector('input');
+    label.style.borderColor = input.checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)';
 }
-
-function pickEvCsel(csId, inputId, val, label) {
-    document.getElementById(inputId).value = val;
-    var lbl = document.getElementById(csId + '-label');
-    lbl.textContent = label;
-    lbl.classList.remove('ev-csel-placeholder');
-    document.getElementById(csId).classList.remove('open');
-    document.querySelectorAll('#' + csId + ' .ev-csel-opt').forEach(function(li) {
-        li.classList.remove('selected');
-        if (li.getAttribute('onclick').indexOf("'" + val + "'") !== -1) li.classList.add('selected');
-    });
-}
-
-document.addEventListener('click', function(e) {
-    document.querySelectorAll('.ev-csel').forEach(function(el) {
-        if (!el.contains(e.target)) el.classList.remove('open');
-    });
-});
 
 // ── Precio ────────────────────────────────────────────────────────────────────
 function togglePrecio() {

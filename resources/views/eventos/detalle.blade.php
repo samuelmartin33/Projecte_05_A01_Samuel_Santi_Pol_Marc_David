@@ -37,8 +37,15 @@
             Volver
         </a>
 
-        {{-- Categoría --}}
-        @if($evento->categoria)
+        {{-- Categorías --}}
+        @if($evento->categorias->isNotEmpty())
+            <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span style="width:28px;height:1px;background:var(--magenta);display:inline-block;"></span>
+                @foreach($evento->categorias as $cat)
+                    <span>{{ $cat->nombre }}</span>
+                @endforeach
+            </div>
+        @elseif($evento->categoria)
             <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;display:flex;align-items:center;gap:10px;">
                 <span style="width:28px;height:1px;background:var(--magenta);display:inline-block;"></span>
                 {{ $evento->categoria->nombre }}
@@ -71,6 +78,41 @@
             @endif
             <span class="display" style="font-size:1.5rem;color:var(--magenta);">{{ $evento->precio_formateado }}</span>
         </div>
+
+        {{-- Promotora en el hero --}}
+        @php $empresaHero = $evento->organizador?->empresa; @endphp
+        @if($empresaHero)
+            <div class="flex items-center gap-3 mt-5">
+                {{-- Logo / inicial --}}
+                <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
+                     style="background:linear-gradient(135deg,#4e3a96,#7c3aed)">
+                    @if($empresaHero->logo_url)
+                        <img src="{{ $empresaHero->logo_url }}" alt="{{ $empresaHero->nombre_empresa }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        <span class="font-bold text-white text-sm">{{ strtoupper(substr($empresaHero->nombre_empresa,0,1)) }}</span>
+                    @endif
+                </div>
+                <span class="font-mono text-xs uppercase tracking-widest text-paper/70">{{ $empresaHero->nombre_empresa }}</span>
+
+                @auth
+                    @if(!Auth::user()->isAdmin() && !Auth::user()->isEmpresa())
+                        <button class="btn-seguir-promotora {{ $siguePromotor ? 'siguiendo' : '' }}"
+                                data-empresa-id="{{ $empresaHero->id }}"
+                                onclick="toggleSeguirPromotora(this)"
+                                style="margin-left:0.25rem">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <line x1="19" y1="8" x2="19" y2="14"/>
+                                <line x1="22" y1="11" x2="16" y2="11"/>
+                            </svg>
+                            <span class="btn-seguir-texto">{{ $siguePromotor ? 'Siguiendo' : 'Seguir' }}</span>
+                        </button>
+                    @endif
+                @endauth
+            </div>
+        @endif
 
     </div>
 </div>
@@ -158,6 +200,19 @@
                                 </a>
                             @endif
                         </div>
+                        @auth
+                        @if(!Auth::user()->isAdmin() && !Auth::user()->isEmpresa())
+                        <button id="btn-seguir-promotora"
+                                class="btn-seguir-promotora {{ $siguePromotor ? 'siguiendo' : '' }}"
+                                data-empresa-id="{{ $evento->organizador->empresa->id }}"
+                                onclick="toggleSeguirPromotora(this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            <span class="btn-seguir-texto">{{ $siguePromotor ? 'Siguiendo' : 'Seguir' }}</span>
+                        </button>
+                        @endif
+                        @endauth
                     </div>
                 </div>
             @endif
@@ -183,6 +238,53 @@
                     </div>
                 </div>
             @endif
+
+        {{-- ════════════════════════
+             CUPONES DE LA EMPRESA
+        ════════════════════════ --}}
+        @if($cupones->isNotEmpty())
+            <section class="seccion-detalle">
+                <h2 class="seccion-titulo">Cupones de descuento</h2>
+                <p class="text-navy/60 text-sm mb-4">
+                    Usa uno de estos códigos al comprar tu entrada para obtener descuento.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @foreach($cupones as $cupon)
+                        <div class="rounded-xl p-4" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
+                            {{-- Código del cupón --}}
+                            <div class="flex items-center justify-between mb-2">
+                                <code id="codigo-cupon-{{ $cupon->id }}"
+                                      class="font-mono font-black text-lg tracking-widest"
+                                      style="color:#c084fc;">
+                                    {{ $cupon->codigo }}
+                                </code>
+                                <button onclick="copiarCodigoCupon('{{ $cupon->codigo }}', {{ $cupon->id }})"
+                                        id="btn-copiar-{{ $cupon->id }}"
+                                        class="text-xs font-bold px-3 py-1 rounded-lg transition-colors"
+                                        style="background:rgba(168,85,247,0.2);color:#c084fc;border:1px solid rgba(168,85,247,0.3);">
+                                    Copiar
+                                </button>
+                            </div>
+                            {{-- Descuento --}}
+                            <p class="font-black text-2xl mb-1" style="color:#a855f7;">
+                                {{ number_format($cupon->valor_descuento, 0) }}% de descuento
+                            </p>
+                            {{-- Descripción --}}
+                            @if($cupon->descripcion)
+                                <p class="text-sm text-navy/60">{{ $cupon->descripcion }}</p>
+                            @endif
+                            {{-- Validez --}}
+                            <p class="text-xs text-navy/40 mt-2">
+                                Válido hasta {{ $cupon->fecha_fin->format('d/m/Y') }}
+                                @if($cupon->usos_restantes !== -1)
+                                    · {{ $cupon->usos_restantes }} usos restantes
+                                @endif
+                            </p>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
 
         </div>
 
@@ -297,6 +399,41 @@
 
 @endsection
 
+@push('estilos')
+<style>
+.btn-seguir-promotora {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1.5px solid rgba(168,85,247,0.6);
+    background: transparent;
+    color: #a855f7;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.btn-seguir-promotora:hover {
+    background: rgba(168,85,247,0.15);
+}
+.btn-seguir-promotora.siguiendo {
+    background: rgba(168,85,247,0.2);
+    border-color: #a855f7;
+    color: #e9d5ff;
+}
+.btn-seguir-promotora.cargando {
+    opacity: 0.6;
+    pointer-events: none;
+}
+</style>
+@endpush
+
 @push('scripts')
 <script src="{{ asset('js/favoritos.js') }}"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -308,4 +445,51 @@ window.eventoData = {
 };
 </script>
 <script src="{{ asset('js/eventos-detalle.js') }}"></script>
+<script>
+async function toggleSeguirPromotora(btn) {
+    const empresaId = btn.dataset.empresaId;
+    btn.classList.add('cargando');
+    try {
+        const res = await fetch(`/api/seguimientos/${empresaId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+        });
+        const data = await res.json();
+        if (data.success) {
+            const texto = btn.querySelector('.btn-seguir-texto');
+            if (data.siguiendo) {
+                btn.classList.add('siguiendo');
+                texto.textContent = 'Siguiendo';
+            } else {
+                btn.classList.remove('siguiendo');
+                texto.textContent = 'Seguir';
+            }
+        }
+    } catch (e) {
+        console.error('Error al seguir promotora', e);
+    } finally {
+        btn.classList.remove('cargando');
+    }
+}
+
+// Copia el código del cupón al portapapeles y cambia el texto del botón
+function copiarCodigoCupon(codigo, id) {
+    navigator.clipboard.writeText(codigo).then(function () {
+        var btn = document.getElementById('btn-copiar-' + id);
+        var textoOriginal = btn.textContent;
+        btn.textContent = '¡Copiado!';
+        btn.style.background = 'rgba(74,222,128,0.2)';
+        btn.style.color = '#4ade80';
+        // Volver al estado original después de 2 segundos
+        setTimeout(function () {
+            btn.textContent = textoOriginal;
+            btn.style.background = 'rgba(168,85,247,0.2)';
+            btn.style.color = '#c084fc';
+        }, 2000);
+    });
+}
+</script>
 @endpush

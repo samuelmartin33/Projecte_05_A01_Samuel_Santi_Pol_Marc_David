@@ -37,10 +37,7 @@
 
         {{-- Contenido editorial (empujado al fondo del panel) --}}
         <div class="auth-side-content">
-            <div class="mono auth-kicker">
-                <span class="kicker-line"></span>
-                Sé parte · Edición #428
-            </div>
+
             <h1 class="display auth-side-title">
                 Bienvenido<br><em>a la lista</em>.
             </h1>
@@ -68,7 +65,6 @@
 
         {{-- Stickers decorativos --}}
         <div class="deco-sticker deco-1">NEW · MEMBER</div>
-        <div class="deco-sticker deco-2">★ EDICIÓN 428</div>
         <div class="deco-numbers" aria-hidden="true">{{ now()->format('d') }}<br>{{ now()->format('m') }}</div>
 
         <div class="auth-form-wrap auth-form-wide">
