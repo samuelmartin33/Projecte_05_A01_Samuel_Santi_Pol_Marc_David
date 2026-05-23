@@ -4,316 +4,296 @@
 
 @push('estilos')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/eventos-detalle.css') }}">
 @endpush
 
-@section('contenido')
+@section('content')
+
+{{-- ── Mismo nav que el home ── --}}
+@include('partials.home.nav')
 
 {{-- ════════════════════════════════════════════════════
-     HERO EDITORIAL — imagen de fondo + overlay ink
+     HERO — imagen de fondo + overlay
 ════════════════════════════════════════════════════ --}}
-<div class="relative overflow-hidden bg-ink" style="min-height:420px;">
+<div style="position:relative;overflow:hidden;min-height:420px;background:#07060c;">
 
-    {{-- Imagen de fondo con overlay --}}
-    <div style="position:absolute;inset:0;background-image:url('{{ $evento->url_portada }}');background-size:cover;background-position:center;opacity:0.25;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(27,20,48,0.6) 0%,rgba(27,20,48,0.95) 100%);"></div>
+    {{-- Imagen de fondo --}}
+    <div style="position:absolute;inset:0;background-image:url('{{ $evento->url_portada }}');background-size:cover;background-position:center;opacity:0.22;"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,6,12,0.5) 0%,rgba(7,6,12,0.96) 100%);"></div>
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(168,85,247,0.08) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
 
-    {{-- Dot grid --}}
-    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(139,120,204,0.1) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;"></div>
-
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 py-14 relative" style="z-index:1">
+    <div style="max-width:1480px;margin:0 auto;padding:3.5rem 2rem 3rem;position:relative;z-index:1;">
 
         {{-- Volver --}}
         <a href="{{ route('home') }}"
-           class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-paper/50 hover:text-paper transition-colors duration-100 mb-8">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+           class="mono"
+           style="display:inline-flex;align-items:center;gap:8px;font-size:10px;color:rgba(245,241,234,0.4);text-decoration:none;margin-bottom:2rem;transition:color 0.15s;"
+           onmouseover="this.style.color='rgba(245,241,234,0.8)'"
+           onmouseout="this.style.color='rgba(245,241,234,0.4)'">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
             </svg>
             Volver
         </a>
 
         {{-- Categoría --}}
         @if($evento->categoria)
-            <span class="inline-block font-mono text-xs uppercase tracking-widest text-lilac border border-lilac/40 px-3 py-1 mb-4">
+            <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;display:flex;align-items:center;gap:10px;">
+                <span style="width:28px;height:1px;background:var(--magenta);display:inline-block;"></span>
                 {{ $evento->categoria->nombre }}
-            </span>
+            </div>
         @endif
 
         {{-- Título --}}
-        <h1 class="font-display font-black uppercase text-paper tracking-tightest leading-[0.88] max-w-4xl"
-            style="font-size:clamp(2rem,6vw,5rem)">
+        <h1 class="display" style="font-size:clamp(2.5rem,7vw,5.5rem);color:var(--ink);margin:0 0 1.5rem;max-width:900px;">
             {{ $evento->titulo }}
         </h1>
 
         {{-- Metadatos --}}
-        <div class="flex flex-wrap items-center gap-6 mt-6">
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-paper/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:1.5rem;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:rgba(245,241,234,0.35);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                <span class="font-mono text-xs uppercase tracking-widest text-paper/60">
+                <span class="mono" style="font-size:10px;color:rgba(245,241,234,0.6);">
                     {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                     · {{ \Carbon\Carbon::parse($evento->fecha_inicio)->format('H:i') }}h
                 </span>
             </div>
             @if($evento->ubicacion_nombre)
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-paper/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:rgba(245,241,234,0.35);">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     </svg>
-                    <span class="font-mono text-xs uppercase tracking-widest text-paper/60">{{ $evento->ubicacion_nombre }}</span>
+                    <span class="mono" style="font-size:10px;color:rgba(245,241,234,0.6);">{{ $evento->ubicacion_nombre }}</span>
                 </div>
             @endif
-            <div class="flex items-center gap-2">
-                <span class="font-mono text-xs uppercase tracking-widest text-lilac font-bold">
-                    {{ $evento->precio_formateado }}
-                </span>
-            </div>
+            <span class="display" style="font-size:1.5rem;color:var(--magenta);">{{ $evento->precio_formateado }}</span>
         </div>
 
     </div>
 </div>
 
 {{-- ════════════════════════════════════════════════════
-     CUERPO DEL DETALLE — 2 columnas
+     CUERPO — 2 columnas
 ════════════════════════════════════════════════════ --}}
-<div class="eventos-detalle-wrap">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div style="background:radial-gradient(circle,rgba(124,58,237,0.08) 1.5px,transparent 1.5px),linear-gradient(160deg,#0d0820 0%,#130228 45%,#0d0820 100%);background-size:28px 28px,100% 100%;padding:4rem 0;">
+<div style="max-width:1480px;margin:0 auto;padding:0 2rem;">
+    <div style="display:grid;grid-template-columns:1fr 400px;gap:2.5rem;align-items:start;">
 
         {{-- ─── COLUMNA IZQUIERDA ─── --}}
-        <div class="lg:col-span-2 space-y-10">
+        <div style="display:flex;flex-direction:column;gap:2rem;">
 
-            <section class="seccion-detalle">
-                <h2 class="seccion-titulo">Sobre el evento</h2>
-                <p class="text-navy/80 leading-relaxed text-base">
+            {{-- Sobre el evento --}}
+            <div class="vibe-card" style="padding:2rem;">
+                <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--line);">
+                    <span style="width:20px;height:1px;background:var(--magenta);display:inline-block;margin-right:8px;vertical-align:middle;"></span>
+                    Sobre el evento
+                </div>
+                <p style="font-family:'Archivo',sans-serif;font-size:15px;color:var(--ink-dim);line-height:1.7;">
                     {{ $evento->descripcion ?? 'No hay descripción disponible.' }}
                 </p>
-            </section>
+            </div>
 
-            <section class="seccion-detalle">
-                <h2 class="seccion-titulo">Información adicional</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {{-- Información adicional --}}
+            @if($evento->aforo_maximo || $evento->edad_minima || $evento->fecha_fin)
+            <div class="vibe-card" style="padding:2rem;">
+                <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--line);">
+                    <span style="width:20px;height:1px;background:var(--magenta);display:inline-block;margin-right:8px;vertical-align:middle;"></span>
+                    Información adicional
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;">
                     @if($evento->aforo_maximo)
-                        <div class="ficha-dato">
-                            <span class="ficha-dato-label">Aforo máximo</span>
-                            <span class="ficha-dato-valor">{{ number_format($evento->aforo_maximo) }} personas</span>
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);padding:1rem;border-radius:8px;">
+                            <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.35);margin-bottom:4px;">Aforo máximo</div>
+                            <div class="display" style="font-size:1.2rem;color:var(--ink);">{{ number_format($evento->aforo_maximo) }}</div>
                         </div>
-                    @endif
-                    @if($evento->aforo_maximo)
                         @php $disponibles = $evento->aforo_maximo - $evento->aforo_actual; @endphp
-                        <div class="ficha-dato">
-                            <span class="ficha-dato-label">Disponibles</span>
-                            <span class="ficha-dato-valor {{ $disponibles < 50 ? 'text-red-600' : 'text-green-600' }}">
-                                {{ number_format($disponibles) }}
-                            </span>
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);padding:1rem;border-radius:8px;">
+                            <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.35);margin-bottom:4px;">Disponibles</div>
+                            <div class="display" style="font-size:1.2rem;color:{{ $disponibles < 50 ? '#ef4444' : '#22c55e' }};">{{ number_format($disponibles) }}</div>
                         </div>
                     @endif
                     @if($evento->edad_minima)
-                        <div class="ficha-dato">
-                            <span class="ficha-dato-label">Edad mínima</span>
-                            <span class="ficha-dato-valor">+{{ $evento->edad_minima }}</span>
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);padding:1rem;border-radius:8px;">
+                            <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.35);margin-bottom:4px;">Edad mínima</div>
+                            <div class="display" style="font-size:1.2rem;color:var(--ink);">+{{ $evento->edad_minima }}</div>
                         </div>
                     @endif
                     @if($evento->fecha_fin)
-                        <div class="ficha-dato">
-                            <span class="ficha-dato-label">Finaliza</span>
-                            <span class="ficha-dato-valor">{{ \Carbon\Carbon::parse($evento->fecha_fin)->format('H:i') }}h</span>
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);padding:1rem;border-radius:8px;">
+                            <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.35);margin-bottom:4px;">Finaliza</div>
+                            <div class="display" style="font-size:1.2rem;color:var(--ink);">{{ \Carbon\Carbon::parse($evento->fecha_fin)->format('H:i') }}h</div>
                         </div>
                     @endif
                 </div>
-            </section>
+            </div>
+            @endif
 
+            {{-- Organizador --}}
             @if($evento->organizador?->empresa)
-                <section class="seccion-detalle">
-                    <h2 class="seccion-titulo">Organiza</h2>
-                    <div class="card-organizador-detalle">
-                        <div class="logo-empresa">
+                <div class="vibe-card" style="padding:2rem;">
+                    <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--line);">
+                        <span style="width:20px;height:1px;background:var(--magenta);display:inline-block;margin-right:8px;vertical-align:middle;"></span>
+                        Organiza
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <div style="width:52px;height:52px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#4e3a96,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                             @if($evento->organizador->empresa->logo_url)
-                                <img src="{{ $evento->organizador->empresa->logo_url }}" alt="{{ $evento->organizador->empresa->nombre_empresa }}" class="w-full h-full object-cover">
+                                <img src="{{ $evento->organizador->empresa->logo_url }}" alt="{{ $evento->organizador->empresa->nombre_empresa }}" style="width:100%;height:100%;object-fit:cover;">
                             @else
-                                <span class="text-white font-black text-xl">{{ strtoupper(substr($evento->organizador->empresa->nombre_empresa, 0, 1)) }}</span>
+                                <span style="color:#fff;font-family:'Anton',sans-serif;font-size:22px;">{{ strtoupper(substr($evento->organizador->empresa->nombre_empresa, 0, 1)) }}</span>
                             @endif
                         </div>
                         <div>
-                            <p class="font-bold text-navy text-lg">{{ $evento->organizador->empresa->nombre_empresa }}</p>
+                            <p style="font-family:'Anton',sans-serif;font-size:1.1rem;color:var(--ink);text-transform:uppercase;margin:0 0 4px;">{{ $evento->organizador->empresa->nombre_empresa }}</p>
                             @if($evento->organizador->empresa->descripcion)
-                                <p class="text-navy/60 text-sm mt-1 line-clamp-2">{{ $evento->organizador->empresa->descripcion }}</p>
+                                <p style="font-family:'Archivo',sans-serif;font-size:13px;color:var(--ink-dim);margin:0 0 8px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $evento->organizador->empresa->descripcion }}</p>
                             @endif
                             @if($evento->organizador->empresa->sitio_web)
-                                <a href="{{ $evento->organizador->empresa->sitio_web }}" target="_blank" class="texto-enlace text-sm mt-2 inline-block">Visitar web →</a>
+                                <a href="{{ $evento->organizador->empresa->sitio_web }}" target="_blank"
+                                   class="mono" style="font-size:10px;color:var(--magenta);text-decoration:none;">
+                                    Visitar web →
+                                </a>
                             @endif
                         </div>
                     </div>
-                </section>
+                </div>
             @endif
 
+            {{-- Galería --}}
             @if($evento->imagenes->where('es_portada', 0)->count() > 0)
-                <section class="seccion-detalle">
-                    <h2 class="seccion-titulo">Galería</h2>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="vibe-card" style="padding:2rem;">
+                    <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--line);">
+                        <span style="width:20px;height:1px;background:var(--magenta);display:inline-block;margin-right:8px;vertical-align:middle;"></span>
+                        Galería
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">
                         @foreach($evento->imagenes->where('es_portada', 0) as $imagen)
-                            <div class="overflow-hidden aspect-video border border-ink/10">
+                            <div style="overflow:hidden;aspect-ratio:16/9;border:1px solid var(--line);border-radius:6px;">
                                 <img src="{{ $imagen->imagen_url }}"
                                      alt="{{ $imagen->descripcion ?? $evento->titulo }}"
-                                     class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                     style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s;"
+                                     onmouseover="this.style.transform='scale(1.05)'"
+                                     onmouseout="this.style.transform='scale(1)'"
                                      onerror="this.parentElement.remove()">
                             </div>
                         @endforeach
                     </div>
-                </section>
+                </div>
             @endif
 
         </div>
 
-        {{-- ─── COLUMNA DERECHA ─── --}}
-        <div class="lg:col-span-1">
-            <div class="lg:sticky lg:top-24 space-y-6">
+        {{-- ─── COLUMNA DERECHA (sticky) ─── --}}
+        <div style="position:sticky;top:90px;display:flex;flex-direction:column;gap:1.5rem;">
 
-                <div class="ficha-compra">
-                    <div class="text-center mb-6">
-                        <p class="text-navy/50 text-sm uppercase tracking-widest font-semibold mb-1">Precio</p>
-                        <p class="text-4xl font-black text-gradient">{{ $evento->precio_formateado }}</p>
-                        @if(!$evento->es_gratuito)
-                            <p class="text-navy/40 text-xs mt-1">por persona · IVA incluido</p>
-                        @endif
-                    </div>
+            {{-- Panel de compra --}}
+            <div class="vibe-card" style="padding:2rem;">
 
-                    @if($evento->aforo_maximo)
-                        @php $porcentajeOcupacion = ($evento->aforo_actual / $evento->aforo_maximo) * 100; @endphp
-                        <div class="mb-6">
-                            <div class="flex justify-between text-xs text-navy/50 mb-1">
-                                <span>{{ number_format($evento->aforo_maximo - $evento->aforo_actual) }} entradas disponibles</span>
-                                <span>{{ round($porcentajeOcupacion) }}% ocupado</span>
-                            </div>
-                            <div class="barra-aforo-fondo">
-                                <div class="barra-aforo-relleno {{ $porcentajeOcupacion > 80 ? 'barra-aforo-critico' : '' }}"
-                                     style="width:{{ min($porcentajeOcupacion, 100) }}%"></div>
-                            </div>
-                        </div>
+                {{-- Precio --}}
+                <div style="text-align:center;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line);">
+                    <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.4);margin-bottom:8px;">Precio por persona</div>
+                    <div class="display" style="font-size:3rem;color:var(--magenta);">{{ $evento->precio_formateado }}</div>
+                    @if(!$evento->es_gratuito)
+                        <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.3);margin-top:4px;">IVA incluido</div>
                     @endif
-
-                    @if(!Auth::check() || !Auth::user()->isAdmin())
-                    <button class="btn-comprar w-full" onclick="abrirCompra()">
-                        {{ $evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada' }}
-                    </button>
-                    @endif
-
-                    @auth
-                        <button type="button"
-                                id="btn-favorito-detalle"
-                                class="btn-favorito-detalle {{ $esFavorito ? 'activo' : '' }}"
-                                data-evento-id="{{ $evento->id }}"
-                                data-favorito="{{ $esFavorito ? '1' : '0' }}"
-                                aria-pressed="{{ $esFavorito ? 'true' : 'false' }}"
-                                onclick="toggleFavoritoDetalle(event.currentTarget)">
-                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-                            <span id="btn-favorito-detalle-texto">{{ $esFavorito ? 'En favoritos' : 'Guardar en favoritos' }}</span>
-                        </button>
-                    @endauth
-
-                    @if($evento->url_externa)
-                        <a href="{{ $evento->url_externa }}" target="_blank" class="btn-secundario w-full mt-3 block text-center">Ver en web oficial</a>
-                    @endif
-
-                    <p class="text-center text-navy/40 text-xs mt-4"> Compra segura · Entrada con código QR</p>
                 </div>
 
-                @if($evento->latitud && $evento->longitud)
-                    <div class="ficha-mapa">
-                        <h3 class="font-bold text-navy mb-3 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-morado-vibez" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            </svg>
-                            Ubicación
-                        </h3>
-                        @if($evento->ubicacion_direccion)
-                            <p class="text-navy/60 text-sm mb-3">{{ $evento->ubicacion_direccion }}</p>
-                        @endif
-                        <div id="mapa-evento"></div>
-                        <a href="https://www.google.com/maps?q={{ $evento->latitud }},{{ $evento->longitud }}"
-                           target="_blank" class="texto-enlace text-sm mt-3 inline-block">
-                            Abrir en Google Maps →
-                        </a>
-                    </div>
-                @else
-                    <div class="ficha-mapa text-center py-6">
-                        <p class="text-navy/40 text-sm"> Ubicación no disponible</p>
+                {{-- Barra de aforo --}}
+                @if($evento->aforo_maximo)
+                    @php $porcentajeOcupacion = ($evento->aforo_actual / $evento->aforo_maximo) * 100; @endphp
+                    <div style="margin-bottom:1.5rem;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span class="mono" style="font-size:9px;color:rgba(245,241,234,0.45);">{{ number_format($evento->aforo_maximo - $evento->aforo_actual) }} entradas disponibles</span>
+                            <span class="mono" style="font-size:9px;color:rgba(245,241,234,0.45);">{{ round($porcentajeOcupacion) }}% ocupado</span>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.1);border-radius:999px;height:4px;overflow:hidden;">
+                            <div style="height:100%;border-radius:999px;width:{{ min($porcentajeOcupacion, 100) }}%;background:{{ $porcentajeOcupacion > 80 ? 'linear-gradient(90deg,#ef4444,#f97316)' : 'linear-gradient(90deg,#7c3aed,#a855f7)' }};"></div>
+                        </div>
                     </div>
                 @endif
 
+                {{-- Botón comprar --}}
+                @if(!Auth::check())
+                    <a href="{{ route('eventos.comprar', $evento->id) }}"
+                       class="btn-primary"
+                       style="display:block;width:100%;padding:14px;text-align:center;border-radius:999px;font-size:14px;text-decoration:none;margin-bottom:10px;">
+                        {{ $evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada →' }}
+                    </a>
+                @elseif(!Auth::user()->isAdmin())
+                    <a href="{{ route('eventos.comprar', $evento->id) }}"
+                       class="btn-primary"
+                       style="display:block;width:100%;padding:14px;text-align:center;border-radius:999px;font-size:14px;text-decoration:none;margin-bottom:10px;">
+                        {{ $evento->es_gratuito ? 'Reservar entrada gratuita' : 'Comprar entrada →' }}
+                    </a>
+                @endif
+
+                {{-- Favorito --}}
+                @auth
+                    <button type="button"
+                            id="btn-favorito-detalle"
+                            class="{{ $esFavorito ? 'activo' : '' }}"
+                            data-evento-id="{{ $evento->id }}"
+                            data-favorito="{{ $esFavorito ? '1' : '0' }}"
+                            aria-pressed="{{ $esFavorito ? 'true' : 'false' }}"
+                            onclick="toggleFavoritoDetalle(event.currentTarget)"
+                            style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:999px;border:1px solid rgba(245,241,234,0.15);background:rgba(255,255,255,0.04);color:rgba(192,132,252,0.9);font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;margin-bottom:10px;"
+                            onmouseover="if(!this.classList.contains('activo')){this.style.borderColor='rgba(168,85,247,0.5)';}"
+                            onmouseout="if(!this.classList.contains('activo')){this.style.borderColor='rgba(245,241,234,0.15)';}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span id="btn-favorito-detalle-texto">{{ $esFavorito ? 'En favoritos' : 'Guardar en favoritos' }}</span>
+                    </button>
+                @endauth
+
+                @if($evento->url_externa)
+                    <a href="{{ $evento->url_externa }}" target="_blank"
+                       style="display:block;width:100%;padding:11px;text-align:center;border-radius:999px;border:1px solid rgba(245,241,234,0.12);background:transparent;color:rgba(245,241,234,0.5);font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;text-decoration:none;transition:all 0.2s;"
+                       onmouseover="this.style.borderColor='rgba(245,241,234,0.3)';this.style.color='rgba(245,241,234,0.8)'"
+                       onmouseout="this.style.borderColor='rgba(245,241,234,0.12)';this.style.color='rgba(245,241,234,0.5)'">
+                        Ver en web oficial
+                    </a>
+                @endif
+
+                <p class="mono" style="text-align:center;font-size:9px;color:rgba(245,241,234,0.2);margin-top:1rem;">Compra segura · Entrada con código QR</p>
             </div>
+
+            {{-- Mapa --}}
+            @if($evento->latitud && $evento->longitud)
+                <div class="vibe-card" style="padding:1.5rem;">
+                    <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        </svg>
+                        Ubicación
+                    </div>
+                    @if($evento->ubicacion_direccion)
+                        <p style="font-family:'Archivo',sans-serif;font-size:12px;color:var(--ink-dim);margin-bottom:0.75rem;">{{ $evento->ubicacion_direccion }}</p>
+                    @endif
+                    <div id="mapa-evento" style="height:220px;border-radius:8px;z-index:1;"></div>
+                    <a href="https://www.google.com/maps?q={{ $evento->latitud }},{{ $evento->longitud }}"
+                       target="_blank"
+                       class="mono" style="font-size:9px;color:var(--magenta);text-decoration:none;display:inline-block;margin-top:10px;">
+                        Abrir en Google Maps →
+                    </a>
+                </div>
+            @else
+                <div class="vibe-card" style="padding:1.5rem;text-align:center;">
+                    <p class="mono" style="font-size:10px;color:rgba(245,241,234,0.3);">Ubicación no disponible</p>
+                </div>
+            @endif
+
         </div>
 
     </div>
 </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════
-     MODAL DE COMPRA (estructura funcional intacta)
-════════════════════════════════════════════════════ --}}
-@auth
-@if(!Auth::user()->isAdmin())
-<div id="modal-compra"
-     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,6,12,0.80);backdrop-filter:blur(4px);"
-     onclick="if(event.target===this)cerrarModalCompra()">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                background:#0d0a18;padding:2rem;width:calc(100% - 2rem);max-width:440px;
-                box-shadow:0 25px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(124,58,237,0.2);
-                border:1px solid rgba(245,241,234,0.10);">
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-            <h2 style="font-family:'DM Sans',sans-serif;font-weight:900;font-size:1.25rem;color:#f5f1ea;margin:0;text-transform:uppercase;letter-spacing:-0.02em;">
-                Comprar entradas
-            </h2>
-            <button onclick="cerrarModalCompra()"
-                    style="background:none;border:none;cursor:pointer;font-size:1.75rem;color:rgba(245,241,234,0.4);line-height:1">×</button>
-        </div>
-
-        <div style="background:rgba(124,58,237,0.15);padding:1rem;margin-bottom:1.5rem;border-left:3px solid #a855f7;">
-            <p style="font-family:'DM Sans',sans-serif;font-weight:700;color:#f5f1ea;margin:0;font-size:0.95rem">{{ $evento->titulo }}</p>
-            <p style="font-family:'Syne',sans-serif;color:#c084fc;font-size:0.8rem;margin:4px 0 0;text-transform:uppercase;letter-spacing:0.05em;">
-                {{ \Carbon\Carbon::parse($evento->fecha_inicio)->locale('es')->isoFormat('D [de] MMMM [de] YYYY') }}
-            </p>
-        </div>
-
-        <div style="margin-bottom:1.5rem">
-            <label style="font-family:'Syne',sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);display:block;margin-bottom:10px">
-                Cantidad de entradas
-            </label>
-            <div style="display:flex;align-items:center;gap:16px">
-                <button type="button" onclick="cambiarCantidad(-1)"
-                        style="width:40px;height:40px;border:2px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.15);color:#c084fc;font-size:1.25rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">−</button>
-                <span id="modal-cantidad" style="font-family:'DM Sans',sans-serif;font-size:1.5rem;font-weight:900;color:#f5f1ea;min-width:40px;text-align:center">1</span>
-                <button type="button" onclick="cambiarCantidad(1)"
-                        style="width:40px;height:40px;border:2px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.15);color:#c084fc;font-size:1.25rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
-            </div>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.08);padding-top:1rem;margin-bottom:1.5rem">
-            <span style="font-family:'Syne',sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.4);">Total</span>
-            <span id="modal-total" class="text-gradient" style="font-family:'DM Sans',sans-serif;font-size:1.75rem;font-weight:900">
-                @if($evento->es_gratuito) Gratis
-                @else {{ number_format($evento->precio_base, 2) }} €
-                @endif
-            </span>
-        </div>
-
-        <div id="modal-error" style="display:none;background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.35);color:#f87171;padding:10px 14px;font-family:'Syne',sans-serif;font-size:0.875rem;margin-bottom:1rem"></div>
-
-        <button id="modal-btn-comprar" onclick="confirmarCompra()" class="btn-comprar w-full">
-            {{ $evento->es_gratuito ? 'Reservar gratis' : 'Confirmar compra' }}
-        </button>
-
-        <p style="text-align:center;font-family:'Syne',sans-serif;font-size:0.7rem;color:rgba(245,241,234,0.3);margin-top:12px;margin-bottom:0;text-transform:uppercase;letter-spacing:0.05em;">
-             Transacción segura · Recibirás tu QR al instante
-        </p>
-    </div>
-</div>
-@endif
-@endauth
+{{-- ── Mismo footer que el home ── --}}
+@include('partials.home.footer')
 
 @endsection
 
@@ -322,15 +302,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 window.eventoData = {
-    id:              {{ $evento->id }},
-    precioBase:      {{ $evento->precio_base ?? 0 }},
-    esGratuito:      {{ $evento->es_gratuito ? 'true' : 'false' }},
-    aforoLibre:      {{ $evento->aforo_maximo ? $evento->aforo_maximo - $evento->aforo_actual : 9999 }},
     latitud:         {{ $evento->latitud ?? 'null' }},
     longitud:        {{ $evento->longitud ?? 'null' }},
     nombreUbicacion: '{{ addslashes($evento->ubicacion_nombre ?? 'Ubicación del evento') }}',
-    loginUrl:        '{{ route('login') }}',
-    guestRedirect:   {{ Auth::check() ? 'false' : 'true' }}
 };
 </script>
 <script src="{{ asset('js/eventos-detalle.js') }}"></script>

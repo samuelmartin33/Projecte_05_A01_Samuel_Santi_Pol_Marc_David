@@ -43,6 +43,8 @@ use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\Empresa\EquipoController;
 use App\Http\Controllers\Empresa\PerfilFiscalController;
+use App\Http\Controllers\Empresa\StripeOnboardingController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +101,12 @@ Route::get('/', function () {
 Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
     ->where('id', '[0-9]+')
     ->name('eventos.detalle');
+
+// --- Página de compra de entradas (requiere login) ---
+Route::get('/eventos/{id}/comprar', [PublicEventoController::class, 'compra'])
+    ->where('id', '[0-9]+')
+    ->middleware('auth')
+    ->name('eventos.comprar');
 
 // --- Detalle de una oferta de trabajo ---
 Route::get('/trabajos/{id}', [PublicEventoController::class, 'detalleOferta'])
@@ -209,6 +217,16 @@ Route::middleware(['auth','no-portero'])->prefix('empresa')->name('empresa.')->g
     Route::get('/perfil-fiscal',  [PerfilFiscalController::class, 'show'])  ->name('perfil-fiscal');
     Route::post('/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('perfil-fiscal.guardar');
 });
+
+/* — Stripe Connect: onboarding de cuentas Express para empresas — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/stripe')->name('empresa.stripe.')->group(function () {
+    Route::get('/conectar',  [StripeOnboardingController::class, 'iniciar'])  ->name('conectar');
+    Route::get('/retorno',   [StripeOnboardingController::class, 'retorno'])  ->name('retorno');
+    Route::get('/refrescar', [StripeOnboardingController::class, 'refrescar'])->name('refrescar');
+});
+
+/* — Stripe Webhook: recibe eventos de Stripe (sin CSRF, sin auth) — */
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 
 /* — Equipo de empresa: gestión de usuarios y roles — */
 Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empresa.equipo.')->group(function () {

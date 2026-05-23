@@ -9,6 +9,7 @@ use App\Models\EventoImagen;
 use App\Models\Organizador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 /**
@@ -86,7 +87,7 @@ class EventosController extends Controller
      * Muestra el formulario de creación de evento.
      * GET /empresa/eventos/crear
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
         // Bloquear si el perfil fiscal no está completo
         $empresa = Auth::user()->empresa;

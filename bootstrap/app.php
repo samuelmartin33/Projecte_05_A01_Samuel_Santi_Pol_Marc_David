@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\RedirectIfPortero::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'stripe/webhook',
+        ]);
         $middleware->alias([
             'admin'      => \App\Http\Middleware\IsAdmin::class,
             'verificado' => \App\Http\Middleware\EstaVerificado::class,

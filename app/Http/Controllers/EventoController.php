@@ -290,7 +290,43 @@ class EventoController extends Controller
                 ->exists();
         }
 
-        return view('eventos.detalle', compact('evento', 'esFavorito'));
+        $empresa     = $evento->organizador?->empresa;
+        $stripeActivo = !$evento->es_gratuito
+            && $empresa
+            && $empresa->stripe_account_id
+            && $empresa->stripe_charges_enabled;
+
+        return view('eventos.detalle', compact('evento', 'esFavorito', 'stripeActivo'));
+    }
+
+    /**
+     * Página de compra de entradas para un evento.
+     * GET /eventos/{id}/comprar
+     */
+    public function compra(int $id)
+    {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        if ($usuario->isAdmin()) {
+            abort(403, 'Los administradores no pueden comprar entradas.');
+        }
+
+        $evento = Evento::with(['categoria', 'imagenes', 'organizador.empresa'])
+            ->where('estado', 1)
+            ->findOrFail($id);
+
+        $empresa      = $evento->organizador?->empresa;
+        $stripeActivo = !$evento->es_gratuito
+            && $empresa
+            && $empresa->stripe_account_id
+            && $empresa->stripe_charges_enabled;
+
+        $aforoLibre = $evento->aforo_maximo !== null
+            ? max(0, $evento->aforo_maximo - $evento->aforo_actual)
+            : 9999;
+
+        return view('eventos.comprar', compact('evento', 'stripeActivo', 'aforoLibre'));
     }
 
     /**

@@ -110,114 +110,16 @@ function vibezScrollCarousel(id, dir) {
     if (el) el.scrollBy({ left: dir * 420, behavior: 'smooth' });
 }
 
-/* ── Modal detalle ───────────────────────────────────────────── */
+/* ── Navegación al detalle del evento ────────────────────────── */
 function vibezOpenModal(eventoId) {
-    var eventos = window.EVENTOS_DATA || [];
-    var e = eventos.find(function (ev) { return ev.id == eventoId; });
-    if (!e) return;
-
-    var set = function (id, val) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = val || '';
-    };
-    var setHtml = function (id, val) {
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = val || '';
-    };
-    var setSrc = function (id, src) {
-        var el = document.getElementById(id);
-        if (el) el.src = src;
-    };
-
-    setSrc('modal-img',     e.img);
-    set('modal-titulo',     e.titulo);
-    set('modal-artista',    e.artista || '—');
-    set('modal-tagline',    e.tagline ? '"' + e.tagline + '"' : '');
-    set('modal-fecha',      e.fechaFmt);
-    set('modal-hora',       e.hora);
-    set('modal-lugar',      e.lugar);
-    set('modal-ciudad',     e.ciudad || '');
-    set('modal-precio',     e.precio);
-    set('modal-sticker',    e.categoria);
-
-    /* Badge "En curso" si el evento está pasando ahora */
-    var badge = document.getElementById('modal-en-curso');
-    if (badge) badge.style.display = e.estaOcurriendo ? 'inline-flex' : 'none';
-
-    /* Cupos disponibles */
-    var cuposEl = document.getElementById('modal-cupos');
-    if (cuposEl) {
-        if (e.soldOut) { cuposEl.textContent = 'Sin entradas'; cuposEl.style.color = 'var(--magenta)'; }
-        else if (e.cupos !== null && e.cupos < 50) { cuposEl.textContent = 'Quedan ' + e.cupos; cuposEl.style.color = 'var(--magenta)'; }
-        else { cuposEl.textContent = 'Disponible'; cuposEl.style.color = ''; }
-    }
-
-    /* Botón comprar */
-    var btn = document.getElementById('modal-comprar');
-    if (btn) {
-        if (e.soldOut) {
-            btn.textContent = 'Sold out — lista de espera';
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-        } else {
-            btn.textContent = 'Comprar entrada →';
-            btn.disabled = false;
-            btn.style.opacity = '';
-        }
-        btn.dataset.eventoId = eventoId;
-    }
-
-    /* Contador de cantidad */
-    var qty = document.getElementById('modal-cantidad');
-    if (qty) qty.value = 1;
-
-    /* Resetear campo de cupón al abrir nuevo modal */
-    var cuponInput = document.getElementById('modal-cupon-codigo');
-    if (cuponInput) { cuponInput.value = ''; cuponInput.style.borderColor = ''; }
-    if (typeof vibezResetCupon === 'function') vibezResetCupon();
-
-    var modal = document.getElementById('vibez-detail-modal');
-    if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    window.location.href = '/eventos/' + eventoId;
 }
 
-function vibezCloseModal() {
-    var modal = document.getElementById('vibez-detail-modal');
-    if (modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
-}
+function vibezCloseModal() {}
 
 /* ── Compra de entrada ───────────────────────────────────────── */
 function vibezBuy(eventoId) {
-    if (!window.USER_AUTH) {
-        window.location.href = window.LOGIN_URL || '/login';
-        return;
-    }
-    var qtyEl    = document.getElementById('modal-cantidad');
-    var cantidad = qtyEl ? parseInt(qtyEl.value) || 1 : 1;
-    var cuponEl  = document.getElementById('modal-cupon-codigo');
-    var codigoCupon = cuponEl ? cuponEl.value.trim() : '';
-    var btn      = document.getElementById('modal-comprar');
-    if (btn) { btn.textContent = 'Procesando…'; btn.disabled = true; }
-
-    var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
-    fetch('/api/entradas/comprar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
-        body: JSON.stringify({ evento_id: eventoId, cantidad: cantidad, cupon_codigo: codigoCupon })
-    })
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-        if (data.success && data.redirect) {
-            vibezCloseModal();
-            window.location.href = data.redirect;
-        } else {
-            vibezToast('Error: ' + (data.message || 'Inténtalo de nuevo'));
-            if (btn) { btn.textContent = 'Comprar entrada →'; btn.disabled = false; }
-        }
-    })
-    .catch(function () {
-        vibezToast('Error de conexión. Inténtalo de nuevo.');
-        if (btn) { btn.textContent = 'Comprar entrada →'; btn.disabled = false; }
-    });
+    window.location.href = '/eventos/' + eventoId + '/comprar';
 }
 
 /* ── Toast ───────────────────────────────────────────────────── */
