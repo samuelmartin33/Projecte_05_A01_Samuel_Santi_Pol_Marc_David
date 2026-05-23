@@ -52,11 +52,12 @@ class Pedido extends Model
     // Lista blanca de campos asignables masivamente con create() o fill().
     // Incluye todos los campos necesarios para registrar una orden de compra.
     protected $fillable = [
-        'usuario_id',      // quién realizó la compra
-        'total',           // suma de precios unitarios sin descuentos
-        'total_descuento', // importe descontado (para cupones futuros, ahora siempre 0)
-        'total_final',     // precio real pagado = total - total_descuento
-        'estado',          // estado del pedido
+        'usuario_id',
+        'total',
+        'total_descuento',
+        'total_final',
+        'estado',
+        'stripe_payment_intent_id',
         'fecha_creacion',
         'fecha_actualizacion',
     ];

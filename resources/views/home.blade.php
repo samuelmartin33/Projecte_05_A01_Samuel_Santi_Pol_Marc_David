@@ -160,11 +160,6 @@
 ════════════════════════════════════════════════════ --}}
 @include('partials.home.footer')
 
-{{-- ════════════════════════════════════════════════════
-     MODAL DE DETALLE
-════════════════════════════════════════════════════ --}}
-@include('partials.home.detail-modal')
-
 {{-- Toast --}}
 <div id="vibez-toast" class="toast" style="display:none;"></div>
 
