@@ -22,20 +22,26 @@ class EventoController extends Controller
      */
     public function index()
     {
+        /* Excluir eventos cuya fecha de fin (o inicio si no hay fin) ya pasó */
+        $noTerminado = fn ($q) => $q->whereRaw('COALESCE(fecha_fin, fecha_inicio) >= NOW()');
+
         /* Evento destacado: el primero con featured=1, o el más próximo */
         $eventoFeatured = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
             ->where('estado', 1)
             ->where('featured', 1)
+            ->tap($noTerminado)
             ->orderBy('fecha_inicio')
             ->first()
             ?? Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
                 ->where('estado', 1)
+                ->tap($noTerminado)
                 ->orderBy('fecha_inicio')
                 ->first();
 
         /* Resto de eventos (sin el featured) */
         $eventos = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
             ->where('estado', 1)
+            ->tap($noTerminado)
             ->when($eventoFeatured, fn ($q) => $q->where('id', '!=', $eventoFeatured->id))
             ->orderBy('fecha_inicio')
             ->get();
@@ -45,6 +51,7 @@ class EventoController extends Controller
 
         /* Ubicaciones únicas (compatibilidad con código existente) */
         $ubicaciones = Evento::where('estado', 1)
+            ->tap($noTerminado)
             ->whereNotNull('ubicacion_nombre')
             ->orderBy('ubicacion_nombre')
             ->distinct()
@@ -70,6 +77,7 @@ class EventoController extends Controller
             if (count($seguimientosIds) > 0) {
                 $eventosPromotor = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
                     ->where('estado', 1)
+                    ->tap($noTerminado)
                     ->whereHas('organizador', fn ($q) =>
                         $q->whereIn('empresa_id', $seguimientosIds)
                     )
@@ -110,6 +118,7 @@ class EventoController extends Controller
             'titulo'         => $e->titulo,
             'artista'        => $e->organizador?->empresa?->nombre_empresa ?? '',
             'organizador'    => $e->organizador?->empresa?->nombre_empresa ?? '',
+            'empresa_id'     => $e->organizador?->empresa?->id,
             'tagline'        => $e->tagline,
             'fechaFmt'       => $e->fecha_fmt,
             'hora'           => $e->hora,
@@ -132,6 +141,74 @@ class EventoController extends Controller
             'categorias', 'ubicaciones', 'favoritosIds',
             'moods', 'eventosParaJs',
             'seguimientosIds', 'eventosPromotor'
+        ));
+    }
+
+    /**
+     * Página pública de Eventos: lista completa con grid, filtros y mapa.
+     * Accesible tanto para usuarios autenticados como para invitados.
+     */
+    public function eventos()
+    {
+        $noTerminado = fn ($q) => $q->whereRaw('COALESCE(fecha_fin, fecha_inicio) >= NOW()');
+
+        $eventos = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
+            ->where('estado', 1)
+            ->tap($noTerminado)
+            ->orderBy('fecha_inicio')
+            ->get();
+
+        $categorias = CategoriaEvento::where('estado', 1)->orderBy('nombre')->get();
+
+        $ubicaciones = Evento::where('estado', 1)
+            ->tap($noTerminado)
+            ->whereNotNull('ubicacion_nombre')
+            ->orderBy('ubicacion_nombre')
+            ->distinct()
+            ->pluck('ubicacion_nombre');
+
+        $favoritosIds    = [];
+        $seguimientosIds = [];
+        /** @var \App\Models\Usuario|null $usuario */
+        $usuario = Auth::user();
+        if ($usuario) {
+            $favoritosIds = $usuario->favoritos()
+                ->pluck('eventos.id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+            $seguimientosIds = $usuario->seguimientos()
+                ->pluck('empresas.id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        $ahora = now();
+        $eventosParaJs = $eventos->map(fn ($e) => [
+            'id'             => $e->id,
+            'titulo'         => $e->titulo,
+            'artista'        => $e->organizador?->empresa?->nombre_empresa ?? '',
+            'organizador'    => $e->organizador?->empresa?->nombre_empresa ?? '',
+            'empresa_id'     => $e->organizador?->empresa?->id,
+            'tagline'        => $e->tagline,
+            'fechaFmt'       => $e->fecha_fmt,
+            'hora'           => $e->hora,
+            'lugar'          => $e->ubicacion_nombre,
+            'ciudad'         => $e->ubicacion_nombre,
+            'coords'         => $e->coords,
+            'categoria'      => $e->categorias->pluck('nombre')->join(' · ') ?: ($e->categoria?->nombre ?? 'Evento'),
+            'precio'         => $e->precio_formateado,
+            'cupos'          => $e->cupos_disponibles,
+            'img'            => $e->url_portada,
+            'featured'       => (bool) $e->featured,
+            'soldOut'        => $e->sell_out,
+            'estaOcurriendo' => $e->fecha_inicio <= $ahora && ($e->fecha_fin === null || $e->fecha_fin >= $ahora),
+            'haTerminado'    => $e->fecha_fin !== null && $e->fecha_fin < $ahora,
+            'color'          => '#a855f7',
+        ]);
+
+        return view('eventos', compact(
+            'eventos', 'categorias', 'ubicaciones',
+            'favoritosIds', 'seguimientosIds', 'eventosParaJs'
         ));
     }
 
@@ -170,6 +247,8 @@ class EventoController extends Controller
                 ->all();
         }
 
+        $noTerminado = fn ($q) => $q->whereRaw('COALESCE(fecha_fin, fecha_inicio) >= NOW()');
+
         // --- Determinar qué mostrar según filtros activos ---
         if ($soloFavoritos) {
             // Solo eventos marcados como favorito (sin ofertas)
@@ -177,7 +256,8 @@ class EventoController extends Controller
                 $eventos = collect();
             } else {
                 $eventosQuery = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
-                    ->where('estado', 1);
+                    ->where('estado', 1)
+                    ->tap($noTerminado);
 
                 if (count($favoritosIds) > 0) {
                     $eventosQuery->whereIn('id', $favoritosIds);
@@ -213,7 +293,8 @@ class EventoController extends Controller
         } elseif ($categoriaId) {
             // Filtrar eventos por categoría — acepta ID numérico o nombre de categoría
             $eventosQuery = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
-                ->where('estado', 1);
+                ->where('estado', 1)
+                ->tap($noTerminado);
 
             if (is_numeric($categoriaId)) {
                 $eventosQuery->whereHas('categorias', fn ($q) => $q->where('categorias_evento.id', $categoriaId));
@@ -231,7 +312,8 @@ class EventoController extends Controller
         } else {
             // Sin filtro de categoría → mostrar todo
             $eventosQuery = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
-                ->where('estado', 1);
+                ->where('estado', 1)
+                ->tap($noTerminado);
 
             if ($ubicacion) {
                 $eventosQuery->where('ubicacion_nombre', 'like', "%{$ubicacion}%");

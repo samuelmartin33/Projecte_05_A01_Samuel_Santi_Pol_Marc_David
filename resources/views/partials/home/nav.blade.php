@@ -57,6 +57,7 @@
           } else {
             $navLinks = array_filter([
               ['Para ti',     route('home'),                        'home'],
+              ['Eventos',     route('eventos.index'),               'eventos.index'],
               !$esAdmin ? ['Mis tickets', route('entradas.mis-entradas'), 'entradas.mis-entradas'] : null,
               ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
               ['Social',      route('social'),                      'social'],
@@ -66,8 +67,9 @@
       @else
         @php
           $navLinks = [
-            ['Explorar',         route('home'),           'home'],
-            ['Bolsa de trabajo', route('trabajos.index'), 'trabajos.index'],
+            ['Explorar',         route('home'),            'home'],
+            ['Eventos',          route('eventos.index'),   'eventos.index'],
+            ['Bolsa de trabajo', route('trabajos.index'),  'trabajos.index'],
           ];
         @endphp
       @endauth
