@@ -21,7 +21,14 @@ class PasswordResetController extends Controller
 
     public function sendResetLink(Request $request): RedirectResponse
     {
-        $request->validate(['email' => ['required', 'email']]);
+        $request->validate(
+            ['email' => ['required', 'email', 'max:255']],
+            [
+                'email.required' => 'El correo electrónico es obligatorio.',
+                'email.email'    => 'Introduce un correo electrónico válido.',
+                'email.max'      => 'El correo no puede superar los 255 caracteres.',
+            ]
+        );
 
         $usuario = Usuario::where('email', $request->email)->where('estado', 1)->first();
 
@@ -92,7 +99,7 @@ class PasswordResetController extends Controller
             return back()->withErrors(['email' => 'No se encontró ninguna cuenta con ese correo.']);
         }
 
-        $usuario->update(['password' => Hash::make($request->password)]);
+        $usuario->update(['password_hash' => $request->password]);
 
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 

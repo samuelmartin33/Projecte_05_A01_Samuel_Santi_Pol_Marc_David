@@ -190,11 +190,6 @@
     _eventosFiltrar();
   };
 
-  /* El select de ciudad llama vibezGridFiltrar.
-     Redirigimos al sistema unificado (conserva la categoría activa). */
-  vibezGridFiltrar = function() {
-    _eventosFiltrar();
-  };
 </script>
 
 @endsection

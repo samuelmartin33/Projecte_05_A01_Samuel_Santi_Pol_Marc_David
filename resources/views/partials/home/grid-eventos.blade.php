@@ -22,7 +22,7 @@
     {{-- Filtros --}}
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <select id="grid-filtro-ubicacion"
-              onchange="vibezGridFiltrar()"
+              onchange="vibezFiltrarCiudad()"
               style="background:rgba(7,6,12,0.6);border:1px solid var(--line);color:var(--ink);padding:10px 16px;font-family:'Archivo Narrow',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;">
         <option value="">Todas las ciudades</option>
         @foreach($ubicaciones ?? [] as $ub)
@@ -192,6 +192,13 @@ if (typeof toggleSeguirHome === 'undefined') {
   };
 }
 
+/* Filtra por ciudad: usa _eventosFiltrar si está disponible (página Eventos),
+   si no cae al vibezGridFiltrar clásico. */
+function vibezFiltrarCiudad() {
+  if (typeof _eventosFiltrar !== 'undefined') { _eventosFiltrar(); return; }
+  vibezGridFiltrar();
+}
+
 /* Filtrado AJAX del grid */
 function vibezGridFiltrar() {
   var cat      = document.getElementById('grid-filtro-cat')?.value || '';
@@ -199,6 +206,7 @@ function vibezGridFiltrar() {
   var grid     = document.getElementById('vibez-grid-todos');
   var spinner  = document.getElementById('vibez-grid-spinner');
   var countEl  = document.getElementById('vibez-grid-count');
+  var mainCount = document.getElementById('vibez-count-label');
 
   if (spinner) spinner.style.display = 'flex';
 
@@ -210,6 +218,7 @@ function vibezGridFiltrar() {
       if (spinner) spinner.style.display = 'none';
       var eventos = data.eventos || [];
       if (countEl) countEl.textContent = eventos.length;
+      if (mainCount) mainCount.textContent = eventos.length;
       if (!grid) return;
       if (!eventos.length) {
         grid.innerHTML = '<p style="color:var(--ink-dim);font-family:\'Archivo Narrow\',sans-serif;padding:60px 0;text-align:center;grid-column:1/-1;">No hay eventos para estos filtros.</p>';

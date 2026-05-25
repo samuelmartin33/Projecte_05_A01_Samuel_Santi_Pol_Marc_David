@@ -58,11 +58,13 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('password.email') }}" novalidate>
+            <form method="POST" action="{{ route('password.email') }}" novalidate
+                  id="forgot-form"
+                  onsubmit="enviarFormRecupera(event)">
                 @csrf
                 <div class="auth-form">
 
-                    <div class="auth-field" id="field-email">
+                    <div class="auth-field {{ $errors->has('email') ? 'has-error' : '' }}" id="field-email">
                         <label class="auth-label" for="email">Correo electrónico</label>
                         <input
                             type="email"
@@ -72,14 +74,13 @@
                             placeholder="tu@email.com"
                             autocomplete="email"
                             inputmode="email"
-                            required
+                            onblur="validarEmailRecupera()"
                         >
-                        @error('email')
-                            <span class="field-error" role="alert">{{ $message }}</span>
-                        @enderror
+                        <span class="field-error {{ $errors->has('email') ? 'visible' : '' }}"
+                              id="error-email" role="alert">{{ $errors->first('email') }}</span>
                     </div>
 
-                    <button type="submit" class="btn-primary auth-btn-main" onclick="rippleBtn(event, this)">
+                    <button type="submit" id="btn-recupera" class="btn-primary auth-btn-main" onclick="rippleBtn(event, this)">
                         <span class="btn-text">Enviar enlace de recuperación →</span>
                         <span class="btn-spinner" aria-hidden="true"><span class="spinner-ring"></span></span>
                     </button>

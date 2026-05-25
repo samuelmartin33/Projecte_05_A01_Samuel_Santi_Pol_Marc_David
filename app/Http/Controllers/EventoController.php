@@ -328,7 +328,7 @@ class EventoController extends Controller
 
         // --- Formatear eventos para JSON ---
         $ahora = now();
-        $eventosData = $eventos->map(function ($evento) use ($favoritosIds, $ahora) {
+        $eventosData = $eventos->map(function ($evento) use ($favoritosIds, $seguimientosIds, $ahora) {
             return [
                 'id'               => $evento->id,
                 'tipo'             => 'evento',
