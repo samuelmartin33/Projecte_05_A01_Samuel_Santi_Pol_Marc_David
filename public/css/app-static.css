@@ -150,8 +150,10 @@ body {
 
 /* Cabecera con gradiente lila atractivo */
 .nav-vibez {
-    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 55%, #a855f7 100%);
-    box-shadow: 0 4px 24px rgba(124,58,237,0.45), 0 1px 0 rgba(255,255,255,0.08);
+    background: rgba(7, 6, 12, 0.92);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    box-shadow: none;
 }
 
 /* Isotipo circular con degradado morado — muestra "V" */

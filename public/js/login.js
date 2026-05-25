@@ -203,7 +203,20 @@ function iniciarSesion(evento) {
             setTimeout(function () {
                 document.body.style.transition = 'opacity 0.35s ease';
                 document.body.style.opacity    = '0';
-                setTimeout(function () { window.location.href = '/home'; }, 360);
+                setTimeout(function () {
+                    var params      = new URLSearchParams(window.location.search);
+                    var redirectUrl = params.get('redirect');
+                    var destino     = '/home';
+                    if (redirectUrl) {
+                        try {
+                            var parsed = new URL(redirectUrl);
+                            if (parsed.origin === window.location.origin) {
+                                destino = parsed.pathname + parsed.search + parsed.hash;
+                            }
+                        } catch (ex) { /* URL inválida, usar /home */ }
+                    }
+                    window.location.href = destino;
+                }, 360);
             }, 750);
         } else {
             /* Error del servidor */

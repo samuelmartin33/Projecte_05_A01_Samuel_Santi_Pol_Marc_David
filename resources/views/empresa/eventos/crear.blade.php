@@ -3,7 +3,27 @@
 @section('titulo', 'Crear Evento — VIBEZ')
 
 @push('estilos')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
+    /* ── Flatpickr VIBEZ dark theme ── */
+    .flatpickr-calendar{background:#0d0a18!important;border:1px solid rgba(168,85,247,0.3)!important;box-shadow:0 8px 32px rgba(0,0,0,0.6)!important;}
+    .flatpickr-day{color:rgba(245,241,234,0.85)!important;}
+    .flatpickr-day.selected,.flatpickr-day.selected:hover{background:#7c3aed!important;border-color:#7c3aed!important;color:#fff!important;}
+    .flatpickr-day:hover{background:rgba(168,85,247,0.2)!important;}
+    .flatpickr-day.today{border-color:rgba(168,85,247,0.5)!important;}
+    .flatpickr-day.flatpickr-disabled,.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay{color:rgba(245,241,234,0.2)!important;}
+    .flatpickr-months,.flatpickr-month,.flatpickr-weekdays,.flatpickr-weekday{background:transparent!important;color:rgba(245,241,234,0.7)!important;fill:rgba(245,241,234,0.7)!important;}
+    .flatpickr-current-month{color:#f5f1ea!important;}
+    .flatpickr-monthDropdown-months{background:#0d0a18!important;color:#f5f1ea!important;}
+    .numInputWrapper input,.numInputWrapper span{color:#f5f1ea!important;background:#0d0a18!important;}
+    .numInputWrapper span{border-color:rgba(168,85,247,0.3)!important;}
+    .flatpickr-time{background:#0d0a18!important;border-top:1px solid rgba(168,85,247,0.2)!important;}
+    .flatpickr-time input,.flatpickr-time .flatpickr-time-separator{color:#f5f1ea!important;}
+    .flatpickr-time input:hover,.flatpickr-time input:focus{background:rgba(168,85,247,0.1)!important;}
+    .flatpickr-am-pm{color:#f5f1ea!important;}
+    .arrowUp,.arrowDown{border-bottom-color:rgba(168,85,247,0.6)!important;border-top-color:rgba(168,85,247,0.6)!important;}
+    .flatpickr-input{cursor:pointer;}
+
     body { background: #07060c; }
 
     .form-crear-evento {
@@ -56,15 +76,54 @@
     .form-input::placeholder,
     .form-textarea::placeholder { color: rgba(245,241,234,0.25); }
     .form-textarea { resize: vertical; min-height: 80px; }
-    .form-select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 4px center;
-        padding-right: 24px;
+    /* ── Custom select ── */
+    .ev-csel { position: relative; width: 100%; }
+    .ev-csel-trigger {
+        width: 100%;
+        padding: 6px 0;
+        border: none;
+        border-bottom: 1.5px solid rgba(245,241,234,0.18);
+        background: transparent;
+        font-size: 1.0625rem;
+        font-family: 'Archivo', sans-serif;
+        color: #f5f1ea;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+        user-select: none;
+        outline: none;
+    }
+    .ev-csel.open .ev-csel-trigger { border-bottom-color: #a855f7; }
+    .ev-csel-placeholder { color: rgba(245,241,234,0.25); }
+    .ev-csel-arrow { font-size: 11px; color: #c084fc; transition: transform 0.18s; flex-shrink: 0; }
+    .ev-csel.open .ev-csel-arrow { transform: rotate(180deg); }
+    .ev-csel-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0; right: 0;
+        background: #0d0a18;
+        border: 1px solid rgba(168,85,247,0.3);
+        padding: 4px 0;
+        z-index: 300;
+        list-style: none;
+        margin: 0;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+    .ev-csel.open .ev-csel-menu { display: block; }
+    .ev-csel-opt {
+        padding: 10px 12px;
+        font-family: 'Archivo', sans-serif;
+        font-size: 0.9375rem;
+        color: rgba(245,241,234,0.75);
         cursor: pointer;
     }
-    .form-select option { background: #0d0a18; color: #f5f1ea; }
+    .ev-csel-opt:hover { background: rgba(168,85,247,0.15); color: #f5f1ea; }
+    .ev-csel-opt.selected { color: #c084fc; }
     .form-hint {
         font-family: 'Archivo Narrow', sans-serif;
         font-size: 0.5625rem;
@@ -283,13 +342,13 @@
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Fecha de inicio <span class="form-required">*</span></label>
-                <input type="datetime-local" name="fecha_inicio" class="form-input"
-                       value="{{ old('fecha_inicio') }}">
+                <input type="text" name="fecha_inicio" id="fecha_inicio" class="form-input flatpickr-input"
+                       value="{{ old('fecha_inicio') }}" placeholder="dd/mm/aaaa hh:mm" autocomplete="off" readonly>
             </div>
             <div>
                 <label class="form-label">Fecha de fin</label>
-                <input type="datetime-local" name="fecha_fin" class="form-input"
-                       value="{{ old('fecha_fin') }}">
+                <input type="text" name="fecha_fin" id="fecha_fin" class="form-input flatpickr-input"
+                       value="{{ old('fecha_fin') }}" placeholder="dd/mm/aaaa hh:mm" autocomplete="off" readonly>
                 <p class="form-hint">Opcional. Déjalo vacío si es un evento de un solo momento.</p>
             </div>
         </div>
@@ -429,12 +488,40 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script>
+// ── Flatpickr fecha/hora ──────────────────────────────────────────────────────
+var fpConfig = {
+    enableTime:  true,
+    time_24hr:   true,
+    dateFormat:  'Y-m-d H:i',
+    altInput:    true,
+    altFormat:   'd/m/Y H:i',
+    locale:      'es',
+    disableMobile: true,
+};
+
+var fpInicio = flatpickr('#fecha_inicio', Object.assign({}, fpConfig, {
+    onChange: function(dates) {
+        if (dates[0]) fpFin.set('minDate', dates[0]);
+    }
+}));
+var fpFin = flatpickr('#fecha_fin', Object.assign({}, fpConfig, {
+    onChange: function() {}
+}));
+
+// Si hay valor previo (error de validación), aplicar minDate
+if (fpInicio.selectedDates[0]) {
+    fpFin.set('minDate', fpInicio.selectedDates[0]);
+}
+
 function actualizarBordeCat(label) {
     var input = label.querySelector('input');
     label.style.borderColor = input.checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)';
 }
 
+// ── Precio ────────────────────────────────────────────────────────────────────
 function togglePrecio() {
     var checkbox = document.getElementById('es_gratuito');
     var precioWrap = document.getElementById('precio-wrap');
