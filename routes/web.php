@@ -97,6 +97,10 @@ Route::get('/', function () {
     return view('welcome', compact('eventos', 'categorias', 'eventosMapa', 'statRavers', 'statEventos', 'statPromotores', 'statSatisf'));
 })->name('welcome');
 
+// --- Página pública de Eventos: lista completa con grid, filtros y mapa ---
+Route::get('/eventos', [PublicEventoController::class, 'eventos'])
+    ->name('eventos.index');
+
 // --- Detalle de un evento específico ---
 Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
     ->where('id', '[0-9]+')

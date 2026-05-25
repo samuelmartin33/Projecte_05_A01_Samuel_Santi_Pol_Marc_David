@@ -188,9 +188,9 @@ function vibezOpenModal(eventoId) {
     var btnSeguir = document.getElementById('modal-btn-seguir');
     var btnSeguirTxt = document.getElementById('modal-btn-seguir-texto');
     if (btnSeguir) {
-        if (e.empresa_id) {
-            var isSiguiendo = (window.SEGUIMIENTOS_IDS || []).includes(e.empresa_id);
-            btnSeguir.dataset.empresaId = e.empresa_id;
+        if (eventoSeleccionado.empresa_id) {
+            var isSiguiendo = (window.SEGUIMIENTOS_IDS || []).includes(eventoSeleccionado.empresa_id);
+            btnSeguir.dataset.empresaId = eventoSeleccionado.empresa_id;
             btnSeguir.style.display = 'inline-flex';
             if (isSiguiendo) {
                 btnSeguir.style.background = 'rgba(168,85,247,0.2)';
