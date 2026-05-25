@@ -30,7 +30,15 @@
  * @returns {string} El valor del token CSRF
  */
 function getCsrf() {
-    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            return metadatos[indice].getAttribute('content');
+        }
+    }
+
+    return '';
 }
 
 /* ============================================================
@@ -60,11 +68,11 @@ function previsualizarFoto(input) {
     // sin necesidad de subirlos al servidor. Genera una URL en formato base64
     // (Data URL) que podemos usar directamente como src de una imagen.
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function (eventoCarga) {
         // Reemplazamos el contenido del avatar con la imagen en base64.
-        // e.target.result contiene la cadena "data:image/jpeg;base64,/9j/4AA..."
+        // eventoCarga.target.result contiene la cadena "data:image/jpeg;base64,/9j/4AA..."
         const avatar = document.getElementById('avatarPreview');
-        avatar.innerHTML = '<img src="' + e.target.result + '" alt="foto" style="width:100%;height:100%;object-fit:cover;">';
+        avatar.innerHTML = '<img src="' + eventoCarga.target.result + '" alt="foto" style="width:100%;height:100%;object-fit:cover;">';
     };
     reader.readAsDataURL(archivo);
 
@@ -83,7 +91,7 @@ function previsualizarFoto(input) {
 
 // Variable en el scope del módulo que guarda el ID del último temporizador de búsqueda.
 // Al cancelarla con clearTimeout antes de crear una nueva, implementamos el patrón debounce.
-let _buscarTimeout = null;
+let temporizadorBusqueda = null;
 
 /**
  * Busca usuarios con un retraso de 350 ms (debounce) para no llamar al servidor
@@ -97,7 +105,7 @@ let _buscarTimeout = null;
 function buscarAmigos(valor) {
     // Cancelar el temporizador anterior: si el usuario sigue escribiendo,
     // el setTimeout anterior no se habrá ejecutado todavía y lo descartamos
-    clearTimeout(_buscarTimeout);
+    clearTimeout(temporizadorBusqueda);
 
     const contenedor = document.getElementById('resultadosBusqueda');
 
@@ -111,14 +119,14 @@ function buscarAmigos(valor) {
 
     // Creamos un nuevo temporizador: si el usuario no escribe nada más en 350 ms,
     // se ejecutará la función de búsqueda
-    _buscarTimeout = setTimeout(function () {
+    temporizadorBusqueda = setTimeout(function () {
         // encodeURIComponent convierte caracteres especiales para que sean seguros en una URL.
         // Ejemplo: "ñ" → "%C3%B1", "á" → "%C3%A1", "&" → "%26".
         // Sin esto, un nombre como "José & Ana" rompería la URL del servidor.
         fetch('/api/amigos/buscar?q=' + encodeURIComponent(valor), {
             headers: { 'Accept': 'application/json' },
         })
-        .then(function (r) { return r.json(); })
+        .then(function (respuesta) { return respuesta.json(); })
         .then(function (data) {
             contenedor.innerHTML = '';
 
@@ -200,13 +208,13 @@ function seleccionarMood(valor, btn) {
         },
         body: JSON.stringify({ mood: valor }),
     })
-    .then(function(r) { return r.json(); })
+    .then(function(respuesta) { return respuesta.json(); })
     .then(function(data) {
         if (!data.success) return;
 
         // Actualizar estado visual de los botones del grid
-        document.querySelectorAll('.mood-opcion').forEach(function(b) {
-            b.classList.remove('mood-opcion--activo');
+        Array.from(document.getElementsByClassName('mood-opcion')).forEach(function(botonMood) {
+            botonMood.classList.remove('mood-opcion--activo');
         });
         if (valor && btn) {
             btn.classList.add('mood-opcion--activo');
@@ -225,13 +233,13 @@ function seleccionarMood(valor, btn) {
         // Limpiar el área de mood personalizado (input + emoji seleccionado)
         var inputPersonalizado = document.getElementById('mood-personalizado');
         if (inputPersonalizado) inputPersonalizado.value = '';
-        _emojiPersonalizado = '';
+        emojiPersonalizado = '';
         var spanEmoji = document.getElementById('emoji-seleccionado');
         if (spanEmoji) { spanEmoji.textContent = '🙂'; spanEmoji.style.opacity = '0.4'; }
 
         // Actualizar el emoji en el badge del avatar y en el dropdown
         var emoji    = valor ? ([...valor][0] || '') : '';
-        var navBadge = document.querySelector('.nav-mood-badge');
+        var navBadge = document.getElementsByClassName('nav-mood-badge')[0];
         if (navBadge) {
             if (emoji) {
                 navBadge.textContent   = emoji;
@@ -240,7 +248,7 @@ function seleccionarMood(valor, btn) {
                 navBadge.style.display = 'none';
             }
         }
-        var dropdownMood = document.querySelector('.nav-dropdown-mood');
+        var dropdownMood = document.getElementsByClassName('nav-dropdown-mood')[0];
         if (dropdownMood) {
             dropdownMood.textContent   = emoji;
             dropdownMood.style.display = emoji ? '' : 'none';
@@ -265,7 +273,7 @@ function enviarMoodPersonalizado() {
     var input = document.getElementById('mood-personalizado');
     var texto = input ? input.value.trim() : '';
 
-    if (!_emojiPersonalizado) {
+    if (!emojiPersonalizado) {
         var btn   = document.getElementById('btn-emoji-picker');
         var aviso = document.getElementById('mood-emoji-aviso');
         if (btn)   { btn.style.borderColor = '#f87171'; setTimeout(function () { btn.style.borderColor = 'rgba(124,58,237,0.3)'; }, 1500); }
@@ -275,14 +283,14 @@ function enviarMoodPersonalizado() {
 
     if (!texto) return;
 
-    seleccionarMood(_emojiPersonalizado + ' ' + texto, null);
+    seleccionarMood(emojiPersonalizado + ' ' + texto, null);
 }
 
 /* ============================================================
    EMOJI PICKER
    ============================================================ */
 
-var _emojiPersonalizado = ''; // emoji seleccionado para el mood personalizado
+var emojiPersonalizado = ''; // emoji seleccionado para el mood personalizado
 
 function toggleEmojiPicker(event) {
     event.stopPropagation();
@@ -298,7 +306,7 @@ function toggleEmojiPicker(event) {
  * @param {string} emoji
  */
 function insertarEmoji(emoji) {
-    _emojiPersonalizado = emoji;
+    emojiPersonalizado = emoji;
 
     var span = document.getElementById('emoji-seleccionado');
     if (span) {
@@ -312,10 +320,10 @@ function insertarEmoji(emoji) {
 }
 
 // Cerrar el panel al hacer clic fuera de él
-document.addEventListener('click', function () {
+document.onclick = function () {
     var panel = document.getElementById('emoji-picker-panel');
     if (panel) panel.style.display = 'none';
-});
+};
 
 function enviarSolicitud(receptorId, btn) {
     // Deshabilitamos el botón inmediatamente para prevenir el doble envío:
@@ -333,7 +341,7 @@ function enviarSolicitud(receptorId, btn) {
         },
         body: JSON.stringify({ receptor_id: receptorId }),
     })
-    .then(function (r) { return r.json(); })
+    .then(function (respuesta) { return respuesta.json(); })
     .then(function (data) {
         // Actualizamos el texto del botón según la respuesta del servidor:
         // éxito → muestra un tick y queda deshabilitado; error → muestra el mensaje

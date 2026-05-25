@@ -18,10 +18,10 @@ function toggleDropdown(id) {
 
 function cerrarTodosDropdowns() {
     ['categoria', 'ubicacion'].forEach(function(id) {
-        var d = document.getElementById(id + '-dropdown');
-        var w = document.getElementById('wrapper-' + id);
-        if (d) d.style.display = 'none';
-        if (w) w.classList.remove('abierto');
+        var dropdownElemento = document.getElementById(id + '-dropdown');
+        var wrapperElemento = document.getElementById('wrapper-' + id);
+        if (dropdownElemento) dropdownElemento.style.display = 'none';
+        if (wrapperElemento) wrapperElemento.classList.remove('abierto');
     });
     var overlay = document.getElementById('overlay-dropdowns');
     if (overlay) overlay.style.display = 'none';
@@ -37,7 +37,7 @@ function seleccionarFiltro(filtroId, valor, texto, event) {
 
     var dropdown = document.getElementById(filtroId + '-dropdown');
     if (dropdown) {
-        dropdown.querySelectorAll('.custom-select-option').forEach(function(op) {
+        Array.from(dropdown.getElementsByClassName('custom-select-option')).forEach(function(op) {
             op.classList.remove('seleccionado');
         });
         if (event.target && event.target.classList) {
@@ -49,13 +49,23 @@ function seleccionarFiltro(filtroId, valor, texto, event) {
 
     /* Sincronizar mood chips si el filtro cambiado es de categoría */
     if (filtroId === 'categoria') {
-        document.querySelectorAll('.mood-chip').forEach(function(c) {
-            c.classList.remove('activo');
+        Array.from(document.getElementsByClassName('mood-chip')).forEach(function(moodChip) {
+            moodChip.classList.remove('activo');
         });
         /* Activar el chip que coincida con el valor seleccionado */
-        var chipActivo = valor === ''
-            ? document.getElementById('mood-chip-todos')
-            : document.querySelector('.mood-chip[onclick*="' + valor + '"]');
+        var chipActivo = null;
+        if (valor === '') {
+            chipActivo = document.getElementById('mood-chip-todos');
+        } else {
+            var chips = document.getElementsByClassName('mood-chip');
+            for (var indiceChip = 0; indiceChip < chips.length; indiceChip++) {
+                var clickAttr = chips[indiceChip].getAttribute('onclick');
+                if (clickAttr && clickAttr.indexOf(valor) !== -1) {
+                    chipActivo = chips[indiceChip];
+                    break;
+                }
+            }
+        }
         if (chipActivo) chipActivo.classList.add('activo');
     }
 
@@ -110,11 +120,12 @@ function limpiarFiltros() {
     document.getElementById('categoria-display').textContent = 'Todas';
     document.getElementById('ubicacion-display').textContent = 'Todas las ciudades';
 
-    document.querySelectorAll('.custom-select-dropdown .custom-select-option').forEach(function(op) {
+    Array.from(document.getElementsByClassName('custom-select-option')).forEach(function(op) {
         op.classList.remove('seleccionado');
     });
     ['categoria-dropdown', 'ubicacion-dropdown'].forEach(function(id) {
-        var primera = document.querySelector('#' + id + ' .custom-select-option');
+        var primeraDrop = document.getElementById(id);
+        var primera = primeraDrop ? primeraDrop.getElementsByClassName('custom-select-option')[0] : null;
         if (primera) primera.classList.add('seleccionado');
     });
 
@@ -127,33 +138,13 @@ function limpiarFiltros() {
     document.getElementById('contador-resultados').textContent = Number(HOME_CFG.totalEventos || 0);
 
     /* Resetear también los mood chips */
-    document.querySelectorAll('.mood-chip').forEach(function(c) {
-        c.classList.remove('activo');
+    Array.from(document.getElementsByClassName('mood-chip')).forEach(function(moodChip) {
+        moodChip.classList.remove('activo');
     });
     var chipTodos = document.getElementById('mood-chip-todos');
     if (chipTodos) chipTodos.classList.add('activo');
 }
 
-function toggleSoloFavoritos() {
-    var cfg = window.vibezFavoritosConfig || {};
-    if (!cfg.userAuthenticated) {
-        window.location.href = cfg.loginUrl || '/login';
-        return;
-    }
-
-    var btn   = document.getElementById('btn-solo-favoritos');
-    var input = document.getElementById('filtro-favoritos');
-
-    if (input.value === '1') {
-        input.value = '0';
-        btn.classList.remove('activo');
-    } else {
-        input.value = '1';
-        btn.classList.add('activo');
-    }
-
-    aplicarFiltros();
-}
 
 function irADetalle(tipo, id) {
     window.location.href = tipo === 'evento' ? '/eventos/' + id : '/trabajos/' + id;

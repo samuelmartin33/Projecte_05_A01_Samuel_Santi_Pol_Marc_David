@@ -12,8 +12,15 @@ document.getElementById('logoutBtn').onclick = async function () {
     this.textContent = 'Cerrando sesión...';
 
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')
-                                  .getAttribute('content');
+        const metadatos = document.getElementsByTagName('meta');
+        let csrfToken = '';
+
+        for (let indice = 0; indice < metadatos.length; indice++) {
+            if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+                csrfToken = metadatos[indice].getAttribute('content');
+                break;
+            }
+        }
 
         const response = await fetch('/api/logout', {
             method: 'POST',
@@ -52,8 +59,8 @@ document.getElementById('logoutBtn').onclick = async function () {
     const adminPanel = document.getElementById('adminPanel');
     if (!adminPanel) return;
 
-    const tabBtns  = adminPanel.querySelectorAll('.admin-tab');
-    const tabPanels = adminPanel.querySelectorAll('.admin-tab-panel');
+    const tabBtns = Array.from(adminPanel.getElementsByClassName('admin-tab'));
+    const tabPanels = Array.from(adminPanel.getElementsByClassName('admin-tab-panel'));
 
     tabBtns.forEach(function (btn) {
         btn.onclick = function () {
@@ -68,7 +75,7 @@ document.getElementById('logoutBtn').onclick = async function () {
     });
 
     // Auto-scroll al panel admin si hay un flash message
-    const flash = adminPanel.querySelector('.admin-flash');
+    const flash = adminPanel.getElementsByClassName('admin-flash')[0];
     if (flash) {
         setTimeout(() => {
             adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -4,7 +4,7 @@
  * También gestiona Google Identity Services y flatpickr.
  *
  * Reglas del proyecto:
- *   - Sin addEventListener (conexión via atributos onsubmit/onclick/onchange del blade)
+ *   - Eventos directos desde atributos onsubmit/onclick/onchange del blade
  *   - Solo getElementById para acceder al DOM
  *   - Variables y comentarios en castellano
  *
@@ -77,8 +77,15 @@ window.onGoogleLibraryLoad = function () {
  */
 window.handleGoogleCredential = function (respuestaGoogle) {
     var alerta = document.getElementById('alert-global');
-    /* querySelector solo para el meta CSRF — no tiene id asignable en el layout */
-    var csrf   = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf   = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     fetch('/api/auth/google', {
         method:  'POST',
@@ -89,7 +96,7 @@ window.handleGoogleCredential = function (respuestaGoogle) {
         },
         body: JSON.stringify({ credential: respuestaGoogle.credential }),
     })
-    .then(function (r) { return r.json(); })
+    .then(function (respuesta) { return respuesta.json(); })
     .then(function (datos) {
         if (datos.success) {
             document.body.style.transition = 'opacity 0.35s ease';
@@ -118,8 +125,8 @@ function togglePassword(inputId, boton) {
     var campo     = document.getElementById(inputId);
     var mostrando = campo.type === 'text';
     campo.type    = mostrando ? 'password' : 'text';
-    boton.querySelector('.eye-open').style.display   = mostrando ? ''     : 'none';
-    boton.querySelector('.eye-closed').style.display = mostrando ? 'none' : '';
+    boton.getElementsByClassName('eye-open')[0].style.display   = mostrando ? ''     : 'none';
+    boton.getElementsByClassName('eye-closed')[0].style.display = mostrando ? 'none' : '';
     boton.setAttribute('aria-label', mostrando ? 'Mostrar contraseña' : 'Ocultar contraseña');
 }
 
@@ -398,8 +405,8 @@ function registrar(evento) {
         ['field-telefono',              'error-telefono'],
         ['field-tipo_cuenta',           'error-tipo_cuenta'],
     ];
-    for (var c = 0; c < camposLimpiar.length; c++) {
-        limpiarErrorCampo(camposLimpiar[c][0], camposLimpiar[c][1]);
+    for (var indiceCampo = 0; indiceCampo < camposLimpiar.length; indiceCampo++) {
+        limpiarErrorCampo(camposLimpiar[indiceCampo][0], camposLimpiar[indiceCampo][1]);
     }
     ocultarAlerta();
 
@@ -532,8 +539,15 @@ function registrar(evento) {
     /* Enviar al servidor */
     boton.classList.add('loading');
 
-    /* querySelector solo para el meta CSRF — no tiene id asignable en el layout */
-    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     /* Construir cuerpo de la petición: campos comunes + empresa si aplica */
     var cuerpo = {
@@ -616,11 +630,11 @@ function registrar(evento) {
         boton.classList.remove('loading');
         if (datos.errors) {
             var claves = Object.keys(datos.errors);
-            for (var i = 0; i < claves.length; i++) {
+            for (var indiceClave = 0; indiceClave < claves.length; indiceClave++) {
                 mostrarErrorCampo(
-                    'field-' + claves[i],
-                    'error-' + claves[i],
-                    datos.errors[claves[i]][0]
+                    'field-' + claves[indiceClave],
+                    'error-' + claves[indiceClave],
+                    datos.errors[claves[indiceClave]][0]
                 );
             }
         }
