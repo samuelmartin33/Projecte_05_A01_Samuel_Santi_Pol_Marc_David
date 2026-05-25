@@ -124,91 +124,7 @@ function vibezScrollCarousel(id, dir) {
 
 /* ── Navegación al detalle del evento ────────────────────────── */
 function vibezOpenModal(eventoId) {
-    var eventos = window.EVENTOS_DATA || [];
-    var eventoSeleccionado = eventos.find(function (evento) { return evento.id == eventoId; });
-    if (!eventoSeleccionado) return;
-
-    var set = function (id, val) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = val || '';
-    };
-    var setSrc = function (id, src) {
-        var el = document.getElementById(id);
-        if (el) el.src = src;
-    };
-
-    setSrc('modal-img',     eventoSeleccionado.img);
-    set('modal-titulo',     eventoSeleccionado.titulo);
-    set('modal-artista',    eventoSeleccionado.artista || '—');
-    set('modal-tagline',    eventoSeleccionado.tagline ? '"' + eventoSeleccionado.tagline + '"' : '');
-    set('modal-fecha',      eventoSeleccionado.fechaFmt);
-    set('modal-hora',       eventoSeleccionado.hora);
-    set('modal-lugar',      eventoSeleccionado.lugar);
-    set('modal-ciudad',     eventoSeleccionado.ciudad || '');
-    set('modal-precio',     eventoSeleccionado.precio);
-    set('modal-sticker',    eventoSeleccionado.categoria);
-
-    /* Badge "En curso" si el evento está pasando ahora */
-    var badge = document.getElementById('modal-en-curso');
-    if (badge) badge.style.display = eventoSeleccionado.estaOcurriendo ? 'inline-flex' : 'none';
-
-    /* Cupos disponibles */
-    var cuposEl = document.getElementById('modal-cupos');
-    if (cuposEl) {
-        if (eventoSeleccionado.soldOut) { cuposEl.textContent = 'Sin entradas'; cuposEl.style.color = 'var(--magenta)'; }
-        else if (eventoSeleccionado.cupos !== null && eventoSeleccionado.cupos < 50) { cuposEl.textContent = 'Quedan ' + eventoSeleccionado.cupos; cuposEl.style.color = 'var(--magenta)'; }
-        else { cuposEl.textContent = 'Disponible'; cuposEl.style.color = ''; }
-    }
-
-    /* Botón comprar */
-    var btn = document.getElementById('modal-comprar');
-    if (btn) {
-        if (eventoSeleccionado.soldOut) {
-            btn.textContent = 'Sold out — lista de espera';
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-        } else {
-            btn.textContent = 'Comprar entrada →';
-            btn.disabled = false;
-            btn.style.opacity = '';
-        }
-        btn.dataset.eventoId = eventoId;
-    }
-
-    /* Contador de cantidad */
-    var qty = document.getElementById('modal-cantidad');
-    if (qty) qty.value = 1;
-
-    /* Resetear campo de cupón al abrir nuevo modal */
-    var cuponInput = document.getElementById('modal-cupon-codigo');
-    if (cuponInput) { cuponInput.value = ''; cuponInput.style.borderColor = ''; }
-    if (typeof vibezResetCupon === 'function') vibezResetCupon();
-
-    /* Botón seguir promotora */
-    var btnSeguir = document.getElementById('modal-btn-seguir');
-    var btnSeguirTxt = document.getElementById('modal-btn-seguir-texto');
-    if (btnSeguir) {
-        if (eventoSeleccionado.empresa_id) {
-            var isSiguiendo = (window.SEGUIMIENTOS_IDS || []).includes(eventoSeleccionado.empresa_id);
-            btnSeguir.dataset.empresaId = eventoSeleccionado.empresa_id;
-            btnSeguir.style.display = 'inline-flex';
-            if (isSiguiendo) {
-                btnSeguir.style.background = 'rgba(168,85,247,0.2)';
-                btnSeguir.style.borderColor = '#a855f7';
-                btnSeguir.style.color = '#e9d5ff';
-            } else {
-                btnSeguir.style.background = 'transparent';
-                btnSeguir.style.borderColor = 'rgba(168,85,247,0.6)';
-                btnSeguir.style.color = '#a855f7';
-            }
-            if (btnSeguirTxt) btnSeguirTxt.textContent = isSiguiendo ? 'Siguiendo' : 'Seguir';
-        } else {
-            btnSeguir.style.display = 'none';
-        }
-    }
-
-    var modal = document.getElementById('vibez-detail-modal');
-    if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    window.location.href = '/eventos/' + eventoId;
 }
 
 function vibezToggleSeguirModal(btn) {
@@ -247,44 +163,11 @@ function vibezToggleSeguirModal(btn) {
     .catch(function () { btn.style.opacity = ''; btn.style.pointerEvents = ''; });
 }
 
-function vibezCloseModal() {
-    var modal = document.getElementById('vibez-detail-modal');
-    if (modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
-}
+function vibezCloseModal() {}
 
 /* ── Compra de entrada ───────────────────────────────────────── */
 function vibezBuy(eventoId) {
-    if (!window.USER_AUTH) {
-        window.location.href = window.LOGIN_URL || '/login';
-        return;
-    }
-    var qtyEl    = document.getElementById('modal-cantidad');
-    var cantidad = qtyEl ? parseInt(qtyEl.value) || 1 : 1;
-    var cuponEl  = document.getElementById('modal-cupon-codigo');
-    var codigoCupon = cuponEl ? cuponEl.value.trim() : '';
-    var btn      = document.getElementById('modal-comprar');
-    if (btn) { btn.textContent = 'Procesando…'; btn.disabled = true; }
-
-    var csrf = obtenerTokenCsrf();
-    fetch('/api/entradas/comprar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
-        body: JSON.stringify({ evento_id: eventoId, cantidad: cantidad, cupon_codigo: codigoCupon })
-    })
-    .then(function (respuesta) { return respuesta.json(); })
-    .then(function (data) {
-        if (data.success && data.redirect) {
-            vibezCloseModal();
-            window.location.href = data.redirect;
-        } else {
-            vibezToast('Error: ' + (data.message || 'Inténtalo de nuevo'));
-            if (btn) { btn.textContent = 'Comprar entrada →'; btn.disabled = false; }
-        }
-    })
-    .catch(function () {
-        vibezToast('Error de conexión. Inténtalo de nuevo.');
-        if (btn) { btn.textContent = 'Comprar entrada →'; btn.disabled = false; }
-    });
+    window.location.href = '/eventos/' + eventoId + '/comprar';
 }
 
 /* ── Toast ───────────────────────────────────────────────────── */
