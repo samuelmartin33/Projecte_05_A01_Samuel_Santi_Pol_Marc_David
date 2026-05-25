@@ -12,29 +12,36 @@ document.getElementById('logoutBtn').onclick = async function () {
     this.textContent = 'Cerrando sesión...';
 
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')
-                                  .getAttribute('content');
+        var metadatos = document.getElementsByTagName('meta');
+        var tokenCsrf = '';
 
-        const response = await fetch('/api/logout', {
+        for (var indice = 0; indice < metadatos.length; indice++) {
+            if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+                tokenCsrf = metadatos[indice].getAttribute('content');
+                break;
+            }
+        }
+
+        var respuesta = await fetch('/api/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept':       'application/json',
-                'X-CSRF-TOKEN': csrfToken,
+                'X-CSRF-TOKEN': tokenCsrf,
             },
         });
 
-        const data = await response.json();
+        var datos = await respuesta.json();
 
-        if (data.success) {
-            // Fade-out y redirect al login
+        if (datos.success) {
+            /* Fade-out y redirect al login */
             document.body.style.transition = 'opacity 0.35s ease';
             document.body.style.opacity    = '0';
-            setTimeout(() => { window.location.href = '/login'; }, 360);
+            setTimeout(function () { window.location.href = '/login'; }, 360);
         } else {
             this.classList.remove('loading');
             this.textContent = 'Cerrar sesión';
-            console.error('[VIBEZ] Error en logout:', data.message);
+            console.error('[VIBEZ] Error en logout:', datos.message);
         }
 
     } catch (err) {
@@ -49,29 +56,28 @@ document.getElementById('logoutBtn').onclick = async function () {
    ADMIN PANEL — Tabs (solo si el panel existe en el DOM)
    ============================================================ */
 (function () {
-    const adminPanel = document.getElementById('adminPanel');
-    if (!adminPanel) return;
+    var panelAdmin = document.getElementById('adminPanel');
+    if (!panelAdmin) return;
 
-    const tabBtns  = adminPanel.querySelectorAll('.admin-tab');
-    const tabPanels = adminPanel.querySelectorAll('.admin-tab-panel');
+    var botonesTabs  = Array.from(panelAdmin.getElementsByClassName('admin-tab'));
+    var panelesTabs  = Array.from(panelAdmin.getElementsByClassName('admin-tab-panel'));
 
-    tabBtns.forEach(function (btn) {
-        btn.onclick = function () {
-            const target = btn.getAttribute('data-tab');
+    botonesTabs.forEach(function (boton) {
+        boton.onclick = function () {
+            var destino = boton.getAttribute('data-tab');
 
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabPanels.forEach(p => p.classList.remove('active'));
+            botonesTabs.forEach(function (botonTab) { botonTab.classList.remove('active'); });
+            panelesTabs.forEach(function (panelTab) { panelTab.classList.remove('active'); });
 
-            btn.classList.add('active');
-            document.getElementById('panel-' + target).classList.add('active');
+            boton.classList.add('active');
+            document.getElementById('panel-' + destino).classList.add('active');
         };
     });
 
-    // Auto-scroll al panel admin si hay un flash message
-    const flash = adminPanel.querySelector('.admin-flash');
-    if (flash) {
-        setTimeout(() => {
-            adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var mensajeFlash = panelAdmin.getElementsByClassName('admin-flash')[0];
+    if (mensajeFlash) {
+        setTimeout(function () {
+            panelAdmin.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 300);
     }
 })();

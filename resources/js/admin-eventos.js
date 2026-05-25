@@ -18,8 +18,8 @@ var AdminEventos = {
             toggle.setAttribute('aria-expanded', isOpen);
         };
 
-        document.onclick = function (e) {
-            if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+        document.onclick = function (eventoClic) {
+            if (!toggle.contains(eventoClic.target) && !menu.contains(eventoClic.target)) {
                 menu.classList.remove('open');
                 toggle.setAttribute('aria-expanded', 'false');
             }
@@ -27,11 +27,11 @@ var AdminEventos = {
     },
 
     configurarConfirmacionBorrado: function () {
-        var formularios = document.querySelectorAll('.delete-form');
-        var i = 0;
+        var formularios = document.getElementsByClassName('delete-form');
+        var indiceFormulario = 0;
 
-        while (i < formularios.length) {
-            formularios[i].onsubmit = function () {
+        while (indiceFormulario < formularios.length) {
+            formularios[indiceFormulario].onsubmit = function () {
                 var formulario = this;
 
                 if (window.Swal && typeof window.Swal.fire === 'function') {
@@ -44,14 +44,14 @@ var AdminEventos = {
                         cancelButtonText: 'Cancelar',
                         confirmButtonColor: '#d33',
                         cancelButtonColor: '#6c757d'
-                    }).then(function (result) {
-                        if (result.isConfirmed) {
+                    }).then(function (resultado) {
+                        if (resultado.isConfirmed) {
                             formulario.submit();
                         }
                     });
 
                     return false;
-                }
+            indiceFormulario = indiceFormulario + 1;
 
                 return window.confirm('Estas seguro de eliminar este evento?');
             };

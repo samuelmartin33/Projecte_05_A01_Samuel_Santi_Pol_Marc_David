@@ -25,19 +25,19 @@
  * @param {string} id - 'categoria' o 'ciudad'
  */
 function toggleDropdown(id) {
-    var dropdown = document.getElementById(id + '-dropdown');
-    var wrapper  = document.getElementById('wrapper-' + id);
-    var overlay  = document.getElementById('overlay-dropdowns');
-    var estaAbierto = dropdown.style.display === 'block';
+    var dropdownElemento = document.getElementById(id + '-dropdown');
+    var wrapperElemento  = document.getElementById('wrapper-' + id);
+    var overlayElemento  = document.getElementById('overlay-dropdowns');
+    var estaAbierto = dropdownElemento.style.display === 'block';
 
     // Cerrar primero todos los dropdowns (incluido el que se va a abrir)
     cerrarTodosDropdowns();
 
     // Si no estaba abierto, lo abrimos
     if (!estaAbierto) {
-        dropdown.style.display = 'block';
-        wrapper.classList.add('abierto'); // la clase 'abierto' gira la flecha en CSS
-        overlay.style.display = 'block';  // activa el overlay para cerrar al hacer clic fuera
+        dropdownElemento.style.display = 'block';
+        wrapperElemento.classList.add('abierto'); // la clase 'abierto' gira la flecha en CSS
+        overlayElemento.style.display = 'block';  // activa el overlay para cerrar al hacer clic fuera
     }
 }
 
@@ -46,14 +46,14 @@ function toggleDropdown(id) {
  * Se llama desde toggleDropdown() y desde el onclick del overlay.
  */
 function cerrarTodosDropdowns() {
-    ['categoria', 'ciudad'].forEach(function(id) {
-        var d = document.getElementById(id + '-dropdown');
-        var w = document.getElementById('wrapper-' + id);
-        if (d) d.style.display = 'none';
-        if (w) w.classList.remove('abierto');
+    ['categoria', 'ciudad'].forEach(function(idFiltro) {
+        var dropdownElemento = document.getElementById(idFiltro + '-dropdown');
+        var wrapperElemento = document.getElementById('wrapper-' + idFiltro);
+        if (dropdownElemento) dropdownElemento.style.display = 'none';
+        if (wrapperElemento) wrapperElemento.classList.remove('abierto');
     });
-    var overlay = document.getElementById('overlay-dropdowns');
-    if (overlay) overlay.style.display = 'none';
+    var overlayElemento = document.getElementById('overlay-dropdowns');
+    if (overlayElemento) overlayElemento.style.display = 'none';
 }
 
 /**
@@ -78,7 +78,7 @@ function seleccionarFiltro(filtroId, valor, texto, event) {
     // Marca visualmente la opción seleccionada
     var dropdown = document.getElementById(filtroId + '-dropdown');
     if (dropdown) {
-        dropdown.querySelectorAll('.custom-select-option').forEach(function(op) {
+        Array.from(dropdown.getElementsByClassName('custom-select-option')).forEach(function(op) {
             op.classList.remove('seleccionado');
         });
         if (event.target && event.target.classList) {
@@ -111,7 +111,7 @@ function aplicarFiltros() {
 
     // encodeURIComponent garantiza que caracteres como tildes o ñ no rompan la URL
     fetch('/api/filtrar-trabajos?categoria=' + encodeURIComponent(categoria) + '&ciudad=' + encodeURIComponent(ciudad))
-        .then(function(r) { return r.json(); })
+        .then(function(respuesta) { return respuesta.json(); })
         .then(function(datos) {
 
             // Actualiza el contador de ofertas en la barra de filtros
@@ -156,13 +156,14 @@ function limpiarFiltros() {
     document.getElementById('categoria-display').textContent = 'Todas las categorías';
     document.getElementById('ciudad-display').textContent    = 'Todas las ciudades';
 
-    // Resetea el marcado visual de las opciones seleccionadas
-    document.querySelectorAll('.custom-select-dropdown .custom-select-option').forEach(function(op) {
-        op.classList.remove('seleccionado');
+    /* Resetea el marcado visual de las opciones seleccionadas */
+    Array.from(document.getElementsByClassName('custom-select-option')).forEach(function(opcion) {
+        opcion.classList.remove('seleccionado');
     });
-    // La primera opción de cada dropdown ("Todas las...") vuelve a quedar seleccionada
+    /* La primera opción de cada dropdown ("Todas las...") vuelve a quedar seleccionada */
     ['categoria-dropdown', 'ciudad-dropdown'].forEach(function(id) {
-        var primera = document.querySelector('#' + id + ' .custom-select-option');
+        var primeraDrop = document.getElementById(id);
+        var primera = primeraDrop ? primeraDrop.getElementsByClassName('custom-select-option')[0] : null;
         if (primera) primera.classList.add('seleccionado');
     });
 

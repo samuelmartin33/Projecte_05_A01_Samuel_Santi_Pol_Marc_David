@@ -12,7 +12,15 @@
 
 /* ─── Helper: leer el token CSRF del meta tag ─── */
 function getCsrf() {
-    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            return metadatos[indice].getAttribute('content');
+        }
+    }
+
+    return '';
 }
 
 /* ============================================================
@@ -38,10 +46,10 @@ function previsualizarFoto(input) {
 
     // FileReader lee el archivo localmente y genera una URL temporal (base64)
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function (eventoCarga) {
         // Reemplazamos el contenido del avatar con la imagen en base64
         const avatar = document.getElementById('avatarPreview');
-        avatar.innerHTML = '<img src="' + e.target.result + '" alt="foto" style="width:100%;height:100%;object-fit:cover;">';
+        avatar.innerHTML = '<img src="' + eventoCarga.target.result + '" alt="foto" style="width:100%;height:100%;object-fit:cover;">';
     };
     reader.readAsDataURL(archivo);
 
@@ -84,7 +92,7 @@ function buscarAmigos(valor) {
         fetch('/api/amigos/buscar?q=' + encodeURIComponent(valor), {
             headers: { 'Accept': 'application/json' },
         })
-        .then(function (r) { return r.json(); })
+        .then(function (respuesta) { return respuesta.json(); })
         .then(function (data) {
             contenedor.innerHTML = '';
 
@@ -153,7 +161,7 @@ function enviarSolicitud(receptorId, btn) {
         },
         body: JSON.stringify({ receptor_id: receptorId }),
     })
-    .then(function (r) { return r.json(); })
+    .then(function (respuesta) { return respuesta.json(); })
     .then(function (data) {
         // Actualizamos el texto del botón según la respuesta del servidor
         btn.textContent = data.success ? '✓ Enviado' : '⚠ ' + (data.message ?? 'Error');

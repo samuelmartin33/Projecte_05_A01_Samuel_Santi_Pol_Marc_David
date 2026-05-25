@@ -12,7 +12,7 @@
 /* ════ 1. GENERACIÓN DE CÓDIGOS QR ════
    Busca todos los elementos con [data-codigo] y genera el QR dentro.
    Depende de qrcodejs, que debe cargarse en el HTML ANTES que este script. */
-document.querySelectorAll('[data-codigo]').forEach(function(el) {
+Array.from(document.getElementsByClassName('qr-container')).forEach(function(el) {
     new QRCode(el, {
         text:       el.dataset.codigo,
         width:      180,
@@ -27,7 +27,7 @@ document.querySelectorAll('[data-codigo]').forEach(function(el) {
    Lee la fecha ISO del atributo data-fecha del banner y actualiza los
    dígitos cada segundo hasta que el evento llegue. */
 (function() {
-    var banner = document.querySelector('.me-cnt-row');
+    var banner = document.getElementsByClassName('me-cnt-row')[0];
     if (!banner) return;
 
     var target = new Date(banner.dataset.fecha).getTime();
@@ -45,13 +45,13 @@ document.querySelectorAll('[data-codigo]').forEach(function(el) {
 
         var dias  = Math.floor(diff / 86400000);
         var horas = Math.floor((diff % 86400000) / 3600000);
-        var min   = Math.floor((diff % 3600000)  / 60000);
-        var seg   = Math.floor((diff % 60000)    / 1000);
+        var minutos = Math.floor((diff % 3600000)  / 60000);
+        var segundos = Math.floor((diff % 60000)    / 1000);
 
         document.getElementById('cnt-dias').textContent  = String(dias).padStart(2, '0');
         document.getElementById('cnt-horas').textContent = String(horas).padStart(2, '0');
-        document.getElementById('cnt-min').textContent   = String(min).padStart(2, '0');
-        document.getElementById('cnt-seg').textContent   = String(seg).padStart(2, '0');
+        document.getElementById('cnt-min').textContent   = String(minutos).padStart(2, '0');
+        document.getElementById('cnt-seg').textContent   = String(segundos).padStart(2, '0');
     }
 
     actualizar();
@@ -87,16 +87,16 @@ function toggleTicketQr(pedidoId) {
    Llamado con onclick desde los botones .me-filtro-btn en el HTML. */
 function filtrarEntradas(filtro, btnPulsado) {
     /* Marcar botón activo */
-    document.querySelectorAll('.me-filtro-btn').forEach(function(btn) {
+    Array.from(document.getElementsByClassName('me-filtro-btn')).forEach(function(btn) {
         btn.classList.remove('activo');
     });
     if (btnPulsado) btnPulsado.classList.add('activo');
 
-    var cards    = document.querySelectorAll('.me-ticket-card');
+    var cards    = document.getElementsByClassName('me-ticket-card');
     var visibles = 0;
 
     /* Mostrar u ocultar cada tarjeta según su estado */
-    cards.forEach(function(card) {
+    Array.from(cards).forEach(function(card) {
         var mostrar = filtro === 'todas' || card.dataset.estado === filtro;
         card.style.display = mostrar ? '' : 'none';
         if (mostrar) visibles++;

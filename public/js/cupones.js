@@ -8,7 +8,7 @@ function copiarCodigo(codigo, cuponId) {
         el.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
         document.body.appendChild(el);
         el.select();
-        try { document.execCommand('copy'); } catch(e) {}
+        try { document.execCommand('copy'); } catch(errorPortapapeles) {}
         document.body.removeChild(el);
         mostrarToastCupon('✓ Código copiado: ' + codigo);
         marcarCopiado(cuponId);
@@ -33,24 +33,24 @@ function marcarCopiado(cuponId) {
 
 // Muestra notificación temporal en la esquina inferior
 function mostrarToastCupon(msg) {
-    var t = document.getElementById('cup-toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._tid);
-    t._tid = setTimeout(function() { t.classList.remove('show'); }, 2800);
+    var toastCupon = document.getElementById('cup-toast');
+    if (!toastCupon) return;
+    toastCupon.textContent = msg;
+    toastCupon.classList.add('show');
+    clearTimeout(toastCupon._tid);
+    toastCupon._tid = setTimeout(function() { toastCupon.classList.remove('show'); }, 2800);
 }
 
 // Filtra cupones por tipo: 'all', 'active', 'free'
 function cupSetFilter(btn, filtro) {
-    document.querySelectorAll('.cup-filter-chip').forEach(function(c) { c.classList.remove('active'); });
+    Array.from(document.getElementsByClassName('cup-filter-chip')).forEach(function(chipCupon) { chipCupon.classList.remove('active'); });
     btn.classList.add('active');
-    var expired = document.getElementById('cup-sec-expired');
-    document.querySelectorAll('.cup-card').forEach(function(card) {
-        var tipo = card.dataset.type || 'active';
-        if (filtro === 'all')         { card.style.display = ''; }
-        else if (filtro === 'active') { card.style.display = (tipo === 'active' || tipo === 'free') ? '' : 'none'; }
-        else if (filtro === 'free')   { card.style.display = tipo === 'free' ? '' : 'none'; }
+    var bloqueCaducados = document.getElementById('cup-sec-expired');
+    Array.from(document.getElementsByClassName('cup-card')).forEach(function(tarjetaCupon) {
+        var tipo = tarjetaCupon.dataset.type || 'active';
+        if (filtro === 'all')         { tarjetaCupon.style.display = ''; }
+        else if (filtro === 'active') { tarjetaCupon.style.display = (tipo === 'active' || tipo === 'free') ? '' : 'none'; }
+        else if (filtro === 'free')   { tarjetaCupon.style.display = tipo === 'free' ? '' : 'none'; }
     });
-    if (expired) expired.style.display = (filtro === 'all') ? '' : 'none';
+    if (bloqueCaducados) bloqueCaducados.style.display = (filtro === 'all') ? '' : 'none';
 }

@@ -36,7 +36,7 @@ function toggleNavDropdown() {
 
 /**
  * Cierra el dropdown del avatar cuando el usuario pulsa fuera de él.
- * Se asigna directamente a document.onclick (sin addEventListener).
+ * Se asigna directamente a document.onclick.
  */
 document.onclick = function (evento) {
     var contenedor = document.getElementById('navAvatarWrapper');
@@ -57,7 +57,15 @@ document.onclick = function (evento) {
  * Usa fetch para no recargar la página bruscamente.
  */
 function cerrarSesion() {
-    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     fetch('/api/logout', {
         method:  'POST',
@@ -84,7 +92,7 @@ function cerrarSesion() {
  */
 function refrescarBadgeSocial() {
     fetch('/api/social/contador', { headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json(); })
+        .then(function (respuesta) { return respuesta.json(); })
         .then(function (respuesta) {
             if (!respuesta.exito) return;
             var badge = document.getElementById('nav-badge-social');
@@ -128,8 +136,8 @@ function toggleMenuMovil() {
         panel.classList.add('activo');
         overlay.classList.add('activo');
         boton.setAttribute('aria-expanded', 'true');
-        boton.querySelector('.icono-ham').style.display = 'none';
-        boton.querySelector('.icono-x').style.display   = 'block';
+        boton.getElementsByClassName('icono-ham')[0].style.display = 'none';
+        boton.getElementsByClassName('icono-x')[0].style.display   = 'block';
         document.body.style.overflow = 'hidden';
     }
 }
@@ -149,14 +157,14 @@ function cerrarMenuMovil() {
 
     if (boton) {
         boton.setAttribute('aria-expanded', 'false');
-        boton.querySelector('.icono-ham').style.display = 'block';
-        boton.querySelector('.icono-x').style.display   = 'none';
+        boton.getElementsByClassName('icono-ham')[0].style.display = 'block';
+        boton.getElementsByClassName('icono-x')[0].style.display   = 'none';
     }
 }
 
 /**
  * Cierra el menú móvil si el usuario pulsa la tecla Escape.
- * Se asigna directamente a document.onkeydown (sin addEventListener).
+ * Se asigna directamente a document.onkeydown.
  */
 document.onkeydown = function (evento) {
     if (evento.key === 'Escape') cerrarMenuMovil();
