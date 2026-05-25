@@ -125,6 +125,11 @@
                         <p class="text-navy/50 text-sm">vacante{{ $oferta->vacantes !== 1 ? 's' : '' }} disponible{{ $oferta->vacantes !== 1 ? 's' : '' }}</p>
                     </div>
 
+                    @if(auth()->check() && auth()->user()->es_admin)
+                    <div class="w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-navy/50 text-sm font-medium">
+                        Los administradores no pueden postularse a ofertas de trabajo.
+                    </div>
+                    @else
                     <button class="btn-comprar w-full" onclick="abrirPostulacion({{ $oferta->id }})">
                         Postularme ahora
                     </button>
@@ -132,6 +137,7 @@
                     <p class="text-center text-navy/40 text-xs mt-4">
                         Tu candidatura se enviará al organizador
                     </p>
+                    @endif
 
                 </div>
             </div>

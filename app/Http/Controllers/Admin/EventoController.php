@@ -28,7 +28,7 @@ class EventoController extends Controller
     {
         return view('admin.eventos.create', [
             'evento' => new Evento(),
-            'organizadores' => Organizador::orderBy('id')->get(),
+            'organizadores' => Organizador::with('usuario')->orderBy('id')->get(),
             'categorias' => CategoriaEvento::orderBy('nombre')->get(),
         ]);
     }
@@ -53,7 +53,7 @@ class EventoController extends Controller
     {
         return view('admin.eventos.edit', [
             'evento' => $evento,
-            'organizadores' => Organizador::orderBy('id')->get(),
+            'organizadores' => Organizador::with('usuario')->orderBy('id')->get(),
             'categorias' => CategoriaEvento::orderBy('nombre')->get(),
         ]);
     }

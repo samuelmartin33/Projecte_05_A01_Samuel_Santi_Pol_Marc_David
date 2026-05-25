@@ -382,6 +382,7 @@
                 <div class="me-qr-marco">
                   {{-- data-codigo es leído por JS para generar el QR --}}
                   <div id="qr-canvas-{{ $entrada->id }}"
+                       class="qr-container"
                        data-codigo="{{ $entrada->codigo_qr }}"
                        style="width:180px;height:180px;display:block;"></div>
                 </div>

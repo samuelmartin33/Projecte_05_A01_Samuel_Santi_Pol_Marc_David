@@ -547,6 +547,10 @@ class EventoController extends Controller
      */
     public function postular(Request $request, int $id)
     {
+        if (Auth::check() && Auth::user()->es_admin) {
+            return response()->json(['success' => false, 'message' => 'Los administradores no pueden postularse a ofertas de trabajo.'], 403);
+        }
+
         $request->validate([
             'nombre'               => 'required|string|max:100',
             'apellidos'            => 'required|string|max:100',
@@ -595,6 +599,10 @@ class EventoController extends Controller
      */
     public function postularArchivo(Request $request, int $id)
     {
+        if (Auth::check() && Auth::user()->es_admin) {
+            return response()->json(['success' => false, 'message' => 'Los administradores no pueden postularse a ofertas de trabajo.'], 403);
+        }
+
         $request->validate([
             'cv_file'                    => 'required|file|mimes:pdf,doc,docx|max:5120',
             'carta_presentacion_archivo' => 'nullable|string|max:3000',
