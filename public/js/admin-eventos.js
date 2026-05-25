@@ -39,7 +39,7 @@ var AdminEventos = {
 
                 if (window.Swal && typeof window.Swal.fire === 'function') {
                     window.Swal.fire({
-                        title: 'Confirmar eliminación',
+                        title: 'Confirmar desactivación',
                         text: mensajeConfirmacion,
                         icon: 'warning',
                         showCancelButton: true,

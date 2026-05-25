@@ -246,6 +246,16 @@ class AuthController extends Controller
             ], 403);
         }
 
+        if ((int) $usuario->estado === 0) {
+            Auth::logout();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tu cuenta ha sido desactivada. Contacta con el administrador.',
+                'data'    => null,
+            ], 403);
+        }
+
         // regenerate() cambia el ID de la sesión para evitar ataques de session fixation:
         // si alguien robó el ID de sesión antes del login, ese ID ya no servirá.
         $request->session()->regenerate();

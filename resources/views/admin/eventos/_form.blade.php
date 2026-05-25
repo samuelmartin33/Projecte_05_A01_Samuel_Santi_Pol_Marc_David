@@ -16,7 +16,7 @@
             <option value="">Selecciona</option>
             @foreach ($organizadores as $organizador)
                 <option value="{{ $organizador->id }}" @selected(old('organizador_id', $evento->organizador_id) == $organizador->id)>
-                    Organizador #{{ $organizador->id }}
+                    {{ $organizador->usuario?->nombre }} {{ $organizador->usuario?->apellido1 }} (#{{ $organizador->id }})
                 </option>
             @endforeach
         </select>

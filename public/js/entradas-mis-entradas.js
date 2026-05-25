@@ -10,17 +10,23 @@
 
 
 /* ════ 1. GENERACIÓN DE CÓDIGOS QR ════
-   Busca todos los elementos con [data-codigo] y genera el QR dentro.
-   Depende de qrcodejs, que debe cargarse en el HTML ANTES que este script. */
-Array.from(document.getElementsByClassName('qr-container')).forEach(function(el) {
-    new QRCode(el, {
-        text:       el.dataset.codigo,
-        width:      180,
-        height:     180,
-        colorDark:  '#000000',
-        colorLight: '#ffffff',
+   Los QR se generan de forma lazy (al abrir el panel) para evitar canvas en
+   blanco cuando el contenedor padre está oculto con display:none. */
+function generarQrEnPanel(pedidoId) {
+    var panel = document.getElementById('qr-panel-' + pedidoId);
+    if (!panel) return;
+    Array.from(panel.getElementsByClassName('qr-container')).forEach(function(el) {
+        if (el.dataset.generado) return;
+        el.dataset.generado = '1';
+        new QRCode(el, {
+            text:       el.dataset.codigo,
+            width:      180,
+            height:     180,
+            colorDark:  '#000000',
+            colorLight: '#ffffff',
+        });
     });
-});
+}
 
 
 /* ════ 2. CUENTA ATRÁS DEL PRÓXIMO EVENTO ════
@@ -68,6 +74,7 @@ function toggleTicketQr(pedidoId) {
     var chevron = document.getElementById('chevron-' + pedidoId);
     var abierto = panel.style.display !== 'none';
 
+    if (!abierto) generarQrEnPanel(pedidoId);
     panel.style.display = abierto ? 'none' : 'block';
 
     /* Rotamos el chevron para dar feedback visual */
