@@ -15,5 +15,15 @@ class CategoriaEvento extends Model
     protected $table = 'categorias_evento';
     public $timestamps = false;
 
-    protected $fillable = ['nombre', 'descripcion', 'icono_url', 'estado'];
+    protected $fillable = ['nombre', 'descripcion', 'icono_url', 'estado', 'fecha_creacion', 'fecha_actualizacion'];
+
+    public function eventos()
+    {
+        return $this->belongsToMany(
+            \App\Models\Evento::class,
+            'evento_categoria',
+            'categoria_evento_id',
+            'evento_id'
+        );
+    }
 }

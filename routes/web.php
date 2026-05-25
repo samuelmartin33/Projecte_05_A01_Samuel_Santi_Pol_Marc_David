@@ -43,6 +43,9 @@ use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\Empresa\EquipoController;
 use App\Http\Controllers\Empresa\PerfilFiscalController;
+use App\Http\Controllers\Empresa\StripeOnboardingController;
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\Empresa\CuponController as EmpresaCuponController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -95,10 +98,20 @@ Route::get('/', function () {
     return view('welcome', compact('eventos', 'categorias', 'eventosMapa', 'statRavers', 'statEventos', 'statPromotores', 'statSatisf'));
 })->name('welcome');
 
+// --- Página pública de Eventos: lista completa con grid, filtros y mapa ---
+Route::get('/eventos', [PublicEventoController::class, 'eventos'])
+    ->name('eventos.index');
+
 // --- Detalle de un evento específico ---
 Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
     ->where('id', '[0-9]+')
     ->name('eventos.detalle');
+
+// --- Página de compra de entradas (requiere login) ---
+Route::get('/eventos/{id}/comprar', [PublicEventoController::class, 'compra'])
+    ->where('id', '[0-9]+')
+    ->middleware('auth')
+    ->name('eventos.comprar');
 
 // --- Detalle de una oferta de trabajo ---
 Route::get('/trabajos/{id}', [PublicEventoController::class, 'detalleOferta'])
@@ -204,11 +217,31 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/facturacion')->name('e
     Route::get('/evento/{evento}/generar-pdf', [FacturacionController::class, 'generarPdf'])->name('generar-pdf');
 });
 
+/* — Cupones de empresa: cada empresa gestiona sus propios cupones — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/cupones')->name('empresa.cupones.')->group(function () {
+    Route::get('/',           [EmpresaCuponController::class, 'index']) ->name('index');
+    Route::get('/crear',      [EmpresaCuponController::class, 'create'])->name('create');
+    Route::post('/',          [EmpresaCuponController::class, 'store']) ->name('store');
+    Route::get('/{id}/editar',[EmpresaCuponController::class, 'edit'])  ->name('edit');
+    Route::put('/{id}',       [EmpresaCuponController::class, 'update'])->name('update');
+    Route::delete('/{id}',    [EmpresaCuponController::class, 'destroy'])->name('destroy');
+});
+
 /* — Perfil fiscal de empresa: fase 2 del onboarding (datos legales, bancarios y Stripe) — */
 Route::middleware(['auth','no-portero'])->prefix('empresa')->name('empresa.')->group(function () {
     Route::get('/perfil-fiscal',  [PerfilFiscalController::class, 'show'])  ->name('perfil-fiscal');
     Route::post('/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('perfil-fiscal.guardar');
 });
+
+/* — Stripe Connect: onboarding de cuentas Express para empresas — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/stripe')->name('empresa.stripe.')->group(function () {
+    Route::get('/conectar',  [StripeOnboardingController::class, 'iniciar'])  ->name('conectar');
+    Route::get('/retorno',   [StripeOnboardingController::class, 'retorno'])  ->name('retorno');
+    Route::get('/refrescar', [StripeOnboardingController::class, 'refrescar'])->name('refrescar');
+});
+
+/* — Stripe Webhook: recibe eventos de Stripe (sin CSRF, sin auth) — */
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 
 /* — Equipo de empresa: gestión de usuarios y roles — */
 Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empresa.equipo.')->group(function () {
@@ -296,6 +329,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.usuarios.update');
     Route::delete('/admin/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])
          ->name('admin.usuarios.destroy');
+    Route::patch('/admin/usuarios/{usuario}/activar', [AdminUsuarioController::class, 'activar'])
+         ->name('admin.usuarios.activar');
 
     /* Rutas de gestión de categorías de eventos */
     Route::get('/admin/categorias', [AdminCategoriaController::class, 'index'])
@@ -329,19 +364,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/pagos/{pago}', [AdminPagoController::class, 'destroy'])
          ->name('admin.pagos.destroy');
 
-    /* Rutas de gestión de cupones */
+    /* Cupones (solo lectura para el admin) */
     Route::get('/admin/cupones', [AdminCuponController::class, 'index'])
          ->name('admin.cupones.index');
-    Route::get('/admin/cupones/crear', [AdminCuponController::class, 'create'])
-         ->name('admin.cupones.create');
-    Route::post('/admin/cupones', [AdminCuponController::class, 'store'])
-         ->name('admin.cupones.store');
-    Route::get('/admin/cupones/{id}/editar', [AdminCuponController::class, 'edit'])
-         ->name('admin.cupones.edit');
-    Route::put('/admin/cupones/{id}', [AdminCuponController::class, 'update'])
-         ->name('admin.cupones.update');
-    Route::delete('/admin/cupones/{id}', [AdminCuponController::class, 'destroy'])
-         ->name('admin.cupones.destroy');
 
     /* Facturación por evento */
     Route::prefix('admin/facturacion')->name('admin.facturacion.')->group(function () {

@@ -277,6 +277,11 @@ body {
     color: #fff;
 }
 
+.btn-info {
+    background: #2563eb;
+    color: #fff;
+}
+
 /* ─── ESTADO BADGE ─────────────────────────────────────── */
 .estado {
     display: inline-flex;

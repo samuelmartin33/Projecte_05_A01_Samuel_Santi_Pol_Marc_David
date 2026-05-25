@@ -16,22 +16,24 @@
             <option value="">Selecciona</option>
             @foreach ($organizadores as $organizador)
                 <option value="{{ $organizador->id }}" @selected(old('organizador_id', $evento->organizador_id) == $organizador->id)>
-                    Organizador #{{ $organizador->id }}
+                    {{ $organizador->usuario?->nombre }} {{ $organizador->usuario?->apellido1 }} (#{{ $organizador->id }})
                 </option>
             @endforeach
         </select>
     </label>
 
-    <label>
-        Categoria
-        <select name="categoria_evento_id">
-            <option value="">Selecciona</option>
+    <label class="full">
+        Categorías <small style="font-weight:normal;">(selecciona una o más)</small>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+            @php $selectedCats = old('categorias', $evento->categorias->pluck('id')->toArray() ?? []); @endphp
             @foreach ($categorias as $categoria)
-                <option value="{{ $categoria->id }}" @selected(old('categoria_evento_id', $evento->categoria_evento_id) == $categoria->id)>
+                <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #555;cursor:pointer;">
+                    <input type="checkbox" name="categorias[]" value="{{ $categoria->id }}"
+                           @checked(in_array($categoria->id, $selectedCats))>
                     {{ $categoria->nombre }}
-                </option>
+                </label>
             @endforeach
-        </select>
+        </div>
     </label>
 
     <label>

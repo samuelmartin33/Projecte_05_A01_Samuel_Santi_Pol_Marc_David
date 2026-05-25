@@ -4,6 +4,18 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
+<style>
+.te-csel{position:relative;width:100%;}
+.te-csel-trigger{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;user-select:none;}
+.te-csel-trigger:hover{border-color:rgba(168,85,247,0.5);}
+.te-csel-arrow{font-size:12px;color:rgba(168,85,247,0.8);transition:transform 0.18s;}
+.te-csel.open .te-csel-arrow{transform:rotate(180deg);}
+.te-csel-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0d0a18;border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:4px 0;z-index:200;list-style:none;margin:0;}
+.te-csel.open .te-csel-menu{display:block;}
+.te-csel-opt{padding:10px 14px;font-family:'Archivo Narrow',sans-serif;font-size:14px;color:rgba(245,241,234,0.75);cursor:pointer;}
+.te-csel-opt:hover{background:rgba(168,85,247,0.15);color:#f5f1ea;}
+.te-csel-opt.selected{color:#c084fc;}
+</style>
 @endpush
 
 @section('content')
@@ -43,7 +55,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('empresa.perfil-fiscal.update') }}" novalidate>
+    <form method="POST" action="{{ route('empresa.perfil-fiscal.guardar') }}" novalidate>
         @csrf
 
         {{-- ═══════════════════════════════════
@@ -76,19 +88,29 @@
             </div>
 
             {{-- Tipo de empresa --}}
+            @php
+                $tipoActual = old('tipo_empresa', $empresa->tipo_empresa ?? '');
+                $tipoLabels = ['autonomo' => 'Autónomo','sl' => 'Sociedad Limitada (S.L.)','sa' => 'Sociedad Anónima (S.A.)','asociacion' => 'Asociación','otro' => 'Otro'];
+                $tipoLabelActual = $tipoLabels[$tipoActual] ?? 'Selecciona la forma jurídica';
+            @endphp
             <div>
                 <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
                     Forma jurídica *
                 </label>
-                <select name="tipo_empresa"
-                        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
-                    <option value="" disabled {{ old('tipo_empresa', $empresa->tipo_empresa ?? '') === '' ? 'selected' : '' }}>Selecciona la forma jurídica</option>
-                    <option value="autonomo"    {{ old('tipo_empresa', $empresa->tipo_empresa ?? '') === 'autonomo'    ? 'selected' : '' }}>Autónomo</option>
-                    <option value="sl"          {{ old('tipo_empresa', $empresa->tipo_empresa ?? '') === 'sl'          ? 'selected' : '' }}>Sociedad Limitada (S.L.)</option>
-                    <option value="sa"          {{ old('tipo_empresa', $empresa->tipo_empresa ?? '') === 'sa'          ? 'selected' : '' }}>Sociedad Anónima (S.A.)</option>
-                    <option value="asociacion"  {{ old('tipo_empresa', $empresa->tipo_empresa ?? '') === 'asociacion'  ? 'selected' : '' }}>Asociación</option>
-                    <option value="otro"        {{ old('tipo_empresa', $empresa->tipo_empresa ?? '') === 'otro'        ? 'selected' : '' }}>Otro</option>
-                </select>
+                <input type="hidden" id="tipo_empresa" name="tipo_empresa" value="{{ $tipoActual }}">
+                <div class="te-csel{{ $tipoActual ? ' open-init' : '' }}" id="te-csel">
+                    <div class="te-csel-trigger" id="te-csel-trigger" onclick="toggleTeCsel()">
+                        <span id="te-csel-label">{{ $tipoLabelActual }}</span>
+                        <span class="te-csel-arrow" id="te-csel-arrow">▾</span>
+                    </div>
+                    <ul class="te-csel-menu" id="te-csel-menu">
+                        <li class="te-csel-opt {{ $tipoActual === 'autonomo'   ? 'selected' : '' }}" onclick="pickTeCsel('autonomo','Autónomo')">Autónomo</li>
+                        <li class="te-csel-opt {{ $tipoActual === 'sl'         ? 'selected' : '' }}" onclick="pickTeCsel('sl','Sociedad Limitada (S.L.)')">Sociedad Limitada (S.L.)</li>
+                        <li class="te-csel-opt {{ $tipoActual === 'sa'         ? 'selected' : '' }}" onclick="pickTeCsel('sa','Sociedad Anónima (S.A.)')">Sociedad Anónima (S.A.)</li>
+                        <li class="te-csel-opt {{ $tipoActual === 'asociacion' ? 'selected' : '' }}" onclick="pickTeCsel('asociacion','Asociación')">Asociación</li>
+                        <li class="te-csel-opt {{ $tipoActual === 'otro'       ? 'selected' : '' }}" onclick="pickTeCsel('otro','Otro')">Otro</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -155,49 +177,7 @@
             </div>
         </div>
 
-        {{-- ═══════════════════════════════════
-             BLOQUE C — Datos bancarios
-        ═══════════════════════════════════ --}}
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(245,241,234,0.08);border-radius:16px;padding:32px;margin-bottom:32px;">
-            <p class="mono" style="font-size:10px;color:rgba(168,85,247,0.7);letter-spacing:0.18em;margin-bottom:20px;">C · DATOS BANCARIOS PARA RECIBIR PAGOS</p>
-
-            {{-- Aviso de seguridad --}}
-            <div style="background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-                <span style="font-size:16px;">🔒</span>
-                <p style="font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.6);margin:0;">
-                    Tu IBAN se almacena <strong style="color:rgba(245,241,234,0.85);">cifrado</strong> con encriptación de clave privada y nunca se comparte con terceros.
-                </p>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-                {{-- Titular --}}
-                <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
-                        Titular de la cuenta *
-                    </label>
-                    <input type="text" name="titular_cuenta" value="{{ old('titular_cuenta', $empresa->titular_cuenta ?? '') }}"
-                           placeholder="Nombre del titular"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
-                </div>
-
-                {{-- IBAN --}}
-                <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
-                        IBAN *
-                    </label>
-                    <input type="text" id="iban-input" name="iban"
-                           value="{{ old('iban') }}"
-                           placeholder="ES00 0000 0000 0000 0000 0000"
-                           maxlength="29"
-                           oninput="formatearIban(this)"
-                           onblur="validarIban(this)"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;letter-spacing:0.05em;">
-                    <span id="error-iban" style="font-size:11px;color:#f87171;margin-top:4px;display:block;"></span>
-                </div>
-            </div>
-        </div>
-
-        {{-- Botón submit --}}
+        {{-- Botón submit —datos legales— --}}
         <button type="submit"
                 style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#f5f1ea;border:none;border-radius:999px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:0.04em;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 24px rgba(124,58,237,0.4);transition:all 0.2s ease;"
                 onmouseover="this.style.boxShadow='0 6px 32px rgba(124,58,237,0.6)'"
@@ -206,30 +186,96 @@
         </button>
 
     </form>
+
+    {{-- ═══════════════════════════════════
+         BLOQUE C — Cuenta bancaria Stripe
+    ═══════════════════════════════════ --}}
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(245,241,234,0.08);border-radius:16px;padding:32px;margin-top:24px;">
+        <p class="mono" style="font-size:10px;color:rgba(168,85,247,0.7);letter-spacing:0.18em;margin-bottom:20px;">C · CUENTA BANCARIA PARA RECIBIR PAGOS</p>
+
+        @php
+            $stripeOk      = $empresa && $empresa->stripe_charges_enabled;
+            $stripeInicio  = $empresa && $empresa->stripe_account_id && !$empresa->stripe_charges_enabled;
+            $stripeSinCuenta = !$empresa || !$empresa->stripe_account_id;
+        @endphp
+
+        @if($stripeOk)
+            {{-- ✅ Cuenta activa --}}
+            <div style="display:flex;align-items:center;gap:16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:20px 24px;margin-bottom:20px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">✓</div>
+                <div>
+                    <p style="font-family:'Anton',sans-serif;font-size:16px;color:#6ee7b7;margin:0 0 4px;">Cuenta bancaria conectada</p>
+                    <p style="font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.5);margin:0;">
+                        Tu cuenta Stripe Express está activa. Recibirás el 90% de cada venta de entradas automáticamente.
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('empresa.stripe.refrescar') }}"
+               style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(245,241,234,0.15);border-radius:999px;font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.6);text-decoration:none;">
+                Gestionar cuenta en Stripe →
+            </a>
+
+        @elseif($stripeInicio)
+            {{-- ⏳ Onboarding iniciado pero sin completar --}}
+            <div style="display:flex;align-items:center;gap:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:20px 24px;margin-bottom:20px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">⏳</div>
+                <div>
+                    <p style="font-family:'Anton',sans-serif;font-size:16px;color:#fcd34d;margin:0 0 4px;">Onboarding pendiente</p>
+                    <p style="font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.5);margin:0;">
+                        Has iniciado el proceso pero aún no has completado los datos bancarios en Stripe.
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('empresa.stripe.refrescar') }}"
+               style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:999px;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:0.04em;text-decoration:none;text-transform:uppercase;box-shadow:0 4px 16px rgba(245,158,11,0.35);">
+                Continuar onboarding en Stripe →
+            </a>
+
+        @else
+            {{-- 🔗 Sin cuenta Stripe —estado inicial— --}}
+            <div style="display:flex;align-items:flex-start;gap:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:16px 20px;margin-bottom:24px;">
+                <span style="font-size:18px;flex-shrink:0;margin-top:1px;">💳</span>
+                <div>
+                    <p style="font-family:'Archivo Narrow',sans-serif;font-size:14px;color:rgba(245,241,234,0.75);margin:0 0 4px;">
+                        <strong style="color:#f5f1ea;">Conecta tu cuenta bancaria a través de Stripe</strong> para recibir el 90% de cada venta de entradas directamente en tu banco.
+                    </p>
+                    <p style="font-family:'Archivo Narrow',sans-serif;font-size:12px;color:rgba(245,241,234,0.4);margin:0;">
+                        VIBEZ usa Stripe Connect. El proceso tarda ~2 minutos y es completamente seguro.
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('empresa.stripe.conectar') }}"
+               style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;background:linear-gradient(135deg,#635BFF,#4F46E5);color:#fff;border:none;border-radius:999px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:0.04em;text-decoration:none;text-transform:uppercase;box-shadow:0 4px 24px rgba(99,91,255,0.45);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                Conectar cuenta bancaria con Stripe
+            </a>
+        @endif
+    </div>
+
 </div>
 </div>
 
+@push('scripts')
 <script>
-    /* Formatea el IBAN en grupos de 4 caracteres: ES00 0000 0000... */
-    function formatearIban(input) {
-        var raw   = input.value.replace(/\s/g, '').toUpperCase();
-        var groups = raw.match(/.{1,4}/g) || [];
-        input.value = groups.join(' ');
-    }
+function toggleTeCsel() {
+    var el = document.getElementById('te-csel');
+    el.classList.toggle('open');
+}
 
-    /* Validación básica: empieza por ES + 22 dígitos = 24 chars en total (sin espacios) */
-    function validarIban(input) {
-        var raw   = input.value.replace(/\s/g, '');
-        var error = document.getElementById('error-iban');
-        if (!raw) { error.textContent = ''; return; }
-        if (!/^ES[0-9]{22}$/i.test(raw)) {
-            error.textContent = 'El IBAN debe comenzar por ES seguido de 22 dígitos';
-            input.style.borderColor = 'rgba(239,68,68,0.6)';
-        } else {
-            error.textContent = '';
-            input.style.borderColor = 'rgba(16,185,129,0.5)';
-        }
-    }
+function pickTeCsel(val, label) {
+    document.getElementById('tipo_empresa').value    = val;
+    document.getElementById('te-csel-label').textContent = label;
+    document.getElementById('te-csel').classList.remove('open');
+    document.querySelectorAll('.te-csel-opt').forEach(function(li) {
+        li.classList.toggle('selected', li.getAttribute('onclick').indexOf("'" + val + "'") !== -1);
+    });
+}
+
+document.addEventListener('click', function(e) {
+    var el = document.getElementById('te-csel');
+    if (el && !el.contains(e.target)) el.classList.remove('open');
+});
 </script>
+@endpush
 
 @endsection

@@ -39,4 +39,16 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
     ],
 
+    // Apple Sign In with Apple — Service ID registrado en Apple Developer Console
+    // client_id es el identificador del Service ID (formato: com.vibez.web)
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+    ],
+
+    'stripe' => [
+        'key'            => env('STRIPE_KEY'),
+        'secret'         => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
 ];

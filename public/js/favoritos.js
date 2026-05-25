@@ -38,6 +38,18 @@ var USER_AUTHENTICATED = Boolean(FAVORITOS_CFG.userAuthenticated);
 // URL de login para redirigir al usuario si intenta marcar favorito sin estar autenticado
 var LOGIN_URL = FAVORITOS_CFG.loginUrl || '/login';
 
+function obtenerCsrfToken() {
+    var metadatos = document.getElementsByTagName('meta');
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            return metadatos[indice].getAttribute('content');
+        }
+    }
+
+    return '';
+}
+
 /**
  * Actualiza el estado visual de un botón de favorito (corazón) individualmente.
  * Se usa como función auxiliar llamada por las funciones de sincronización.
@@ -63,11 +75,13 @@ function actualizarBotonFavorito(btn, esFavorito) {
  * @param {boolean} esFavorito - Nuevo estado del favorito
  */
 function sincronizarBotonesFavorito(eventoId, esFavorito) {
-    // Seleccionamos todos los botones que tengan el data-evento-id del evento modificado,
-    // independientemente de en qué sección de la página estén
-    var selector = '[data-evento-id="' + eventoId + '"]';
-    document.querySelectorAll(selector).forEach(function(btn) {
-        actualizarBotonFavorito(btn, esFavorito);
+    // Seleccionamos todos los botones que tengan la clase btn-favorito-card
+    // y filtramos por el eventoId.
+    var botones = document.getElementsByClassName('btn-favorito-card');
+    Array.from(botones).forEach(function(btn) {
+        if (btn.dataset.eventoId === String(eventoId)) {
+            actualizarBotonFavorito(btn, esFavorito);
+        }
     });
 }
 
@@ -140,7 +154,7 @@ function toggleFavorito(event, boton) {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             // El token CSRF evita que sitios externos puedan hacer peticiones en nombre del usuario
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': obtenerCsrfToken()
         },
         body: JSON.stringify({ evento_id: eventoId })
     })
@@ -231,7 +245,7 @@ function toggleFavoritoDetalle(btn) {
     btn.dataset.loading = '1';
     btn.classList.add('cargando');
 
-    var csrfToken = document.querySelector('meta[name="csrf-token"]');
+    var csrfToken = obtenerCsrfToken();
     // Verificamos explícitamente que el meta tag existe porque sin CSRF el servidor
     // rechazará la petición con un error 419 (CSRF token mismatch)
     if (!csrfToken) {
@@ -249,7 +263,7 @@ function toggleFavoritoDetalle(btn) {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+            'X-CSRF-TOKEN': csrfToken
         },
         body: JSON.stringify({ evento_id: eventoId })
     })

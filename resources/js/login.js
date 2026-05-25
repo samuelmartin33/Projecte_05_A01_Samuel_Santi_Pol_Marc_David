@@ -9,15 +9,15 @@
    ============================================================ */
 const submitBtn = document.getElementById('submitBtn');
 
-submitBtn.onclick = function (e) {
+submitBtn.onclick = function (eventoClic) {
     const rect   = this.getBoundingClientRect();
     const size   = Math.max(rect.width, rect.height);
-    const x      = e.clientX - rect.left - size / 2;
-    const y      = e.clientY - rect.top  - size / 2;
+    const posicionX = eventoClic.clientX - rect.left - size / 2;
+    const posicionY = eventoClic.clientY - rect.top  - size / 2;
 
     const ripple = document.createElement('span');
     ripple.classList.add('ripple');
-    ripple.style.cssText = `width:${size}px; height:${size}px; left:${x}px; top:${y}px`;
+    ripple.style.cssText = `width:${size}px; height:${size}px; left:${posicionX}px; top:${posicionY}px`;
     this.appendChild(ripple);
 
     setTimeout(() => ripple.remove(), 700);
@@ -72,8 +72,8 @@ function shakeElement(element) {
 /* ============================================================
    LÓGICA PRINCIPAL — Validación y envío via fetch
    ============================================================ */
-document.getElementById('loginForm').onsubmit = async function (e) {
-    e.preventDefault();
+document.getElementById('loginForm').onsubmit = async function (eventoEnvio) {
+    eventoEnvio.preventDefault();
 
     const email    = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
@@ -109,8 +109,15 @@ document.getElementById('loginForm').onsubmit = async function (e) {
     submitBtn.classList.add('loading');
 
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')
-                                  .getAttribute('content');
+        const metadatos = document.getElementsByTagName('meta');
+        let csrfToken = '';
+
+        for (let indice = 0; indice < metadatos.length; indice++) {
+            if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+                csrfToken = metadatos[indice].getAttribute('content');
+                break;
+            }
+        }
 
         const response = await fetch('/api/login', {
             method: 'POST',

@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use App\Models\Cupon;
 use Illuminate\Support\Facades\Crypt;
 
 /**
@@ -154,6 +156,16 @@ class Empresa extends Model
     }
 
     /**
+     * Usuarios que siguen esta empresa/promotora.
+     * Acceso: $empresa->seguidores  →  colección de objetos Usuario.
+     */
+    public function seguidores(): BelongsToMany
+    {
+        return $this->belongsToMany(Usuario::class, 'seguimientos_empresa', 'empresa_id', 'usuario_id')
+            ->withPivot('fecha_creacion');
+    }
+
+    /**
      * Relación HasMany: una empresa TIENE MUCHOS organizadores.
      *
      * HasMany indica que la clave foránea (empresa_id) está en la tabla "organizadores".
@@ -238,6 +250,16 @@ class Empresa extends Model
      *
      * @return HasManyThrough
      */
+    /**
+     * Relación HasMany: una empresa TIENE MUCHOS cupones.
+     * La clave foránea empresa_id está en la tabla cupones.
+     * Acceso: $empresa->cupones  →  colección de objetos Cupon.
+     */
+    public function cupones(): HasMany
+    {
+        return $this->hasMany(Cupon::class, 'empresa_id');
+    }
+
     public function ofertas(): HasManyThrough
     {
         return $this->hasManyThrough(

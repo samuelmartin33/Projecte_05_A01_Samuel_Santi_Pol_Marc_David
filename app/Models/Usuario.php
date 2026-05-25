@@ -72,6 +72,8 @@ class Usuario extends Authenticatable
         'fecha_nacimiento',
         'telefono',
         'email_verificado',
+        'social_provider',
+        'social_id',
         'tipo_cuenta',
         'estado_registro',
         'es_admin',
@@ -138,9 +140,9 @@ class Usuario extends Authenticatable
      *
      * @return string|null null desactiva la funcionalidad.
      */
-    public function getRememberTokenName(): ?string
+    public function getRememberTokenName(): string
     {
-        return null;
+        return 'remember_token';
     }
 
     /* ——— Relaciones ——— */
@@ -190,6 +192,16 @@ class Usuario extends Authenticatable
         return $this->belongsToMany(Evento::class, 'eventos_favoritos', 'usuario_id', 'evento_id')
             ->wherePivot('estado', 1)
             ->withPivot(['estado', 'fecha_creacion', 'fecha_actualizacion']);
+    }
+
+    /**
+     * Empresas/promotoras que este usuario sigue.
+     * Acceso: $usuario->seguimientos  →  colección de objetos Empresa.
+     */
+    public function seguimientos(): BelongsToMany
+    {
+        return $this->belongsToMany(Empresa::class, 'seguimientos_empresa', 'usuario_id', 'empresa_id')
+            ->withPivot('fecha_creacion');
     }
 
     /* ——— Helpers de rol ——— */

@@ -183,6 +183,14 @@
                         </div>
                     </div>
 
+                    {{-- Promotoras que sigues --}}
+                    <div class="soc-side-card" id="soc-promotoras-card">
+                        <h3 class="soc-side-title">Promotoras que <em>sigues</em></h3>
+                        <div id="soc-promotoras-lista" style="display:flex;flex-direction:column;gap:10px;">
+                            <p class="soc-vacio" style="font-size:0.8rem;padding:4px 0;">Cargando…</p>
+                        </div>
+                    </div>
+
                     {{-- Sugeridos para seguir --}}
                     <div class="soc-side-card">
                         <h3 class="soc-side-title">Sugeridos para <em>seguir</em></h3>
@@ -664,5 +672,75 @@
     window.miUsuarioId = {{ Auth::id() }};
 </script>
 <script src="{{ asset('js/social.js') }}"></script>
+<script>
+(async function cargarPromotorasSocial() {
+    const lista = document.getElementById('soc-promotoras-lista');
+    if (!lista) return;
+    try {
+        const res  = await fetch('/api/seguimientos/promotoras', {
+            headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        const promotoras = data.promotoras ?? [];
+
+        if (promotoras.length === 0) {
+            lista.innerHTML = '<p class="soc-vacio" style="font-size:0.8rem;padding:4px 0;">Aún no sigues ninguna promotora.</p>';
+            return;
+        }
+
+        lista.innerHTML = promotoras.map(p => {
+            const inicialLetra = p.nombre ? p.nombre.charAt(0).toUpperCase() : '?';
+            const logoHtml = p.logo_url
+                ? `<img src="${p.logo_url}" alt="${p.nombre}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+                : `<div style="width:36px;height:36px;border-radius:50%;background:#a855f7;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:0.9rem;flex-shrink:0;">${inicialLetra}</div>`;
+
+            const proximoEvento = (p.proximos_eventos && p.proximos_eventos.length > 0)
+                ? `<span style="color:#a855f7;font-size:0.72rem;">${p.proximos_eventos[0].titulo}</span>`
+                : '';
+
+            return `<div style="display:flex;align-items:center;gap:10px;">
+                ${logoHtml}
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:700;color:#f5f1ea;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.nombre}</div>
+                    ${proximoEvento}
+                </div>
+                <button class="soc-side-btn-ghost"
+                        style="font-size:0.7rem;padding:4px 10px;flex-shrink:0;"
+                        data-empresa-id="${p.id}"
+                        onclick="toggleSeguirSocial(this)">✓</button>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        lista.innerHTML = '<p class="soc-vacio" style="font-size:0.8rem;">Error al cargar promotoras.</p>';
+    }
+})();
+
+async function toggleSeguirSocial(btn) {
+    const empresaId = btn.dataset.empresaId;
+    btn.disabled = true;
+    try {
+        const res  = await fetch(`/api/seguimientos/${empresaId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+        });
+        const data = await res.json();
+        if (data.success && !data.siguiendo) {
+            const fila = btn.closest('div[style*="display:flex"]');
+            if (fila) {
+                fila.style.transition = 'opacity 0.25s';
+                fila.style.opacity   = '0';
+                setTimeout(() => fila.remove(), 250);
+            }
+        }
+    } catch (e) {
+        console.error('Error', e);
+    } finally {
+        btn.disabled = false;
+    }
+}
+</script>
 
 @endsection

@@ -37,10 +37,7 @@
 
         {{-- Contenido editorial (empujado al fondo del panel) --}}
         <div class="auth-side-content">
-            <div class="mono auth-kicker">
-                <span class="kicker-line"></span>
-                Sé parte · Edición #428
-            </div>
+
             <h1 class="display auth-side-title">
                 Bienvenido<br><em>a la lista</em>.
             </h1>
@@ -68,7 +65,6 @@
 
         {{-- Stickers decorativos --}}
         <div class="deco-sticker deco-1">NEW · MEMBER</div>
-        <div class="deco-sticker deco-2">★ EDICIÓN 428</div>
         <div class="deco-numbers" aria-hidden="true">{{ now()->format('d') }}<br>{{ now()->format('m') }}</div>
 
         <div class="auth-form-wrap auth-form-wide">
@@ -412,11 +408,13 @@
                     
 
                     {{-- Aceptar términos --}}
-                    <label class="auth-check auth-check-tall">
-                        <input type="checkbox" name="acepta_terminos" required>
+                    <label class="auth-check auth-check-tall" id="field-acepta_terminos">
+                        <input type="checkbox" id="acepta_terminos" name="acepta_terminos" required
+                               onchange="limpiarErrorCampo('field-acepta_terminos','error-acepta_terminos')">
                         <span class="auth-check-box"></span>
                         <span>Acepto los <a href="{{ route('terminos') }}">Términos de uso</a> y la <a href="{{ route('privacidad') }}">Política de privacidad</a>. Soy mayor de 16 años.</span>
                     </label>
+                    <span class="field-error" id="error-acepta_terminos" role="alert"></span>
 
                     {{-- Fila botones (id="btnRow" usado por JS en estado pendiente) --}}
                     <div id="btnRow">
@@ -434,8 +432,20 @@
 
                         <div class="auth-divider"><span>o continúa con</span></div>
 
-                        <div class="google-btn-wrapper" id="google-btn-wrapper">
-                            <div id="google-signin-btn" data-client-id="{{ config('services.google.client_id') }}"></div>
+                        <div class="auth-socials" style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+                            <div class="google-btn-wrapper" id="google-btn-wrapper">
+                                <div id="google-signin-btn" data-client-id="{{ config('services.google.client_id') }}"></div>
+                            </div>
+                            <button
+                                type="button"
+                                class="auth-social"
+                                id="apple-signin-btn"
+                                data-apple-client-id="{{ config('services.apple.client_id') }}"
+                                onclick="iniciarSesionApple(event, this)"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 1.5c.1 1.2-.4 2.4-1.2 3.3-.9 1-2.2 1.7-3.4 1.6-.1-1.2.5-2.4 1.2-3.2.9-1 2.3-1.7 3.4-1.7zm3.6 16.4c-.7 1.6-1 2.3-1.9 3.7-1.2 1.9-2.9 4.3-5 4.3-1.9 0-2.4-1.2-5-1.2-2.5 0-3.1 1.2-5 1.2-2.1 0-3.7-2.2-4.9-4.1C-1 18.3-1.4 13.5.7 10.6c1.4-2 3.7-3.2 5.8-3.2 2.2 0 3.6 1.2 5.4 1.2 1.8 0 2.9-1.2 5.4-1.2 1.9 0 3.9 1 5.3 2.8-4.7 2.6-3.9 9.3-2.6 7.7z"/></svg>
+                                Continuar con Apple
+                            </button>
                         </div>
                     </div>
 
@@ -456,6 +466,7 @@
 
 @section('scripts')
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <script src="{{ asset('js/register.js') }}"></script>

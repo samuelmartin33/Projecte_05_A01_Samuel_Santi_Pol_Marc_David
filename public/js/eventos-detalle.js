@@ -1,16 +1,16 @@
 // Interacciones de la ficha de evento y compra de entradas.
-var _ed = window.eventoData || {};
+var datosEvento = window.eventoData || {};
 
-var EVENTO_ID   = _ed.id        || 0;
-var PRECIO_BASE = _ed.precioBase || 0;
-var ES_GRATUITO = _ed.esGratuito || false;
-var AFORO_LIBRE = _ed.aforoLibre !== undefined ? _ed.aforoLibre : 9999;
-var LOGIN_URL   = _ed.loginUrl   || '/login';
+var EVENTO_ID   = datosEvento.id        || 0;
+var PRECIO_BASE = datosEvento.precioBase || 0;
+var ES_GRATUITO = datosEvento.esGratuito || false;
+var AFORO_LIBRE = datosEvento.aforoLibre !== undefined ? datosEvento.aforoLibre : 9999;
+var LOGIN_URL   = datosEvento.loginUrl   || '/login';
 
 var cantidadModal = 1;
 
-if (_ed.latitud && _ed.longitud) {
-    inicializarMapa(_ed.latitud, _ed.longitud, _ed.nombreUbicacion || 'Ubicación del evento');
+if (datosEvento.latitud && datosEvento.longitud) {
+    inicializarMapa(datosEvento.latitud, datosEvento.longitud, datosEvento.nombreUbicacion || 'Ubicación del evento');
 }
 
 function inicializarMapa(latitud, longitud, nombreUbicacion) {
@@ -36,7 +36,7 @@ function inicializarMapa(latitud, longitud, nombreUbicacion) {
 }
 
 function abrirCompra() {
-    if (_ed.guestRedirect) {
+    if (datosEvento.guestRedirect) {
         window.location.href = LOGIN_URL;
         return;
     }
@@ -73,7 +73,15 @@ function actualizarModalTotal() {
 function confirmarCompra() {
     var botonComprar = document.getElementById('modal-btn-comprar');
     var zonaError    = document.getElementById('modal-error');
-    var csrf         = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf      = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     botonComprar.disabled    = true;
     botonComprar.textContent = 'Procesando...';

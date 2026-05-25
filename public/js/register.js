@@ -4,7 +4,7 @@
  * También gestiona Google Identity Services y flatpickr.
  *
  * Reglas del proyecto:
- *   - Sin addEventListener (conexión via atributos onsubmit/onclick/onchange del blade)
+ *   - Eventos directos desde atributos onsubmit/onclick/onchange del blade
  *   - Solo getElementById para acceder al DOM
  *   - Variables y comentarios en castellano
  *
@@ -77,10 +77,17 @@ window.onGoogleLibraryLoad = function () {
  */
 window.handleGoogleCredential = function (respuestaGoogle) {
     var alerta = document.getElementById('alert-global');
-    /* querySelector solo para el meta CSRF — no tiene id asignable en el layout */
-    var csrf   = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf   = '';
 
-    fetch('/api/auth/google', {
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
+
+    fetch('/api/google-auth', {
         method:  'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -89,20 +96,18 @@ window.handleGoogleCredential = function (respuestaGoogle) {
         },
         body: JSON.stringify({ credential: respuestaGoogle.credential }),
     })
-    .then(function (r) { return r.json(); })
+    .then(function (respuesta) { return respuesta.json(); })
     .then(function (datos) {
         if (datos.success) {
             document.body.style.transition = 'opacity 0.35s ease';
             document.body.style.opacity    = '0';
             setTimeout(function () { window.location.href = '/home'; }, 360);
         } else {
-            alerta.textContent = datos.message || 'Error al iniciar sesión con Google.';
-            alerta.className   = 'alert alert-error visible';
+            mostrarAlerta(datos.message || 'Error al iniciar sesión con Google.');
         }
     })
     .catch(function () {
-        alerta.textContent = 'Error de conexión. Inténtalo de nuevo.';
-        alerta.className   = 'alert alert-error visible';
+        mostrarAlerta('Error de conexión. Inténtalo de nuevo.');
     });
 };
 
@@ -118,8 +123,8 @@ function togglePassword(inputId, boton) {
     var campo     = document.getElementById(inputId);
     var mostrando = campo.type === 'text';
     campo.type    = mostrando ? 'password' : 'text';
-    boton.querySelector('.eye-open').style.display   = mostrando ? ''     : 'none';
-    boton.querySelector('.eye-closed').style.display = mostrando ? 'none' : '';
+    boton.getElementsByClassName('eye-open')[0].style.display   = mostrando ? ''     : 'none';
+    boton.getElementsByClassName('eye-closed')[0].style.display = mostrando ? 'none' : '';
     boton.setAttribute('aria-label', mostrando ? 'Mostrar contraseña' : 'Ocultar contraseña');
 }
 
@@ -397,9 +402,10 @@ function registrar(evento) {
         ['field-fecha_nacimiento',      'error-fecha_nacimiento'],
         ['field-telefono',              'error-telefono'],
         ['field-tipo_cuenta',           'error-tipo_cuenta'],
+        ['field-acepta_terminos',       'error-acepta_terminos'],
     ];
-    for (var c = 0; c < camposLimpiar.length; c++) {
-        limpiarErrorCampo(camposLimpiar[c][0], camposLimpiar[c][1]);
+    for (var indiceCampo = 0; indiceCampo < camposLimpiar.length; indiceCampo++) {
+        limpiarErrorCampo(camposLimpiar[indiceCampo][0], camposLimpiar[indiceCampo][1]);
     }
     ocultarAlerta();
 
@@ -524,6 +530,13 @@ function registrar(evento) {
         }
     }
 
+    /* Validar aceptación de términos */
+    var checkTerminos = document.getElementById('acepta_terminos');
+    if (!checkTerminos || !checkTerminos.checked) {
+        mostrarErrorCampo('field-acepta_terminos', 'error-acepta_terminos', 'Debes aceptar las condiciones para continuar');
+        esValido = false;
+    }
+
     if (!esValido) {
         sacudirElemento(formulario);
         return;
@@ -532,8 +545,15 @@ function registrar(evento) {
     /* Enviar al servidor */
     boton.classList.add('loading');
 
-    /* querySelector solo para el meta CSRF — no tiene id asignable en el layout */
-    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var metadatos = document.getElementsByTagName('meta');
+    var csrf = '';
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            csrf = metadatos[indice].getAttribute('content');
+            break;
+        }
+    }
 
     /* Construir cuerpo de la petición: campos comunes + empresa si aplica */
     var cuerpo = {
@@ -616,11 +636,11 @@ function registrar(evento) {
         boton.classList.remove('loading');
         if (datos.errors) {
             var claves = Object.keys(datos.errors);
-            for (var i = 0; i < claves.length; i++) {
+            for (var indiceClave = 0; indiceClave < claves.length; indiceClave++) {
                 mostrarErrorCampo(
-                    'field-' + claves[i],
-                    'error-' + claves[i],
-                    datos.errors[claves[i]][0]
+                    'field-' + claves[indiceClave],
+                    'error-' + claves[indiceClave],
+                    datos.errors[claves[indiceClave]][0]
                 );
             }
         }
@@ -630,5 +650,90 @@ function registrar(evento) {
     .catch(function () {
         boton.classList.remove('loading');
         mostrarAlerta('Error de conexión. Verifica tu red e inténtalo de nuevo.');
+    });
+}
+
+/* ============================================================
+   AUTENTICACIÓN CON APPLE (Sign in with Apple — JS SDK)
+   ============================================================ */
+
+/**
+ * Abre el popup de Apple Sign In y envía el id_token al backend.
+ * Ver login.js para la documentación completa del flujo.
+ * Llamado desde onclick="iniciarSesionApple(event, this)" en el blade.
+ */
+function iniciarSesionApple(evento, boton) {
+    var clientId = boton.getAttribute('data-apple-client-id') || '';
+    if (!clientId) {
+        mostrarAlerta('Apple Sign-In no está configurado en este servidor.', 'warning');
+        return;
+    }
+
+    if (typeof AppleID === 'undefined' || !AppleID.auth) {
+        mostrarAlerta('El SDK de Apple no ha cargado. Recarga la página e inténtalo de nuevo.', 'warning');
+        return;
+    }
+
+    AppleID.auth.init({
+        clientId:    clientId,
+        scope:       'name email',
+        redirectURI: window.location.origin,
+        usePopup:    true,
+    });
+
+    AppleID.auth.signIn()
+        .then(function (respuestaApple) {
+            manejarRespuestaApple(respuestaApple);
+        })
+        .catch(function (error) {
+            if (error && error.error !== 'popup_closed_by_user') {
+                mostrarAlerta('No se pudo iniciar sesión con Apple. Inténtalo de nuevo.');
+            }
+        });
+}
+
+/**
+ * Procesa la respuesta del SDK de Apple y la envía al backend.
+ */
+function manejarRespuestaApple(respuestaApple) {
+    var idToken  = respuestaApple.authorization.id_token;
+    var userName = '';
+
+    if (respuestaApple.user) {
+        var nombre   = respuestaApple.user.name || {};
+        var partes   = [nombre.firstName || '', nombre.lastName || ''];
+        userName = partes.join(' ').trim();
+    }
+
+    var csrf = '';
+    var metas = document.getElementsByTagName('meta');
+    for (var i = 0; i < metas.length; i++) {
+        if (metas[i].getAttribute('name') === 'csrf-token') {
+            csrf = metas[i].getAttribute('content');
+            break;
+        }
+    }
+
+    fetch('/api/apple-auth', {
+        method:  'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': csrf,
+        },
+        body: JSON.stringify({ id_token: idToken, user_name: userName }),
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (datos) {
+        if (datos.success) {
+            document.body.style.transition = 'opacity 0.35s ease';
+            document.body.style.opacity    = '0';
+            setTimeout(function () { window.location.href = '/home'; }, 360);
+        } else {
+            mostrarAlerta(datos.message || 'No se pudo iniciar sesión con Apple. Inténtalo de nuevo.');
+        }
+    })
+    .catch(function () {
+        mostrarAlerta('Error de conexión al iniciar sesión con Apple.');
     });
 }

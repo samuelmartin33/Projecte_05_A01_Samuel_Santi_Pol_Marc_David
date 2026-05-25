@@ -47,6 +47,7 @@ function parsearErrorServidor(respuesta, porDefecto) {
 
 var temporizadorBusqueda = null;
 
+<<<<<<< HEAD
 var historialHistorias  = [];  // grupos de historias cargados [{ usuario, historias }]
 var visorGrupoIdx       = 0;   // índice del grupo actual en el visor
 var visorHistoriaIdx    = 0;   // índice de la historia dentro del grupo
@@ -54,6 +55,21 @@ var visorTimer          = null; // setTimeout del avance automático
 var eventoFiltroActual  = null; // id del evento actualmente filtrado
 
 var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+=======
+function obtenerTokenCsrf() {
+    var metadatos = document.getElementsByTagName('meta');
+
+    for (var indice = 0; indice < metadatos.length; indice++) {
+        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
+            return metadatos[indice].getAttribute('content');
+        }
+    }
+
+    return '';
+}
+
+var tokenCsrf = obtenerTokenCsrf();
+>>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
 
 /* ============================================================
    INICIALIZACIÓN
@@ -76,10 +92,10 @@ function irA(panel) {
     }
 
     // Desactivar todos los paneles y botones
-    document.querySelectorAll('.soc-panel').forEach(function (el) {
+    Array.from(document.getElementsByClassName('soc-panel')).forEach(function (el) {
         el.classList.remove('activo');
     });
-    document.querySelectorAll('.soc-nav-btn').forEach(function (el) {
+    Array.from(document.getElementsByClassName('soc-nav-btn')).forEach(function (el) {
         el.classList.remove('activo');
     });
 
@@ -183,9 +199,6 @@ function cargarFeedPosts(pagina) {
         var lista = document.getElementById('feed-lista');
         respuesta.datos.forEach(function (post) {
             lista.insertAdjacentHTML('beforeend', renderizarPost(post));
-            if (post.imagenes && post.imagenes.length > 1) {
-                inicializarTouchCarrusel(post.id);
-            }
         });
 
         pubPagina = pagina;
@@ -208,11 +221,16 @@ function cargarMasPosts() {
 function renderizarPost(post) {
     var avatarHtml    = construirAvatar(post.autor.foto_url, post.autor.nombre, post.autor.apellido1, 'sm');
     var autorNombre   = escaparHtml(post.autor.nombre + ' ' + post.autor.apellido1);
+<<<<<<< HEAD
     var eventoLabel   = post.evento ? escaparHtml(post.evento.titulo) : '';
     var eventoTagHtml = post.evento
         ? '<span class="post-evento-tag" onclick="irAFiltroEvento(' + post.evento.id + ')">🎫 ' + eventoLabel + '</span>'
         : '';
     var fechaLabel    = formatearFechaRelativa(post.fecha);
+=======
+    var eventoLabel   = escaparHtml(post.evento.titulo);
+
+>>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
     var visiBadge     = post.visibilidad === 2
         ? '<span style="font-size:0.6rem;color:rgba(245,241,234,0.35);margin-left:4px;" title="Solo amigos">🔒</span>'
         : '';
@@ -230,8 +248,8 @@ function renderizarPost(post) {
     // Comentarios preview
     var comentariosHtml = '';
     if (post.comentarios_preview && post.comentarios_preview.length > 0) {
-        post.comentarios_preview.forEach(function (c) {
-            comentariosHtml += renderizarComentario(c);
+        post.comentarios_preview.forEach(function (comentario) {
+            comentariosHtml += renderizarComentario(comentario);
         });
     }
 
@@ -309,13 +327,13 @@ function renderizarImagenes(post) {
 
     var slides = '';
     var dots   = '';
-    post.imagenes.forEach(function (img, idx) {
+        post.imagenes.forEach(function (imagen, indice) {
         slides += '<div class="post-carousel-slide">'
-               + '<img src="' + escaparHtml(img.url) + '" alt="Foto del evento" loading="lazy"'
-               + ' onclick="abrirLightbox(\'' + escaparTexto(img.url) + '\')">'
+             + '<img src="' + escaparHtml(imagen.url) + '" alt="Foto del evento" loading="lazy"'
+             + ' onclick="abrirLightbox(\'' + escaparTexto(imagen.url) + '\')">'
                + '</div>';
-        dots += '<span class="post-carousel-dot' + (idx === 0 ? ' activo' : '') + '"'
-              + ' onclick="irASlide(' + post.id + ',' + idx + ')"></span>';
+         dots += '<span class="post-carousel-dot' + (indice === 0 ? ' activo' : '') + '"'
+            + ' onclick="irASlide(' + post.id + ',' + indice + ')"></span>';
     });
 
     return '<div class="post-carousel" id="carousel-' + post.id + '">'
@@ -342,7 +360,7 @@ function irASlide(postId, idx) {
     // Actualizar dots
     var dotsEl = document.getElementById('carousel-dots-' + postId);
     if (dotsEl) {
-        dotsEl.querySelectorAll('.post-carousel-dot').forEach(function (d, i) {
+        Array.from(dotsEl.getElementsByClassName('post-carousel-dot')).forEach(function (d, i) {
             d.classList.toggle('activo', i === idx);
         });
     }
@@ -350,8 +368,8 @@ function irASlide(postId, idx) {
     // Mostrar/ocultar botones
     var carousel = document.getElementById('carousel-' + postId);
     if (carousel) {
-        var btnPrev = carousel.querySelector('.post-carousel-prev');
-        var btnNext = carousel.querySelector('.post-carousel-next');
+        var btnPrev = carousel.getElementsByClassName('post-carousel-prev')[0];
+        var btnNext = carousel.getElementsByClassName('post-carousel-next')[0];
         if (btnPrev) btnPrev.style.display = idx === 0         ? 'none' : 'flex';
         if (btnNext) btnNext.style.display = idx === total - 1 ? 'none' : 'flex';
     }
@@ -371,35 +389,7 @@ function carouselNext(postId) {
     irASlide(postId, idx + 1);
 }
 
-/* ── Touch / drag en el carrusel ── */
 
-function inicializarTouchCarrusel(postId) {
-    var carousel = document.getElementById('carousel-' + postId);
-    if (!carousel) return;
-
-    var startX   = 0;
-    var activo   = false;
-
-    function onStart(x) { startX = x; activo = true; }
-    function onEnd(x) {
-        if (!activo) return;
-        activo = false;
-        var diff = startX - x;
-        if (Math.abs(diff) > 45) {
-            if (diff > 0) carouselNext(postId);
-            else          carouselPrev(postId);
-        }
-    }
-
-    // Touch (móvil)
-    carousel.addEventListener('touchstart', function (e) { onStart(e.touches[0].clientX); },           { passive: true });
-    carousel.addEventListener('touchend',   function (e) { onEnd(e.changedTouches[0].clientX); },      { passive: true });
-
-    // Mouse drag (desktop)
-    carousel.addEventListener('mousedown',  function (e) { onStart(e.clientX); });
-    carousel.addEventListener('mouseup',    function (e) { onEnd(e.clientX); });
-    carousel.addEventListener('mouseleave', function ()  { activo = false; });
-}
 
 function toggleLike(postId) {
     if (likeEnProceso[postId]) return;
@@ -412,7 +402,7 @@ function toggleLike(postId) {
         method:  'POST',
         headers: {
             'Accept':       'application/json',
-            'X-CSRF-TOKEN': csrfToken,
+            'X-CSRF-TOKEN': tokenCsrf,
         },
     })
     .then(function (res) { return res.json(); })
@@ -483,7 +473,7 @@ function enviarComentario(postId) {
         headers: {
             'Content-Type': 'application/json',
             'Accept':       'application/json',
-            'X-CSRF-TOKEN': csrfToken,
+            'X-CSRF-TOKEN': tokenCsrf,
         },
         body: JSON.stringify({ contenido: contenido }),
     })
@@ -507,7 +497,8 @@ function manejarTeclaComentario(event, postId) {
 }
 
 function cargarTodosComentarios(postId) {
-    var btn = document.querySelector('#pub-post-' + postId + ' .post-ver-mas-comentarios');
+    var postEl = document.getElementById('pub-post-' + postId);
+    var btn = postEl ? postEl.getElementsByClassName('post-ver-mas-comentarios')[0] : null;
     if (btn) btn.style.display = 'none';
 
     fetch('/api/social/posts/' + postId + '/comentarios', {
@@ -518,8 +509,8 @@ function cargarTodosComentarios(postId) {
         if (!respuesta.exito) return;
         var seccion = document.getElementById('pub-comentarios-' + postId);
         seccion.innerHTML = '';
-        respuesta.datos.forEach(function (c) {
-            seccion.insertAdjacentHTML('beforeend', renderizarComentario(c));
+        respuesta.datos.forEach(function (comentario) {
+            seccion.insertAdjacentHTML('beforeend', renderizarComentario(comentario));
         });
     });
 }
@@ -551,6 +542,7 @@ function previsualizarFotos(input) {
     var label  = document.getElementById('pub-upload-label');
     var area   = document.getElementById('pub-upload-area');
     grid.innerHTML = '';
+<<<<<<< HEAD
 
     var archivos = Array.from(input.files).slice(0, 10);
 
@@ -567,8 +559,13 @@ function previsualizarFotos(input) {
     archivos.forEach(function (file) {
         var reader = new FileReader();
         reader.onload = function (e) {
+=======
+    Array.from(input.files).slice(0, 10).forEach(function (file) {
+        var reader   = new FileReader();
+        reader.onload = function (eventoCarga) {
+>>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
             grid.insertAdjacentHTML('beforeend',
-                '<div class="soc-preview-thumb"><img src="' + e.target.result + '" alt="preview"></div>'
+                '<div class="soc-preview-thumb"><img src="' + eventoCarga.target.result + '" alt="preview"></div>'
             );
         };
         reader.readAsDataURL(file);
@@ -633,7 +630,7 @@ function publicarPost() {
         method:  'POST',
         headers: {
             'Accept':       'application/json',
-            'X-CSRF-TOKEN': csrfToken,
+            'X-CSRF-TOKEN': tokenCsrf,
         },
         body: formData,
     })
@@ -646,9 +643,6 @@ function publicarPost() {
             var lista    = document.getElementById('feed-lista');
             var nuevoPst = respuesta.datos;
             lista.insertAdjacentHTML('afterbegin', renderizarPost(nuevoPst));
-            if (nuevoPst.imagenes && nuevoPst.imagenes.length > 1) {
-                inicializarTouchCarrusel(nuevoPst.id);
-            }
             document.getElementById('feed-vacio').style.display = 'none';
         } else {
             vibezAlerta('Error al publicar', parsearErrorServidor(respuesta, 'No se pudo publicar.'), 'error');
@@ -765,7 +759,7 @@ function abrirChat(amigoId, nombreAmigo, fotoUrl) {
         headers: {
             'Content-Type': 'application/json',
             'Accept':        'application/json',
-            'X-CSRF-TOKEN':  csrfToken,
+            'X-CSRF-TOKEN':  tokenCsrf,
         },
         body: JSON.stringify({ amigo_id: amigoId }),
     })
@@ -999,7 +993,7 @@ function enviarMensaje() {
         headers: {
             'Content-Type': 'application/json',
             'Accept':        'application/json',
-            'X-CSRF-TOKEN':  csrfToken,
+            'X-CSRF-TOKEN':  tokenCsrf,
         },
         body: JSON.stringify({ contenido: contenido }),
     })
@@ -1012,7 +1006,7 @@ function enviarMensaje() {
         textarea.style.height = 'auto';
 
         var area       = document.getElementById('chat-mensajes');
-        var sinMensajes = area.querySelector('.chat-sin-mensajes');
+        var sinMensajes = area.getElementsByClassName('chat-sin-mensajes')[0];
         if (sinMensajes) sinMensajes.remove();
 
         area.appendChild(crearBurbujaMensaje(respuesta.datos));
@@ -1038,7 +1032,7 @@ function iniciarPolling(chatId) {
             if (!respuesta.exito || respuesta.datos.length === 0) return;
 
             var area      = document.getElementById('chat-mensajes');
-            var sinMensajes = area.querySelector('.chat-sin-mensajes');
+            var sinMensajes = area.getElementsByClassName('chat-sin-mensajes')[0];
             if (sinMensajes) sinMensajes.remove();
 
             var eraFinal      = estaEnElFinal(area);
@@ -1389,7 +1383,7 @@ function formatearHora(fechaStr) {
     try {
         return new Date(fechaStr.replace(' ', 'T'))
             .toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    } catch (e) { return ''; }
+    } catch (errorFecha) { return ''; }
 }
 
 function formatearFechaCompleta(fechaStr) {
@@ -1401,7 +1395,7 @@ function formatearFechaCompleta(fechaStr) {
         if (fecha.toDateString() === hoy.toDateString())  return 'Hoy';
         if (fecha.toDateString() === ayer.toDateString()) return 'Ayer';
         return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    } catch (e) { return ''; }
+    } catch (errorFecha) { return ''; }
 }
 
 function formatearFechaRelativa(fechaStr) {
@@ -1418,7 +1412,7 @@ function formatearFechaRelativa(fechaStr) {
         if (diffH   < 24) return 'hace ' + diffH + 'h';
         if (diffD   < 7)  return 'hace ' + diffD + 'd';
         return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-    } catch (e) { return ''; }
+    } catch (errorFecha) { return ''; }
 }
 
 function escaparHtml(texto) {
@@ -1445,7 +1439,7 @@ function scrollAlFinal(area) {
 }
 
 function obtenerUltimaFechaEnArea(area) {
-    var separadores = area.querySelectorAll('.chat-separador-fecha');
+    var separadores = area.getElementsByClassName('chat-separador-fecha');
     if (!separadores.length) return null;
     return separadores[separadores.length - 1].dataset.fecha || null;
 }

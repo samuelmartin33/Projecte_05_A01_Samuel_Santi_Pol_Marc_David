@@ -205,14 +205,16 @@ class AuthController extends Controller
             'password.min'      => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
+        $remember = $request->boolean('remember');
+
         // Auth::attempt() busca el usuario por email en la tabla 'usuarios' (modelo
         // configurado en config/auth.php) y compara la contraseña con el hash
         // almacenado en la columna 'password_hash' (definida en getAuthPasswordName()).
-        // Devuelve true si las credenciales son correctas e inicia la sesión.
+        // El segundo parámetro $remember activa la cookie de "recuérdame" (30 días).
         if (! Auth::attempt([
             'email'    => $validated['email'],
             'password' => $validated['password'],
-        ])) {
+        ], $remember)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Credenciales incorrectas. Revisa tu email y contraseña.',
@@ -243,6 +245,16 @@ class AuthController extends Controller
                 'estado_registro' => $usuario->estado_registro,
                 'message'         => $mensaje,
                 'data'            => null,
+            ], 403);
+        }
+
+        if ((int) $usuario->estado === 0) {
+            Auth::logout();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tu cuenta ha sido desactivada. Contacta con el administrador.',
+                'data'    => null,
             ], 403);
         }
 
@@ -506,7 +518,8 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $email = $payload['email'] ?? null;
+        $email    = $payload['email'] ?? null;
+        $googleId = $payload['sub']   ?? null;
 
         // El email es imprescindible para identificar al usuario en nuestra BD.
         if (! $email) {
@@ -518,8 +531,18 @@ class AuthController extends Controller
         }
 
         $ahora   = now();
-        // Buscamos si ya existe un usuario con ese email en nuestra BD.
-        $usuario = Usuario::where('email', $email)->first();
+
+        // Buscamos primero por ID de Google (más fiable que email en caso de que
+        // el usuario cambie su dirección en Google pero mantenga la misma cuenta).
+        $usuario = $googleId
+            ? Usuario::where('social_provider', 'google')->where('social_id', $googleId)->first()
+            : null;
+
+        // Si no lo encontramos por ID, buscamos por email.
+        // Esto vincula automáticamente cuentas registradas con el formulario clásico.
+        if (! $usuario) {
+            $usuario = Usuario::where('email', $email)->first();
+        }
 
         if (! $usuario) {
             // El usuario no existe: lo creamos con los datos que Google nos proporciona.
@@ -531,6 +554,8 @@ class AuthController extends Controller
                 'email'               => $email,
                 // UUID aleatorio como contraseña placeholder (el usuario de Google no tiene contraseña propia).
                 'password_hash'       => Str::uuid()->toString(),
+                'social_provider'     => 'google',
+                'social_id'           => $googleId,
                 'email_verificado'    => 1,
                 'es_admin'            => 0,
                 'estado'              => 1,
@@ -539,8 +564,11 @@ class AuthController extends Controller
                 'fecha_actualizacion' => $ahora,
             ]);
         } else {
-            // El usuario ya existe: solo actualizamos la fecha de último acceso.
+            // El usuario ya existe: actualizamos social_id si todavía no estaba vinculado
+            // (caso: registrado antes con formulario, ahora inicia sesión con Google).
             $usuario->update([
+                'social_provider'     => $usuario->social_provider ?? 'google',
+                'social_id'           => $usuario->social_id       ?? $googleId,
                 'ultimo_acceso'       => $ahora,
                 'fecha_actualizacion' => $ahora,
             ]);
@@ -561,6 +589,291 @@ class AuthController extends Controller
                 ],
             ],
         ]);
+    }
+
+    /* ============================================================
+       AUTENTICACIÓN CON APPLE (Sign in with Apple — JS SDK)
+       ============================================================ */
+
+    /**
+     * Verifica el id_token que devuelve el SDK de Apple en el navegador
+     * y crea o vincula el usuario en nuestra BD.
+     *
+     * Flujo completo:
+     *  1. El frontend llama a AppleID.auth.signIn() → Apple abre un popup.
+     *  2. El usuario aprueba → Apple devuelve un id_token (JWT firmado con su clave privada).
+     *  3. El frontend envía ese id_token a este endpoint (POST /api/apple-auth).
+     *  4. Verificamos el JWT usando las claves públicas de Apple (JWKS).
+     *  5. Extraemos el 'sub' (ID único de Apple) y el email.
+     *  6. Buscamos o creamos el usuario; si ya existe (registro clásico), lo vinculamos.
+     *
+     * IMPORTANTE — Limitación en entorno local:
+     *  Apple exige que el dominio registrado en el Service ID use HTTPS.
+     *  En WAMP (localhost sin HTTPS) el popup de Apple no se abrirá.
+     *  Necesitas desplegar en un servidor con dominio real para probarlo.
+     *
+     * @param  Request      $request  Campos: 'id_token' (string), 'user_name' (string|null).
+     * @return JsonResponse
+     */
+    public function appleAuth(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_token'  => ['required', 'string'],
+            'user_name' => ['nullable', 'string', 'max:200'],
+        ]);
+
+        // Verificamos la firma del JWT y obtenemos el payload.
+        $payload = $this->verificarTokenApple($request->id_token);
+
+        if (! $payload) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token de Apple no válido. Inténtalo de nuevo.',
+                'data'    => null,
+            ], 401);
+        }
+
+        // 'sub' es el identificador único e inmutable que Apple asigna a cada usuario.
+        // Nunca cambia, a diferencia del email (que puede ser privado/aleatorio).
+        $appleId = $payload['sub'] ?? null;
+        // Apple solo proporciona el email la PRIMERA vez que el usuario inicia sesión.
+        // En accesos posteriores 'email' puede estar ausente; por eso guardamos 'social_id'.
+        $email   = $payload['email'] ?? null;
+
+        if (! $appleId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo obtener el identificador de la cuenta de Apple.',
+                'data'    => null,
+            ], 422);
+        }
+
+        $ahora = now();
+
+        // Buscamos primero por Apple ID (funciona incluso cuando Apple no devuelve email).
+        $usuario = Usuario::where('social_provider', 'apple')
+                          ->where('social_id', $appleId)
+                          ->first();
+
+        // Fallback: buscar por email para vincular cuentas existentes.
+        if (! $usuario && $email) {
+            $usuario = Usuario::where('email', $email)->first();
+        }
+
+        if (! $usuario) {
+            // Usuario nuevo — Apple solo envía el nombre en el primer login.
+            // El frontend lo captura y nos lo pasa en 'user_name'.
+            if (! $email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo obtener el email. Asegúrate de compartir tu dirección con VIBEZ.',
+                    'data'    => null,
+                ], 422);
+            }
+
+            $nombreCompleto = trim($request->input('user_name', ''));
+            $partes         = $nombreCompleto ? explode(' ', $nombreCompleto, 2) : [];
+            $nombre         = $partes[0] ?? 'Usuario';
+            $apellido       = $partes[1] ?? null;
+
+            $usuario = Usuario::create([
+                'nombre'              => $nombre,
+                'apellido1'           => $apellido,
+                'email'               => $email,
+                'password_hash'       => Str::uuid()->toString(),
+                'social_provider'     => 'apple',
+                'social_id'           => $appleId,
+                'email_verificado'    => 1,
+                'es_admin'            => 0,
+                'estado'              => 1,
+                'ultimo_acceso'       => $ahora,
+                'fecha_creacion'      => $ahora,
+                'fecha_actualizacion' => $ahora,
+            ]);
+        } else {
+            $usuario->update([
+                'social_provider'     => $usuario->social_provider ?? 'apple',
+                'social_id'           => $usuario->social_id       ?? $appleId,
+                'ultimo_acceso'       => $ahora,
+                'fecha_actualizacion' => $ahora,
+            ]);
+        }
+
+        Auth::login($usuario);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sesión iniciada con Apple correctamente',
+            'data'    => [
+                'user' => [
+                    'id'     => $usuario->id,
+                    'nombre' => $usuario->nombre,
+                    'email'  => $usuario->email,
+                ],
+            ],
+        ]);
+    }
+
+    /* ============================================================
+       HELPERS PRIVADOS — Verificación de JWT de Apple
+       ============================================================ */
+
+    /**
+     * Verifica un id_token emitido por Apple.
+     *
+     * Pasos:
+     *  1. Decodifica la cabecera del JWT para leer el campo 'kid' (Key ID).
+     *  2. Descarga las claves públicas de Apple (JWKS — JSON Web Key Set).
+     *  3. Busca la clave cuyo 'kid' coincida con el del token.
+     *  4. Convierte esa clave JWK (formato JSON) a PEM (formato OpenSSL).
+     *  5. Verifica la firma digital del token con openssl_verify().
+     *  6. Comprueba las claims estándar: expiración, emisor y audiencia.
+     *
+     * @param  string     $idToken  JWT en formato compacto: header.payload.signature
+     * @return array|null           Payload decodificado, o null si el token no es válido.
+     */
+    private function verificarTokenApple(string $idToken): ?array
+    {
+        $partes = explode('.', $idToken);
+        if (count($partes) !== 3) {
+            return null;
+        }
+
+        // Decodificamos la cabecera (base64url → JSON) para obtener el 'kid'.
+        $cabecera = json_decode(base64_decode(strtr($partes[0], '-_', '+/')), true);
+        $kid      = $cabecera['kid'] ?? null;
+        if (! $kid) {
+            return null;
+        }
+
+        // Apple publica sus claves públicas en este endpoint estándar (JWKS URI).
+        $http = app()->environment('local')
+            ? Http::withOptions(['verify' => false])
+            : Http::new();
+
+        $respuesta = $http->get('https://appleid.apple.com/auth/keys');
+        if (! $respuesta->ok()) {
+            return null;
+        }
+
+        // Buscamos la clave cuyo 'kid' coincide con el de la cabecera del JWT.
+        $clave = null;
+        foreach ($respuesta->json()['keys'] ?? [] as $c) {
+            if ($c['kid'] === $kid) {
+                $clave = $c;
+                break;
+            }
+        }
+        if (! $clave) {
+            return null;
+        }
+
+        // Convertimos la clave JWK a formato PEM para pasársela a OpenSSL.
+        $pem = $this->jwkARsaPem($clave);
+        if (! $pem) {
+            return null;
+        }
+
+        // Verificamos la firma: openssl_verify devuelve 1 si es válida.
+        $datos    = $partes[0] . '.' . $partes[1];
+        $firma    = base64_decode(strtr($partes[2], '-_', '+/'));
+        $valido   = openssl_verify($datos, $firma, $pem, OPENSSL_ALGO_SHA256);
+        if ($valido !== 1) {
+            return null;
+        }
+
+        // Decodificamos el payload (claims del JWT).
+        $payload = json_decode(base64_decode(strtr($partes[1], '-_', '+/')), true);
+
+        // Comprobamos las claims de seguridad obligatorias.
+        if (($payload['exp'] ?? 0) < time()) {
+            return null; // Token caducado
+        }
+        if (($payload['iss'] ?? '') !== 'https://appleid.apple.com') {
+            return null; // Emisor incorrecto
+        }
+        if (($payload['aud'] ?? '') !== config('services.apple.client_id')) {
+            return null; // Token no destinado a esta app
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Convierte una clave pública RSA en formato JWK al formato PEM que entiende OpenSSL.
+     *
+     * JWK (JSON Web Key) es el formato que usan los JWKS de Apple y Google.
+     * OpenSSL necesita PEM para verificar firmas.
+     *
+     * La codificación sigue el estándar ASN.1 DER (RFC 3447 / RFC 5280):
+     *   SubjectPublicKeyInfo ::= SEQUENCE {
+     *     algorithm AlgorithmIdentifier,  ← OID de RSA + NULL
+     *     subjectPublicKey BIT STRING {   ← clave RSA real (n y e)
+     *       RSAPublicKey ::= SEQUENCE {
+     *         modulus  INTEGER,
+     *         exponent INTEGER
+     *       }
+     *     }
+     *   }
+     *
+     * @param  array       $jwk  Clave en formato JWK (campos 'n' y 'e' en base64url).
+     * @return string|null       Clave pública en formato PEM, o null si el JWK no es válido.
+     */
+    private function jwkARsaPem(array $jwk): ?string
+    {
+        if (empty($jwk['n']) || empty($jwk['e'])) {
+            return null;
+        }
+
+        $modulo    = base64_decode(strtr($jwk['n'], '-_', '+/'));
+        $exponente = base64_decode(strtr($jwk['e'], '-_', '+/'));
+
+        // Si el bit más significativo del módulo es 1, OpenSSL lo interpretaría
+        // como un número negativo (complemento a 2). Añadimos 0x00 para evitarlo.
+        if (ord($modulo[0]) > 0x7f) {
+            $modulo = "\x00" . $modulo;
+        }
+
+        // Construimos la secuencia INTEGER modulo + INTEGER exponente
+        $seqModExp = "\x02" . $this->derLongitud(strlen($modulo))    . $modulo
+                   . "\x02" . $this->derLongitud(strlen($exponente)) . $exponente;
+        $rsaSeq    = "\x30" . $this->derLongitud(strlen($seqModExp)) . $seqModExp;
+
+        // OID para RSA: 1.2.840.113549.1.1.1 + NULL
+        $oid    = "\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00";
+        // BIT STRING: 0x00 indica que no hay bits sin usar al final
+        $bitStr = "\x03" . $this->derLongitud(strlen($rsaSeq) + 1) . "\x00" . $rsaSeq;
+
+        $pubKey = "\x30" . $this->derLongitud(strlen($oid) + strlen($bitStr)) . $oid . $bitStr;
+
+        return "-----BEGIN PUBLIC KEY-----\n"
+             . chunk_split(base64_encode($pubKey), 64, "\n")
+             . "-----END PUBLIC KEY-----\n";
+    }
+
+    /**
+     * Codifica una longitud en formato DER (Distinguished Encoding Rules).
+     *
+     * - Longitudes ≤ 127 → un solo byte.
+     * - Longitudes > 127 → un byte indicador (0x80 | nº de bytes) + los bytes de la longitud.
+     * Esto es necesario para construir estructuras ASN.1 válidas en jwkARsaPem().
+     *
+     * @param  int    $longitud  Valor a codificar.
+     * @return string            Bytes DER de la longitud.
+     */
+    private function derLongitud(int $longitud): string
+    {
+        if ($longitud < 0x80) {
+            return chr($longitud);
+        }
+        $bytes = '';
+        $n     = $longitud;
+        while ($n > 0) {
+            $bytes = chr($n & 0xff) . $bytes;
+            $n >>= 8;
+        }
+        return chr(0x80 | strlen($bytes)) . $bytes;
     }
 
     /**

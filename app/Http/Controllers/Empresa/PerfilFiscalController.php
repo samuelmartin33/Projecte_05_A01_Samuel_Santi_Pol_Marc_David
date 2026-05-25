@@ -48,6 +48,8 @@ class PerfilFiscalController extends Controller
                 ->with('error', 'No se encontró el perfil de empresa.');
         }
 
+        $request->merge(['iban' => strtoupper(str_replace(' ', '', $request->input('iban', '')))]);
+
         $validated = $request->validate([
             'razon_social'       => ['required', 'string', 'max:300'],
             'nif_cif'            => ['required', 'string', 'max:20', 'regex:/^[A-Za-z0-9]{7,9}$/'],
@@ -58,8 +60,6 @@ class PerfilFiscalController extends Controller
             'provincia'          => ['required', 'string', 'max:100'],
             'pais'               => ['required', 'string', 'max:100'],
             'email_facturacion'  => ['required', 'email', 'max:200'],
-            'titular_cuenta'     => ['required', 'string', 'max:200'],
-            'iban'               => ['required', 'string', 'regex:/^ES[0-9]{22}$/i'],
         ], [
             'razon_social.required'      => 'La razón social es obligatoria',
             'nif_cif.required'           => 'El NIF/CIF es obligatorio',
@@ -74,12 +74,8 @@ class PerfilFiscalController extends Controller
             'pais.required'              => 'El país es obligatorio',
             'email_facturacion.required' => 'El email de facturación es obligatorio',
             'email_facturacion.email'    => 'El email de facturación no es válido',
-            'titular_cuenta.required'    => 'El titular de la cuenta es obligatorio',
-            'iban.required'              => 'El IBAN es obligatorio',
-            'iban.regex'                 => 'El IBAN debe comenzar por ES seguido de 22 dígitos',
         ]);
 
-        // El mutator setIbanAttribute() del modelo Empresa cifra el valor automáticamente.
         $empresa->update([
             'razon_social'           => $validated['razon_social'],
             'nif_cif'                => $validated['nif_cif'],
@@ -90,8 +86,6 @@ class PerfilFiscalController extends Controller
             'provincia'              => $validated['provincia'],
             'pais'                   => $validated['pais'],
             'email_facturacion'      => $validated['email_facturacion'],
-            'titular_cuenta'         => $validated['titular_cuenta'],
-            'iban'                   => $validated['iban'],
             'perfil_fiscal_completo' => true,
             'fecha_actualizacion'    => now(),
         ]);

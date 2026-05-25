@@ -94,6 +94,15 @@ class EntradaController extends Controller
         // (estado = 1 significa que el evento está publicado y disponible).
         $evento = Evento::where('estado', 1)->findOrFail($eventoId);
 
+        // Este endpoint solo acepta eventos gratuitos.
+        // Los eventos de pago deben pasar por el flujo Stripe (/api/stripe/crear-payment-intent).
+        if (!$evento->es_gratuito) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este evento requiere pago con tarjeta. Usa el flujo de pago correspondiente.',
+            ], 422);
+        }
+
         // Comprobamos el aforo antes de iniciar la transacción para evitar abrirla
         // innecesariamente si ya no hay plazas. aforo_maximo === null significa
         // que el evento tiene aforo ilimitado.
@@ -277,6 +286,169 @@ class EntradaController extends Controller
      * @param  Pedido $pedido  El pedido resuelto automáticamente por Laravel desde la URL.
      * @return View            Vista 'entradas.confirmacion' con la variable $pedido cargada.
      */
+    /**
+     * Crea un Stripe PaymentIntent para la compra de entradas de un evento de pago.
+     * Devuelve el client_secret para que el frontend confirme el pago con Stripe.js.
+     * Split: 10% application_fee para VIBEZ, 90% transfer a la cuenta Express de la empresa.
+     */
+    public function crearPaymentIntent(Request $request): JsonResponse
+    {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        if ($usuario && $usuario->isAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Los administradores no pueden comprar entradas.'], 403);
+        }
+
+        $request->validate([
+            'evento_id' => ['required', 'integer', 'exists:eventos,id'],
+            'cantidad'  => ['required', 'integer', 'min:1', 'max:10'],
+        ]);
+
+        $eventoId = (int) $request->evento_id;
+        $cantidad = (int) $request->cantidad;
+
+        $evento = Evento::where('estado', 1)->findOrFail($eventoId);
+
+        if ($evento->aforo_maximo !== null && ($evento->aforo_maximo - $evento->aforo_actual) < $cantidad) {
+            return response()->json(['success' => false, 'message' => 'No hay suficientes entradas disponibles.'], 422);
+        }
+
+        $empresa = $evento->organizador?->empresa;
+
+        if (!$empresa || !$empresa->stripe_account_id || !$empresa->stripe_charges_enabled) {
+            return response()->json(['success' => false, 'message' => 'Este evento no tiene pagos online configurados.'], 422);
+        }
+
+        $totalFinal    = round($evento->precio_base * $cantidad, 2);
+        $amountCents   = (int) round($totalFinal * 100);
+        $feeCents      = (int) round($amountCents * 0.10);
+
+        try {
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+            $pi = \Stripe\PaymentIntent::create([
+                'amount'                 => $amountCents,
+                'currency'               => 'eur',
+                'application_fee_amount' => $feeCents,
+                'transfer_data'          => ['destination' => $empresa->stripe_account_id],
+                'metadata'               => [
+                    'evento_id'  => $eventoId,
+                    'cantidad'   => $cantidad,
+                    'usuario_id' => Auth::id(),
+                ],
+            ]);
+
+            return response()->json([
+                'success'           => true,
+                'client_secret'     => $pi->client_secret,
+                'payment_intent_id' => $pi->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Stripe PaymentIntent error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al iniciar el pago. Inténtalo de nuevo.'], 500);
+        }
+    }
+
+    /**
+     * Verifica que el PaymentIntent está pagado y crea el Pedido + Entradas.
+     * El frontend llama a este endpoint justo después de que stripe.confirmCardPayment resuelva.
+     */
+    public function confirmarStripe(Request $request): JsonResponse
+    {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+
+        if ($usuario && $usuario->isAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Los administradores no pueden comprar entradas.'], 403);
+        }
+
+        $request->validate([
+            'payment_intent_id' => ['required', 'string', 'max:255'],
+            'evento_id'         => ['required', 'integer', 'exists:eventos,id'],
+            'cantidad'          => ['required', 'integer', 'min:1', 'max:10'],
+        ]);
+
+        $piId     = $request->payment_intent_id;
+        $eventoId = (int) $request->evento_id;
+        $cantidad = (int) $request->cantidad;
+
+        // Idempotencia: si ya existe un Pedido para este PI, devolver su URL
+        $pedidoExistente = Pedido::where('stripe_payment_intent_id', $piId)->first();
+        if ($pedidoExistente) {
+            return response()->json([
+                'success'  => true,
+                'redirect' => route('entradas.confirmacion', $pedidoExistente->id),
+            ]);
+        }
+
+        try {
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+            $pi = \Stripe\PaymentIntent::retrieve($piId);
+
+            if ($pi->status !== 'succeeded') {
+                return response()->json(['success' => false, 'message' => 'El pago no se ha completado todavía.'], 422);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Stripe PI retrieve error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'No se pudo verificar el pago.'], 500);
+        }
+
+        $evento = Evento::where('estado', 1)->findOrFail($eventoId);
+
+        try {
+            $pedido = DB::transaction(function () use ($evento, $cantidad, $piId) {
+                $ahora                = now();
+                $totalBruto           = round($evento->precio_base * $cantidad, 2);
+                $precioUnitarioPagado = round($totalBruto / $cantidad, 2);
+
+                $pedido = Pedido::create([
+                    'usuario_id'               => Auth::id(),
+                    'total'                    => $totalBruto,
+                    'total_descuento'          => 0.00,
+                    'total_final'              => $totalBruto,
+                    'estado'                   => 1,
+                    'stripe_payment_intent_id' => $piId,
+                    'fecha_creacion'           => $ahora,
+                    'fecha_actualizacion'      => $ahora,
+                ]);
+
+                for ($i = 0; $i < $cantidad; $i++) {
+                    Entrada::create([
+                        'pedido_id'           => $pedido->id,
+                        'evento_id'           => $evento->id,
+                        'estado_entrada'      => 1,
+                        'codigo_qr'           => Str::uuid()->toString(),
+                        'precio_unitario'     => $evento->precio_base,
+                        'precio_pagado'       => $precioUnitarioPagado,
+                        'estado'              => 1,
+                        'fecha_creacion'      => $ahora,
+                        'fecha_actualizacion' => $ahora,
+                    ]);
+                }
+
+                $evento->increment('aforo_actual', $cantidad);
+
+                return $pedido;
+            });
+
+            try {
+                $pedido->load(['entradas.evento', 'usuario']);
+                Mail::to($usuario->email)->send(new EntradaComprada($pedido));
+            } catch (\Throwable $e) {
+                Log::warning('No se pudo enviar el correo de entradas: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'success'  => true,
+                'redirect' => route('entradas.confirmacion', $pedido->id),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('confirmarStripe DB error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al registrar la compra. Contacta con soporte.'], 500);
+        }
+    }
+
     public function confirmacion(Pedido $pedido): View
     {
         /** @var \App\Models\Usuario $usuario */
