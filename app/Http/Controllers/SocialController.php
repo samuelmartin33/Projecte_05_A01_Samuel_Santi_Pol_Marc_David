@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Amigo;
 use App\Models\Chat;
+use App\Models\ChatMiembro;
 use App\Models\Mensaje;
 use App\Models\Usuario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 /**
@@ -248,8 +250,8 @@ class SocialController extends Controller
         $usuario = Auth::user();
         $miId    = $usuario->id;
 
-        // Buscar todos los chats directos donde este usuario es participante
-        $chats = Chat::where('tipo_chat', 1)
+        /* ── Chats directos (DM) ── */
+        $dms = Chat::where('tipo_chat', 1)
             ->where('estado', 1)
             ->where(function ($q) use ($miId) {
                 $q->where('nombre', 'like', "dm_{$miId}_%")
@@ -258,12 +260,10 @@ class SocialController extends Controller
             ->with(['ultimoMensaje.usuario'])
             ->get()
             ->map(function ($chat) use ($miId) {
-                // Extraer el ID del otro usuario del nombre (formato: dm_5_12)
-                $partes  = explode('_', $chat->nombre);
-                $idOtro  = (int) $partes[1] === $miId ? (int) $partes[2] : (int) $partes[1];
-                $amigo   = Usuario::find($idOtro, ['id', 'nombre', 'apellido1', 'foto_url', 'mood']);
+                $partes = explode('_', $chat->nombre);
+                $idOtro = (int) $partes[1] === $miId ? (int) $partes[2] : (int) $partes[1];
+                $amigo  = Usuario::find($idOtro, ['id', 'nombre', 'apellido1', 'foto_url', 'mood']);
 
-                // Contar mensajes no leídos del otro usuario en este chat
                 $noLeidos = Mensaje::where('chat_id', $chat->id)
                     ->where('usuario_id', '!=', $miId)
                     ->where('leido', 0)
@@ -271,6 +271,7 @@ class SocialController extends Controller
                     ->count();
 
                 return [
+                    'tipo'           => 'dm',
                     'chat_id'        => $chat->id,
                     'amigo'          => $amigo,
                     'ultimo_mensaje' => $chat->ultimoMensaje ? [
@@ -280,11 +281,51 @@ class SocialController extends Controller
                     ] : null,
                     'no_leidos'      => $noLeidos,
                 ];
-            })
+            });
+
+        /* ── Chats de grupo (crew) ── */
+        $grupoIds = ChatMiembro::where('usuario_id', $miId)->pluck('chat_id');
+        $grupos   = Chat::whereIn('id', $grupoIds)
+            ->where('tipo_chat', 2)
+            ->where('estado', 1)
+            ->with(['ultimoMensaje.usuario', 'miembros'])
+            ->get()
+            ->map(function ($chat) use ($miId) {
+                $miembros = $chat->miembros->map(fn($m) => [
+                    'id'        => $m->usuario->id,
+                    'nombre'    => $m->usuario->nombre,
+                    'apellido1' => $m->usuario->apellido1,
+                    'foto_url'  => $m->usuario->foto_url,
+                ]);
+
+                $noLeidos = Mensaje::where('chat_id', $chat->id)
+                    ->where('usuario_id', '!=', $miId)
+                    ->where('leido', 0)
+                    ->where('estado', 1)
+                    ->count();
+
+                return [
+                    'tipo'           => 'grupo',
+                    'chat_id'        => $chat->id,
+                    'grupo'          => [
+                        'id'       => $chat->id,
+                        'nombre'   => $chat->nombre,
+                        'miembros' => $miembros,
+                    ],
+                    'ultimo_mensaje' => $chat->ultimoMensaje ? [
+                        'contenido' => $chat->ultimoMensaje->contenido,
+                        'es_mio'    => $chat->ultimoMensaje->usuario_id === $miId,
+                        'fecha'     => $chat->ultimoMensaje->fecha_creacion,
+                    ] : null,
+                    'no_leidos'      => $noLeidos,
+                ];
+            });
+
+        $todos = $dms->concat($grupos)
             ->sortByDesc(fn($c) => $c['ultimo_mensaje']['fecha'] ?? '1970-01-01')
             ->values();
 
-        return response()->json(['exito' => true, 'datos' => $chats]);
+        return response()->json(['exito' => true, 'datos' => $todos]);
     }
 
     /**
@@ -343,6 +384,79 @@ class SocialController extends Controller
                 'amigo'   => $amigo,
             ],
         ]);
+    }
+
+    /**
+     * Crea un chat de grupo (crew) con el usuario como admin.
+     * Solo se pueden añadir amigos aceptados.
+     */
+    public function crearGrupo(Request $request): JsonResponse
+    {
+        $request->validate([
+            'nombre'       => ['required', 'string', 'max:100'],
+            'miembro_ids'  => ['required', 'array', 'min:1', 'max:49'],
+            'miembro_ids.*' => ['required', 'integer', 'exists:usuarios,id'],
+        ]);
+
+        /** @var Usuario $usuario */
+        $usuario   = Auth::user();
+        $ahora     = now();
+
+        // Solo se pueden añadir amigos
+        $amigoIds = Amigo::where('estado', 1)
+            ->where(fn($q) => $q
+                ->where('solicitante_id', $usuario->id)
+                ->orWhere('receptor_id', $usuario->id))
+            ->get()
+            ->map(fn($a) => $a->solicitante_id === $usuario->id ? $a->receptor_id : $a->solicitante_id)
+            ->toArray();
+
+        $miembroIds = array_unique(array_map('intval', $request->miembro_ids));
+        foreach ($miembroIds as $id) {
+            if (!in_array($id, $amigoIds)) {
+                return response()->json([
+                    'exito'   => false,
+                    'mensaje' => 'Solo puedes añadir amigos al crew.',
+                ], 422);
+            }
+        }
+
+        $chat = DB::transaction(function () use ($usuario, $request, $miembroIds, $ahora) {
+            $chat = Chat::create([
+                'tipo_chat'      => 2,
+                'nombre'         => trim($request->nombre),
+                'estado'         => 1,
+                'fecha_creacion' => $ahora,
+            ]);
+
+            // Creador como admin
+            ChatMiembro::create([
+                'chat_id'    => $chat->id,
+                'usuario_id' => $usuario->id,
+                'es_admin'   => 1,
+                'fecha_union' => $ahora,
+            ]);
+
+            // Resto de miembros
+            foreach ($miembroIds as $id) {
+                ChatMiembro::create([
+                    'chat_id'    => $chat->id,
+                    'usuario_id' => $id,
+                    'es_admin'   => 0,
+                    'fecha_union' => $ahora,
+                ]);
+            }
+
+            return $chat;
+        });
+
+        return response()->json([
+            'exito' => true,
+            'datos' => [
+                'chat_id' => $chat->id,
+                'nombre'  => $chat->nombre,
+            ],
+        ], 201);
     }
 
     /**
@@ -460,7 +574,7 @@ class SocialController extends Controller
 
     /**
      * Devuelve el total de mensajes no leídos y solicitudes pendientes.
-     * Lo usa el navbar para mostrar el badge de notificaciones.
+     * Incluye DMs y grupos.
      */
     public function contadorNoLeidos(): JsonResponse
     {
@@ -468,16 +582,18 @@ class SocialController extends Controller
         $usuario = Auth::user();
         $miId    = $usuario->id;
 
-        // IDs de los chats del usuario
-        $idsChats = Chat::where('tipo_chat', 1)
-            ->where('estado', 1)
+        // DMs
+        $idsDms = Chat::where('tipo_chat', 1)->where('estado', 1)
             ->where(function ($q) use ($miId) {
                 $q->where('nombre', 'like', "dm_{$miId}_%")
                   ->orWhere('nombre', 'like', "dm_%_{$miId}");
             })
             ->pluck('id');
 
-        $mensajesNoLeidos = Mensaje::whereIn('chat_id', $idsChats)
+        // Grupos
+        $idsGrupos = ChatMiembro::where('usuario_id', $miId)->pluck('chat_id');
+
+        $mensajesNoLeidos = Mensaje::whereIn('chat_id', $idsDms->concat($idsGrupos)->unique())
             ->where('usuario_id', '!=', $miId)
             ->where('leido', 0)
             ->where('estado', 1)
@@ -502,20 +618,22 @@ class SocialController extends Controller
        ============================================================ */
 
     /**
-     * Verifica que el usuario autenticado tiene acceso al chat indicado.
-     * Los chats directos se identifican por el campo nombre: dm_minId_maxId.
-     * Devuelve 403 si el usuario no pertenece al chat.
+     * Verifica acceso al chat: DMs por naming convention, grupos por chat_miembros.
+     * Aborta con 403 si el usuario no pertenece al chat.
      */
     private function verificarAccesoChat(int $chatId, int $usuarioId): void
     {
-        $tieneAcceso = Chat::where('id', $chatId)
-            ->where('tipo_chat', 1)
-            ->where('estado', 1)
-            ->where(function ($q) use ($usuarioId) {
-                $q->where('nombre', 'like', "dm_{$usuarioId}_%")
-                  ->orWhere('nombre', 'like', "dm_%_{$usuarioId}");
-            })
-            ->exists();
+        $chat = Chat::where('id', $chatId)->where('estado', 1)->first();
+        abort_unless($chat, 404, 'Chat no encontrado.');
+
+        if ((int) $chat->tipo_chat === 1) {
+            $tieneAcceso = str_contains($chat->nombre, "dm_{$usuarioId}_")
+                        || str_ends_with($chat->nombre, "_{$usuarioId}");
+        } else {
+            $tieneAcceso = ChatMiembro::where('chat_id', $chatId)
+                ->where('usuario_id', $usuarioId)
+                ->exists();
+        }
 
         abort_unless($tieneAcceso, 403, 'No tienes acceso a este chat.');
     }

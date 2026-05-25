@@ -1,3 +1,9 @@
+# Subir límites de subida de archivos para permitir fotos de móvil (hasta 20MB por archivo)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size       40M
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

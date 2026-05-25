@@ -12,7 +12,11 @@ class EmpresasSeeder extends Seeder
         $ahora = now();
 
         DB::table('empresas')->insert([
+<<<<<<< HEAD
+            // Laura (usuario_id=2) — SoundWave Events (empresa_id=1)
+=======
             // empresa_id=1 — SoundWave Events (Laura, usuario_id=2)
+>>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
             [
                 'usuario_id'                => 2,
                 'nombre_empresa'            => 'SoundWave Events S.L.',
@@ -67,6 +71,21 @@ class EmpresasSeeder extends Seeder
                 'estado'                    => 1,
                 'fecha_creacion'            => $ahora,
                 'fecha_actualizacion'       => null,
+            ],
+            // Lucía (usuario_id=10) — UrbanBeat Promotions (empresa_id=2)
+            [
+                'usuario_id'          => 10,
+                'nombre_empresa'      => 'UrbanBeat Promotions S.L.',
+                'razon_social'        => 'UrbanBeat Promotions Sociedad Limitada',
+                'nif_cif'             => 'B87654321',
+                'descripcion'         => 'Promotora de eventos urbanos, conciertos de rap y cultura de calle.',
+                'logo_url'            => null,
+                'sitio_web'           => 'https://urbanbeatpromotions.es',
+                'telefono_contacto'   => '900200300',
+                'direccion'           => 'Calle Fuencarral 88, 28004 Madrid',
+                'estado'              => 1,
+                'fecha_creacion'      => $ahora,
+                'fecha_actualizacion' => null,
             ],
         ]);
     }

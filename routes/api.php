@@ -19,6 +19,7 @@ use App\Http\Controllers\EventoPostController;
 use App\Http\Controllers\FavoritoController;
 use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\CuponController;
+use App\Http\Controllers\HistoriaController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SeguimientoController;
@@ -96,6 +97,7 @@ Route::middleware('auth')->prefix('social')->group(function () {
     // Chats y mensajes
     Route::get('/chats',                         [SocialController::class, 'misChats']);
     Route::post('/chats/abrir',                  [SocialController::class, 'abrirChat']);
+    Route::post('/chats/grupo',                  [SocialController::class, 'crearGrupo']);
     Route::get('/chats/{id}/mensajes',           [SocialController::class, 'mensajesChat']);
     Route::post('/chats/{id}/mensajes',          [SocialController::class, 'enviarMensaje']);
     Route::get('/chats/{id}/nuevos',             [SocialController::class, 'mensajesNuevos']);
@@ -110,4 +112,18 @@ Route::middleware('auth')->prefix('social')->group(function () {
     Route::post('/posts/{id}/comentarios',       [EventoPostController::class, 'comentar'])->where('id', '[0-9]+');
     Route::post('/posts/{id}/like',              [EventoPostController::class, 'toggleLike'])->where('id', '[0-9]+');
     Route::get('/mis-eventos-asistidos',         [EventoPostController::class, 'misEventosAsistidos']);
+<<<<<<< HEAD
+
+    // Historias
+    Route::get('/historias',                     [HistoriaController::class, 'feed']);
+    Route::post('/historias',                    [HistoriaController::class, 'store']);
+    Route::post('/historias/{id}/vista',         [HistoriaController::class, 'vista'])->where('id', '[0-9]+');
+    Route::get('/mis-historias',                 [HistoriaController::class, 'misHistorias']);
+
+    // Filtro por evento
+    Route::get('/eventos-con-contenido',         [EventoPostController::class, 'eventosConContenido']);
+    Route::get('/evento/{eventoId}',             [EventoPostController::class, 'feedPorEvento'])->where('eventoId', '[0-9]+');
 });
+=======
+});
+>>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
