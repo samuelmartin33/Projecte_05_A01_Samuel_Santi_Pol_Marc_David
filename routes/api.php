@@ -60,6 +60,12 @@ Route::middleware('auth')->group(function () {
     // Compra de entradas
     Route::post('/entradas/comprar', [EntradaController::class, 'comprar'])->name('api.entradas.comprar');
 
+    // Stripe: crear PaymentIntent (eventos de pago con Stripe Connect)
+    Route::post('/stripe/crear-payment-intent', [EntradaController::class, 'crearPaymentIntent'])->name('api.stripe.crear-payment-intent');
+
+    // Stripe: confirmar pedido tras pago exitoso
+    Route::post('/entradas/confirmar-stripe', [EntradaController::class, 'confirmarStripe'])->name('api.entradas.confirmar-stripe');
+
     // Validar código de cupón (requiere sesión para verificar límites por usuario)
     Route::post('/cupones/validar', [CuponController::class, 'validar'])->name('api.cupones.validar');
 });
