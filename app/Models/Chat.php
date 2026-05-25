@@ -24,6 +24,12 @@ class Chat extends Model
 
     /* ——— Relaciones ——— */
 
+    /** Miembros del chat (solo para tipo_chat = 2 / grupos) */
+    public function miembros()
+    {
+        return $this->hasMany(ChatMiembro::class, 'chat_id')->with('usuario:id,nombre,apellido1,foto_url');
+    }
+
     /** Todos los mensajes de este chat, ordenados por fecha */
     public function mensajes()
     {

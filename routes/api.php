@@ -74,6 +74,7 @@ Route::middleware('auth')->prefix('social')->group(function () {
     // Chats y mensajes
     Route::get('/chats',                         [SocialController::class, 'misChats']);
     Route::post('/chats/abrir',                  [SocialController::class, 'abrirChat']);
+    Route::post('/chats/grupo',                  [SocialController::class, 'crearGrupo']);
     Route::get('/chats/{id}/mensajes',           [SocialController::class, 'mensajesChat']);
     Route::post('/chats/{id}/mensajes',          [SocialController::class, 'enviarMensaje']);
     Route::get('/chats/{id}/nuevos',             [SocialController::class, 'mensajesNuevos']);

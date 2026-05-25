@@ -229,6 +229,12 @@
 
             <header class="soc-topbar">
                 <h1 class="soc-topbar-titulo">Mensajes</h1>
+                <button class="soc-topbar-btn" onclick="abrirModalCrearCrew()" title="Crear crew">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </button>
             </header>
 
             <div class="soc-subpanel activo" id="chats-lista-view">
@@ -543,6 +549,45 @@
     </div>
 
     {{-- ══════════════════════════════════════
+         MODAL: Crear crew (grupo de chat)
+         ══════════════════════════════════════ --}}
+    <div class="soc-modal-overlay" id="crew-modal-overlay" style="display:none"
+         onclick="cerrarModalCrearCrew()">
+        <div class="soc-modal" onclick="event.stopPropagation()">
+
+            <div class="soc-modal-head">
+                <h3 class="soc-modal-titulo">Crear crew</h3>
+                <button class="soc-modal-cerrar" onclick="cerrarModalCrearCrew()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="soc-modal-body">
+
+                <label class="soc-field-label">Nombre del crew</label>
+                <input type="text" id="crew-input-nombre" class="soc-select"
+                       placeholder="Ej: Los del viernes…" maxlength="100">
+
+                <label class="soc-field-label" style="margin-top:14px">Añadir amigos</label>
+                <div id="crew-lista-amigos" class="amigo-check-lista">
+                    <p class="soc-vacio" style="padding:12px 0">Cargando amigos…</p>
+                </div>
+
+            </div>
+
+            <div class="soc-modal-foot">
+                <button class="soc-btn-secondary" onclick="cerrarModalCrearCrew()">Cancelar</button>
+                <button class="soc-btn-primary" id="crew-btn-crear" onclick="crearCrew()">
+                    Crear crew
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- ══════════════════════════════════════
          MODAL: Añadir amigo
          ══════════════════════════════════════ --}}
     <div class="soc-modal-overlay" id="modal-amigo-overlay" style="display:none"
@@ -614,6 +659,7 @@
 </div>{{-- /soc --}}
 
 {{-- ── Scripts ── --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     window.miUsuarioId = {{ Auth::id() }};
 </script>

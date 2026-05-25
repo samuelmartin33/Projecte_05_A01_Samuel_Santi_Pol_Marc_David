@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Amigo;
 use App\Models\Entrada;
 use App\Models\Evento;
+use App\Models\EventoImagen;
 use App\Models\EventoPost;
 use App\Models\EventoPostComentario;
 use App\Models\EventoPostImagen;
@@ -86,7 +87,7 @@ class EventoPostController extends Controller
             'descripcion' => ['nullable', 'string', 'max:1000'],
             'visibilidad' => ['nullable', 'integer', 'in:1,2'],
             'imagenes'    => ['required', 'array', 'min:1', 'max:10'],
-            'imagenes.*'  => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'imagenes.*'  => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:20480'],
         ]);
 
         /** @var \App\Models\Usuario $usuario */
@@ -311,20 +312,8 @@ class EventoPostController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
 
-        // Verificar que el usuario asistió al evento
-        $asistio = Entrada::where('evento_id', $eventoId)
-            ->whereIn('estado_entrada', [1, 2])
-            ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
-            ->exists();
-
-        if (!$asistio) {
-            return response()->json([
-                'exito'   => false,
-                'mensaje' => 'No tienes acceso a este contenido',
-            ], 403);
-        }
-
-        $evento = Evento::find($eventoId);
+        $evento = Evento::with(['imagenes' => fn ($q) => $q->where('es_portada', 1)->where('estado', 1)->limit(1)])
+            ->find($eventoId);
 
         if (!$evento) {
             return response()->json(['exito' => false, 'mensaje' => 'Evento no encontrado'], 404);
@@ -368,7 +357,7 @@ class EventoPostController extends Controller
             'evento'   => [
                 'id'          => $evento->id,
                 'titulo'      => $evento->titulo,
-                'portada_url' => $evento->portada_url ?? null,
+                'portada_url' => $evento->imagenes->first() ? $evento->imagenes->first()->imagen_url : null,
             ],
             'posts'    => $posts,
             'historias' => $historias,
@@ -381,31 +370,36 @@ class EventoPostController extends Controller
 
     public function eventosConContenido(): JsonResponse
     {
-        /** @var \App\Models\Usuario $usuario */
-        $usuario = Auth::user();
+        // Todos los eventos que tengan publicaciones activas o historias activas (sin filtro de asistencia)
+        $idsConPosts = EventoPost::where('estado', 1)
+            ->whereNotNull('evento_id')
+            ->distinct()
+            ->pluck('evento_id');
 
-        // Eventos asistidos por el usuario
-        $eventosAsistidos = Entrada::whereIn('estado_entrada', [1, 2])
-            ->whereHas('pedido', fn ($q) => $q->where('usuario_id', $usuario->id))
-            ->with('evento:id,titulo,portada_url')
-            ->get()
-            ->pluck('evento')
-            ->unique('id')
-            ->filter()
+        $idsConHistorias = Historia::activas()
+            ->whereNotNull('evento_id')
+            ->distinct()
+            ->pluck('evento_id');
+
+        $eventoIds = $idsConPosts->merge($idsConHistorias)->unique()->values();
+
+        if ($eventoIds->isEmpty()) {
+            return response()->json(['exito' => true, 'datos' => []]);
+        }
+
+        $resultado = Evento::whereIn('id', $eventoIds)
+            ->with(['imagenes' => fn ($q) => $q->where('es_portada', 1)->where('estado', 1)->limit(1)])
+            ->get(['id', 'titulo'])
+            ->map(function ($e) {
+                return [
+                    'id'              => $e->id,
+                    'titulo'          => $e->titulo,
+                    'portada_url'     => $e->imagenes->first() ? $e->imagenes->first()->imagen_url : null,
+                    'total_posts'     => EventoPost::where('evento_id', $e->id)->where('estado', 1)->count(),
+                    'total_historias' => Historia::activas()->where('evento_id', $e->id)->count(),
+                ];
+            })
             ->values();
-
-        $resultado = $eventosAsistidos->map(function ($e) {
-            $totalPosts     = EventoPost::where('evento_id', $e->id)->where('estado', 1)->count();
-            $totalHistorias = Historia::activas()->where('evento_id', $e->id)->count();
-
-            return [
-                'id'               => $e->id,
-                'titulo'           => $e->titulo,
-                'portada_url'      => $e->portada_url ?? null,
-                'total_posts'      => $totalPosts,
-                'total_historias'  => $totalHistorias,
-            ];
-        })->filter(fn ($e) => $e['total_posts'] > 0 || $e['total_historias'] > 0)->values();
 
         return response()->json(['exito' => true, 'datos' => $resultado]);
     }

@@ -90,7 +90,7 @@ class HistoriaController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'foto'      => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:8192'],
+            'foto'      => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:20480'],
             'texto'     => ['nullable', 'string', 'max:200'],
             'evento_id' => ['nullable', 'integer', 'exists:eventos,id'],
         ]);
