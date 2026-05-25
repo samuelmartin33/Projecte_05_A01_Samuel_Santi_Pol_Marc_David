@@ -72,6 +72,8 @@ class Usuario extends Authenticatable
         'fecha_nacimiento',
         'telefono',
         'email_verificado',
+        'social_provider',
+        'social_id',
         'tipo_cuenta',
         'estado_registro',
         'es_admin',
@@ -138,9 +140,9 @@ class Usuario extends Authenticatable
      *
      * @return string|null null desactiva la funcionalidad.
      */
-    public function getRememberTokenName(): ?string
+    public function getRememberTokenName(): string
     {
-        return null;
+        return 'remember_token';
     }
 
     /* ——— Relaciones ——— */

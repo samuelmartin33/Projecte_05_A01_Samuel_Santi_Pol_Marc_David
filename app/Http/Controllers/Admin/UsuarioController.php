@@ -68,14 +68,35 @@ class UsuarioController extends Controller
         if (Auth::id() === $usuario->id) {
             return redirect()
                 ->route('admin.usuarios.index')
-                ->with('error', 'No puedes eliminar tu propio usuario administrador.');
+                ->with('error', 'No puedes desactivar tu propio usuario administrador.');
         }
 
-        $usuario->delete();
+        if ((int) $usuario->estado === 0) {
+            return redirect()
+                ->route('admin.usuarios.index')
+                ->with('error', 'El usuario ya está desactivado.');
+        }
+
+        $usuario->update([
+            'estado' => 0,
+            'fecha_actualizacion' => now(),
+        ]);
 
         return redirect()
             ->route('admin.usuarios.index')
-            ->with('success', 'Usuario eliminado correctamente.');
+            ->with('success', 'Usuario desactivado correctamente. Ya no podrá acceder a su cuenta.');
+    }
+
+    public function activar(Usuario $usuario): RedirectResponse
+    {
+        $usuario->update([
+            'estado' => 1,
+            'fecha_actualizacion' => now(),
+        ]);
+
+        return redirect()
+            ->route('admin.usuarios.index')
+            ->with('success', 'Usuario activado correctamente. Ya puede acceder a su cuenta.');
     }
 
     private function validatedData(Request $request, ?Usuario $usuario = null): array

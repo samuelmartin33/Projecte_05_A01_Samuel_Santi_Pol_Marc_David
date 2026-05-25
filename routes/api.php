@@ -30,6 +30,17 @@ Route::post('/login', [AuthController::class, 'login'])
      ->middleware('throttle:5,1')
      ->name('api.login');
 
+// Autenticación social — Google y Apple
+// throttle:10,1 → máx 10 intentos por minuto (más permisivo que login clásico
+// porque el token ya fue validado por el proveedor externo)
+Route::post('/google-auth', [AuthController::class, 'googleAuth'])
+     ->middleware('throttle:10,1')
+     ->name('api.google-auth');
+
+Route::post('/apple-auth', [AuthController::class, 'appleAuth'])
+     ->middleware('throttle:10,1')
+     ->name('api.apple-auth');
+
 // Register — mismo límite de rate
 Route::post('/register', [AuthController::class, 'register'])
      ->middleware('throttle:5,1')

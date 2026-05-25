@@ -1550,14 +1550,14 @@ span.flatpickr-weekday {
     letter-spacing: 0.05em;
 }
 
-.flatpickr-days { width: 236px; }
-.dayContainer { width: 236px; min-width: 236px; max-width: 236px; }
+.flatpickr-days { width: 231px !important; }
+.dayContainer { width: 231px !important; min-width: 231px !important; max-width: 231px !important; }
 
 .flatpickr-day {
     border-radius: 8px;
-    height: 32px;
-    line-height: 32px;
-    max-width: 32px;
+    height: 33px;
+    line-height: 33px;
+    max-width: 33px;
     color: #1e1b4b;
     font-size: 0.85rem;
     font-weight: 500;

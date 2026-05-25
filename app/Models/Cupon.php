@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Models\Evento;
 
 /**
  * Modelo Cupon — Representa un cupón de descuento en VIBEZ.
@@ -138,10 +139,21 @@ class Cupon extends Model
      */
     public function aplicaAEvento(int $eventoId): bool
     {
-        // Si no tiene eventos asignados, aplica a todos (cupón global)
-        if ($this->eventos()->count() === 0) return true;
+        $tieneEventos = $this->eventos()->count() > 0;
 
-        return $this->eventos()->where('eventos.id', $eventoId)->exists();
+        if ($tieneEventos) {
+            return $this->eventos()->where('eventos.id', $eventoId)->exists();
+        }
+
+        // Sin eventos asignados: si el cupón pertenece a una empresa,
+        // solo aplica a los eventos de esa empresa.
+        if ($this->empresa_id) {
+            return Evento::where('id', $eventoId)
+                ->whereHas('organizador', fn ($q) => $q->where('empresa_id', $this->empresa_id))
+                ->exists();
+        }
+
+        return true;
     }
 
     /**

@@ -87,7 +87,7 @@ window.handleGoogleCredential = function (respuestaGoogle) {
         }
     }
 
-    fetch('/api/auth/google', {
+    fetch('/api/google-auth', {
         method:  'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -103,13 +103,11 @@ window.handleGoogleCredential = function (respuestaGoogle) {
             document.body.style.opacity    = '0';
             setTimeout(function () { window.location.href = '/home'; }, 360);
         } else {
-            alerta.textContent = datos.message || 'Error al iniciar sesión con Google.';
-            alerta.className   = 'alert alert-error visible';
+            mostrarAlerta(datos.message || 'Error al iniciar sesión con Google.');
         }
     })
     .catch(function () {
-        alerta.textContent = 'Error de conexión. Inténtalo de nuevo.';
-        alerta.className   = 'alert alert-error visible';
+        mostrarAlerta('Error de conexión. Inténtalo de nuevo.');
     });
 };
 
@@ -404,6 +402,7 @@ function registrar(evento) {
         ['field-fecha_nacimiento',      'error-fecha_nacimiento'],
         ['field-telefono',              'error-telefono'],
         ['field-tipo_cuenta',           'error-tipo_cuenta'],
+        ['field-acepta_terminos',       'error-acepta_terminos'],
     ];
     for (var indiceCampo = 0; indiceCampo < camposLimpiar.length; indiceCampo++) {
         limpiarErrorCampo(camposLimpiar[indiceCampo][0], camposLimpiar[indiceCampo][1]);
@@ -531,6 +530,13 @@ function registrar(evento) {
         }
     }
 
+    /* Validar aceptación de términos */
+    var checkTerminos = document.getElementById('acepta_terminos');
+    if (!checkTerminos || !checkTerminos.checked) {
+        mostrarErrorCampo('field-acepta_terminos', 'error-acepta_terminos', 'Debes aceptar las condiciones para continuar');
+        esValido = false;
+    }
+
     if (!esValido) {
         sacudirElemento(formulario);
         return;
@@ -644,5 +650,90 @@ function registrar(evento) {
     .catch(function () {
         boton.classList.remove('loading');
         mostrarAlerta('Error de conexión. Verifica tu red e inténtalo de nuevo.');
+    });
+}
+
+/* ============================================================
+   AUTENTICACIÓN CON APPLE (Sign in with Apple — JS SDK)
+   ============================================================ */
+
+/**
+ * Abre el popup de Apple Sign In y envía el id_token al backend.
+ * Ver login.js para la documentación completa del flujo.
+ * Llamado desde onclick="iniciarSesionApple(event, this)" en el blade.
+ */
+function iniciarSesionApple(evento, boton) {
+    var clientId = boton.getAttribute('data-apple-client-id') || '';
+    if (!clientId) {
+        mostrarAlerta('Apple Sign-In no está configurado en este servidor.', 'warning');
+        return;
+    }
+
+    if (typeof AppleID === 'undefined' || !AppleID.auth) {
+        mostrarAlerta('El SDK de Apple no ha cargado. Recarga la página e inténtalo de nuevo.', 'warning');
+        return;
+    }
+
+    AppleID.auth.init({
+        clientId:    clientId,
+        scope:       'name email',
+        redirectURI: window.location.origin,
+        usePopup:    true,
+    });
+
+    AppleID.auth.signIn()
+        .then(function (respuestaApple) {
+            manejarRespuestaApple(respuestaApple);
+        })
+        .catch(function (error) {
+            if (error && error.error !== 'popup_closed_by_user') {
+                mostrarAlerta('No se pudo iniciar sesión con Apple. Inténtalo de nuevo.');
+            }
+        });
+}
+
+/**
+ * Procesa la respuesta del SDK de Apple y la envía al backend.
+ */
+function manejarRespuestaApple(respuestaApple) {
+    var idToken  = respuestaApple.authorization.id_token;
+    var userName = '';
+
+    if (respuestaApple.user) {
+        var nombre   = respuestaApple.user.name || {};
+        var partes   = [nombre.firstName || '', nombre.lastName || ''];
+        userName = partes.join(' ').trim();
+    }
+
+    var csrf = '';
+    var metas = document.getElementsByTagName('meta');
+    for (var i = 0; i < metas.length; i++) {
+        if (metas[i].getAttribute('name') === 'csrf-token') {
+            csrf = metas[i].getAttribute('content');
+            break;
+        }
+    }
+
+    fetch('/api/apple-auth', {
+        method:  'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept':       'application/json',
+            'X-CSRF-TOKEN': csrf,
+        },
+        body: JSON.stringify({ id_token: idToken, user_name: userName }),
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (datos) {
+        if (datos.success) {
+            document.body.style.transition = 'opacity 0.35s ease';
+            document.body.style.opacity    = '0';
+            setTimeout(function () { window.location.href = '/home'; }, 360);
+        } else {
+            mostrarAlerta(datos.message || 'No se pudo iniciar sesión con Apple. Inténtalo de nuevo.');
+        }
+    })
+    .catch(function () {
+        mostrarAlerta('Error de conexión al iniciar sesión con Apple.');
     });
 }

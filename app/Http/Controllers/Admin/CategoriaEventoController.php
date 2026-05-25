@@ -28,6 +28,7 @@ class CategoriaEventoController extends Controller
         ]);
 
         $data['estado'] = $request->input('estado', 1);
+        $data['fecha_creacion'] = now();
         CategoriaEvento::create($data);
 
         return redirect()->route('admin.categorias.index')->with('success', 'Categoría creada correctamente.');
@@ -47,6 +48,7 @@ class CategoriaEventoController extends Controller
         ]);
 
         $data['estado'] = $request->input('estado', 1);
+        $data['fecha_actualizacion'] = now();
         $categoria->update($data);
 
         return redirect()->route('admin.categorias.index')->with('success', 'Categoría actualizada correctamente.');

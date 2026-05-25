@@ -55,11 +55,19 @@
                     </td>
                     <td data-label="Acciones" class="acciones">
                         <a class="btn btn-secondary" href="{{ route('admin.usuarios.edit', $usuario) }}">Editar</a>
-                        <form method="POST" action="{{ route('admin.usuarios.destroy', $usuario) }}" class="delete-form" data-confirm-msg="¿Eliminar a {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}?">
+                        @if((int) $usuario->estado === 1)
+                        <form method="POST" action="{{ route('admin.usuarios.destroy', $usuario) }}" class="delete-form" data-confirm-msg="¿Desactivar a {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}? No podrá acceder a su cuenta.">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                            <button type="submit" class="btn btn-danger">Desactivar</button>
                         </form>
+                        @else
+                        <form method="POST" action="{{ route('admin.usuarios.activar', $usuario) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-info">Activar</button>
+                        </form>
+                        @endif
                     </td>
                 </tr>
             @empty

@@ -33,6 +33,7 @@ use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
 use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\FacturacionEventoController;
+use App\Http\Controllers\Admin\CuponController as AdminCuponController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
@@ -96,6 +97,10 @@ Route::get('/', function () {
 
     return view('welcome', compact('eventos', 'categorias', 'eventosMapa', 'statRavers', 'statEventos', 'statPromotores', 'statSatisf'));
 })->name('welcome');
+
+// --- Página pública de Eventos: lista completa con grid, filtros y mapa ---
+Route::get('/eventos', [PublicEventoController::class, 'eventos'])
+    ->name('eventos.index');
 
 // --- Detalle de un evento específico ---
 Route::get('/eventos/{id}', [PublicEventoController::class, 'detalle'])
@@ -324,6 +329,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.usuarios.update');
     Route::delete('/admin/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])
          ->name('admin.usuarios.destroy');
+    Route::patch('/admin/usuarios/{usuario}/activar', [AdminUsuarioController::class, 'activar'])
+         ->name('admin.usuarios.activar');
 
     /* Rutas de gestión de categorías de eventos */
     Route::get('/admin/categorias', [AdminCategoriaController::class, 'index'])
@@ -356,6 +363,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.pagos.update');
     Route::delete('/admin/pagos/{pago}', [AdminPagoController::class, 'destroy'])
          ->name('admin.pagos.destroy');
+
+    /* Cupones (solo lectura para el admin) */
+    Route::get('/admin/cupones', [AdminCuponController::class, 'index'])
+         ->name('admin.cupones.index');
 
     /* Facturación por evento */
     Route::prefix('admin/facturacion')->name('admin.facturacion.')->group(function () {
