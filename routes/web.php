@@ -49,6 +49,7 @@ use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\Empresa\CuponController as EmpresaCuponController;
 use App\Http\Controllers\InvitacionEquipoController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
@@ -291,6 +292,18 @@ Route::middleware('auth')->group(function () {
     // Aceptar / rechazar solicitudes de amistad (botones de formulario)
     Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
     Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
+});
+
+/* — Premium: oferta, checkout con Stripe y páginas de retorno — */
+Route::middleware('auth')->group(function () {
+    // Página de oferta: muestra los beneficios Premium y el botón de pago.
+    Route::get('/premium',           [PremiumController::class, 'mostrar'])->name('premium');
+    // Inicia el checkout de Stripe (POST para prevenir accesos directos desde URL).
+    Route::post('/premium/checkout', [PremiumController::class, 'iniciarCheckout'])->name('premium.checkout');
+    // Stripe redirige aquí tras pago exitoso.
+    Route::get('/premium/exito',     [PremiumController::class, 'exito'])->name('premium.exito');
+    // Stripe redirige aquí si el usuario cancela.
+    Route::get('/premium/cancelado', [PremiumController::class, 'cancelado'])->name('premium.cancelado');
 });
 
 /* — Página Social: protegida por auth — */

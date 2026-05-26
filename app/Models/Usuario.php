@@ -77,6 +77,7 @@ class Usuario extends Authenticatable
         'tipo_cuenta',
         'estado_registro',
         'es_admin',
+        'es_premium',
         'ultimo_acceso',
         'estado',
         'fecha_creacion',
@@ -111,6 +112,7 @@ class Usuario extends Authenticatable
             'password_hash'    => 'hashed',    // bcrypt automático al asignar
             'email_verificado' => 'boolean',   // 0/1 en BD → true/false en PHP
             'es_admin'         => 'boolean',   // 0/1 en BD → true/false en PHP
+            'es_premium'       => 'boolean',   // 0/1 en BD → true/false en PHP
         ];
     }
 
