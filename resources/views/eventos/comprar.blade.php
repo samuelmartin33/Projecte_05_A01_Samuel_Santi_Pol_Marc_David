@@ -106,6 +106,30 @@
             </div>
 
         </div>
+
+        {{-- ── Banner Premium: solo visible si el usuario NO es premium ── --}}
+        @if(!auth()->user()->es_premium)
+        <div style="margin:0 2rem 2rem;padding:1.25rem 1.5rem;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:10px;display:flex;align-items:center;gap:14px;">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color:#a855f7;flex-shrink:0;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <div style="flex:1;">
+                <div style="font-family:'Archivo Narrow',sans-serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;">
+                    ¿Sabías que los miembros Premium tienen cupones exclusivos?
+                </div>
+                <div style="font-family:'Archivo Narrow',sans-serif;font-size:12px;color:rgba(245,241,234,0.45);">
+                    Por solo 5€ únicos desbloqueas descuentos especiales de todas las promotoras.
+                </div>
+            </div>
+            <a href="{{ route('premium') }}"
+               style="white-space:nowrap;font-family:'Archivo Narrow',sans-serif;font-size:12px;font-weight:600;color:#a855f7;text-decoration:none;border:1px solid rgba(168,85,247,0.4);padding:6px 14px;border-radius:999px;transition:background 0.15s;"
+               onmouseover="this.style.background='rgba(168,85,247,0.15)'"
+               onmouseout="this.style.background='transparent'">
+                Ver Premium
+            </a>
+        </div>
+        @endif
+
     </div>
 
     {{-- ── Columna derecha: panel de pago ── --}}
@@ -156,6 +180,29 @@
         @elseif(!$evento->es_gratuito && !$stripeActivo)
         <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;padding:12px 16px;font-family:'Archivo Narrow',sans-serif;font-size:13px;border-radius:8px;margin-bottom:1.5rem;">
             Los pagos con tarjeta no están disponibles para este evento. Contacta con el organizador.
+        </div>
+        @endif
+
+        {{-- Cupón: solo visible para usuarios Premium --}}
+        {{-- auth()->user()->es_premium viene del modelo y ya está casteado a bool --}}
+        @if(auth()->user()->es_premium)
+        <div style="margin-bottom:1.5rem;">
+            <div class="mono" style="font-size:9px;color:var(--magenta);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--magenta);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                Cupón Premium (opcional)
+            </div>
+            <input id="premium-cupon-codigo"
+                   type="text"
+                   placeholder="Código de descuento"
+                   maxlength="50"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(168,85,247,0.35);color:var(--ink);padding:12px 14px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;font-size:14px;box-sizing:border-box;transition:border-color 0.2s;text-transform:uppercase;"
+                   onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"
+                   onblur="this.style.borderColor='rgba(168,85,247,0.35)'">
+            <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.3);margin-top:6px;">
+                Exclusivo para miembros Premium ✦
+            </div>
         </div>
         @endif
 

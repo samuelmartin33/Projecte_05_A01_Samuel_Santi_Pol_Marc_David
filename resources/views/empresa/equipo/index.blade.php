@@ -17,7 +17,7 @@
 .eq-table tbody tr { border-bottom:1px solid rgba(245,241,234,0.06); transition:background 0.12s; }
 .eq-table tbody tr:last-child { border-bottom:none; }
 .eq-table tbody tr:hover { background:rgba(245,241,234,0.03); }
-.eq-table td { padding:16px 20px; color:#f5f1ea; vertical-align:middle; }
+.eq-table td { padding:14px 20px; color:#f5f1ea; vertical-align:middle; }
 
 .eq-avatar {
     width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#a855f7);
@@ -27,31 +27,37 @@
 .eq-nombre { font-family:'Archivo',sans-serif; font-weight:700; font-size:0.9rem; color:#f5f1ea; }
 .eq-email  { font-family:'Archivo Narrow',sans-serif; font-size:0.7rem; color:rgba(245,241,234,0.40); margin-top:2px; }
 
-/* Badges de rol */
+/* Badges */
 .rol-badge {
     display:inline-flex; align-items:center; gap:5px;
     font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.14em; padding:4px 10px;
-    white-space:nowrap;
+    text-transform:uppercase; letter-spacing:0.14em; padding:4px 10px; white-space:nowrap;
 }
 .rol-organizador { background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.25); }
 .rol-portero     { background:rgba(52,211,153,0.12);  color:#34d399; border:1px solid rgba(52,211,153,0.25); }
+.puesto-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.12em; padding:4px 10px; white-space:nowrap;
+    background:rgba(245,241,234,0.06); color:rgba(245,241,234,0.55); border:1px solid rgba(245,241,234,0.10);
+}
+.puesto-badge.asignado { background:rgba(251,191,36,0.10); color:#fbbf24; border-color:rgba(251,191,36,0.25); }
 
-/* Selector de rol inline */
-.rol-form { display:inline-flex; align-items:center; gap:6px; }
-.csinline { position:relative; display:inline-block; min-width:130px; }
+/* Formulario de edición inline (rol + puesto juntos) */
+.edit-form { display:flex; flex-direction:column; gap:6px; min-width:180px; }
+.csinline { position:relative; display:block; }
 .csinline-trigger {
     display:flex; align-items:center; justify-content:space-between; gap:8px;
     background:#0d0a18; border:1px solid rgba(245,241,234,0.12); color:#f5f1ea;
     padding:5px 10px; font-family:'Archivo Narrow',sans-serif; font-size:0.75rem;
-    cursor:pointer; user-select:none; transition:border-color 0.15s;
+    cursor:pointer; user-select:none; transition:border-color 0.15s; width:100%;
 }
 .csinline.open .csinline-trigger { border-color:rgba(168,85,247,0.50); }
 .csinline-arrow { width:9px;height:9px;flex-shrink:0;opacity:0.45;transition:transform 0.15s; }
-.csinline.open .csinline-arrow { transform:rotate(180deg);opacity:0.8; }
+.csinline.open .csinline-arrow { transform:rotate(180deg); opacity:0.8; }
 .csinline-menu {
-    display:none; position:absolute; top:calc(100% + 3px); left:0; right:0; z-index:200;
-    background:#0d0a18; border:1px solid rgba(168,85,247,0.30);
+    display:none; position:absolute; top:calc(100% + 2px); left:0; right:0; z-index:200;
+    background:#0d0a18; border:1px solid rgba(168,85,247,0.30); max-height:180px; overflow-y:auto;
 }
 .csinline.open .csinline-menu { display:block; }
 .csinline-opt {
@@ -64,7 +70,7 @@
     font-family:'Archivo Narrow',sans-serif; font-size:0.55rem; font-weight:700;
     text-transform:uppercase; letter-spacing:0.12em; padding:5px 10px;
     background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.30);
-    cursor:pointer; transition:background 0.15s;
+    cursor:pointer; transition:background 0.15s; width:100%;
 }
 .btn-rol-save:hover { background:rgba(168,85,247,0.28); }
 .btn-remove {
@@ -75,17 +81,14 @@
 }
 .btn-remove:hover { background:rgba(248,113,113,0.10); color:#f87171; }
 
-/* ── Modal / panel crear usuario ── */
-.crear-panel {
-    background:#0d0a18; border:1px solid rgba(245,241,234,0.10);
-    padding:28px 32px; margin-bottom:24px; display:none;
-}
+/* Panel crear usuario */
+.crear-panel { background:#0d0a18; border:1px solid rgba(245,241,234,0.10); padding:28px 32px; margin-bottom:24px; display:none; }
 .crear-panel.open { display:block; }
 .crear-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .form-field { display:flex; flex-direction:column; gap:6px; }
 .form-input.error { border-bottom-color:rgba(248,113,113,0.55); }
 
-/* Selector de rol en formulario (custom igual al de filtros) */
+/* Custom select del formulario de crear */
 .cselect-form { position:relative; }
 .cselect-form-trigger {
     display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -99,19 +102,16 @@
 .cselect-form-menu {
     display:none; position:absolute; top:calc(100% + 3px); left:0; right:0;
     background:#0f0c1e; border:1px solid rgba(168,85,247,0.30); z-index:300;
-    box-shadow:0 8px 32px rgba(0,0,0,0.55);
+    box-shadow:0 8px 32px rgba(0,0,0,0.55); max-height:200px; overflow-y:auto;
 }
 .cselect-form.open .cselect-form-menu { display:block; }
 .cselect-form-opt {
     padding:10px 14px; font-family:'Archivo Narrow',sans-serif; font-size:0.85rem;
     color:rgba(245,241,234,0.65); cursor:pointer; transition:background 0.1s,color 0.1s;
 }
-.cselect-form-opt:hover   { background:rgba(168,85,247,0.12); color:#f5f1ea; }
-.cselect-form-opt.sel     { background:rgba(168,85,247,0.18); color:#c084fc; font-weight:700; }
-.cselect-form-desc {
-    font-family:'Archivo Narrow',sans-serif; font-size:0.65rem;
-    color:rgba(245,241,234,0.30); margin-top:4px;
-}
+.cselect-form-opt:hover { background:rgba(168,85,247,0.12); color:#f5f1ea; }
+.cselect-form-opt.sel  { background:rgba(168,85,247,0.18); color:#c084fc; font-weight:700; }
+.cselect-form-desc { font-family:'Archivo Narrow',sans-serif; font-size:0.65rem; color:rgba(245,241,234,0.30); margin-top:4px; }
 
 .btn-abrir-form {
     display:inline-flex; align-items:center; gap:7px;
@@ -156,7 +156,7 @@
         </div>
         <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-3">Equipo</h1>
         <p class="text-slate-400 text-lg max-w-xl mx-auto">
-            Añade miembros a tu empresa y asígnales un rol dentro de la plataforma.
+            Añade miembros, asígnales un nivel de acceso y su puesto de trabajo.
         </p>
     </div>
 </section>
@@ -217,8 +217,10 @@
                     <input class="form-input {{ $errors->has('email') ? 'error' : '' }}"
                            type="email" name="email" value="{{ old('email') }}" placeholder="correo@ejemplo.com">
                 </div>
+
+                {{-- Selector de acceso (rol de permiso) --}}
                 <div class="form-field">
-                    <label class="form-label">Rol</label>
+                    <label class="form-label">Acceso</label>
                     <div class="cselect-form" id="csf-rol">
                         <div class="cselect-form-trigger" onclick="toggleCsf('csf-rol')">
                             <span class="csf-val">{{ old('rol') === 'portero' ? 'Portero' : 'Organizador' }}</span>
@@ -227,19 +229,48 @@
                             </svg>
                         </div>
                         <div class="cselect-form-menu">
-                            <div class="cselect-form-opt {{ old('rol','organizador') === 'organizador' ? 'sel' : '' }}" data-val="organizador">Organizador</div>
-                            <div class="cselect-form-opt {{ old('rol') === 'portero' ? 'sel' : '' }}" data-val="portero">Portero</div>
+                            <div class="cselect-form-opt {{ old('rol','organizador') === 'organizador' ? 'sel' : '' }}"
+                                 onclick="seleccionarRolForm('organizador', 'Organizador')">Organizador</div>
+                            <div class="cselect-form-opt {{ old('rol') === 'portero' ? 'sel' : '' }}"
+                                 onclick="seleccionarRolForm('portero', 'Portero')">Portero</div>
                         </div>
                     </div>
                     <input type="hidden" name="rol" id="input-rol" value="{{ old('rol','organizador') }}">
                     <div class="cselect-form-desc" id="desc-rol">
-                        @if(old('rol') === 'portero')
-                            Solo puede validar entradas QR al acceder a la app.
-                        @else
-                            Acceso completo al panel de empresa.
+                        @if(old('rol') === 'portero') Solo puede validar entradas QR.
+                        @else Acceso completo al panel de empresa.
                         @endif
                     </div>
                 </div>
+
+                {{-- Selector de puesto (categorias_trabajo) --}}
+                <div class="form-field">
+                    <label class="form-label">Puesto de trabajo</label>
+                    <div class="cselect-form" id="csf-puesto">
+                        <div class="cselect-form-trigger" onclick="toggleCsf('csf-puesto')">
+                            <span class="csf-val" id="csf-puesto-label">
+                                @php $oldCat = $categorias->firstWhere('id', old('categoria_trabajo_id')); @endphp
+                                {{ $oldCat ? $oldCat->nombre : '— Sin puesto —' }}
+                            </span>
+                            <svg class="cselect-form-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="cselect-form-menu">
+                            <div class="cselect-form-opt {{ !old('categoria_trabajo_id') ? 'sel' : '' }}"
+                                 onclick="seleccionarPuestoForm('', '— Sin puesto —')">— Sin puesto —</div>
+                            @foreach($categorias as $cat)
+                                <div class="cselect-form-opt {{ old('categoria_trabajo_id') == $cat->id ? 'sel' : '' }}"
+                                     onclick="seleccionarPuestoForm('{{ $cat->id }}', '{{ $cat->nombre }}')">
+                                    {{ $cat->nombre }}
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <input type="hidden" name="categoria_trabajo_id" id="input-puesto" value="{{ old('categoria_trabajo_id') }}">
+                    <div class="cselect-form-desc">Puesto que aparece en el equipo (Camarero, Barman…)</div>
+                </div>
+
                 <div class="form-field">
                     <label class="form-label">Contraseña</label>
                     <input class="form-input {{ $errors->has('password') ? 'error' : '' }}"
@@ -272,8 +303,9 @@
             <thead>
                 <tr>
                     <th>Miembro</th>
-                    <th>Rol</th>
-                    <th>Cambiar rol</th>
+                    <th>Acceso</th>
+                    <th>Puesto</th>
+                    <th>Editar</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -281,6 +313,7 @@
             @foreach($miembros as $miembro)
             @php $usr = $miembro->usuario; @endphp
             <tr>
+                {{-- Nombre + email --}}
                 <td>
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div class="eq-avatar">
@@ -292,6 +325,8 @@
                         </div>
                     </div>
                 </td>
+
+                {{-- Badge de acceso (permiso) --}}
                 <td>
                     @if($miembro->rol === 'portero')
                         <span class="rol-badge rol-portero">
@@ -309,29 +344,87 @@
                         </span>
                     @endif
                 </td>
+
+                {{-- Badge de puesto (categorias_trabajo) --}}
                 <td>
-                    <form method="POST" action="{{ route('empresa.equipo.rol', $miembro) }}" class="rol-form">
+                    @if($miembro->categoriaTrabajo)
+                        <span class="puesto-badge asignado">
+                            <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            {{ $miembro->categoriaTrabajo->nombre }}
+                        </span>
+                    @else
+                        <span class="puesto-badge">— Sin puesto —</span>
+                    @endif
+                </td>
+
+                {{-- Formulario de edición: acceso + puesto en una sola acción --}}
+                <td>
+                    <form method="POST" action="{{ route('empresa.equipo.rol', $miembro) }}">
                         @csrf @method('PATCH')
-                        <input type="hidden" name="rol" value="{{ $miembro->rol }}">
-                        <div class="csinline" onclick="toggleCsInline(this)">
-                            <div class="csinline-trigger">
-                                <span>{{ $miembro->rol === 'portero' ? 'Portero' : 'Organizador' }}</span>
-                                <svg class="csinline-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                        <input type="hidden" name="rol" id="rol-{{ $miembro->id }}" value="{{ $miembro->rol }}">
+                        <input type="hidden" name="categoria_trabajo_id" id="cat-{{ $miembro->id }}" value="{{ $miembro->categoria_trabajo_id }}">
+
+                        <div class="edit-form">
+                            {{-- Selector acceso --}}
+                            <div class="csinline" id="csi-rol-{{ $miembro->id }}"
+                                 onmouseleave="cerrarCsInline('csi-rol-{{ $miembro->id }}')">
+                                <div class="csinline-trigger" onclick="toggleCsInline('csi-rol-{{ $miembro->id }}')">
+                                    <span id="lbl-rol-{{ $miembro->id }}">{{ $miembro->rol === 'portero' ? 'Portero' : 'Organizador' }}</span>
+                                    <svg class="csinline-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                                <div class="csinline-menu">
+                                    <div class="csinline-opt {{ $miembro->rol === 'organizador' ? 'sel' : '' }}"
+                                         onclick="elegirRol('{{ $miembro->id }}', 'organizador', 'Organizador')">Organizador</div>
+                                    <div class="csinline-opt {{ $miembro->rol === 'portero' ? 'sel' : '' }}"
+                                         onclick="elegirRol('{{ $miembro->id }}', 'portero', 'Portero')">Portero</div>
+                                </div>
                             </div>
-                            <div class="csinline-menu">
-                                <div class="csinline-opt {{ $miembro->rol === 'organizador' ? 'sel' : '' }}" data-val="organizador">Organizador</div>
-                                <div class="csinline-opt {{ $miembro->rol === 'portero' ? 'sel' : '' }}" data-val="portero">Portero</div>
+
+                            {{-- Selector puesto --}}
+                            <div class="csinline" id="csi-cat-{{ $miembro->id }}"
+                                 onmouseleave="cerrarCsInline('csi-cat-{{ $miembro->id }}')">
+                                <div class="csinline-trigger" onclick="toggleCsInline('csi-cat-{{ $miembro->id }}')">
+                                    <span id="lbl-cat-{{ $miembro->id }}">{{ $miembro->categoriaTrabajo ? $miembro->categoriaTrabajo->nombre : '— Sin puesto —' }}</span>
+                                    <svg class="csinline-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                                <div class="csinline-menu">
+                                    <div class="csinline-opt {{ !$miembro->categoria_trabajo_id ? 'sel' : '' }}"
+                                         onclick="elegirPuesto('{{ $miembro->id }}', '', '— Sin puesto —')">— Sin puesto —</div>
+                                    @foreach($categorias as $cat)
+                                        <div class="csinline-opt {{ $miembro->categoria_trabajo_id == $cat->id ? 'sel' : '' }}"
+                                             onclick="elegirPuesto('{{ $miembro->id }}', '{{ $cat->id }}', '{{ $cat->nombre }}')">
+                                            {{ $cat->nombre }}
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
+
+                            <button type="submit" class="btn-rol-save">Guardar cambios</button>
                         </div>
-                        <button type="submit" class="btn-rol-save">Guardar</button>
                     </form>
                 </td>
+
+                {{-- Acciones: horas + eliminar --}}
                 <td>
-                    <form method="POST" action="{{ route('empresa.equipo.destroy', $miembro) }}"
-                          onsubmit="return confirm('¿Eliminar a {{ $usr->nombre }} del equipo?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn-remove">Eliminar</button>
-                    </form>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <a href="{{ route('empresa.equipo.horas', $miembro->usuario_id) }}"
+                           title="Ver horas de {{ $usr->nombre }}"
+                           style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.30);color:#c084fc;text-decoration:none;transition:background 0.15s;"
+                           onmouseover="this.style.background='rgba(168,85,247,0.25)'"
+                           onmouseout="this.style.background='rgba(168,85,247,0.12)'">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </a>
+                        <form method="POST" action="{{ route('empresa.equipo.destroy', $miembro) }}"
+                              onsubmit="return confirm('¿Eliminar a {{ $usr->nombre }} del equipo?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn-remove">Eliminar</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             @endforeach
@@ -340,7 +433,7 @@
     </div>
     @endif
 
-    {{-- Leyenda de roles --}}
+    {{-- Leyenda --}}
     <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.07);padding:16px 20px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -355,7 +448,7 @@
                 <span class="rol-badge rol-portero" style="font-size:0.45rem;">Portero</span>
             </div>
             <p style="font-family:'Archivo Narrow',sans-serif;font-size:0.8rem;color:rgba(245,241,234,0.45);line-height:1.5;">
-                Acceso restringido: al iniciar sesión solo puede validar entradas QR en la puerta del evento.
+                Acceso restringido: solo puede validar entradas QR e iniciar sesión como usuario normal con funciones extra.
             </p>
         </div>
     </div>
@@ -366,57 +459,67 @@
 
 @push('scripts')
 <script>
+/* ── Panel crear ── */
 function toggleCrear() {
-    var p = document.getElementById('crear-panel');
-    p.classList.toggle('open');
+    document.getElementById('crear-panel').classList.toggle('open');
 }
 
-// Custom select del formulario
+/* ── Selectores del formulario de creación ── */
 function toggleCsf(id) {
+    document.getElementById(id).classList.toggle('open');
+}
+
+/* Selecciona el rol en el formulario de creación */
+function seleccionarRolForm(val, label) {
+    document.getElementById('csf-rol').querySelectorAll('.cselect-form-opt').forEach(function(o) {
+        o.classList.toggle('sel', o.textContent.trim() === label);
+    });
+    document.getElementById('csf-rol').querySelector('.csf-val').textContent = label;
+    document.getElementById('input-rol').value = val;
+    document.getElementById('csf-rol').classList.remove('open');
+    document.getElementById('desc-rol').textContent = val === 'portero'
+        ? 'Solo puede validar entradas QR al acceder a la app.'
+        : 'Acceso completo al panel de empresa.';
+}
+
+/* Selecciona el puesto en el formulario de creación */
+function seleccionarPuestoForm(val, label) {
+    document.getElementById('csf-puesto').querySelectorAll('.cselect-form-opt').forEach(function(o) {
+        o.classList.toggle('sel', o.textContent.trim() === label);
+    });
+    document.getElementById('csf-puesto').querySelector('.csf-val').textContent = label;
+    document.getElementById('input-puesto').value = val;
+    document.getElementById('csf-puesto').classList.remove('open');
+}
+
+/* ── Selectores inline de la tabla ── */
+function toggleCsInline(id) {
     var el = document.getElementById(id);
     el.classList.toggle('open');
 }
 
-// Toggle inline rol dropdowns
-function toggleCsInline(el) {
-    el.classList.toggle('open');
+function cerrarCsInline(id) {
+    document.getElementById(id).classList.remove('open');
 }
 
-document.addEventListener('click', function(e) {
-    // Form creation select
-    var opt = e.target.closest('.cselect-form-opt');
-    if (opt) {
-        var cs  = opt.closest('.cselect-form');
-        var val = opt.dataset.val;
-        cs.querySelectorAll('.cselect-form-opt').forEach(function(o) { o.classList.toggle('sel', o.dataset.val === val); });
-        cs.querySelector('.csf-val').textContent = opt.textContent.trim();
-        document.getElementById('input-rol').value = val;
-        cs.classList.remove('open');
-        document.getElementById('desc-rol').textContent = val === 'portero'
-            ? 'Solo puede validar entradas QR al acceder a la app.'
-            : 'Acceso completo al panel de empresa.';
-        return;
-    }
+/* Elige el rol de acceso para un miembro de la tabla */
+function elegirRol(mid, val, label) {
+    document.getElementById('csi-rol-' + mid).querySelectorAll('.csinline-opt').forEach(function(o) {
+        o.classList.toggle('sel', o.textContent.trim() === label);
+    });
+    document.getElementById('lbl-rol-' + mid).textContent = label;
+    document.getElementById('rol-' + mid).value = val;
+    document.getElementById('csi-rol-' + mid).classList.remove('open');
+}
 
-    // Inline rol-changer select
-    var inlineOpt = e.target.closest('.csinline-opt');
-    if (inlineOpt) {
-        var cs  = inlineOpt.closest('.csinline');
-        var val = inlineOpt.dataset.val;
-        cs.querySelectorAll('.csinline-opt').forEach(function(o) { o.classList.toggle('sel', o.dataset.val === val); });
-        cs.querySelector('.csinline-trigger span').textContent = inlineOpt.textContent.trim();
-        cs.closest('form').querySelector('input[name="rol"]').value = val;
-        cs.classList.remove('open');
-        return;
-    }
-
-    // Close all open dropdowns when clicking outside
-    if (!e.target.closest('.cselect-form')) {
-        document.querySelectorAll('.cselect-form.open').forEach(function(s) { s.classList.remove('open'); });
-    }
-    if (!e.target.closest('.csinline')) {
-        document.querySelectorAll('.csinline.open').forEach(function(s) { s.classList.remove('open'); });
-    }
-});
+/* Elige el puesto de trabajo para un miembro de la tabla */
+function elegirPuesto(mid, val, label) {
+    document.getElementById('csi-cat-' + mid).querySelectorAll('.csinline-opt').forEach(function(o) {
+        o.classList.toggle('sel', o.textContent.trim() === label);
+    });
+    document.getElementById('lbl-cat-' + mid).textContent = label;
+    document.getElementById('cat-' + mid).value = val;
+    document.getElementById('csi-cat-' + mid).classList.remove('open');
+}
 </script>
 @endpush
