@@ -83,18 +83,7 @@
 .crear-panel.open { display:block; }
 .crear-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .form-field { display:flex; flex-direction:column; gap:6px; }
-.form-label {
-    font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.16em; color:rgba(245,241,234,0.35);
-}
-.form-input {
-    background:#07050f; border:1px solid rgba(245,241,234,0.12); color:#f5f1ea;
-    padding:9px 12px; font-size:0.85rem; font-family:'Archivo Narrow',sans-serif;
-    outline:none; transition:border-color 0.15s;
-}
-.form-input::placeholder { color:rgba(245,241,234,0.20); }
-.form-input:focus { border-color:rgba(168,85,247,0.55); }
-.form-input.error { border-color:rgba(248,113,113,0.55); }
+.form-input.error { border-bottom-color:rgba(248,113,113,0.55); }
 
 /* Selector de rol en formulario (custom igual al de filtros) */
 .cselect-form { position:relative; }

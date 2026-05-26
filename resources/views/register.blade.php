@@ -387,7 +387,7 @@
                                 placeholder="Breve descripción de vuestra empresa y tipo de eventos que organizáis"
                                 maxlength="500"
                                 rows="3"
-                                style="width:100%;resize:vertical;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:10px 14px;color:var(--ink);font-family:'Archivo Narrow',sans-serif;font-size:14px;"
+                                class="form-textarea"
                             ></textarea>
                         </div>
 
