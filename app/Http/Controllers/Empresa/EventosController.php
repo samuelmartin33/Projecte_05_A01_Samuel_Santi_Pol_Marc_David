@@ -200,6 +200,122 @@ class EventosController extends Controller
     }
 
     /**
+     * Muestra el formulario de edición de un evento existente.
+     * GET /empresa/eventos/{id}/editar
+     */
+    public function edit(int $id): View|RedirectResponse
+    {
+        $organizador = $this->obtenerOrganizador();
+
+        // Verificar que el evento pertenece a este organizador
+        $evento = Evento::where('id', $id)
+            ->where('organizador_id', $organizador->id)
+            ->with('categorias', 'portada')
+            ->firstOrFail();
+
+        $categorias = CategoriaEvento::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('empresa.eventos.editar', compact('evento', 'categorias'));
+    }
+
+    /**
+     * Actualiza los datos de un evento existente.
+     * PUT /empresa/eventos/{id}
+     */
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $organizador = $this->obtenerOrganizador();
+
+        // Verificar que el evento pertenece a este organizador
+        $evento = Evento::where('id', $id)
+            ->where('organizador_id', $organizador->id)
+            ->with('portada')
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'titulo'              => ['required', 'string', 'max:300'],
+            'descripcion'         => ['nullable', 'string', 'max:5000'],
+            'categorias'          => ['required', 'array', 'min:1'],
+            'categorias.*'        => ['integer', 'exists:categorias_evento,id'],
+            'tipo_evento'         => ['required', 'integer', 'in:1,2'],
+            'fecha_inicio'        => ['required', 'date'],
+            'fecha_fin'           => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'ubicacion_nombre'    => ['required', 'string', 'max:300'],
+            'ubicacion_direccion' => ['nullable', 'string', 'max:500'],
+            'latitud'             => ['nullable', 'numeric', 'between:-90,90'],
+            'longitud'            => ['nullable', 'numeric', 'between:-180,180'],
+            'precio_base'         => ['required', 'numeric', 'min:0'],
+            'aforo_maximo'        => ['nullable', 'integer', 'min:1'],
+            'edad_minima'         => ['nullable', 'integer', 'between:0,120'],
+            'es_gratuito'         => ['nullable'],
+            'url_externa'         => ['nullable', 'url', 'max:500'],
+            'imagen_portada'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+        ], [
+            'titulo.required'          => 'El título del evento es obligatorio.',
+            'titulo.max'               => 'El título no puede superar los 300 caracteres.',
+            'categorias.required'      => 'Selecciona al menos una categoría.',
+            'categorias.min'           => 'Selecciona al menos una categoría.',
+            'categorias.*.exists'      => 'Una de las categorías seleccionadas no es válida.',
+            'tipo_evento.required'     => 'Selecciona el tipo de evento.',
+            'fecha_inicio.required'    => 'La fecha de inicio es obligatoria.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior a la de inicio.',
+            'ubicacion_nombre.required'=> 'El nombre del lugar es obligatorio.',
+            'precio_base.required'     => 'Indica el precio (0 si es gratuito).',
+            'imagen_portada.image'     => 'El archivo debe ser una imagen.',
+            'imagen_portada.mimes'     => 'Formatos permitidos: JPG, PNG, WebP, GIF.',
+            'imagen_portada.max'       => 'La imagen no puede superar los 5 MB.',
+            'precio_base.min'          => 'El precio no puede ser negativo.',
+        ]);
+
+        $esGratuito = $request->boolean('es_gratuito');
+
+        $evento->update([
+            'categoria_evento_id' => $validated['categorias'][0],
+            'tipo_evento'         => $validated['tipo_evento'],
+            'titulo'              => $validated['titulo'],
+            'descripcion'         => $validated['descripcion'] ?? null,
+            'fecha_inicio'        => $validated['fecha_inicio'],
+            'fecha_fin'           => $validated['fecha_fin'] ?? null,
+            'ubicacion_nombre'    => $validated['ubicacion_nombre'] ?? null,
+            'ubicacion_direccion' => $validated['ubicacion_direccion'] ?? null,
+            'latitud'             => $validated['latitud'] ?? null,
+            'longitud'            => $validated['longitud'] ?? null,
+            'precio_base'         => $esGratuito ? 0 : $validated['precio_base'],
+            'aforo_maximo'        => $validated['aforo_maximo'] ?? null,
+            'edad_minima'         => $validated['edad_minima'] ?? null,
+            'es_gratuito'         => $esGratuito ? 1 : 0,
+            'url_externa'         => $validated['url_externa'] ?? null,
+            'fecha_actualizacion' => now(),
+        ]);
+
+        $evento->categorias()->sync($validated['categorias']);
+
+        // Si se subió nueva imagen, reemplazar la portada anterior
+        if ($request->hasFile('imagen_portada')) {
+            // Eliminar portada anterior si existe
+            if ($evento->portada) {
+                $evento->portada->delete();
+            }
+
+            $path = $request->file('imagen_portada')->store('eventos', 'public');
+            EventoImagen::create([
+                'evento_id'      => $evento->id,
+                'imagen_url'     => '/storage/' . $path,
+                'descripcion'    => 'Portada del evento',
+                'es_portada'     => 1,
+                'estado'         => 1,
+                'fecha_creacion' => now(),
+            ]);
+        }
+
+        return redirect()
+            ->route('empresa.home')
+            ->with('success', '¡Evento "' . $evento->titulo . '" actualizado correctamente!');
+    }
+
+    /**
      * Elimina un evento propio de la empresa.
      * DELETE /empresa/eventos/{id}
      */

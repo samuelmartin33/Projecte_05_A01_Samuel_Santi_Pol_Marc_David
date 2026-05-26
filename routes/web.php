@@ -46,6 +46,7 @@ use App\Http\Controllers\Empresa\PerfilFiscalController;
 use App\Http\Controllers\Empresa\StripeOnboardingController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\Empresa\CuponController as EmpresaCuponController;
+use App\Http\Controllers\InvitacionEquipoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -150,6 +151,10 @@ Route::view('/devoluciones',   'static.devoluciones')->name('devoluciones');
 Route::get('/cupones', [CuponController::class, 'index'])
     ->name('cupones.index');
 
+// --- Aceptar invitación al equipo de empresa (enlace del correo de selección) ---
+Route::get('/equipo/aceptar/{token}', [InvitacionEquipoController::class, 'aceptar'])
+    ->name('equipo.aceptar');
+
 // --- Página completa de Bolsa de Trabajo ---
 Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
     ->name('trabajos.index');
@@ -186,6 +191,8 @@ Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
 Route::middleware(['auth','no-portero'])->prefix('empresa/eventos')->name('empresa.eventos.')->group(function () {
     Route::get('/crear', [EmpresaEventosController::class, 'create'])->name('create');
     Route::post('/',     [EmpresaEventosController::class, 'store'])->name('store');
+    Route::get('/{id}/editar', [EmpresaEventosController::class, 'edit'])->where('id', '[0-9]+')->name('edit');
+    Route::put('/{id}',        [EmpresaEventosController::class, 'update'])->where('id', '[0-9]+')->name('update');
     Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
 });
 
@@ -199,9 +206,10 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/ofertas')->name('empre
 Route::middleware(['auth','no-portero'])->prefix('empresa/candidaturas')->name('empresa.candidaturas.')->group(function () {
     Route::get('/',                              [CandidaturasController::class, 'ofertas'])->name('ofertas');
     Route::get('/{ofertaId}',                    [CandidaturasController::class, 'candidaturas'])->where('ofertaId', '[0-9]+')->name('detalle');
-    Route::patch('/{candidaturaId}/estado',      [CandidaturasController::class, 'actualizarEstado'])->where('candidaturaId', '[0-9]+')->name('estado');
-    Route::get('/{candidaturaId}/descargar',     [CandidaturasController::class, 'descargarCv'])->where('candidaturaId', '[0-9]+')->name('descargar');
-    Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])->where('ofertaId', '[0-9]+')->name('cerrar-oferta');
+    Route::patch('/{candidaturaId}/estado',          [CandidaturasController::class, 'actualizarEstado'])->where('candidaturaId', '[0-9]+')->name('estado');
+    Route::get('/{candidaturaId}/descargar',         [CandidaturasController::class, 'descargarCv'])->where('candidaturaId', '[0-9]+')->name('descargar');
+    Route::post('/{candidaturaId}/enviar-seleccion', [CandidaturasController::class, 'enviarEmailSeleccion'])->where('candidaturaId', '[0-9]+')->name('enviar-seleccion');
+    Route::patch('/oferta/{ofertaId}/cerrar',        [CandidaturasController::class, 'cerrarOferta'])->where('ofertaId', '[0-9]+')->name('cerrar-oferta');
 });
 
 /* — Validación QR (accesible también a porteros) — */
