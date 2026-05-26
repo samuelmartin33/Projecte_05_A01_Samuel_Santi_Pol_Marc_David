@@ -65,6 +65,7 @@
             $navLinks = array_filter([
               ['Para ti',     route('home'),                        'home'],
               ['Eventos',     route('eventos.index'),               'eventos.index'],
+              ['Calendario',  route('calendario'),                  'calendario'],
               !$esAdmin ? ['Mis tickets', route('entradas.mis-entradas'), 'entradas.mis-entradas'] : null,
               ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
               ['Social',      route('social'),                      'social'],
@@ -77,6 +78,7 @@
           $navLinks = [
             ['Explorar',         route('home'),            'home'],
             ['Eventos',          route('eventos.index'),   'eventos.index'],
+            ['Calendario',       route('calendario'),      'calendario'],
             ['Bolsa de trabajo', route('trabajos.index'),  'trabajos.index'],
           ];
         @endphp

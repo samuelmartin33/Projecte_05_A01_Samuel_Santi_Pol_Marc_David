@@ -97,6 +97,11 @@
                               {{ request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Trabajo
                     </a>
+                    <a href="{{ route('calendario') }}"
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('calendario') ? 'text-white' : 'text-white/60 hover:text-white' }}">
+                        Calendario
+                    </a>
                     @auth
                     <a href="{{ route('social') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 relative

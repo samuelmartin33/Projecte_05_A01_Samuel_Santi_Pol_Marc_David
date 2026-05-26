@@ -141,6 +141,10 @@ Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
 Route::get('/mapa', [PublicEventoController::class, 'mapa'])
     ->name('mapa');
 
+// --- Calendario mensual de eventos ---
+Route::get('/calendario', [PublicEventoController::class, 'calendario'])
+    ->name('calendario');
+
 // --- Páginas estáticas del footer ---
 Route::view('/quienes-somos',  'static.quienes-somos')->name('quienes-somos');
 Route::view('/manifiesto',     'static.manifiesto')->name('manifiesto');
@@ -172,6 +176,10 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
+
+/* — Google OAuth (Socialite — flujo server-side redirect) — */
+Route::get('/auth/google',          [\App\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 /* — Recuperación de contraseña (solo invitados) — */
 Route::middleware('guest')->group(function () {
