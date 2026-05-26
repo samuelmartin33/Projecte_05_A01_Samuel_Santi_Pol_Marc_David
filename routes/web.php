@@ -50,6 +50,7 @@ use App\Http\Controllers\Empresa\CuponController as EmpresaCuponController;
 use App\Http\Controllers\InvitacionEquipoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SocialController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
 use App\Models\CategoriaEvento;
@@ -395,6 +396,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/factura/{factura}/descargar',[FacturacionEventoController::class, 'descargar'])->name('descargar');
         Route::patch('/factura/{factura}/anular', [FacturacionEventoController::class, 'anular'])   ->name('anular');
     });
+});
+
+/* — Migración remota: permite ejecutar migraciones desde el servidor sin SSH — */
+Route::get('/migrate', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== 'vibez_migrate_2026') {
+        abort(403);
+    }
+    Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
 });
 
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —
