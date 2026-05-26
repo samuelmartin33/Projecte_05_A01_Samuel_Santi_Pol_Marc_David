@@ -532,6 +532,7 @@ class EventoController extends Controller
 
     /**
      * Vista de detalle de una oferta de trabajo.
+     * Carga también los tipos de trabajo activos para el selector del formulario de candidatura.
      */
     public function detalleOferta(int $id)
     {
@@ -539,7 +540,12 @@ class EventoController extends Controller
             ->where('estado', 1)
             ->findOrFail($id);
 
-        return view('trabajos.detalle', compact('oferta'));
+        // Cargar las categorías activas para el selector de puesto en el formulario de candidatura
+        $trabajos = CategoriaTrabajo::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('trabajos.detalle', compact('oferta', 'trabajos'));
     }
 
     /**
@@ -559,6 +565,7 @@ class EventoController extends Controller
             'ciudad'               => 'required|string|max:100',
             'perfil_profesional'   => 'required|string|max:2000',
             'carta_presentacion'   => 'required|string|max:5000',
+            'trabajo_id'           => 'nullable|integer|exists:trabajos,id',
             'linkedin'             => 'nullable|string|max:500',
             'habilidades'          => 'nullable|string|max:1000',
             'idiomas'              => 'nullable|string|max:500',
@@ -572,6 +579,7 @@ class EventoController extends Controller
 
         DB::table('candidaturas_trabajo')->insert([
             'oferta_id'              => $id,
+            'trabajo_id'             => $request->trabajo_id ?: null,
             'trabajador_id'          => $trabajadorId,
             'estado_candidatura'     => 1,
             // Structured columns (visible to empresa)
@@ -606,6 +614,7 @@ class EventoController extends Controller
         $request->validate([
             'cv_file'                    => 'required|file|mimes:pdf,doc,docx|max:5120',
             'carta_presentacion_archivo' => 'nullable|string|max:3000',
+            'trabajo_id'                 => 'nullable|integer|exists:trabajos,id',
         ]);
 
         BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
@@ -619,6 +628,7 @@ class EventoController extends Controller
 
         DB::table('candidaturas_trabajo')->insert([
             'oferta_id'           => $id,
+            'trabajo_id'          => $request->trabajo_id ?: null,
             'trabajador_id'       => $trabajadorId,
             'estado_candidatura'  => 1,
             'carta_presentacion'  => $request->input('carta_presentacion_archivo'),

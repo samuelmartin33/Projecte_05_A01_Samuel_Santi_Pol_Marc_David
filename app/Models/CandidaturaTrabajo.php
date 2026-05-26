@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use App\Models\CategoriaTrabajo;
 
 /**
  * Modelo para la tabla `candidaturas_trabajo`.
@@ -22,7 +23,7 @@ class CandidaturaTrabajo extends Model
     const ESTADO_SELECCIONADO    = 5;
 
     protected $fillable = [
-        'oferta_id', 'trabajador_id', 'estado_candidatura',
+        'oferta_id', 'trabajo_id', 'trabajador_id', 'estado_candidatura',
         'carta_presentacion', 'cv_url', 'estado',
         'fecha_creacion', 'fecha_actualizacion',
         'nombre_candidato', 'apellidos_candidato', 'email_candidato',
@@ -33,6 +34,15 @@ class CandidaturaTrabajo extends Model
     public function oferta(): BelongsTo
     {
         return $this->belongsTo(BolsaOfertaTrabajo::class, 'oferta_id');
+    }
+
+    /**
+     * Relación con la categoría de trabajo a la que se postula el candidato.
+     * Usa la misma tabla que las categorías de las ofertas (categorias_trabajo).
+     */
+    public function trabajo(): BelongsTo
+    {
+        return $this->belongsTo(CategoriaTrabajo::class, 'trabajo_id');
     }
 
     // ── Helpers ──────────────────────────────────────────────

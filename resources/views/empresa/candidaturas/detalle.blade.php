@@ -131,6 +131,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
     return [
         'id'            => $c->id,
         'nombre'        => $c->nombreCompleto(),
+        'trabajo'       => $c->trabajo?->nombre ?? null,
         'email'         => $c->email_candidato ?? '',
         'telefono'      => $c->telefono_candidato ?? '',
         'ciudad'        => $c->ciudad_candidato ?? '',
@@ -188,6 +189,13 @@ $candidaturasJson = $candidaturas->map(function($c) {
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-0.5">
                         <span class="font-bold text-sm" style="color:#f5f1ea;">{{ $cand->nombreCompleto() }}</span>
+
+                        {{-- Rol / tipo de trabajo al que se postula --}}
+                        @if($cand->trabajo)
+                            <span style="background:rgba(168,85,247,0.18);border:1px solid rgba(168,85,247,0.35);color:#c084fc;font-size:10px;font-family:'Archivo Narrow',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;padding:2px 8px;border-radius:4px;">
+                                {{ $cand->trabajo->nombre }}
+                            </span>
+                        @endif
 
                         {{-- Estado badge (se actualiza via JS) --}}
                         <span id="badge-{{ $cand->id }}" class="estado-badge {{ $cand->estadoClases() }}">
@@ -281,6 +289,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
                             </svg>
                         </button>
                     @endif
+
                 </div>
             </div>
             @endforeach

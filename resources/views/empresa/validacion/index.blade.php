@@ -5,13 +5,22 @@
 @push('estilos')
 <style>
 /* ── VIBEZ Validación QR ── */
-body { background: #07060c; }
+html, body { width: 100%; margin: 0; padding: 0; background: #07060c; }
+
+/* Asegurar que el main de layouts.app ocupa todo el ancho disponible */
+body > main {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
 
 /* ── Layout ── */
 .validacion-wrapper {
+    width: 100%;
     max-width: 640px;
     margin: 0 auto;
     padding: 2rem 1rem 5rem;
+    box-sizing: border-box;
 }
 
 /* ── Hero ── */
@@ -402,15 +411,15 @@ body { background: #07060c; }
     <div class="evento-selector">
         <label>Evento a validar</label>
         <input type="hidden" id="filtro-evento" value="">
-        <div class="ev-csel" id="ev-csel-main">
+        <div class="ev-csel" id="ev-csel-main" onmouseleave="document.getElementById('ev-csel-main').classList.remove('open')">
             <div class="ev-csel-trigger" onclick="toggleEvCsel()">
                 <span id="ev-csel-label">— Todos los eventos activos —</span>
                 <svg class="ev-csel-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
             </div>
             <div class="ev-csel-menu">
-                <div class="ev-csel-opt sel" data-val="">— Todos los eventos activos —</div>
+                <div class="ev-csel-opt sel" data-val="" onclick="seleccionarEvento(this, '')">— Todos los eventos activos —</div>
                 @foreach($eventos as $ev)
-                    <div class="ev-csel-opt" data-val="{{ $ev->id }}">{{ $ev->titulo }}</div>
+                    <div class="ev-csel-opt" data-val="{{ $ev->id }}" onclick="seleccionarEvento(this, '{{ $ev->id }}')">{{ $ev->titulo }}</div>
                 @endforeach
             </div>
         </div>
@@ -533,10 +542,8 @@ function iniciarEscaner() {
     );
 }
 
-// Arrancar escáner al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    iniciarEscaner();
-});
+// Arrancar escáner al cargar (el script está al final del body, DOM ya disponible)
+iniciarEscaner();
 
 /* ════════════════════════ MANUAL ════════════════════════ */
 
@@ -734,25 +741,20 @@ function svgWarn() {
     return '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>';
 }
 
-// Custom evento selector
+/* Abre/cierra el selector de evento */
 function toggleEvCsel() {
     document.getElementById('ev-csel-main').classList.toggle('open');
 }
-document.addEventListener('click', function(e) {
-    var opt = e.target.closest('.ev-csel-opt');
-    if (opt) {
-        var cs = opt.closest('.ev-csel');
-        var val = opt.dataset.val;
-        cs.querySelectorAll('.ev-csel-opt').forEach(function(o) { o.classList.toggle('sel', o.dataset.val === val); });
-        document.getElementById('ev-csel-label').textContent = opt.textContent.trim();
-        document.getElementById('filtro-evento').value = val;
-        cs.classList.remove('open');
-        return;
-    }
-    if (!e.target.closest('.ev-csel')) {
-        var el = document.getElementById('ev-csel-main');
-        if (el) el.classList.remove('open');
-    }
-});
+
+/* Selecciona una opción del selector de evento — llamado con onclick en cada opción */
+function seleccionarEvento(el, val) {
+    var cs = document.getElementById('ev-csel-main');
+    cs.querySelectorAll('.ev-csel-opt').forEach(function(o) {
+        o.classList.toggle('sel', o.dataset.val === val);
+    });
+    document.getElementById('ev-csel-label').textContent = el.textContent.trim();
+    document.getElementById('filtro-evento').value = val;
+    cs.classList.remove('open');
+}
 </script>
 @endpush

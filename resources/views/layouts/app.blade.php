@@ -438,6 +438,9 @@
     </footer>
     @endif
 
+    {{-- SweetAlert2 global — disponible en todas las páginas --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     {{-- Espacio para scripts específicos de cada página (ej: Leaflet, AJAX) --}}
     @stack('scripts')
     @yield('scripts')

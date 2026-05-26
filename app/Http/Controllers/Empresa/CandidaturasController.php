@@ -90,7 +90,8 @@ class CandidaturasController extends Controller
             ->where('bolsa_ofertas_trabajo.id', $ofertaId)
             ->firstOrFail();
 
-        $query = CandidaturaTrabajo::where('oferta_id', $ofertaId)
+        $query = CandidaturaTrabajo::with('trabajo')
+            ->where('oferta_id', $ofertaId)
             ->where('estado', 1);
 
         // Filter by estado_candidatura
@@ -306,6 +307,10 @@ class CandidaturasController extends Controller
     /**
      * Genera un token de invitación con 5 días de validez y envía el correo de selección.
      * Usado tanto en el cambio automático de estado como en el reenvío manual.
+     *
+     * El rol de equipo se deduce del trabajo al que se postuló el candidato:
+     *  - Si el trabajo contiene "portero" → rol 'portero' (validación QR)
+     *  - Cualquier otro trabajo → rol 'organizador' (acceso completo de staff)
      */
     private function enviarSeleccionConInvitacion(CandidaturaTrabajo $candidatura, $empresa): void
     {
@@ -315,6 +320,10 @@ class CandidaturasController extends Controller
             return;
         }
 
+        // Determinar el rol de equipo según el tipo de trabajo de la candidatura
+        $nombreTrabajo = $candidatura->trabajo?->nombre ?? '';
+        $rolEquipo = str_contains(mb_strtolower($nombreTrabajo), 'portero') ? 'portero' : 'organizador';
+
         // Generar token único de 64 caracteres
         $token = Str::random(64);
 
@@ -323,7 +332,7 @@ class CandidaturasController extends Controller
             'candidatura_id' => $candidatura->id,
             'empresa_id'     => $empresa->id,
             'email'          => $email,
-            'rol'            => 'organizador',
+            'rol'            => $rolEquipo,
             'expira_en'      => now()->addDays(5),
             'fecha_creacion' => now(),
         ]);
