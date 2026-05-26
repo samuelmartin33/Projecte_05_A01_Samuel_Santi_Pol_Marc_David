@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'admin'      => \App\Http\Middleware\IsAdmin::class,
+            'moderador'  => \App\Http\Middleware\IsModerador::class,
             'verificado' => \App\Http\Middleware\EstaVerificado::class,
             'no-portero' => \App\Http\Middleware\RedirectIfPortero::class,
         ]);

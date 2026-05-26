@@ -5,7 +5,8 @@
  *  1. Generación de QR con qrcodejs para cada entrada (data-codigo).
  *  2. Cuenta atrás en tiempo real para el próximo evento con entrada activa.
  *  3. Toggle de QR al hacer clic en la tarjeta del pedido.
- *  4. Filtro de tarjetas por estado (Todas / Activas / Usadas).
+ *  4. Filtro de tarjetas por estado (Todas / Activas / Usadas / Caducadas).
+ *  5. Solicitud de reembolso de un pedido con confirmación SweetAlert2.
  */
 
 
@@ -49,9 +50,9 @@ function generarQrEnPanel(pedidoId) {
             return;
         }
 
-        var dias  = Math.floor(diff / 86400000);
-        var horas = Math.floor((diff % 86400000) / 3600000);
-        var minutos = Math.floor((diff % 3600000)  / 60000);
+        var dias     = Math.floor(diff / 86400000);
+        var horas    = Math.floor((diff % 86400000) / 3600000);
+        var minutos  = Math.floor((diff % 3600000)  / 60000);
         var segundos = Math.floor((diff % 60000)    / 1000);
 
         document.getElementById('cnt-dias').textContent  = String(dias).padStart(2, '0');
@@ -68,7 +69,7 @@ function generarQrEnPanel(pedidoId) {
 /* ════ 3. TOGGLE DE QR POR TARJETA ════
    Al pulsar en una tarjeta de pedido se muestra u oculta el panel de QR.
    El chevron rota para indicar el estado abierto/cerrado.
-   Llamado con onclick desde el div .me-ticket-card en el HTML. */
+   Llamado con onclick desde el div .me-card en el HTML. */
 function toggleTicketQr(pedidoId) {
     var panel   = document.getElementById('qr-panel-'  + pedidoId);
     var chevron = document.getElementById('chevron-' + pedidoId);
@@ -99,7 +100,7 @@ function filtrarEntradas(filtro, btnPulsado) {
     });
     if (btnPulsado) btnPulsado.classList.add('activo');
 
-    var cards    = document.getElementsByClassName('me-ticket-card');
+    var cards    = document.getElementsByClassName('me-card');
     var visibles = 0;
 
     /* Mostrar u ocultar cada tarjeta según su estado */
@@ -114,4 +115,86 @@ function filtrarEntradas(filtro, btnPulsado) {
     if (noResultados) {
         noResultados.style.display = visibles === 0 ? '' : 'none';
     }
+}
+
+
+/* ════ 5. SOLICITUD DE REEMBOLSO ════
+   Muestra una confirmación SweetAlert2 y, si el usuario acepta, llama al
+   endpoint de reembolso. Si tiene éxito, elimina la tarjeta del DOM.
+   evt.stopPropagation() evita que el clic abra el panel QR de la tarjeta.
+   Llamado con onclick desde el botón .me-btn-reembolso en el HTML. */
+function solicitarReembolso(evt, pedidoId, url) {
+    evt.stopPropagation();
+
+    Swal.fire({
+        title: '¿Pedir reembolso?',
+        html: 'Se cancelarán <strong>todas las entradas</strong> de este pedido y recibirás el importe pagado de vuelta.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#7c3aed',
+        cancelButtonColor: '#334155',
+        confirmButtonText: 'Sí, reembolsar',
+        cancelButtonText: 'Cancelar',
+        background: '#0f172a',
+        color: '#f5f1ea',
+    }).then(function(result) {
+        if (!result.isConfirmed) return;
+
+        /* Obtenemos el token CSRF del meta tag que Laravel inyecta en el layout */
+        var csrfToken = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type':  'application/json',
+                'X-CSRF-TOKEN':  csrfToken,
+                'Accept':        'application/json',
+            },
+        })
+        .then(function(res) {
+            return res.json().then(function(data) {
+                return { ok: res.ok, data: data };
+            });
+        })
+        .then(function(respuesta) {
+            if (respuesta.ok && respuesta.data.success) {
+                Swal.fire({
+                    title: '¡Reembolso procesado!',
+                    text: respuesta.data.message || 'Tu reembolso se ha procesado correctamente.',
+                    icon: 'success',
+                    confirmButtonColor: '#7c3aed',
+                    background: '#0f172a',
+                    color: '#f5f1ea',
+                }).then(function() {
+                    /* Animación de salida y eliminación de la tarjeta */
+                    var card = document.getElementById('pedido-card-' + pedidoId);
+                    if (card) {
+                        card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                        card.style.opacity    = '0';
+                        card.style.transform  = 'translateY(-10px)';
+                        setTimeout(function() { card.remove(); }, 380);
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: respuesta.data.message || 'No se pudo procesar el reembolso.',
+                    icon: 'error',
+                    confirmButtonColor: '#7c3aed',
+                    background: '#0f172a',
+                    color: '#f5f1ea',
+                });
+            }
+        })
+        .catch(function() {
+            Swal.fire({
+                title: 'Error de conexión',
+                text: 'No se pudo conectar con el servidor. Inténtalo de nuevo.',
+                icon: 'error',
+                confirmButtonColor: '#7c3aed',
+                background: '#0f172a',
+                color: '#f5f1ea',
+            });
+        });
+    });
 }

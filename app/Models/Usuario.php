@@ -78,6 +78,7 @@ class Usuario extends Authenticatable
         'estado_registro',
         'es_admin',
         'es_premium',
+        'es_moderador',
         'ultimo_acceso',
         'estado',
         'fecha_creacion',
@@ -113,6 +114,7 @@ class Usuario extends Authenticatable
             'email_verificado' => 'boolean',   // 0/1 en BD → true/false en PHP
             'es_admin'         => 'boolean',   // 0/1 en BD → true/false en PHP
             'es_premium'       => 'boolean',   // 0/1 en BD → true/false en PHP
+            'es_moderador'     => 'boolean',   // 0/1 en BD → true/false en PHP
         ];
     }
 
@@ -230,6 +232,7 @@ class Usuario extends Authenticatable
     {
         return match($role) {
             'admin'       => $this->isAdmin(),
+            'moderador'   => $this->isModerador(),
             'organizador' => $this->isOrganizador(),
             'empresa'     => $this->isEmpresa(),
             'usuario'     => $this->isUsuario(),
@@ -248,6 +251,17 @@ class Usuario extends Authenticatable
     public function isAdmin(): bool
     {
         return (bool) $this->es_admin;
+    }
+
+    /**
+     * Devuelve true si el usuario tiene rol de moderador.
+     * El moderador puede eliminar contenido social y banear usuarios.
+     *
+     * @return bool
+     */
+    public function isModerador(): bool
+    {
+        return (bool) $this->es_moderador;
     }
 
     /**

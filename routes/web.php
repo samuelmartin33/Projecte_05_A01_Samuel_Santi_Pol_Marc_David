@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
 use App\Http\Controllers\Admin\CategoriaEventoController as AdminCategoriaController;
 use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
 use App\Http\Controllers\Admin\PagoController as AdminPagoController;
+use App\Http\Controllers\Admin\PagoPremiumController as AdminPagoPremiumController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\FacturacionEventoController;
 use App\Http\Controllers\Admin\CuponController as AdminCuponController;
@@ -53,6 +54,11 @@ use App\Http\Controllers\HorasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\SocialController;
+use App\Http\Controllers\Moderador\DashboardController as ModDashboardController;
+use App\Http\Controllers\Moderador\PostController as ModPostController;
+use App\Http\Controllers\Moderador\HistoriaController as ModHistoriaController;
+use App\Http\Controllers\Moderador\ComentarioController as ModComentarioController;
+use App\Http\Controllers\Moderador\UsuarioController as ModUsuarioController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
@@ -293,6 +299,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/mis-entradas', [\App\Http\Controllers\EntradaController::class, 'misEntradas'])
          ->name('entradas.mis-entradas');
 
+    // Solicitar reembolso de un pedido activo (evento futuro, entradas no escaneadas)
+    Route::post('/mis-entradas/pedido/{pedido}/reembolsar', [\App\Http\Controllers\EntradaController::class, 'solicitarReembolso'])
+         ->name('entradas.reembolsar');
+
     // Registro de horas diarias (para organizadores y porteros)
     Route::get('/mis-horas',  [HorasController::class, 'index'])->name('horas.index');
     Route::post('/mis-horas', [HorasController::class, 'store'])->name('horas.store');
@@ -410,9 +420,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/pedidos', [AdminPedidoController::class, 'index'])
          ->name('admin.pedidos.index');
 
-    /* Rutas de pagos (solo lectura) */
+    /* Rutas de pagos de entradas */
     Route::get('/admin/pagos', [AdminPagoController::class, 'index'])
          ->name('admin.pagos.index');
+    Route::post('/admin/pagos/{pago}/reembolsar', [AdminPagoController::class, 'reembolsar'])
+         ->name('admin.pagos.reembolsar');
+
+    /* Rutas de pagos premium */
+    Route::get('/admin/pagos-premium', [AdminPagoPremiumController::class, 'index'])
+         ->name('admin.pagos-premium.index');
 
     /* Cupones (solo lectura para el admin) */
     Route::get('/admin/cupones', [AdminCuponController::class, 'index'])
@@ -440,6 +456,33 @@ Route::get('/migrate', function (\Illuminate\Http\Request $request) {
     }
     Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   PANEL MODERADOR — protegido por auth + middleware moderador
+   Prefijo: /moderador  |  Nombre: moderador.*
+═══════════════════════════════════════════════════════════════════ */
+Route::middleware(['auth', 'moderador'])->prefix('moderador')->name('moderador.')->group(function () {
+
+    // Dashboard del moderador
+    Route::get('/', [ModDashboardController::class, 'index'])->name('dashboard');
+
+    // Publicaciones del social
+    Route::get('/publicaciones',            [ModPostController::class, 'index'])  ->name('posts.index');
+    Route::delete('/publicaciones/{post}',  [ModPostController::class, 'destroy'])->name('posts.destroy');
+
+    // Historias del social
+    Route::get('/historias',               [ModHistoriaController::class, 'index'])  ->name('historias.index');
+    Route::delete('/historias/{historia}', [ModHistoriaController::class, 'destroy'])->name('historias.destroy');
+
+    // Comentarios del social
+    Route::get('/comentarios',                 [ModComentarioController::class, 'index'])  ->name('comentarios.index');
+    Route::delete('/comentarios/{comentario}', [ModComentarioController::class, 'destroy'])->name('comentarios.destroy');
+
+    // Gestión de usuarios (ban/desban)
+    Route::get('/usuarios',                         [ModUsuarioController::class, 'index'])    ->name('usuarios.index');
+    Route::patch('/usuarios/{usuario}/banear',       [ModUsuarioController::class, 'banear'])   ->name('usuarios.banear');
+    Route::patch('/usuarios/{usuario}/desbanear',    [ModUsuarioController::class, 'desbanear'])->name('usuarios.desbanear');
 });
 
 /* — Ruta de mantenimiento: crea el symlink storage → public/storage —

@@ -84,6 +84,13 @@
         Es administrador
     </label>
 
+    <label class="checkbox-wrap" for="es_moderador">
+        <input type="hidden" name="es_moderador" value="0">
+        <input type="checkbox" id="es_moderador" name="es_moderador" value="1"
+               @checked(old('es_moderador', $usuario->es_moderador ?? false))>
+        Es moderador
+    </label>
+
     <label>
         Estado
         <select name="estado">

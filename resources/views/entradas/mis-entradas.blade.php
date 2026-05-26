@@ -98,6 +98,31 @@
     text-transform: uppercase; letter-spacing: 0.14em;
     padding: 3px 10px; border-radius: 999px; margin-bottom: 8px;
   }
+  .me-badge-caducada {
+    background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.25);
+    color: #fb923c; display: inline-block;
+    font-family: 'Archivo Narrow', sans-serif; font-size: 0.58rem;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    padding: 3px 10px; border-radius: 999px; margin-bottom: 8px;
+  }
+
+  /* ── Tarjeta caducada ── */
+  .me-card.caducada { opacity: 0.55; border-color: rgba(251,146,60,0.15); }
+
+  /* ── Botón reembolso ── */
+  .me-btn-reembolso {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.28);
+    color: #f87171; border-radius: 999px;
+    padding: 5px 14px; margin-top: 10px;
+    font-family: 'Archivo Narrow', sans-serif; font-size: 0.66rem;
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .me-btn-reembolso:hover {
+    background: rgba(239,68,68,0.16); border-color: rgba(239,68,68,0.48);
+    color: #fca5a5;
+  }
 
   /* ── Responsive ── */
   @media (max-width: 600px) {
@@ -267,21 +292,35 @@
   @else
 
     {{-- ── Filtros ── --}}
-    <div class="me-filtros" style="display:flex;gap:8px;margin-bottom:2rem;">
+    <div class="me-filtros" style="display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap;">
       <button class="me-filtro-btn activo" onclick="filtrarEntradas('todas', this)">Todas</button>
       <button class="me-filtro-btn" onclick="filtrarEntradas('activas', this)">Activas</button>
       <button class="me-filtro-btn" onclick="filtrarEntradas('usadas', this)">Usadas</button>
+      <button class="me-filtro-btn" onclick="filtrarEntradas('caducadas', this)">Caducadas</button>
     </div>
 
     {{-- ── Tarjetas de pedidos ── --}}
     @foreach($pedidos as $pedido)
       @php
-        $evento       = $pedido->entradas->first()?->evento;
-        $tieneActivas = $pedido->entradas->contains('estado_entrada', 1);
-        $estadoCard   = $tieneActivas ? 'activas' : 'usadas';
+        $evento           = $pedido->entradas->first()?->evento;
+        $tieneActivas     = $pedido->entradas->contains('estado_entrada', 1);
+        $eventoPasado     = $evento && \Carbon\Carbon::parse($evento->fecha_inicio)->isPast();
+        $tieneEscaneadas  = $pedido->entradas->contains('estado_entrada', 2);
+
+        if ($eventoPasado) {
+            $estadoCard = 'caducadas';
+        } elseif ($tieneActivas) {
+            $estadoCard = 'activas';
+        } else {
+            $estadoCard = 'usadas';
+        }
+
+        // Botón de reembolso: evento futuro, al menos una activa, ninguna escaneada
+        $puedeReembolsar = $estadoCard === 'activas' && !$tieneEscaneadas;
       @endphp
 
-      <div class="me-card {{ $estadoCard === 'usadas' ? 'usada' : '' }}"
+      <div class="me-card {{ $estadoCard === 'usadas' ? 'usada' : ($estadoCard === 'caducadas' ? 'caducada' : '') }}"
+           id="pedido-card-{{ $pedido->id }}"
            data-estado="{{ $estadoCard }}"
            onclick="toggleTicketQr({{ $pedido->id }})">
 
@@ -291,8 +330,10 @@
                     display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
 
           <div style="flex:1;min-width:0;">
-            @if($tieneActivas)
+            @if($estadoCard === 'activas')
               <span class="me-badge-activa">Activa</span>
+            @elseif($estadoCard === 'caducadas')
+              <span class="me-badge-caducada">Caducada</span>
             @else
               <span class="me-badge-usada">Usada</span>
             @endif
@@ -329,6 +370,18 @@
                 {{ $evento->ubicacion_nombre }}
               </p>
               @endif
+            @endif
+
+            @if($puedeReembolsar)
+              <button class="me-btn-reembolso"
+                      onclick="solicitarReembolso(event, {{ $pedido->id }}, '{{ route('entradas.reembolsar', $pedido) }}')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l4-4M3 10l4 4"/>
+                </svg>
+                Pedir reembolso
+              </button>
             @endif
           </div>
 
@@ -422,6 +475,8 @@
 </div>
 </div>
 
+{{-- SweetAlert2 para confirmaciones --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {{-- QRCode.js debe cargarse ANTES que nuestro script --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="{{ asset('js/entradas-mis-entradas.js') }}"></script>

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EntradaComprada;
+use App\Mail\ReembolsoProcesado;
 use App\Models\Cupon;
 use App\Models\CuponUso;
 use App\Models\Entrada;
 use App\Models\Evento;
+use App\Models\Pago;
 use App\Models\Pedido;
+use App\Services\StripeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -262,7 +265,9 @@ class EntradaController extends Controller
         // Cargamos todos los pedidos del usuario, junto con sus entradas y los
         // datos del evento de cada entrada (eager loading anidado: entradas.evento).
         // orderByDesc ordena del más reciente al más antiguo.
+        // Solo mostramos pedidos activos (estado=1); los cancelados/reembolsados se ocultan.
         $pedidos = Pedido::where('usuario_id', Auth::id())
+            ->where('estado', 1)
             ->with(['entradas.evento'])
             ->orderByDesc('fecha_creacion')
             ->get();
@@ -472,5 +477,123 @@ class EntradaController extends Controller
         $pedido->load(['entradas.evento']);
 
         return view('entradas.confirmacion', compact('pedido'));
+    }
+
+    /**
+     * Procesa la solicitud de reembolso de un pedido por parte del usuario.
+     *
+     * Condiciones para poder reembolsar:
+     *  - El pedido pertenece al usuario autenticado.
+     *  - El pedido está activo (estado = 1).
+     *  - El evento todavía no ha tenido lugar.
+     *  - Hay al menos una entrada activa (estado_entrada = 1).
+     *  - Ninguna entrada ha sido escaneada (estado_entrada = 2).
+     *
+     * Flujo:
+     *  - Evento de pago (stripe_payment_intent_id presente): llama a StripeService
+     *    para procesar el reembolso antes de actualizar la BD.
+     *  - Evento gratuito (sin PaymentIntent): solo cancela en BD y libera aforo.
+     *
+     * @param  Pedido $pedido  Pedido resuelto por Route Model Binding.
+     * @return JsonResponse    JSON con 'success' y 'message'.
+     */
+    public function solicitarReembolso(Pedido $pedido): JsonResponse
+    {
+        // Autorización: el pedido debe pertenecer al usuario autenticado.
+        if ($pedido->usuario_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'No tienes permiso para esta acción.'], 403);
+        }
+
+        // Guardia: pedido ya cancelado
+        if ((int) $pedido->estado === 0) {
+            return response()->json(['success' => false, 'message' => 'Este pedido ya está cancelado.'], 422);
+        }
+
+        $pedido->load('entradas.evento');
+        $evento = $pedido->entradas->first()?->evento;
+
+        // Guardia: el evento ya ha tenido lugar
+        if ($evento && \Carbon\Carbon::parse($evento->fecha_inicio)->isPast()) {
+            return response()->json(['success' => false, 'message' => 'No se puede reembolsar: el evento ya ha tenido lugar.'], 422);
+        }
+
+        // Guardia: ninguna entrada activa para reembolsar
+        $entradasActivas = $pedido->entradas->where('estado_entrada', 1)->count();
+        if ($entradasActivas === 0) {
+            return response()->json(['success' => false, 'message' => 'No hay entradas activas para reembolsar.'], 422);
+        }
+
+        // Guardia: entradas ya escaneadas no se pueden reembolsar
+        $entradasEscaneadas = $pedido->entradas->where('estado_entrada', 2)->count();
+        if ($entradasEscaneadas > 0) {
+            return response()->json(['success' => false, 'message' => 'No se puede reembolsar: alguna entrada ya ha sido escaneada.'], 422);
+        }
+
+        try {
+            if (!empty($pedido->stripe_payment_intent_id)) {
+                // Evento de pago: llamamos a Stripe antes de modificar la BD.
+                // Si Stripe falla, la BD no se toca y el usuario ve el error.
+                $refund = (new StripeService())->procesarReembolso($pedido->stripe_payment_intent_id);
+
+                DB::transaction(function () use ($pedido, $refund, $evento, $entradasActivas) {
+                    $ahora = now();
+
+                    // Actualizar el registro Pago asociado si existe
+                    $pago = Pago::where('pedido_id', $pedido->id)->first();
+                    if ($pago) {
+                        $pago->update([
+                            'estado_pago'         => 3,
+                            'fecha_reembolso'     => $ahora,
+                            'importe_reembolso'   => $pago->importe,
+                            'motivo_reembolso'    => 'Solicitado por el usuario',
+                            'stripe_refund_id'    => $refund->id,
+                            'fecha_actualizacion' => $ahora,
+                        ]);
+                    }
+
+                    $pedido->update(['estado' => 0, 'fecha_actualizacion' => $ahora]);
+                    $pedido->entradas()->where('estado_entrada', 1)
+                        ->update(['estado_entrada' => 0, 'fecha_actualizacion' => $ahora]);
+
+                    // Liberar el aforo del evento
+                    if ($evento) {
+                        $evento->decrement('aforo_actual', $entradasActivas);
+                    }
+                });
+
+                Log::info("Reembolso usuario OK: pedido #{$pedido->id}, Stripe refund: {$refund->id}");
+            } else {
+                // Evento gratuito: solo cancelar en BD y liberar aforo
+                DB::transaction(function () use ($pedido, $evento, $entradasActivas) {
+                    $ahora = now();
+                    $pedido->update(['estado' => 0, 'fecha_actualizacion' => $ahora]);
+                    $pedido->entradas()->where('estado_entrada', 1)
+                        ->update(['estado_entrada' => 0, 'fecha_actualizacion' => $ahora]);
+
+                    if ($evento && $entradasActivas > 0) {
+                        $evento->decrement('aforo_actual', $entradasActivas);
+                    }
+                });
+
+                Log::info("Cancelación entrada gratuita: pedido #{$pedido->id}");
+            }
+
+            // Enviamos el correo de confirmación de reembolso (sin cortar el flujo si falla)
+            try {
+                $pedido->load(['entradas.evento', 'usuario']);
+                Mail::to($pedido->usuario->email)->send(new ReembolsoProcesado($pedido));
+            } catch (\Throwable $e) {
+                Log::warning("No se pudo enviar el correo de reembolso pedido #{$pedido->id}: {$e->getMessage()}");
+            }
+
+            return response()->json(['success' => true, 'message' => 'Reembolso procesado correctamente.']);
+
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            Log::error("Error Stripe reembolso usuario pedido #{$pedido->id}: {$e->getMessage()}");
+            return response()->json(['success' => false, 'message' => 'Error de Stripe al procesar el reembolso: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            Log::error("Error inesperado reembolso usuario pedido #{$pedido->id}: {$e->getMessage()}");
+            return response()->json(['success' => false, 'message' => 'Error al procesar el reembolso. Inténtalo de nuevo.'], 500);
+        }
     }
 }

@@ -29,6 +29,7 @@
                 <th>Cuenta</th>
                 <th>Registro</th>
                 <th>Admin</th>
+                <th>Mod.</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
@@ -46,6 +47,11 @@
                     <td data-label="Admin">
                         <span class="estado {{ $usuario->es_admin ? 'activo' : 'inactivo' }}">
                             {{ $usuario->es_admin ? 'Sí' : 'No' }}
+                        </span>
+                    </td>
+                    <td data-label="Mod.">
+                        <span class="estado {{ $usuario->es_moderador ? 'activo' : 'inactivo' }}">
+                            {{ $usuario->es_moderador ? 'Sí' : 'No' }}
                         </span>
                     </td>
                     <td data-label="Estado">
@@ -72,7 +78,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="empty">No hay usuarios registrados.</td>
+                    <td colspan="9" class="empty">No hay usuarios registrados.</td>
                 </tr>
             @endforelse
             </tbody>

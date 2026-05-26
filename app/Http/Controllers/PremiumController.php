@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PagoPremium;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Stripe\Checkout\Session as StripeSession;
@@ -161,10 +163,28 @@ class PremiumController extends Controller
                 $pagado       = $session->payment_status === 'paid';
 
                 if ($mismoUsuario && $esPremium && $pagado) {
+                    $ahora = now();
+
                     $usuario->update([
                         'es_premium'          => true,
-                        'fecha_actualizacion' => now(),
+                        'fecha_actualizacion' => $ahora,
                     ]);
+
+                    // Registramos el pago como fallback si el webhook no llegó (ej. entorno local).
+                    // insertOrIgnore garantiza idempotencia por el UNIQUE de stripe_session_id.
+                    $importe = ($session->amount_total ?? 500) / 100;
+                    DB::table('pagos_premium')->insertOrIgnore([
+                        'usuario_id'               => $usuario->id,
+                        'stripe_session_id'        => $sessionId,
+                        'stripe_payment_intent_id' => $session->payment_intent ?? null,
+                        'importe'                  => $importe,
+                        'moneda'                   => strtoupper($session->currency ?? 'eur'),
+                        'estado'                   => 1,
+                        'fecha_pago'               => $ahora,
+                        'fecha_creacion'           => $ahora,
+                        'fecha_actualizacion'      => null,
+                    ]);
+
                     Log::info("Premium activado via success_url para usuario {$usuario->id}, session {$sessionId}");
                 }
             } catch (\Throwable $e) {

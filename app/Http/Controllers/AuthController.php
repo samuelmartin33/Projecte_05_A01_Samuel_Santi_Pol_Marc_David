@@ -108,6 +108,11 @@ class AuthController extends Controller
             return redirect()->route('empresa.home');
         }
 
+        // Moderador (sin ser admin): redirigir al panel de moderación
+        if ($usuario && $usuario->isModerador() && ! $usuario->isAdmin()) {
+            return redirect()->route('moderador.dashboard');
+        }
+
         return (new EventoController())->index();
     }
 

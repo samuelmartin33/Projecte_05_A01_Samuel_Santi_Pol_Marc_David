@@ -113,8 +113,9 @@ class UsuarioController extends Controller
             'tipo_cuenta' => ['required', 'in:cliente,empresa'],
             'estado_registro' => ['required', 'in:pendiente,aprobado,rechazado'],
             'email_verificado' => ['nullable', 'boolean'],
-            'es_admin' => ['nullable', 'boolean'],
-            'estado' => ['required', 'integer', 'in:0,1'],
+            'es_admin'      => ['nullable', 'boolean'],
+            'es_moderador'  => ['nullable', 'boolean'],
+            'estado'        => ['required', 'integer', 'in:0,1'],
         ];
 
         if ($usuario === null) {
@@ -126,8 +127,9 @@ class UsuarioController extends Controller
         $data = $request->validate($rules);
 
         $data['email_verificado'] = $request->boolean('email_verificado') ? 1 : 0;
-        $data['es_admin'] = $request->boolean('es_admin') ? 1 : 0;
-        $data['estado'] = (int) $request->input('estado', 1);
+        $data['es_admin']         = $request->boolean('es_admin') ? 1 : 0;
+        $data['es_moderador']     = $request->boolean('es_moderador') ? 1 : 0;
+        $data['estado']           = (int) $request->input('estado', 1);
 
         if (! array_key_exists('password_hash', $data) || $data['password_hash'] === '') {
             unset($data['password_hash']);
