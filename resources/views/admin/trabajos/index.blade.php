@@ -329,23 +329,24 @@
 
             <div class="tr-acciones">
                 {{-- Toggle estado --}}
-                <form method="POST" action="{{ route('admin.trabajos.estado', $trabajo) }}" style="display:inline">
+                <form id="form-estado-{{ $trabajo->id }}" method="POST" action="{{ route('admin.trabajos.estado', $trabajo) }}" style="display:none">
                     @csrf @method('PATCH')
-                    <button type="submit" class="tr-accion tr-accion-toggle"
-                            title="{{ $trabajo->estado ? 'Desactivar' : 'Activar' }}">
-                        @if($trabajo->estado)
-                            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                            </svg>
-                            Pausar
-                        @else
-                            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            Activar
-                        @endif
-                    </button>
                 </form>
+                <button type="button" class="tr-accion tr-accion-toggle"
+                        title="{{ $trabajo->estado ? 'Desactivar' : 'Activar' }}"
+                        onclick="confirmarToggle({{ $trabajo->id }}, {{ $trabajo->estado ? 'true' : 'false' }}, '{{ addslashes($trabajo->nombre) }}')">
+                    @if($trabajo->estado)
+                        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                        </svg>
+                        Pausar
+                    @else
+                        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Activar
+                    @endif
+                </button>
 
                 {{-- Editar con SweetAlert --}}
                 <button type="button" class="tr-accion tr-accion-editar"
@@ -371,6 +372,28 @@
 
 @push('scripts')
 <script>
+/* Confirmación antes de activar o desactivar un puesto */
+function confirmarToggle(id, estaActivo, nombre) {
+    Swal.fire({
+        title: estaActivo ? 'Pausar puesto de trabajo' : 'Activar puesto de trabajo',
+        text: estaActivo
+            ? 'El puesto "' + nombre + '" dejará de aparecer en las ofertas y candidaturas.'
+            : 'El puesto "' + nombre + '" volverá a estar disponible en ofertas y candidaturas.',
+        icon: estaActivo ? 'warning' : 'question',
+        background: '#0d0a18',
+        color: '#f5f1ea',
+        showCancelButton: true,
+        confirmButtonText: estaActivo ? 'Sí, pausar' : 'Sí, activar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: estaActivo ? '#ef4444' : '#22c55e',
+        cancelButtonColor: 'rgba(245,241,234,0.10)',
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            document.getElementById('form-estado-' + id).submit();
+        }
+    });
+}
+
 /* Muestra u oculta el panel de creación */
 function toggleFormulario() {
     var panel = document.getElementById('tr-form-panel');
@@ -435,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             icon: 'success',
             title: '¡Listo!',
-            text: '{{ session('success') }}',
+            text: @json(session('success')),
             background: '#0d0a18',
             color: '#f5f1ea',
             confirmButtonColor: '#a855f7',
