@@ -22,6 +22,7 @@ class Pago extends Model
         'fecha_reembolso',
         'importe_reembolso',
         'motivo_reembolso',
+        'stripe_refund_id',
         'estado',
         'fecha_creacion',
         'fecha_actualizacion',

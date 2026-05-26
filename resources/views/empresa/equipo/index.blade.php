@@ -157,7 +157,7 @@
         </div>
         <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-3">Equipo</h1>
         <p class="text-slate-400 text-lg max-w-xl mx-auto">
-            Añade miembros, asígnales un nivel de acceso y su puesto de trabajo.
+            Gestiona el acceso y el puesto de trabajo de cada miembro.
         </p>
     </div>
 </section>
@@ -187,106 +187,6 @@
             </div>
             <p class="seccion-empresa-sub" style="margin-top:4px;">{{ $miembros->count() }} miembro{{ $miembros->count() !== 1 ? 's' : '' }} activo{{ $miembros->count() !== 1 ? 's' : '' }}</p>
         </div>
-        <button class="btn-abrir-form" onclick="toggleCrear()">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-            </svg>
-            Añadir miembro
-        </button>
-    </div>
-
-    {{-- Panel crear usuario --}}
-    <div class="crear-panel {{ $errors->any() ? 'open' : '' }}" id="crear-panel">
-        <div style="font-family:'Anton',sans-serif;font-size:1.1rem;text-transform:uppercase;letter-spacing:0.02em;color:#f5f1ea;margin-bottom:20px;">
-            Nuevo miembro
-        </div>
-        <form method="POST" action="{{ route('empresa.equipo.store') }}" id="form-crear">
-            @csrf
-            <div class="crear-grid">
-                <div class="form-field">
-                    <label class="form-label">Nombre</label>
-                    <input class="form-input {{ $errors->has('nombre') ? 'error' : '' }}"
-                           type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Nombre">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Apellido</label>
-                    <input class="form-input {{ $errors->has('apellido1') ? 'error' : '' }}"
-                           type="text" name="apellido1" value="{{ old('apellido1') }}" placeholder="Apellido">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Correo electrónico</label>
-                    <input class="form-input {{ $errors->has('email') ? 'error' : '' }}"
-                           type="email" name="email" value="{{ old('email') }}" placeholder="correo@ejemplo.com">
-                </div>
-
-                {{-- Selector de acceso (rol de permiso) --}}
-                <div class="form-field">
-                    <label class="form-label">Acceso</label>
-                    <div class="cselect-form" id="csf-rol">
-                        <div class="cselect-form-trigger" onclick="toggleCsf('csf-rol')">
-                            <span class="csf-val">{{ old('rol') === 'portero' ? 'Portero' : 'Organizador' }}</span>
-                            <svg class="cselect-form-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <div class="cselect-form-menu">
-                            <div class="cselect-form-opt {{ old('rol','organizador') === 'organizador' ? 'sel' : '' }}"
-                                 onclick="seleccionarRolForm('organizador', 'Organizador')">Organizador</div>
-                            <div class="cselect-form-opt {{ old('rol') === 'portero' ? 'sel' : '' }}"
-                                 onclick="seleccionarRolForm('portero', 'Portero')">Portero</div>
-                        </div>
-                    </div>
-                    <input type="hidden" name="rol" id="input-rol" value="{{ old('rol','organizador') }}">
-                    <div class="cselect-form-desc" id="desc-rol">
-                        @if(old('rol') === 'portero') Solo puede validar entradas QR.
-                        @else Acceso completo al panel de empresa.
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Selector de puesto (categorias_trabajo) --}}
-                <div class="form-field">
-                    <label class="form-label">Puesto de trabajo</label>
-                    <div class="cselect-form" id="csf-puesto">
-                        <div class="cselect-form-trigger" onclick="toggleCsf('csf-puesto')">
-                            <span class="csf-val" id="csf-puesto-label">
-                                @php $oldCat = $categorias->firstWhere('id', old('categoria_trabajo_id')); @endphp
-                                {{ $oldCat ? $oldCat->nombre : '— Sin puesto —' }}
-                            </span>
-                            <svg class="cselect-form-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <div class="cselect-form-menu">
-                            <div class="cselect-form-opt {{ !old('categoria_trabajo_id') ? 'sel' : '' }}"
-                                 onclick="seleccionarPuestoForm('', '— Sin puesto —')">— Sin puesto —</div>
-                            @foreach($categorias as $cat)
-                                <div class="cselect-form-opt {{ old('categoria_trabajo_id') == $cat->id ? 'sel' : '' }}"
-                                     onclick="seleccionarPuestoForm('{{ $cat->id }}', '{{ $cat->nombre }}')">
-                                    {{ $cat->nombre }}
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <input type="hidden" name="categoria_trabajo_id" id="input-puesto" value="{{ old('categoria_trabajo_id') }}">
-                    <div class="cselect-form-desc">Puesto que aparece en el equipo (Camarero, Barman…)</div>
-                </div>
-
-                <div class="form-field">
-                    <label class="form-label">Contraseña</label>
-                    <input class="form-input {{ $errors->has('password') ? 'error' : '' }}"
-                           type="password" name="password" placeholder="Mínimo 8 caracteres">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Repetir contraseña</label>
-                    <input class="form-input" type="password" name="password_confirmation" placeholder="Repite la contraseña">
-                </div>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(245,241,234,0.07);">
-                <button type="submit" class="btn-submit">Crear miembro</button>
-                <button type="button" class="btn-cancelar" onclick="toggleCrear()">Cancelar</button>
-            </div>
-        </form>
     </div>
 
     {{-- Tabla --}}
@@ -296,7 +196,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
             <p class="empty-titulo">Aún no tienes miembros en tu equipo</p>
-            <p class="empty-desc">Añade el primer miembro pulsando el botón de arriba.</p>
+            <p class="empty-desc">Aún no hay miembros asociados a esta empresa.</p>
         </div>
     @else
     <div class="eq-table-wrap">
@@ -460,39 +360,6 @@
 
 @push('scripts')
 <script>
-/* ── Panel crear ── */
-function toggleCrear() {
-    document.getElementById('crear-panel').classList.toggle('open');
-}
-
-/* ── Selectores del formulario de creación ── */
-function toggleCsf(id) {
-    document.getElementById(id).classList.toggle('open');
-}
-
-/* Selecciona el rol en el formulario de creación */
-function seleccionarRolForm(val, label) {
-    document.getElementById('csf-rol').querySelectorAll('.cselect-form-opt').forEach(function(o) {
-        o.classList.toggle('sel', o.textContent.trim() === label);
-    });
-    document.getElementById('csf-rol').querySelector('.csf-val').textContent = label;
-    document.getElementById('input-rol').value = val;
-    document.getElementById('csf-rol').classList.remove('open');
-    document.getElementById('desc-rol').textContent = val === 'portero'
-        ? 'Solo puede validar entradas QR al acceder a la app.'
-        : 'Acceso completo al panel de empresa.';
-}
-
-/* Selecciona el puesto en el formulario de creación */
-function seleccionarPuestoForm(val, label) {
-    document.getElementById('csf-puesto').querySelectorAll('.cselect-form-opt').forEach(function(o) {
-        o.classList.toggle('sel', o.textContent.trim() === label);
-    });
-    document.getElementById('csf-puesto').querySelector('.csf-val').textContent = label;
-    document.getElementById('input-puesto').value = val;
-    document.getElementById('csf-puesto').classList.remove('open');
-}
-
 /* ── Selectores inline de la tabla ── */
 function toggleCsInline(id) {
     var el = document.getElementById(id);

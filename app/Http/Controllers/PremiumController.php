@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PagoPremium;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Stripe\Checkout\Session as StripeSession;
@@ -130,18 +133,66 @@ class PremiumController extends Controller
     /**
      * Página de éxito tras el pago.
      *
-     * IMPORTANTE: Esta vista muestra una confirmación visual, pero NO activa el Premium.
-     * La activación real la hace el webhook 'checkout.session.completed' en StripeWebhookController.
+     * Verifica directamente con la API de Stripe que el pago está completado usando
+     * el session_id que Stripe añade a la URL de retorno. Esto es seguro porque
+     * consultamos el estado desde los servidores de Stripe (no confiamos en parámetros
+     * manipulables por el usuario) y sirve de respaldo cuando el webhook no llega
+     * (p. ej. en entorno local donde Stripe no puede alcanzar localhost).
      *
-     * Por qué no activamos aquí:
-     *  - Un usuario malicioso podría navegar directamente a /premium/exito sin pagar.
-     *  - El webhook viene de los servidores de Stripe y está firmado criptográficamente,
-     *    por lo que es la única fuente de verdad del pago.
+     * El webhook de StripeWebhookController sigue siendo el mecanismo principal;
+     * este método actúa como red de seguridad.
      *
      * @return View
      */
-    public function exito(): View
+    public function exito(Request $request): View
     {
+        /** @var \App\Models\Usuario $usuario */
+        $usuario   = Auth::user();
+        $sessionId = $request->get('session_id');
+
+        // Si el usuario aún no es premium e Stripe nos envió un session_id, verificamos.
+        if ($sessionId && $usuario && ! $usuario->es_premium) {
+            try {
+                Stripe::setApiKey(config('services.stripe.secret'));
+                $session = StripeSession::retrieve($sessionId);
+
+                // Comprobamos que la sesión pertenece a este usuario, que es del tipo
+                // correcto y que el pago fue completado.
+                $mismoUsuario = ((int) ($session->metadata->usuario_id ?? 0)) === $usuario->id;
+                $esPremium    = ($session->metadata->tipo ?? '') === 'premium';
+                $pagado       = $session->payment_status === 'paid';
+
+                if ($mismoUsuario && $esPremium && $pagado) {
+                    $ahora = now();
+
+                    $usuario->update([
+                        'es_premium'          => true,
+                        'fecha_actualizacion' => $ahora,
+                    ]);
+
+                    // Registramos el pago como fallback si el webhook no llegó (ej. entorno local).
+                    // insertOrIgnore garantiza idempotencia por el UNIQUE de stripe_session_id.
+                    $importe = ($session->amount_total ?? 500) / 100;
+                    DB::table('pagos_premium')->insertOrIgnore([
+                        'usuario_id'               => $usuario->id,
+                        'stripe_session_id'        => $sessionId,
+                        'stripe_payment_intent_id' => $session->payment_intent ?? null,
+                        'importe'                  => $importe,
+                        'moneda'                   => strtoupper($session->currency ?? 'eur'),
+                        'estado'                   => 1,
+                        'fecha_pago'               => $ahora,
+                        'fecha_creacion'           => $ahora,
+                        'fecha_actualizacion'      => null,
+                    ]);
+
+                    Log::info("Premium activado via success_url para usuario {$usuario->id}, session {$sessionId}");
+                }
+            } catch (\Throwable $e) {
+                // No bloqueamos la página si Stripe falla; el webhook lo reintentará.
+                Log::error("Error verificando sesión Stripe en exito(): " . $e->getMessage());
+            }
+        }
+
         return view('premium.exito');
     }
 

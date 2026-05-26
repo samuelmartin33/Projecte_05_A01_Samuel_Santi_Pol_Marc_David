@@ -187,8 +187,85 @@
         $u = Auth::user();
         $notifSinLeer = \App\Models\Notificacion::where('usuario_id', $u->id)
             ->where('estado', 1)->where('leida', 0)->count();
+        // Cupones vigentes: solo se cargan si el usuario es premium
+        $cuponesNav = $u->es_premium
+            ? \App\Models\Cupon::vigentes()->with('eventos')->orderBy('fecha_fin')->get()
+            : collect();
       @endphp
       <div id="navAvatarWrapper" style="display:flex;align-items:center;gap:12px;position:relative;">
+
+        {{-- Icono de cupones Premium: solo visible para usuarios con membresía activa --}}
+        @if($u->es_premium)
+        <div style="position:relative;">
+          <button id="navCuponesBtn" onclick="toggleCuponesDropdown()"
+                  title="Mis cupones Premium"
+                  style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.4);color:#c084fc;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            @if($cuponesNav->isNotEmpty())
+            <span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#a855f7);font-size:10px;font-family:'Archivo Narrow',sans-serif;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #07060c;">
+              {{ $cuponesNav->count() > 9 ? '9+' : $cuponesNav->count() }}
+            </span>
+            @endif
+          </button>
+
+          {{-- Dropdown de cupones --}}
+          <div id="navCuponesDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.97);backdrop-filter:blur(20px);border:1px solid rgba(168,85,247,0.25);border-radius:14px;padding:8px;min-width:320px;max-width:360px;box-shadow:0 20px 50px rgba(0,0,0,0.6);z-index:200;">
+
+            {{-- Cabecera --}}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 10px;border-bottom:1px solid rgba(245,241,234,0.08);">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="color:#a855f7;font-size:0.85rem;">✦</span>
+                <span style="font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.5);">Mis Cupones Premium</span>
+              </div>
+              <a href="{{ route('cupones.index') }}" onclick="document.getElementById('navCuponesDropdown').style.display='none'"
+                 style="color:#a855f7;font-size:11px;font-family:'Archivo Narrow',sans-serif;text-decoration:none;">Ver todos</a>
+            </div>
+
+            {{-- Lista de cupones --}}
+            <div style="max-height:340px;overflow-y:auto;padding:4px 0;">
+              @if($cuponesNav->isEmpty())
+                <p style="padding:20px 12px;text-align:center;font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.35);">No hay cupones activos ahora mismo</p>
+              @else
+                @foreach($cuponesNav as $cup)
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;transition:background 0.15s;"
+                     onmouseover="this.style.background='rgba(124,58,237,0.1)'"
+                     onmouseout="this.style.background='transparent'">
+                  {{-- Porcentaje --}}
+                  <div style="flex-shrink:0;width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;">
+                    @if($cup->valor_descuento == 0)
+                      <span style="color:#fff;font-size:1rem;">✦</span>
+                    @else
+                      <span style="font-size:0.85rem;font-weight:900;color:#fff;font-family:'Anton',sans-serif;line-height:1;">
+                        {{ number_format($cup->valor_descuento, 0) }}%
+                      </span>
+                    @endif
+                  </div>
+                  {{-- Info --}}
+                  <div style="flex:1;min-width:0;">
+                    <p style="font-weight:700;color:#f5f1ea;margin:0 0 1px;font-size:0.85rem;font-family:'Syne',sans-serif;letter-spacing:0.03em;">{{ $cup->codigo }}</p>
+                    @if($cup->descripcion)
+                      <p style="color:rgba(245,241,234,0.45);font-size:0.72rem;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $cup->descripcion }}</p>
+                    @endif
+                    <p style="color:rgba(245,241,234,0.28);font-size:0.68rem;margin:0;font-family:'Archivo Narrow',sans-serif;">
+                      Hasta {{ $cup->fecha_fin->locale('es')->isoFormat('D MMM YYYY') }}
+                    </p>
+                  </div>
+                  {{-- Botón copiar --}}
+                  <button id="nav-btn-cup-{{ $cup->id }}"
+                          onclick="copiarCuponNav('{{ $cup->codigo }}', {{ $cup->id }})"
+                          style="flex-shrink:0;background:rgba(168,85,247,0.15);border:1.5px solid rgba(168,85,247,0.35);color:#e9d5ff;font-family:'Archivo Narrow',sans-serif;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:5px 10px;border-radius:6px;cursor:pointer;transition:background 0.18s,color 0.18s;white-space:nowrap;">
+                    Copiar
+                  </button>
+                </div>
+                @endforeach
+              @endif
+            </div>
+
+          </div>
+        </div>
+        @endif
 
         {{-- Campana de notificaciones con badge y dropdown --}}
         <div style="position:relative;">
@@ -418,6 +495,52 @@ document.addEventListener('click', function(e) {
 
 @auth
 <script>
+/* ─── Cupones Premium: dropdown del icono de ticket ─────────── */
+
+var _cuponesAbierto = false;
+
+function toggleCuponesDropdown() {
+    var drop      = document.getElementById('navCuponesDropdown');
+    var notifDrop = document.getElementById('navNotifDropdown');
+    var avatarDrop = document.getElementById('navDropdown');
+    if (!drop) return;
+
+    // Cierra los otros dropdowns al abrir éste
+    if (notifDrop) notifDrop.style.display = 'none';
+    if (avatarDrop) avatarDrop.style.display = 'none';
+    _notifAbierto = false;
+
+    _cuponesAbierto = !_cuponesAbierto;
+    drop.style.display = _cuponesAbierto ? 'block' : 'none';
+}
+
+/* Copia el código del cupón al portapapeles y muestra feedback en el botón */
+function copiarCuponNav(codigo, cuponId) {
+    navigator.clipboard.writeText(codigo).then(function() {
+        var btn = document.getElementById('nav-btn-cup-' + cuponId);
+        if (!btn) return;
+        btn.textContent = '¡Copiado!';
+        btn.style.background = 'rgba(124,58,237,0.35)';
+        btn.style.color = '#fff';
+        setTimeout(function() {
+            btn.textContent = 'Copiar';
+            btn.style.background = 'rgba(168,85,247,0.15)';
+            btn.style.color = '#e9d5ff';
+        }, 2000);
+    });
+}
+
+/* Cierra el dropdown de cupones al hacer clic fuera */
+document.addEventListener('click', function(e) {
+    var btnCup  = document.getElementById('navCuponesBtn');
+    var dropCup = document.getElementById('navCuponesDropdown');
+    if (!btnCup || !dropCup) return;
+    if (!btnCup.contains(e.target) && !dropCup.contains(e.target)) {
+        dropCup.style.display = 'none';
+        _cuponesAbierto = false;
+    }
+});
+
 /* ─── Notificaciones: campanita del nav ─────────────────────── */
 
 var _notifAbierto = false;

@@ -424,7 +424,38 @@ class EventoController extends Controller
                 ->get();
         }
 
-        return view('eventos.detalle', compact('evento', 'esFavorito', 'stripeActivo', 'siguePromotor', 'cupones'));
+        // Valoraciones del evento y estado del usuario respecto a ellas
+        $valoraciones = \App\Models\ValoracionEvento::with('usuario')
+            ->where('evento_id', $id)
+            ->where('estado', 1)
+            ->orderBy('fecha_creacion', 'desc')
+            ->get();
+
+        $mediaValoracion   = $valoraciones->count() > 0 ? round($valoraciones->avg('puntuacion'), 1) : null;
+        $totalValoraciones = $valoraciones->count();
+
+        $puedeValorar = false;
+        $yaValorado   = false;
+        if (Auth::check()) {
+            $u = Auth::user();
+            if (!$u->isAdmin() && !$u->isEmpresa()) {
+                $yaValorado = \App\Models\ValoracionEvento::where('usuario_id', $u->id)
+                                                          ->where('evento_id', $id)
+                                                          ->exists();
+                if (!$yaValorado) {
+                    $puedeValorar = \App\Models\Entrada::whereHas('pedido', function ($q) use ($u) {
+                        $q->where('usuario_id', $u->id)->where('estado', 1);
+                    })->where('evento_id', $id)
+                      ->whereIn('estado_entrada', [1, 2])
+                      ->exists();
+                }
+            }
+        }
+
+        return view('eventos.detalle', compact(
+            'evento', 'esFavorito', 'stripeActivo', 'siguePromotor', 'cupones',
+            'valoraciones', 'mediaValoracion', 'totalValoraciones', 'puedeValorar', 'yaValorado'
+        ));
     }
 
     /**

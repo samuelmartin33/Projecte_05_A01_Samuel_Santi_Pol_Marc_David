@@ -200,8 +200,16 @@
                 <span class="adm-stat-value">{{ $totalUsuarios }}</span>
             </div>
             <div class="adm-stat-row">
+                <span class="adm-stat-label">Usuarios Premium</span>
+                <span class="adm-stat-value" style="color:#a855f7;">{{ $usuariosPremium }}</span>
+            </div>
+            <div class="adm-stat-row">
                 <span class="adm-stat-label">Pagos registrados</span>
                 <span class="adm-stat-value">{{ $totalPagos }}</span>
+            </div>
+            <div class="adm-stat-row">
+                <span class="adm-stat-label">Ingresos VIBEZ</span>
+                <span class="adm-stat-value" style="color:#a855f7;">{{ number_format($ingresoTotal, 2) }} €</span>
             </div>
             <div class="adm-stat-row">
                 <span class="adm-stat-label">Categorías</span>
@@ -236,5 +244,150 @@
     </p>
 </div>
 @endif
+
+{{-- ── Ingresos de VIBEZ ── --}}
+<div class="adm-section">
+    <div class="adm-card-head" style="margin-bottom:1rem;">
+        <div>
+            <h2 style="font-size:1.15rem;font-weight:700;margin:0;color:var(--adm-ink);">Ingresos de VIBEZ</h2>
+            <div style="font-size:12px;color:var(--adm-ink-dim);margin-top:2px;">Facturación acumulada recibida por la plataforma</div>
+        </div>
+        <a href="{{ route('admin.pagos.index') }}" class="adm-btn-ghost">Ver todos los pagos →</a>
+    </div>
+
+    {{-- KPIs financieros --}}
+    <div class="adm-kpi-grid" style="grid-template-columns: repeat(3,1fr); margin-bottom:1.5rem;">
+
+        {{-- Total ingresos VIBEZ --}}
+        <div class="adm-kpi" style="background:linear-gradient(135deg,#1e1b4b 0%,#2d1b69 100%);border-color:#4c1d95;">
+            <div class="adm-kpi-head">
+                <div class="adm-kpi-label" style="color:#c4b5fd;">Total recibido por VIBEZ</div>
+                <div class="adm-kpi-icon" style="color:#a855f7;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                        <path d="M15 9a3 3 0 0 0-6 0v1h6V9z"/>
+                        <path d="M9 14a3 3 0 0 0 6 0v-1H9v1z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="adm-kpi-value" style="font-size:1.75rem;color:#f5f3ff;">
+                {{ number_format($ingresoTotal, 2) }} €
+            </div>
+            <div class="adm-kpi-foot">
+                <span class="adm-kpi-lbl" style="color:#a78bfa;">comisiones + premium</span>
+            </div>
+        </div>
+
+        {{-- Comisiones de entradas --}}
+        <div class="adm-kpi">
+            <div class="adm-kpi-head">
+                <div class="adm-kpi-label">Comisiones de entradas</div>
+                <div class="adm-kpi-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 9V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>
+                        <line x1="13" y1="5" x2="13" y2="19"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="adm-kpi-value">{{ number_format($ingresoComisiones, 2) }} €</div>
+            <div class="adm-kpi-foot">
+                <span class="adm-kpi-lbl">
+                    10 % de {{ number_format($totalVentasEntradas, 2) }} € vendidos
+                </span>
+            </div>
+            <svg class="adm-spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+                <polyline points="0,18 20,14 40,10 60,7 80,4"
+                          fill="none" stroke="#a855f7" stroke-width="1.5"/>
+            </svg>
+        </div>
+
+        {{-- Premium --}}
+        <div class="adm-kpi">
+            <div class="adm-kpi-head">
+                <div class="adm-kpi-label">Suscripciones Premium</div>
+                <div class="adm-kpi-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="adm-kpi-value">{{ number_format($ingresoPremium, 2) }} €</div>
+            <div class="adm-kpi-foot">
+                <a href="{{ route('admin.pagos-premium.index') }}"
+                   style="color:#a855f7;font-size:.78rem;text-decoration:underline;">
+                    {{ $usuariosPremium }} usuario{{ $usuariosPremium !== 1 ? 's' : '' }} premium →
+                </a>
+            </div>
+            <svg class="adm-spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+                <polyline points="0,20 20,16 40,11 60,8 80,4"
+                          fill="none" stroke="#a855f7" stroke-width="1.5"/>
+            </svg>
+        </div>
+
+    </div>
+
+    {{-- Últimos pagos completados --}}
+    @if($ultimosPagos->isNotEmpty())
+    <div class="adm-card">
+        <div class="adm-card-head" style="margin-bottom:1rem;">
+            <div>
+                <h3 class="adm-card-title">Últimas transacciones</h3>
+                <div class="adm-card-sub">Pagos completados más recientes</div>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="admin-table" style="font-size:.85rem;">
+                <thead>
+                    <tr>
+                        <th>#Pago</th>
+                        <th>Usuario</th>
+                        <th>Evento</th>
+                        <th>Total cliente</th>
+                        <th>Comisión VIBEZ (10%)</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($ultimosPagos as $p)
+                        @php
+                            $usuario  = $p->pedido?->usuario;
+                            $evento   = $p->pedido?->entradas?->first()?->evento;
+                        @endphp
+                        <tr>
+                            <td data-label="#Pago"><span style="color:#a855f7;">#{{ $p->id }}</span></td>
+                            <td data-label="Usuario">
+                                @if($usuario)
+                                    {{ $usuario->nombre }} {{ $usuario->apellido1 }}
+                                    <br><small style="color:#64748b;">{{ $usuario->email }}</small>
+                                @else
+                                    <span style="color:#475569;">—</span>
+                                @endif
+                            </td>
+                            <td data-label="Evento">
+                                {{ $evento?->nombre ?? '—' }}
+                            </td>
+                            <td data-label="Total cliente">
+                                <strong>{{ number_format($p->importe, 2) }} {{ $p->moneda }}</strong>
+                            </td>
+                            <td data-label="Comisión VIBEZ (10%)">
+                                <span style="color:#a855f7;font-weight:600;">
+                                    + {{ number_format($p->importe * 0.10, 2) }} €
+                                </span>
+                            </td>
+                            <td data-label="Fecha">
+                                <span style="color:#94a3b8;font-size:.8rem;">
+                                    {{ optional($p->fecha_creacion)->format('d/m/Y H:i') ?? '—' }}
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+</div>
 
 @endsection

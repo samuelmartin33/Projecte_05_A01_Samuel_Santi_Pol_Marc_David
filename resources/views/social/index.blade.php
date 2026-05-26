@@ -102,6 +102,30 @@
                 {{-- SIDEBAR DERECHO (solo desktop) --}}
                 <aside class="soc-sidebar-right">
 
+                    {{-- Distintivo premium: solo visible si el usuario tiene membresía activa --}}
+                    @if(Auth::user()->es_premium)
+                    <div class="soc-side-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.08));border-color:rgba(168,85,247,0.45);">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">
+                                ✦
+                            </div>
+                            <div>
+                                <p style="margin:0;font-family:'Anton',sans-serif;font-size:0.8rem;color:#c084fc;letter-spacing:0.08em;text-transform:uppercase;">VIBEZ Premium</p>
+                                <p style="margin:2px 0 0;font-size:0.72rem;color:rgba(245,241,234,0.45);font-family:'Archivo Narrow',sans-serif;">Miembro activo</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('cupones.index') }}"
+                           style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:8px 0;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.35);border-radius:0.5rem;color:#c084fc;font-size:0.7rem;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.1em;text-decoration:none;transition:background 0.2s;"
+                           onmouseover="this.style.background='rgba(168,85,247,0.25)'"
+                           onmouseout="this.style.background='rgba(168,85,247,0.15)'">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            Ver mis cupones
+                        </a>
+                    </div>
+                    @endif
+
                     {{-- Crews activos --}}
                     <div class="soc-side-card">
                         <h3 class="soc-side-title">Crews <em>activos</em></h3>

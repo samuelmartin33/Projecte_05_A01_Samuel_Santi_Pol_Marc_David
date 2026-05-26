@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Empresa;
 use Stripe\Account;
 use Stripe\AccountLink;
+use Stripe\Refund;
 use Stripe\Stripe;
 
 class StripeService
@@ -54,6 +55,31 @@ class StripeService
         ]);
 
         return $link->url;
+    }
+
+    /**
+     * Procesa un reembolso de un pago con Stripe Connect (destination charge).
+     *
+     * reverse_transfer=true       → Revierte el 90% transferido a la cuenta Express de la empresa.
+     * refund_application_fee=true → Devuelve el 10% de comisión retenido por VIBEZ.
+     * Resultado: el usuario recupera el 100% del importe pagado.
+     *
+     * @param  string   $paymentIntentId  ID del PaymentIntent de Stripe.
+     * @param  int|null $amountCents      Importe en céntimos (null = reembolso total).
+     */
+    public function procesarReembolso(string $paymentIntentId, ?int $amountCents = null): Refund
+    {
+        $params = [
+            'payment_intent'         => $paymentIntentId,
+            'reverse_transfer'       => true,
+            'refund_application_fee' => true,
+        ];
+
+        if ($amountCents !== null) {
+            $params['amount'] = $amountCents;
+        }
+
+        return Refund::create($params);
     }
 
     /**
