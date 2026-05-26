@@ -12,11 +12,7 @@ class EmpresasSeeder extends Seeder
         $ahora = now();
 
         DB::table('empresas')->insert([
-<<<<<<< HEAD
             // Laura (usuario_id=2) — SoundWave Events (empresa_id=1)
-=======
-            // empresa_id=1 — SoundWave Events (Laura, usuario_id=2)
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
             [
                 'usuario_id'                => 2,
                 'nombre_empresa'            => 'SoundWave Events S.L.',
@@ -44,7 +40,7 @@ class EmpresasSeeder extends Seeder
                 'fecha_creacion'            => $ahora,
                 'fecha_actualizacion'       => null,
             ],
-            // empresa_id=2 — CarniaFest (Marc, usuario_id=6) — Stripe Connect activo
+            // Marc (usuario_id=6) — CarniaFest (empresa_id=2) — Stripe Connect activo
             [
                 'usuario_id'                => 6,
                 'nombre_empresa'            => 'CarniaFest',
@@ -72,20 +68,33 @@ class EmpresasSeeder extends Seeder
                 'fecha_creacion'            => $ahora,
                 'fecha_actualizacion'       => null,
             ],
-            // Lucía (usuario_id=10) — UrbanBeat Promotions (empresa_id=2)
+            // Lucía (usuario_id=12) — UrbanBeat Promotions (empresa_id=3)
             [
-                'usuario_id'          => 10,
-                'nombre_empresa'      => 'UrbanBeat Promotions S.L.',
-                'razon_social'        => 'UrbanBeat Promotions Sociedad Limitada',
-                'nif_cif'             => 'B87654321',
-                'descripcion'         => 'Promotora de eventos urbanos, conciertos de rap y cultura de calle.',
-                'logo_url'            => null,
-                'sitio_web'           => 'https://urbanbeatpromotions.es',
-                'telefono_contacto'   => '900200300',
-                'direccion'           => 'Calle Fuencarral 88, 28004 Madrid',
-                'estado'              => 1,
-                'fecha_creacion'      => $ahora,
-                'fecha_actualizacion' => null,
+                'usuario_id'                => 12,
+                'nombre_empresa'            => 'UrbanBeat Promotions S.L.',
+                'razon_social'              => 'UrbanBeat Promotions Sociedad Limitada',
+                'nif_cif'                   => 'B87654321',
+                'descripcion'               => 'Promotora de eventos urbanos, conciertos de rap y cultura de calle.',
+                'tipo_promotor'             => null,
+                'tipo_empresa'              => 'sl',
+                'logo_url'                  => null,
+                'sitio_web'                 => 'https://urbanbeatpromotions.es',
+                'telefono_contacto'         => '900200300',
+                'direccion'                 => 'Calle Fuencarral 88, 28004 Madrid',
+                'ciudad'                    => null,
+                'codigo_postal'             => null,
+                'provincia'                 => null,
+                'pais'                      => null,
+                'email_facturacion'         => null,
+                'perfil_fiscal_completo'    => 0,
+                'stripe_account_id'         => null,
+                'stripe_onboarding_status'  => null,
+                'stripe_charges_enabled'    => 0,
+                'stripe_payouts_enabled'    => 0,
+                'stripe_details_submitted'  => 0,
+                'estado'                    => 1,
+                'fecha_creacion'            => $ahora,
+                'fecha_actualizacion'       => null,
             ],
         ]);
     }

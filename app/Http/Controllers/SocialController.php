@@ -148,6 +148,28 @@ class SocialController extends Controller
     }
 
     /**
+     * Elimina una relación de amistad aceptada.
+     * Solo puede hacerlo uno de los dos participantes.
+     */
+    public function eliminarAmigo(int $id): JsonResponse
+    {
+        /** @var Usuario $usuario */
+        $usuario = Auth::user();
+
+        $relacion = Amigo::where('id', $id)
+            ->where('estado', 1)
+            ->where(function ($q) use ($usuario) {
+                $q->where('solicitante_id', $usuario->id)
+                  ->orWhere('receptor_id', $usuario->id);
+            })
+            ->firstOrFail();
+
+        $relacion->delete();
+
+        return response()->json(['exito' => true, 'mensaje' => 'Amigo eliminado.']);
+    }
+
+    /**
      * Busca usuarios por nombre o email para añadirlos como amigos.
      * Excluye al propio usuario y a los que ya tienen relación (pendiente, aceptada o rechazada).
      */
