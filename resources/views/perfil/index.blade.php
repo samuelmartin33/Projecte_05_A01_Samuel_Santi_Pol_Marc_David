@@ -54,9 +54,17 @@
 
         {{-- ── Nombre, email, bio y mood ── --}}
         <div class="flex-1">
-            <h1 class="text-2xl sm:text-3xl font-black text-white">
-                {{ $usuario->nombre }} {{ $usuario->apellido1 }}
-            </h1>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <h1 class="text-2xl sm:text-3xl font-black text-white" style="margin:0;">
+                    {{ $usuario->nombre }} {{ $usuario->apellido1 }}
+                </h1>
+                {{-- Distintivo premium: solo visible para usuarios premium --}}
+                @if($usuario->es_premium)
+                <span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,rgba(124,58,237,0.3),rgba(168,85,247,0.2));border:1px solid rgba(168,85,247,0.6);color:#c084fc;font-size:0.68rem;font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;padding:4px 12px;border-radius:999px;flex-shrink:0;">
+                    ✦ Premium
+                </span>
+                @endif
+            </div>
             <p class="text-white/50 text-sm mt-1">{{ $usuario->email }}</p>
 
             {{-- Biografía visible en el hero para que los amigos la vean --}}

@@ -53,6 +53,7 @@ use App\Http\Controllers\HorasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\SocialController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
 use App\Models\CategoriaEvento;
@@ -430,3 +431,29 @@ Route::middleware(['auth', 'admin'])->group(function () {
 /* — Endpoints AJAX: cargados desde api.php con prefijo /api —
      Heredan el middleware 'web' al estar dentro de web.php */
 Route::prefix('api')->group(base_path('routes/api.php'));
+
+/* — Ruta de mantenimiento: ejecuta migrate:fresh --seed en el servidor —
+     Uso: https://dominio.com/migrate?secret=vibez_migrate_2026              */
+Route::get('/migrate', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== 'vibez_migrate_2026') {
+        abort(403);
+    }
+    Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
+
+/* — Ruta de mantenimiento: crea el symlink storage → public/storage —
+     Necesario en el servidor de producción para que las imágenes subidas sean accesibles.
+     Uso: https://dominio.com/storage-link?secret=MIGRATE_SECRET               */
+Route::get('/storage-link', function () {
+    $secret = request('secret');
+    if ($secret !== env('MIGRATE_SECRET')) {
+        abort(403, 'Acceso no autorizado.');
+    }
+    try {
+        Artisan::call('storage:link');
+        return 'Symlink creado correctamente. ' . Artisan::output();
+    } catch (\Throwable $e) {
+        return 'Error al crear symlink: ' . $e->getMessage();
+    }
+});
