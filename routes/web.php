@@ -54,14 +54,11 @@ use App\Http\Controllers\HorasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\SocialController;
-<<<<<<< HEAD
-=======
 use App\Http\Controllers\Moderador\DashboardController as ModDashboardController;
 use App\Http\Controllers\Moderador\PostController as ModPostController;
 use App\Http\Controllers\Moderador\HistoriaController as ModHistoriaController;
 use App\Http\Controllers\Moderador\ComentarioController as ModComentarioController;
 use App\Http\Controllers\Moderador\UsuarioController as ModUsuarioController;
->>>>>>> feature/middleware
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
