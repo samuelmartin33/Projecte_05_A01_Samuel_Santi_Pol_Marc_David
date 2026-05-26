@@ -3,245 +3,7 @@
 @section('title', 'Puestos de trabajo — Admin VIBEZ')
 
 @push('estilos')
-<style>
-/* ══ Variables locales ══════════════════════════════════════════ */
-:root {
-    --tr-bg:      #0d0a18;
-    --tr-border:  rgba(245,241,234,0.08);
-    --tr-hover:   rgba(168,85,247,0.06);
-    --purple:     #a855f7;
-    --purple-dim: rgba(168,85,247,0.18);
-    --purple-bd:  rgba(168,85,247,0.35);
-    --ink:        #f5f1ea;
-    --ink-dim:    rgba(245,241,234,0.45);
-    --ink-faint:  rgba(245,241,234,0.18);
-}
-
-/* ── Cabecera de sección ── */
-.tr-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-    flex-wrap: wrap;
-}
-.tr-titulo {
-    font-family: 'Anton', sans-serif;
-    font-size: 1.75rem;
-    color: var(--ink);
-    text-transform: uppercase;
-    letter-spacing: -0.01em;
-    line-height: 1;
-    margin: 0 0 4px;
-}
-.tr-subtitulo {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--ink-dim);
-}
-.tr-btn-nuevo {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 10px 20px;
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
-}
-.tr-btn-nuevo:hover { background: #c084fc; color: #07060c; }
-
-/* ── Panel formulario nuevo puesto ── */
-.tr-form-panel {
-    background: var(--tr-bg);
-    border: 1px solid var(--purple-bd);
-    border-top: 2px solid var(--purple);
-    padding: 1.5rem 1.75rem;
-    margin-bottom: 1.75rem;
-    display: none;
-}
-.tr-form-panel.open { display: block; }
-.tr-form-titulo {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--purple);
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.tr-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr auto;
-    gap: 1rem;
-    align-items: flex-end;
-}
-.tr-form-campo { display: flex; flex-direction: column; gap: 5px; }
-.tr-form-label {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--ink-dim);
-}
-.tr-form-input {
-    background: rgba(245,241,234,0.04);
-    border: 1px solid var(--tr-border);
-    color: var(--ink);
-    padding: 9px 13px;
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 14px;
-    outline: none;
-    width: 100%;
-    transition: border-color 0.15s;
-}
-.tr-form-input:focus { border-color: var(--purple-bd); }
-.tr-form-input::placeholder { color: rgba(245,241,234,0.25); }
-.tr-btn-crear {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 10px 22px;
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
-}
-.tr-btn-crear:hover { background: #c084fc; color: #07060c; }
-.tr-btn-cancelar {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 10px 16px;
-    background: transparent;
-    color: var(--ink-dim);
-    border: 1px solid var(--tr-border);
-    cursor: pointer;
-    margin-left: 8px;
-}
-
-/* ── Tabla ── */
-.tr-tabla-wrap {
-    background: var(--tr-bg);
-    border: 1px solid var(--tr-border);
-    overflow: hidden;
-}
-.tr-tabla-head {
-    display: grid;
-    grid-template-columns: 50px 1fr 2fr 90px 140px;
-    gap: 1rem;
-    padding: 11px 20px;
-    background: rgba(168,85,247,0.07);
-    border-bottom: 1px solid var(--tr-border);
-}
-.tr-th {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: rgba(245,241,234,0.35);
-}
-.tr-fila {
-    display: grid;
-    grid-template-columns: 50px 1fr 2fr 90px 140px;
-    gap: 1rem;
-    padding: 15px 20px;
-    border-bottom: 1px solid rgba(245,241,234,0.05);
-    align-items: center;
-    transition: background 0.1s;
-}
-.tr-fila:last-child { border-bottom: none; }
-.tr-fila:hover { background: var(--tr-hover); }
-.tr-id {
-    font-family: 'Anton', sans-serif;
-    font-size: 13px;
-    color: rgba(245,241,234,0.25);
-}
-.tr-nombre {
-    font-family: 'Archivo', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-}
-.tr-desc {
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 12px;
-    color: var(--ink-dim);
-}
-.tr-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    padding: 4px 10px;
-}
-.tr-badge-activo   { background:rgba(52,211,153,0.12); color:#34d399; border:1px solid rgba(52,211,153,0.28); }
-.tr-badge-inactivo { background:rgba(248,113,113,0.10); color:#f87171; border:1px solid rgba(248,113,113,0.22); }
-.tr-acciones { display: flex; align-items: center; gap: 6px; }
-
-/* Botones de acción en tabla */
-.tr-accion {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
-    padding: 6px 12px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
-}
-.tr-accion-toggle {
-    background: rgba(245,241,234,0.06);
-    color: var(--ink-dim);
-    border: 1px solid var(--tr-border);
-}
-.tr-accion-toggle:hover { background: rgba(245,241,234,0.12); color: var(--ink); }
-.tr-accion-editar {
-    background: var(--purple-dim);
-    color: #c084fc;
-    border: 1px solid var(--purple-bd);
-}
-.tr-accion-editar:hover { background: rgba(168,85,247,0.30); color: var(--ink); }
-
-/* Empty state */
-.tr-empty {
-    padding: 3.5rem 2rem;
-    text-align: center;
-    color: rgba(245,241,234,0.25);
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 14px;
-}
-</style>
+<link rel="stylesheet" href="{{ asset('css/admin-trabajos.css') }}">
 @endpush
 
 @section('content')
@@ -293,7 +55,7 @@
                        placeholder="Breve descripción del puesto"
                        maxlength="500">
             </div>
-            <div style="display:flex;align-items:flex-end;gap:8px;">
+            <div class="tr-form-actions">
                 <button type="submit" class="tr-btn-crear">Crear</button>
                 <button type="button" class="tr-btn-cancelar" onclick="toggleFormulario()">Cancelar</button>
             </div>
@@ -322,45 +84,48 @@
 
             <span class="tr-desc">{{ $trabajo->descripcion ? Str::limit($trabajo->descripcion, 80) : '—' }}</span>
 
-            <span class="tr-badge {{ $trabajo->estado ? 'tr-badge-activo' : 'tr-badge-inactivo' }}">
-                <span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>
-                {{ $trabajo->estado ? 'Activo' : 'Inactivo' }}
-            </span>
+            {{-- Badge + acciones agrupados para la vista card en móvil --}}
+            <div class="tr-acciones-row">
+                <span class="tr-badge {{ $trabajo->estado ? 'tr-badge-activo' : 'tr-badge-inactivo' }}">
+                    <span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>
+                    {{ $trabajo->estado ? 'Activo' : 'Inactivo' }}
+                </span>
 
-            <div class="tr-acciones">
-                {{-- Toggle estado --}}
-                <form method="POST" action="{{ route('admin.trabajos.estado', $trabajo) }}" style="display:inline">
-                    @csrf @method('PATCH')
-                    <button type="submit" class="tr-accion tr-accion-toggle"
-                            title="{{ $trabajo->estado ? 'Desactivar' : 'Activar' }}">
-                        @if($trabajo->estado)
-                            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                            </svg>
-                            Pausar
-                        @else
-                            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            Activar
-                        @endif
+                <div class="tr-acciones">
+                    {{-- Toggle estado --}}
+                    <form method="POST" action="{{ route('admin.trabajos.estado', $trabajo) }}" style="display:inline">
+                        @csrf @method('PATCH')
+                        <button type="submit" class="tr-accion tr-accion-toggle"
+                                title="{{ $trabajo->estado ? 'Desactivar' : 'Activar' }}">
+                            @if($trabajo->estado)
+                                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                </svg>
+                                Pausar
+                            @else
+                                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Activar
+                            @endif
+                        </button>
+                    </form>
+
+                    {{-- Editar con SweetAlert --}}
+                    <button type="button" class="tr-accion tr-accion-editar"
+                            onclick="editarPuesto(
+                                {{ $trabajo->id }},
+                                '{{ addslashes($trabajo->nombre) }}',
+                                '{{ addslashes($trabajo->descripcion ?? '') }}',
+                                '{{ route('admin.trabajos.update', $trabajo) }}'
+                            )">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Editar
                     </button>
-                </form>
-
-                {{-- Editar con SweetAlert --}}
-                <button type="button" class="tr-accion tr-accion-editar"
-                        onclick="editarPuesto(
-                            {{ $trabajo->id }},
-                            '{{ addslashes($trabajo->nombre) }}',
-                            '{{ addslashes($trabajo->descripcion ?? '') }}',
-                            '{{ route('admin.trabajos.update', $trabajo) }}'
-                        )">
-                    <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                    Editar
-                </button>
+                </div>
             </div>
         </div>
         @endforeach
