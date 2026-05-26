@@ -8,3 +8,25 @@
 
 /* Mapa Leaflet */
 #mapa-evento { z-index: 1; }
+
+/* ─── Layout responsive de detalle ──────────────────────────────
+   En desktop: 2 columnas (contenido | panel de compra sticky).
+   En móvil: 1 columna, el panel de compra sube al principio.
+─────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .detalle-grid {
+        grid-template-columns: 1fr !important;
+    }
+    /* El panel de compra pasa a la parte superior en móvil */
+    .detalle-col-derecha {
+        position: static !important;
+        order: -1;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Reducir padding del hero y cuerpo en móvil */
+    .detalle-grid {
+        gap: 1.25rem !important;
+    }
+}

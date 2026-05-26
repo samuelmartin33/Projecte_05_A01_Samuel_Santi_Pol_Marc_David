@@ -4,6 +4,23 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+<style>
+  /* Grid compra: 2 columnas en desktop, 1 en móvil */
+  .comprar-grid {
+    display: grid;
+    grid-template-columns: 1fr 460px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  /* El panel de pago sube al inicio en móvil para mayor conversión */
+  @media (max-width: 900px) {
+    .comprar-grid { grid-template-columns: 1fr !important; gap: 1.5rem; }
+    .comprar-col-pago { order: -1; }
+  }
+  @media (max-width: 600px) {
+    .comprar-wrap { padding: 1.5rem 1rem !important; }
+  }
+</style>
 @endpush
 
 @section('content')
@@ -29,8 +46,8 @@
 </div>
 
 {{-- ── Grid principal ── --}}
-<div style="background:radial-gradient(circle,rgba(124,58,237,0.08) 1.5px,transparent 1.5px),linear-gradient(160deg,#0d0820 0%,#130228 45%,#0d0820 100%);background-size:28px 28px,100% 100%;min-height:calc(100vh - 160px);padding:3rem 2rem;">
-<div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 460px;gap:2.5rem;align-items:start;">
+<div class="comprar-wrap" style="background:radial-gradient(circle,rgba(124,58,237,0.08) 1.5px,transparent 1.5px),linear-gradient(160deg,#0d0820 0%,#130228 45%,#0d0820 100%);background-size:28px 28px,100% 100%;min-height:calc(100vh - 160px);padding:3rem 2rem;">
+<div class="comprar-grid" style="max-width:1100px;margin:0 auto;">
 
     {{-- ── Columna izquierda: resumen del evento ── --}}
     <div class="vibe-card" style="padding:0;overflow:hidden;">
@@ -132,8 +149,8 @@
 
     </div>
 
-    {{-- ── Columna derecha: panel de pago ── --}}
-    <div class="vibe-card" style="padding:2rem;position:sticky;top:90px;">
+    {{-- ── Columna derecha: panel de pago (sticky en desktop, sube al inicio en móvil) ── --}}
+    <div class="comprar-col-pago vibe-card" style="padding:2rem;position:sticky;top:107px;">
 
         <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;">
             <span style="width:18px;height:1px;background:var(--magenta);display:inline-block;"></span>

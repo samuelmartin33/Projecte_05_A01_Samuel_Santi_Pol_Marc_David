@@ -604,6 +604,43 @@ body {
 }
 
 /* ══════════════════════════════════════
+   HAMBURGUESA ADMIN (oculta en desktop)
+   ══════════════════════════════════════ */
+#adm-hamburger {
+  display: none;
+  width: 36px; height: 36px;
+  align-items: center; justify-content: center;
+  background: rgba(245,241,234,0.04);
+  border: 1px solid rgba(245,241,234,0.18);
+  border-radius: 8px;
+  color: var(--adm-ink);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+#adm-hamburger.abierto {
+  background: rgba(168,85,247,0.15);
+  border-color: rgba(168,85,247,0.5);
+}
+
+/* Panel nav móvil: se activa con la clase .adm-nav-abierto */
+.adm-nav-group.adm-nav-abierto {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed;
+  left: 0; right: 0;
+  background: rgba(13,10,24,0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--adm-line);
+  padding: 8px 16px 14px;
+  z-index: 49;
+  max-height: calc(100vh - 66px);
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ══════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════ */
 @media (max-width: 1100px) {
@@ -625,11 +662,13 @@ body {
     border-right: none;
     border-bottom: 1px solid var(--adm-line);
     z-index: 50;
-    overflow-x: auto;
+    overflow: visible; /* necesario para que el dropdown fijo se vea */
   }
   .adm-side-badge,
   .adm-nav-group,
   .adm-side-divider { display: none; }
+  /* El hamburguesa empuja al footer/avatar a la derecha */
+  #adm-hamburger { display: flex; margin-left: auto; }
   .adm-side-foot { margin-top: 0; flex-shrink: 0; }
   .adm-main { padding: 18px 16px 40px; }
   .adm-kpi-grid { grid-template-columns: 1fr 1fr; }

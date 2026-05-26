@@ -122,7 +122,7 @@
 ════════════════════════════════════════════════════ --}}
 <div style="background:radial-gradient(circle,rgba(124,58,237,0.08) 1.5px,transparent 1.5px),linear-gradient(160deg,#0d0820 0%,#130228 45%,#0d0820 100%);background-size:28px 28px,100% 100%;padding:4rem 0;">
 <div style="max-width:1480px;margin:0 auto;padding:0 2rem;">
-    <div style="display:grid;grid-template-columns:1fr 400px;gap:2.5rem;align-items:start;">
+    <div class="detalle-grid" style="display:grid;grid-template-columns:1fr 400px;gap:2.5rem;align-items:start;">
 
         {{-- ─── COLUMNA IZQUIERDA ─── --}}
         <div style="display:flex;flex-direction:column;gap:2rem;">
@@ -406,8 +406,8 @@
 
         </div>
 
-        {{-- ─── COLUMNA DERECHA (sticky) ─── --}}
-        <div style="position:sticky;top:90px;display:flex;flex-direction:column;gap:1.5rem;">
+        {{-- ─── COLUMNA DERECHA (sticky en desktop, estática en móvil) ─── --}}
+        <div class="detalle-col-derecha" style="position:sticky;top:90px;display:flex;flex-direction:column;gap:1.5rem;">
 
             {{-- Panel de compra --}}
             <div class="vibe-card" style="padding:2rem;">
