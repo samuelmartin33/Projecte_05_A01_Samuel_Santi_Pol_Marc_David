@@ -138,6 +138,10 @@ Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
 Route::get('/mapa', [PublicEventoController::class, 'mapa'])
     ->name('mapa');
 
+// --- Calendario mensual de eventos ---
+Route::get('/calendario', [PublicEventoController::class, 'calendario'])
+    ->name('calendario');
+
 // --- Páginas estáticas del footer ---
 Route::view('/quienes-somos',  'static.quienes-somos')->name('quienes-somos');
 Route::view('/manifiesto',     'static.manifiesto')->name('manifiesto');

@@ -651,6 +651,57 @@ class EventoController extends Controller
             : null;
     }
 
+    /**
+     * Vista de calendario mensual de eventos.
+     * Acepta ?mes= y ?anio= para navegar entre meses.
+     */
+    public function calendario(Request $request)
+    {
+        $mes  = (int) $request->get('mes',  now()->month);
+        $anio = (int) $request->get('anio', now()->year);
+
+        /* Ajustar desbordamiento de mes */
+        if ($mes < 1)  { $mes = 12; $anio--; }
+        if ($mes > 12) { $mes = 1;  $anio++; }
+
+        $inicio = \Carbon\Carbon::create($anio, $mes, 1)->startOfMonth();
+        $fin    = \Carbon\Carbon::create($anio, $mes, 1)->endOfMonth();
+
+        /* Eventos activos y no finalizados dentro del mes seleccionado */
+        $eventos = Evento::with(['portada', 'categorias', 'organizador.empresa'])
+            ->where('estado', 1)
+            ->whereRaw('COALESCE(fecha_fin, fecha_inicio) >= NOW()')
+            ->whereBetween('fecha_inicio', [$inicio, $fin])
+            ->orderBy('fecha_inicio')
+            ->get();
+
+        /* Agrupar por día del mes (clave = 1..31) */
+        $eventosPorDia = $eventos->groupBy(
+            fn($e) => \Carbon\Carbon::parse($e->fecha_inicio)->day
+        );
+
+        /* Preparar datos para el panel JS lateral */
+        $eventosParaCalendario = $eventosPorDia->map(fn($grupo) => $grupo->map(fn($e) => [
+            'id'       => $e->id,
+            'titulo'   => $e->titulo,
+            'hora'     => \Carbon\Carbon::parse($e->fecha_inicio)->format('H:i'),
+            'horaFin'  => $e->fecha_fin ? \Carbon\Carbon::parse($e->fecha_fin)->format('H:i') : null,
+            'precio'   => $e->precio_formateado,
+            'lugar'    => $e->ubicacion_nombre,
+            'img'      => $e->url_portada,
+            'categoria'=> $e->categorias->pluck('nombre')->first() ?? 'Evento',
+            'url'      => route('eventos.detalle', $e->id),
+        ])->values())->toArray();
+
+        $mesPrev = $inicio->copy()->subMonth();
+        $mesSig  = $inicio->copy()->addMonth();
+
+        return view('calendario', compact(
+            'eventos', 'eventosPorDia', 'mes', 'anio',
+            'inicio', 'mesPrev', 'mesSig', 'eventosParaCalendario'
+        ));
+    }
+
     /** Serializa experiencia laboral y formación académica del formulario. */
     private function construirExpFormacion(Request $request): string
     {
