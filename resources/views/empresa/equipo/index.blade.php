@@ -81,59 +81,6 @@
 }
 .btn-remove:hover { background:rgba(248,113,113,0.10); color:#f87171; }
 
-/* Panel crear usuario */
-.crear-panel { background:#0d0a18; border:1px solid rgba(245,241,234,0.10); padding:28px 32px; margin-bottom:24px; display:none; }
-.crear-panel.open { display:block; }
-.crear-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.form-field { display:flex; flex-direction:column; gap:6px; }
-.form-input.error { border-bottom-color:rgba(248,113,113,0.55); }
-
-/* Custom select del formulario de crear */
-.cselect-form { position:relative; }
-.cselect-form-trigger {
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:#07050f; border:1px solid rgba(245,241,234,0.12); color:#f5f1ea;
-    padding:9px 12px; font-size:0.85rem; font-family:'Archivo Narrow',sans-serif;
-    cursor:pointer; transition:border-color 0.15s; user-select:none;
-}
-.cselect-form.open .cselect-form-trigger { border-color:rgba(168,85,247,0.55); }
-.cselect-form-arrow { width:10px; height:10px; flex-shrink:0; opacity:0.4; transition:transform 0.15s; }
-.cselect-form.open .cselect-form-arrow { transform:rotate(180deg); opacity:0.8; }
-.cselect-form-menu {
-    display:none; position:absolute; top:calc(100% + 3px); left:0; right:0;
-    background:#0f0c1e; border:1px solid rgba(168,85,247,0.30); z-index:300;
-    box-shadow:0 8px 32px rgba(0,0,0,0.55); max-height:200px; overflow-y:auto;
-}
-.cselect-form.open .cselect-form-menu { display:block; }
-.cselect-form-opt {
-    padding:10px 14px; font-family:'Archivo Narrow',sans-serif; font-size:0.85rem;
-    color:rgba(245,241,234,0.65); cursor:pointer; transition:background 0.1s,color 0.1s;
-}
-.cselect-form-opt:hover { background:rgba(168,85,247,0.12); color:#f5f1ea; }
-.cselect-form-opt.sel  { background:rgba(168,85,247,0.18); color:#c084fc; font-weight:700; }
-.cselect-form-desc { font-family:'Archivo Narrow',sans-serif; font-size:0.65rem; color:rgba(245,241,234,0.30); margin-top:4px; }
-
-.btn-abrir-form {
-    display:inline-flex; align-items:center; gap:7px;
-    font-family:'Archivo Narrow',sans-serif; font-size:0.625rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.12em; padding:9px 16px;
-    background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.35);
-    cursor:pointer; transition:background 0.15s; text-decoration:none;
-}
-.btn-abrir-form:hover { background:rgba(168,85,247,0.28); }
-.btn-submit {
-    font-family:'Archivo Narrow',sans-serif; font-size:0.625rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.12em; padding:10px 20px;
-    background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; border:none;
-    cursor:pointer; transition:opacity 0.15s;
-}
-.btn-submit:hover { opacity:0.88; }
-.btn-cancelar {
-    font-family:'Archivo Narrow',sans-serif; font-size:0.625rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.12em; padding:10px 16px;
-    background:transparent; color:rgba(245,241,234,0.35); border:1px solid rgba(245,241,234,0.10);
-    cursor:pointer;
-}
 </style>
 @endpush
 
@@ -156,7 +103,7 @@
         </div>
         <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-3">Equipo</h1>
         <p class="text-slate-400 text-lg max-w-xl mx-auto">
-            Añade miembros, asígnales un nivel de acceso y su puesto de trabajo.
+            Gestiona el acceso y el puesto de trabajo de cada miembro.
         </p>
     </div>
 </section>
@@ -186,106 +133,6 @@
             </div>
             <p class="seccion-empresa-sub" style="margin-top:4px;">{{ $miembros->count() }} miembro{{ $miembros->count() !== 1 ? 's' : '' }} activo{{ $miembros->count() !== 1 ? 's' : '' }}</p>
         </div>
-        <button class="btn-abrir-form" onclick="toggleCrear()">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-            </svg>
-            Añadir miembro
-        </button>
-    </div>
-
-    {{-- Panel crear usuario --}}
-    <div class="crear-panel {{ $errors->any() ? 'open' : '' }}" id="crear-panel">
-        <div style="font-family:'Anton',sans-serif;font-size:1.1rem;text-transform:uppercase;letter-spacing:0.02em;color:#f5f1ea;margin-bottom:20px;">
-            Nuevo miembro
-        </div>
-        <form method="POST" action="{{ route('empresa.equipo.store') }}" id="form-crear">
-            @csrf
-            <div class="crear-grid">
-                <div class="form-field">
-                    <label class="form-label">Nombre</label>
-                    <input class="form-input {{ $errors->has('nombre') ? 'error' : '' }}"
-                           type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Nombre">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Apellido</label>
-                    <input class="form-input {{ $errors->has('apellido1') ? 'error' : '' }}"
-                           type="text" name="apellido1" value="{{ old('apellido1') }}" placeholder="Apellido">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Correo electrónico</label>
-                    <input class="form-input {{ $errors->has('email') ? 'error' : '' }}"
-                           type="email" name="email" value="{{ old('email') }}" placeholder="correo@ejemplo.com">
-                </div>
-
-                {{-- Selector de acceso (rol de permiso) --}}
-                <div class="form-field">
-                    <label class="form-label">Acceso</label>
-                    <div class="cselect-form" id="csf-rol">
-                        <div class="cselect-form-trigger" onclick="toggleCsf('csf-rol')">
-                            <span class="csf-val">{{ old('rol') === 'portero' ? 'Portero' : 'Organizador' }}</span>
-                            <svg class="cselect-form-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <div class="cselect-form-menu">
-                            <div class="cselect-form-opt {{ old('rol','organizador') === 'organizador' ? 'sel' : '' }}"
-                                 onclick="seleccionarRolForm('organizador', 'Organizador')">Organizador</div>
-                            <div class="cselect-form-opt {{ old('rol') === 'portero' ? 'sel' : '' }}"
-                                 onclick="seleccionarRolForm('portero', 'Portero')">Portero</div>
-                        </div>
-                    </div>
-                    <input type="hidden" name="rol" id="input-rol" value="{{ old('rol','organizador') }}">
-                    <div class="cselect-form-desc" id="desc-rol">
-                        @if(old('rol') === 'portero') Solo puede validar entradas QR.
-                        @else Acceso completo al panel de empresa.
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Selector de puesto (categorias_trabajo) --}}
-                <div class="form-field">
-                    <label class="form-label">Puesto de trabajo</label>
-                    <div class="cselect-form" id="csf-puesto">
-                        <div class="cselect-form-trigger" onclick="toggleCsf('csf-puesto')">
-                            <span class="csf-val" id="csf-puesto-label">
-                                @php $oldCat = $categorias->firstWhere('id', old('categoria_trabajo_id')); @endphp
-                                {{ $oldCat ? $oldCat->nombre : '— Sin puesto —' }}
-                            </span>
-                            <svg class="cselect-form-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <div class="cselect-form-menu">
-                            <div class="cselect-form-opt {{ !old('categoria_trabajo_id') ? 'sel' : '' }}"
-                                 onclick="seleccionarPuestoForm('', '— Sin puesto —')">— Sin puesto —</div>
-                            @foreach($categorias as $cat)
-                                <div class="cselect-form-opt {{ old('categoria_trabajo_id') == $cat->id ? 'sel' : '' }}"
-                                     onclick="seleccionarPuestoForm('{{ $cat->id }}', '{{ $cat->nombre }}')">
-                                    {{ $cat->nombre }}
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <input type="hidden" name="categoria_trabajo_id" id="input-puesto" value="{{ old('categoria_trabajo_id') }}">
-                    <div class="cselect-form-desc">Puesto que aparece en el equipo (Camarero, Barman…)</div>
-                </div>
-
-                <div class="form-field">
-                    <label class="form-label">Contraseña</label>
-                    <input class="form-input {{ $errors->has('password') ? 'error' : '' }}"
-                           type="password" name="password" placeholder="Mínimo 8 caracteres">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Repetir contraseña</label>
-                    <input class="form-input" type="password" name="password_confirmation" placeholder="Repite la contraseña">
-                </div>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(245,241,234,0.07);">
-                <button type="submit" class="btn-submit">Crear miembro</button>
-                <button type="button" class="btn-cancelar" onclick="toggleCrear()">Cancelar</button>
-            </div>
-        </form>
     </div>
 
     {{-- Tabla --}}
@@ -295,7 +142,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
             <p class="empty-titulo">Aún no tienes miembros en tu equipo</p>
-            <p class="empty-desc">Añade el primer miembro pulsando el botón de arriba.</p>
+            <p class="empty-desc">Aún no hay miembros asociados a esta empresa.</p>
         </div>
     @else
     <div class="eq-table-wrap">
@@ -459,39 +306,6 @@
 
 @push('scripts')
 <script>
-/* ── Panel crear ── */
-function toggleCrear() {
-    document.getElementById('crear-panel').classList.toggle('open');
-}
-
-/* ── Selectores del formulario de creación ── */
-function toggleCsf(id) {
-    document.getElementById(id).classList.toggle('open');
-}
-
-/* Selecciona el rol en el formulario de creación */
-function seleccionarRolForm(val, label) {
-    document.getElementById('csf-rol').querySelectorAll('.cselect-form-opt').forEach(function(o) {
-        o.classList.toggle('sel', o.textContent.trim() === label);
-    });
-    document.getElementById('csf-rol').querySelector('.csf-val').textContent = label;
-    document.getElementById('input-rol').value = val;
-    document.getElementById('csf-rol').classList.remove('open');
-    document.getElementById('desc-rol').textContent = val === 'portero'
-        ? 'Solo puede validar entradas QR al acceder a la app.'
-        : 'Acceso completo al panel de empresa.';
-}
-
-/* Selecciona el puesto en el formulario de creación */
-function seleccionarPuestoForm(val, label) {
-    document.getElementById('csf-puesto').querySelectorAll('.cselect-form-opt').forEach(function(o) {
-        o.classList.toggle('sel', o.textContent.trim() === label);
-    });
-    document.getElementById('csf-puesto').querySelector('.csf-val').textContent = label;
-    document.getElementById('input-puesto').value = val;
-    document.getElementById('csf-puesto').classList.remove('open');
-}
-
 /* ── Selectores inline de la tabla ── */
 function toggleCsInline(id) {
     var el = document.getElementById(id);

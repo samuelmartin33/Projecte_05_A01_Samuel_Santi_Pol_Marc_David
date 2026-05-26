@@ -80,6 +80,16 @@ Route::middleware('auth')->group(function () {
 
     // Validar código de cupón (requiere sesión para verificar límites por usuario)
     Route::post('/cupones/validar', [CuponController::class, 'validar'])->name('api.cupones.validar');
+
+    // Valoraciones de eventos (solo usuarios con entrada válida o usada)
+    Route::post('/valoraciones/eventos/{eventoId}', [\App\Http\Controllers\ValoracionEventoController::class, 'store'])
+         ->where('eventoId', '[0-9]+')
+         ->name('api.valoraciones.eventos.store');
+
+    // Valoraciones de empresas/promotoras (cualquier usuario autenticado)
+    Route::post('/valoraciones/empresas/{empresaId}', [\App\Http\Controllers\ValoracionEmpresaController::class, 'store'])
+         ->where('empresaId', '[0-9]+')
+         ->name('api.valoraciones.empresas.store');
 });
 
 // ── Sección Social ──────────────────────────────────────────

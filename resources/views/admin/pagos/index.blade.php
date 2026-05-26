@@ -5,10 +5,9 @@
 @section('content')
     <header class="admin-header">
         <div>
-            <h1>Gestión de Pagos</h1>
-            <p>Consulta, crea y edita pagos registrados en la plataforma.</p>
+            <h1>Pagos</h1>
+            <p>Consulta los pagos registrados en la plataforma. Solo lectura.</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('admin.pagos.create') }}">Nuevo pago</a>
     </header>
 
     @if (session('success'))
@@ -27,7 +26,6 @@
                         <th>Importe</th>
                         <th>Moneda</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,17 +42,9 @@
                                     {{ (int) $pago->estado === 1 ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
-                            <td data-label="Acciones" class="actions-cell">
-                                <a class="btn btn-secondary" href="{{ route('admin.pagos.edit', $pago) }}">Editar</a>
-                                <form method="POST" action="{{ route('admin.pagos.destroy', $pago) }}" style="display:inline;" class="delete-form" data-confirm-msg="¿Eliminar el pago #{{ $pago->id }}?">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                </form>
-                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="empty">No hay pagos registrados.</td></tr>
+                        <tr><td colspan="7" class="empty">No hay pagos registrados.</td></tr>
                     @endforelse
                 </tbody>
             </table>

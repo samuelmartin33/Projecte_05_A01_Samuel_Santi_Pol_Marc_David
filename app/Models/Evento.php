@@ -161,6 +161,13 @@ class Evento extends Model
         return $this->hasOne(\App\Models\FacturaEvento::class, 'evento_id');
     }
 
+    /* Valoraciones visibles del evento */
+    public function valoraciones()
+    {
+        return $this->hasMany(\App\Models\ValoracionEvento::class, 'evento_id')
+                    ->where('estado', 1);
+    }
+
     /**
      * Relación HasOne filtrada: la imagen de portada del evento.
      *

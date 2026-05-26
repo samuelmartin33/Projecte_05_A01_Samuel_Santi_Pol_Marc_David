@@ -118,6 +118,11 @@ Route::get('/eventos/{id}/comprar', [PublicEventoController::class, 'compra'])
     ->middleware('auth')
     ->name('eventos.comprar');
 
+// --- Perfil público de una promotora/empresa ---
+Route::get('/promotoras/{id}', [\App\Http\Controllers\PromotoraController::class, 'show'])
+    ->where('id', '[0-9]+')
+    ->name('promotoras.perfil');
+
 // --- Detalle de una oferta de trabajo ---
 Route::get('/trabajos/{id}', [PublicEventoController::class, 'detalleOferta'])
     ->where('id', '[0-9]+')
@@ -270,7 +275,6 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 /* — Equipo de empresa: gestión de usuarios y roles — */
 Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empresa.equipo.')->group(function () {
     Route::get('/',              [EquipoController::class, 'index'])->name('index');
-    Route::post('/',             [EquipoController::class, 'store'])->name('store');
     Route::patch('/{organizador}/rol', [EquipoController::class, 'cambiarRol'])->name('rol');
     Route::delete('/{organizador}',    [EquipoController::class, 'destroy'])->name('destroy');
     // Ver horas de un miembro del equipo
@@ -405,19 +409,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/pedidos', [AdminPedidoController::class, 'index'])
          ->name('admin.pedidos.index');
 
-    /* Rutas de gestión de pagos */
+    /* Rutas de pagos (solo lectura) */
     Route::get('/admin/pagos', [AdminPagoController::class, 'index'])
          ->name('admin.pagos.index');
-    Route::get('/admin/pagos/crear', [AdminPagoController::class, 'create'])
-         ->name('admin.pagos.create');
-    Route::post('/admin/pagos', [AdminPagoController::class, 'store'])
-         ->name('admin.pagos.store');
-    Route::get('/admin/pagos/{pago}/editar', [AdminPagoController::class, 'edit'])
-         ->name('admin.pagos.edit');
-    Route::put('/admin/pagos/{pago}', [AdminPagoController::class, 'update'])
-         ->name('admin.pagos.update');
-    Route::delete('/admin/pagos/{pago}', [AdminPagoController::class, 'destroy'])
-         ->name('admin.pagos.destroy');
 
     /* Cupones (solo lectura para el admin) */
     Route::get('/admin/cupones', [AdminCuponController::class, 'index'])

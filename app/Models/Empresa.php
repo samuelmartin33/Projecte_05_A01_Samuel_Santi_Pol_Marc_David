@@ -260,6 +260,13 @@ class Empresa extends Model
         return $this->hasMany(Cupon::class, 'empresa_id');
     }
 
+    /* Valoraciones visibles de la empresa */
+    public function valoraciones()
+    {
+        return $this->hasMany(\App\Models\ValoracionEmpresa::class, 'empresa_id')
+                    ->where('estado', 1);
+    }
+
     public function ofertas(): HasManyThrough
     {
         return $this->hasManyThrough(

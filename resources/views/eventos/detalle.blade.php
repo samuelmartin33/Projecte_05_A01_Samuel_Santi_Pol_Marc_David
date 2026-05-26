@@ -193,12 +193,10 @@
                             @if($evento->organizador->empresa->descripcion)
                                 <p style="font-family:'Archivo',sans-serif;font-size:13px;color:var(--ink-dim);margin:0 0 8px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $evento->organizador->empresa->descripcion }}</p>
                             @endif
-                            @if($evento->organizador->empresa->sitio_web)
-                                <a href="{{ $evento->organizador->empresa->sitio_web }}" target="_blank"
-                                   class="mono" style="font-size:10px;color:var(--magenta);text-decoration:none;">
-                                    Visitar web →
-                                </a>
-                            @endif
+                            <a href="{{ route('promotoras.perfil', $evento->organizador->empresa->id) }}"
+                               class="mono" style="font-size:10px;color:var(--magenta);text-decoration:none;">
+                                Ver perfil →
+                            </a>
                         </div>
                         @auth
                         @if(!Auth::user()->isAdmin() && !Auth::user()->isEmpresa())
@@ -285,6 +283,126 @@
                 </div>
             </section>
         @endif
+
+        {{-- ════════════════════════════════════════════════════
+             VALORACIONES DEL EVENTO
+        ════════════════════════════════════════════════════ --}}
+        <div class="vibe-card" style="padding:2rem;margin-top:1.5rem;" id="seccion-valoraciones">
+
+            {{-- Cabecera --}}
+            <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;">
+                <span style="width:20px;height:1px;background:var(--magenta);display:inline-block;"></span>
+                Valoraciones
+            </div>
+
+            {{-- Resumen: media numérica + estrellas + total --}}
+            <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;">
+                <div style="text-align:center;">
+                    <div class="display" id="media-numerica" style="font-size:2.8rem;color:var(--magenta);line-height:1;">
+                        {{ $totalValoraciones > 0 ? $mediaValoracion : '—' }}
+                    </div>
+                    <div style="color:#f59e0b;font-size:1.1rem;margin-top:2px;" id="estrellas-media-resumen">
+                        @if($totalValoraciones > 0)
+                            @for($i = 1; $i <= 5; $i++){{ $i <= round($mediaValoracion) ? '★' : '☆' }}@endfor
+                        @else
+                            ☆☆☆☆☆
+                        @endif
+                    </div>
+                </div>
+                <div>
+                    <p class="mono" style="font-size:10px;color:rgba(245,241,234,0.45);" id="total-valoraciones-texto">
+                        {{ $totalValoraciones }} {{ $totalValoraciones === 1 ? 'valoración' : 'valoraciones' }}
+                    </p>
+                </div>
+            </div>
+
+            {{-- Formulario condicional --}}
+            @auth
+                @if($puedeValorar)
+                    <div id="form-valoracion-evento" style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:1.25rem;margin-bottom:1.5rem;">
+                        <p class="mono" style="font-size:10px;color:rgba(245,241,234,0.5);margin-bottom:0.75rem;">Tu valoración</p>
+
+                        {{-- Selector de estrellas interactivo --}}
+                        <div id="selector-estrellas" style="display:flex;gap:6px;margin-bottom:0.75rem;">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="estrella-selectable"
+                                      data-valor="{{ $i }}"
+                                      onclick="seleccionarEstrella({{ $i }})"
+                                      onmouseover="resaltarEstrellas({{ $i }})"
+                                      onmouseout="restaurarEstrellas()"
+                                      style="font-size:1.9rem;color:rgba(245,241,234,0.2);transition:color 0.1s;cursor:pointer;user-select:none;">★</span>
+                            @endfor
+                        </div>
+                        <input type="hidden" id="puntuacion-seleccionada" value="0">
+
+                        {{-- Comentario opcional --}}
+                        <textarea id="comentario-valoracion"
+                                  placeholder="Comparte tu experiencia (opcional)..."
+                                  maxlength="1000"
+                                  style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:13px;resize:vertical;min-height:80px;box-sizing:border-box;outline:none;"></textarea>
+
+                        <button onclick="enviarValoracionEvento({{ $evento->id }})"
+                                style="margin-top:0.75rem;padding:10px 24px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:999px;font-family:'Archivo Narrow',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:opacity 0.15s;"
+                                onmouseover="this.style.opacity='0.85'"
+                                onmouseout="this.style.opacity='1'">
+                            Enviar valoración
+                        </button>
+                    </div>
+                @elseif($yaValorado)
+                    <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:10px;padding:1rem;margin-bottom:1.5rem;">
+                        <p class="mono" style="font-size:10px;color:rgba(168,85,247,0.8);">Ya has valorado este evento. ¡Gracias por tu reseña!</p>
+                    </div>
+                @elseif(!Auth::user()->isAdmin() && !Auth::user()->isEmpresa())
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:1rem;margin-bottom:1.5rem;">
+                        <p class="mono" style="font-size:10px;color:rgba(245,241,234,0.35);">
+                            Compra una entrada para poder valorar este evento.
+                        </p>
+                    </div>
+                @endif
+            @else
+                <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:1rem;margin-bottom:1.5rem;">
+                    <p class="mono" style="font-size:10px;color:rgba(245,241,234,0.35);">
+                        <a href="{{ route('login') }}" style="color:var(--magenta);text-decoration:none;">Inicia sesión</a>
+                        y compra una entrada para valorar este evento.
+                    </p>
+                </div>
+            @endauth
+
+            {{-- Lista de reseñas existentes --}}
+            @if($valoraciones->isNotEmpty())
+                <div id="contenedor-resenyas" style="display:flex;flex-direction:column;gap:1.1rem;">
+                    @foreach($valoraciones as $val)
+                        <div style="border-bottom:1px solid var(--line);padding-bottom:1.1rem;">
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                                {{-- Avatar --}}
+                                <div style="width:32px;height:32px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#4e3a96,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    @if($val->usuario?->foto_url)
+                                        <img src="{{ $val->usuario->foto_url }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+                                    @else
+                                        <span style="color:#fff;font-size:12px;font-weight:900;font-family:'Anton',sans-serif;">{{ strtoupper(substr($val->usuario?->nombre ?? '?', 0, 1)) }}</span>
+                                    @endif
+                                </div>
+                                {{-- Nombre + estrellas --}}
+                                <div style="flex:1;min-width:0;">
+                                    <p style="font-family:'Archivo',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        {{ $val->usuario?->nombre }} {{ $val->usuario?->apellido1 }}
+                                    </p>
+                                    <div style="color:#f59e0b;font-size:0.8rem;line-height:1.2;">
+                                        @for($i = 1; $i <= 5; $i++){{ $i <= $val->puntuacion ? '★' : '☆' }}@endfor
+                                    </div>
+                                </div>
+                                {{-- Fecha --}}
+                                <span class="mono" style="font-size:9px;color:rgba(245,241,234,0.25);white-space:nowrap;">{{ $val->fecha_creacion->format('d/m/Y') }}</span>
+                            </div>
+                            @if($val->comentario)
+                                <p style="font-family:'Archivo',sans-serif;font-size:13px;color:var(--ink-dim);line-height:1.6;margin:0;">{{ $val->comentario }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+        </div>
 
         </div>
 
@@ -473,6 +591,100 @@ async function toggleSeguirPromotora(btn) {
     } finally {
         btn.classList.remove('cargando');
     }
+}
+
+// ── Valoraciones de evento ─────────────────────────────────────
+var estrellaPuntuacion = 0;
+
+function seleccionarEstrella(valor) {
+    estrellaPuntuacion = valor;
+    document.getElementById('puntuacion-seleccionada').value = valor;
+    pintarEstrellas(valor, true);
+}
+
+function resaltarEstrellas(valor) {
+    pintarEstrellas(valor, false);
+}
+
+function restaurarEstrellas() {
+    pintarEstrellas(estrellaPuntuacion, true);
+}
+
+function pintarEstrellas(valor, esSeleccion) {
+    var estrellas = document.getElementsByClassName('estrella-selectable');
+    for (var i = 0; i < estrellas.length; i++) {
+        estrellas[i].style.color = i < valor
+            ? '#f59e0b'
+            : (esSeleccion ? 'rgba(245,241,234,0.2)' : 'rgba(245,241,234,0.1)');
+    }
+}
+
+function enviarValoracionEvento(eventoId) {
+    var puntuacion = parseInt(document.getElementById('puntuacion-seleccionada').value, 10);
+    if (!puntuacion || puntuacion < 1 || puntuacion > 5) {
+        vibezAlerta('Selecciona una puntuación', 'Elige entre 1 y 5 estrellas antes de enviar.', 'warning');
+        return;
+    }
+    var comentario = document.getElementById('comentario-valoracion').value.trim();
+
+    fetch('/api/valoraciones/eventos/' + eventoId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ puntuacion: puntuacion, comentario: comentario }),
+    })
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+        if (data.success) {
+            // Ocultar el formulario
+            var form = document.getElementById('form-valoracion-evento');
+            if (form) { form.style.display = 'none'; }
+
+            // Actualizar media numérica y estrellas del resumen
+            document.getElementById('media-numerica').textContent = data.media;
+            document.getElementById('total-valoraciones-texto').textContent =
+                data.total + ' ' + (data.total === 1 ? 'valoración' : 'valoraciones');
+
+            // Insertar la nueva reseña al inicio del contenedor (si tiene comentario)
+            var contenedor = document.getElementById('contenedor-resenyas');
+            if (data.valoracion.comentario && contenedor) {
+                var div = document.createElement('div');
+                div.style.cssText = 'border-bottom:1px solid var(--line);padding-bottom:1.1rem;';
+                var inicialAutor = data.valoracion.autor ? data.valoracion.autor.charAt(0).toUpperCase() : '?';
+                var estrellas = '';
+                for (var i = 1; i <= 5; i++) { estrellas += i <= data.valoracion.puntuacion ? '★' : '☆'; }
+                div.innerHTML =
+                    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">' +
+                        '<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#4e3a96,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                            (data.valoracion.foto
+                                ? '<img src="' + data.valoracion.foto + '" style="width:100%;height:100%;object-fit:cover;" alt="">'
+                                : '<span style="color:#fff;font-size:12px;font-weight:900;font-family:Anton,sans-serif;">' + inicialAutor + '</span>'
+                            ) +
+                        '</div>' +
+                        '<div style="flex:1;min-width:0;">' +
+                            '<p style="font-family:Archivo,sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin:0;">' + data.valoracion.autor + '</p>' +
+                            '<div style="color:#f59e0b;font-size:0.8rem;">' + estrellas + '</div>' +
+                        '</div>' +
+                        '<span style="font-size:9px;color:rgba(245,241,234,0.25);">' + data.valoracion.fecha + '</span>' +
+                    '</div>' +
+                    '<p style="font-family:Archivo,sans-serif;font-size:13px;color:var(--ink-dim);line-height:1.6;margin:0;">' +
+                        data.valoracion.comentario +
+                    '</p>';
+                contenedor.insertBefore(div, contenedor.firstChild);
+            }
+
+            showSuccessAlert('¡Gracias por tu valoración!', data.message);
+        } else {
+            vibezAlerta('No se pudo enviar', data.message, 'error');
+        }
+    })
+    .catch(function (e) {
+        console.error('Error al valorar evento:', e);
+        vibezAlerta('Error', 'No se pudo enviar la valoración. Inténtalo de nuevo.', 'error');
+    });
 }
 
 // Copia el código del cupón al portapapeles y cambia el texto del botón
