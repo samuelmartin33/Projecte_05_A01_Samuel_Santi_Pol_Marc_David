@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FacturaPremium;
 use App\Models\PagoPremium;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Stripe\Checkout\Session as StripeSession;
 use Stripe\Stripe;
@@ -186,6 +188,18 @@ class PremiumController extends Controller
                     ]);
 
                     Log::info("Premium activado via success_url para usuario {$usuario->id}, session {$sessionId}");
+
+                    // Enviamos la factura como fallback (cuando el webhook no llegó, ej. entorno local).
+                    try {
+                        Mail::to($usuario->email)->send(new FacturaPremium(
+                            $usuario,
+                            $importe,
+                            $sessionId,
+                            $ahora,
+                        ));
+                    } catch (\Throwable $e) {
+                        Log::error("Error enviando factura Premium (fallback) a usuario {$usuario->id}: " . $e->getMessage());
+                    }
                 }
             } catch (\Throwable $e) {
                 // No bloqueamos la página si Stripe falla; el webhook lo reintentará.

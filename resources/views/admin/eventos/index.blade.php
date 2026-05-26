@@ -15,6 +15,25 @@
         <div class="alert success">{{ session('success') }}</div>
     @endif
 
+    {{-- Buscador --}}
+    <form method="GET" action="{{ route('admin.eventos.index') }}" style="margin-bottom:1.25rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+        <input type="text"
+               name="busqueda"
+               value="{{ $busqueda }}"
+               placeholder="Buscar por nombre de evento o promotora…"
+               style="flex:1;min-width:220px;padding:9px 14px;background:#0d0a18;border:1px solid rgba(245,241,234,0.15);color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+        <button type="submit"
+                style="padding:9px 20px;background:#a855f7;color:#fff;border:none;cursor:pointer;font-family:'Archivo Narrow',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;">
+            Buscar
+        </button>
+        @if($busqueda)
+            <a href="{{ route('admin.eventos.index') }}"
+               style="padding:9px 16px;background:rgba(245,241,234,0.07);color:rgba(245,241,234,0.6);border:1px solid rgba(245,241,234,0.12);font-family:'Archivo Narrow',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;text-decoration:none;white-space:nowrap;">
+                Limpiar
+            </a>
+        @endif
+    </form>
+
     <section class="card">
         <table class="tabla-eventos">
             <thead>
@@ -34,7 +53,7 @@
                     <td data-label="ID">{{ $evento->id }}</td>
                     <td data-label="Titulo">{{ $evento->titulo }}</td>
                     <td data-label="Categoria">{{ $evento->categoriaEvento->nombre ?? 'Sin categoria' }}</td>
-                    <td data-label="Organizador">#{{ $evento->organizador_id }}</td>
+                    <td data-label="Organizador">{{ $evento->organizador?->empresa?->nombre_empresa ?? '#' . $evento->organizador_id }}</td>
                     <td data-label="Inicio">{{ optional($evento->fecha_inicio)->format('d/m/Y H:i') }}</td>
                     <td data-label="Estado">
                         <span class="estado {{ $evento->estado ? 'activo' : 'inactivo' }}">

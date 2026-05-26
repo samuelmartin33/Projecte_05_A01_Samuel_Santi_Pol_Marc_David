@@ -83,7 +83,25 @@ window.onpopstate = function() {
 };
 
 async function toggleOferta() {
-    var botonOferta = document.getElementById('btn-cerrar-oferta');
+    var botonOferta  = document.getElementById('btn-cerrar-oferta');
+    var estaActiva   = botonOferta.dataset.estado === '1' || botonOferta.dataset.estado === 1;
+
+    // Confirmación según el estado actual
+    var confirmacion = await Swal.fire({
+        title: estaActiva ? '¿Cerrar esta oferta?' : '¿Reabrir esta oferta?',
+        text: estaActiva
+            ? 'Los candidatos ya no podrán postularse a este puesto de trabajo.'
+            : 'La oferta volverá a estar visible y aceptará nuevas candidaturas.',
+        icon: estaActiva ? 'warning' : 'question',
+        showCancelButton: true,
+        confirmButtonText: estaActiva ? 'Sí, cerrar oferta' : 'Sí, reabrir oferta',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: estaActiva ? '#ef4444' : '#22c55e',
+        cancelButtonColor: '#6b7280',
+    });
+
+    if (!confirmacion.isConfirmed) return;
+
     botonOferta.disabled = true;
 
     try {
@@ -110,8 +128,27 @@ async function toggleOferta() {
             etiquetaEstado.textContent = ofertaActiva ? '● Activa' : '○ Cerrada';
             etiquetaEstado.className   = ofertaActiva ? 'text-green-400 font-semibold' : 'text-slate-500 font-semibold';
         }
+
+        // Notificación de éxito
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: ofertaActiva ? 'Oferta reabierta correctamente' : 'Oferta cerrada correctamente',
+            text: ofertaActiva
+                ? 'El puesto de trabajo ya está disponible para nuevas candidaturas.'
+                : 'El puesto de trabajo ya no acepta nuevas candidaturas.',
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true,
+        });
     } catch(errorOferta) {
         console.error('Error al cambiar estado de oferta', errorOferta);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo cambiar el estado de la oferta. Inténtalo de nuevo.',
+        });
     } finally {
         botonOferta.disabled = false;
     }
