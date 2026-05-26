@@ -70,9 +70,22 @@ body {
 }
 
 @media (max-width: 980px) {
+  /* En tablet/móvil: columna única, permitir scroll vertical */
+  html.auth-page,
+  html.auth-page body { height: auto; overflow: auto; }
+
   .auth-shell,
-  .auth-shell-3col { grid-template-columns: 1fr; }
-  .auth-side { min-height: 320px; }
+  .auth-shell-3col {
+    grid-template-columns: 1fr;
+    height: auto;      /* dejar de forzar 100vh; el contenido marca la altura */
+    overflow: visible;
+  }
+
+  /* Panel de marca: altura fija compacta en vez de 100vh */
+  .auth-side {
+    height: auto;
+    min-height: 280px;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -162,16 +175,18 @@ body {
 .auth-logo {
   display: flex; align-items: center; gap: 10px;
   text-decoration: none; color: var(--ink);
-  padding: 6px 14px 6px 6px;
+  padding: 9px 16px 9px 6px;
   background: linear-gradient(135deg, rgba(168,85,247,0.22), rgba(124,58,237,0.08));
   border: 1px solid rgba(168,85,247,0.5);
   border-radius: 999px;
   box-shadow: 0 0 24px rgba(168,85,247,0.4), inset 0 0 12px rgba(168,85,247,0.12);
   transition: box-shadow 0.2s;
+  overflow: visible;
 }
 .auth-logo:hover { box-shadow: 0 0 36px rgba(168,85,247,0.6), inset 0 0 16px rgba(168,85,247,0.18); }
 .auth-logo img { height: 38px; width: 38px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(168,85,247,0.8)); }
-.auth-logo span { font-size: 22px; letter-spacing: 0.04em; text-shadow: 0 0 18px rgba(168,85,247,0.6); }
+/* line-height: 1.1 sobrescribe el 0.88 de .display para evitar que los glifos Anton se salgan del pill */
+.auth-logo span { font-size: 22px; letter-spacing: 0.04em; text-shadow: 0 0 18px rgba(168,85,247,0.6); line-height: 1.1; }
 
 .auth-back {
   font-size: 11px;
@@ -824,9 +839,10 @@ body {
    ════════════════════════════════════════════════════════════ */
 @media (max-width: 980px) {
   .deco-sticker, .deco-numbers { display: none; }
-  .auth-main { padding: 48px 28px; }
+  /* Anular los 100vh forzados en base — este bloque va DESPUÉS de las reglas base, por lo que gana en cascada */
+  .auth-side { padding: 28px 28px 36px; min-height: 0; height: auto !important; }
+  .auth-main { padding: 48px 28px; height: auto !important; overflow-y: auto; }
   .auth-shell-3col .auth-main { padding: 48px 28px; }
-  .auth-side { padding: 28px 28px 36px; min-height: 280px; }
   .auth-side-content { margin-bottom: 24px; margin-top: 24px; }
   .auth-side-watermark span { font-size: clamp(140px, 40vw, 280px); }
   .auth-side-title { font-size: clamp(48px, 12vw, 84px); }
@@ -839,10 +855,13 @@ body {
 @media (max-width: 540px) {
   .auth-main { padding: 36px 20px; }
   .auth-shell-3col .auth-main { padding: 36px 20px; }
-  .auth-side { padding: 22px 20px 28px; min-height: 220px; }
+  /* En móvil pequeño ocultar el contenido editorial del panel lateral para acceder rápido al formulario */
+  .auth-side { padding: 22px 20px 20px; min-height: 0; height: auto !important; }
+  .auth-side-content, .auth-side-watermark { display: none !important; }
   .auth-side-bottom { display: none; }
   .auth-title { font-size: clamp(44px, 12vw, 64px); }
-  .auth-logo span { font-size: 18px; }
+  .auth-logo { padding: 7px 14px 7px 6px; }
+  .auth-logo span { font-size: 18px; line-height: 1.1; }
   .auth-logo img  { height: 30px; width: 30px; }
   .auth-back { font-size: 10px; }
   .auth-tabs { grid-template-columns: 1fr; gap: 8px; margin-bottom: 22px; }

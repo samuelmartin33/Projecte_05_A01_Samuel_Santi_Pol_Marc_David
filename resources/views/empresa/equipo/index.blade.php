@@ -85,6 +85,7 @@
 .crear-panel { background:#0d0a18; border:1px solid rgba(245,241,234,0.10); padding:28px 32px; margin-bottom:24px; display:none; }
 .crear-panel.open { display:block; }
 .crear-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width: 600px) { .crear-grid { grid-template-columns: 1fr; } }
 .form-field { display:flex; flex-direction:column; gap:6px; }
 .form-input.error { border-bottom-color:rgba(248,113,113,0.55); }
 

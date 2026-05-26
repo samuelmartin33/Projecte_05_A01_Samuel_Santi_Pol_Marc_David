@@ -1,5 +1,14 @@
 @extends('layouts.app')
 @section('titulo', 'Contacto — VIBEZ')
+
+@push('estilos')
+<style>
+@media (max-width: 640px) {
+  .contacto-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+}
+</style>
+@endpush
+
 @section('contenido')
 
 <div style="max-width:860px;margin:80px auto;padding:0 32px;">
@@ -11,7 +20,7 @@
     Contac<em style="color:var(--magenta);font-style:italic;">to</em>.
   </h1>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
+  <div class="contacto-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
     <div style="font-family:'Archivo Narrow',sans-serif;font-size:16px;color:var(--ink-dim);line-height:1.7;">
       <p>Estamos aquí para ayudarte. Escríbenos por el motivo que sea — soporte, colaboraciones, prensa o simplemente para decirnos que VIBEZ mola.</p>
       <div style="margin-top:32px;display:flex;flex-direction:column;gap:16px;">

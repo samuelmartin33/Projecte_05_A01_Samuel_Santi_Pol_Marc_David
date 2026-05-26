@@ -294,8 +294,7 @@ body[data-hero="split"] .hero-split { display: grid; }
 }
 
 @media (max-width: 780px) {
-  header > div > nav { display: none !important; }
-  header > div { padding: 14px 18px !important; }
+  /* Las reglas del nav (display, padding) las gestiona partials/home/nav.blade.php */
 
   .hero-poster > div, .hero-split > div {
     padding-left: 20px !important;

@@ -2,6 +2,14 @@
 
 @section('title', 'Admin | Detalle empresa')
 
+@push('estilos')
+<style>
+@media (max-width: 700px) {
+  .adm-empresa-grid { grid-template-columns: 1fr !important; }
+}
+</style>
+@endpush
+
 @section('content')
     <header class="admin-header">
         <div>
@@ -18,7 +26,7 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+    <div class="adm-empresa-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
 
         {{-- Bloque 1: Datos del responsable --}}
         <section class="card admin-panel-section">

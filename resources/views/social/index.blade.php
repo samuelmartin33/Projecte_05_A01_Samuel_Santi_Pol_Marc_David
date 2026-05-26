@@ -9,10 +9,12 @@
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
 <link rel="stylesheet" href="{{ asset('css/social.css') }}">
 
-{{-- El nav home mide aprox. 94px; ajustamos la altura del wrapper social --}}
+{{-- Altura del wrapper social = viewport menos la altura real del nav sticky --}}
+{{-- Desktop: padding 18px*2 + logo 70px + border 1px ≈ 107px               --}}
+{{-- Móvil (≤768px): padding 12px*2 + logo 54px + border 1px ≈ 79px         --}}
 <style>
-  .soc                                { height: calc(100vh - 94px); }
-  @media (min-width: 900px)           { .soc { height: calc(100vh - 94px); } }
+  .soc { height: calc(100vh - 107px); }
+  @media (max-width: 768px) { .soc { height: calc(100vh - 79px); } }
 </style>
 
 {{-- ════ NAV ════ --}}
