@@ -103,42 +103,10 @@
                     {{-- Crews activos --}}
                     <div class="soc-side-card">
                         <h3 class="soc-side-title">Crews <em>activos</em></h3>
-                        <div style="display:flex;flex-direction:column;gap:12px">
-                            <div class="soc-crew">
-                                <div class="soc-crew-avatars">
-                                    <span>SM</span>
-                                    <span style="background:linear-gradient(135deg,#ec4899,#a855f7)">LB</span>
-                                    <span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)">DR</span>
-                                    <span>+5</span>
-                                </div>
-                                <div>
-                                    <h4 class="soc-crew-name">Los del jueves</h4>
-                                    <p class="soc-crew-meta">8 miembros · va a Razzmatazz hoy</p>
-                                </div>
-                            </div>
-                            <div class="soc-crew">
-                                <div class="soc-crew-avatars">
-                                    <span style="background:linear-gradient(135deg,#f59e0b,#ef4444)">MB</span>
-                                    <span style="background:linear-gradient(135deg,#22d3ee,#a855f7)">OR</span>
-                                    <span>+3</span>
-                                </div>
-                                <div>
-                                    <h4 class="soc-crew-name">Primavera Squad</h4>
-                                    <p class="soc-crew-meta">5 miembros · planea Primavera Sound</p>
-                                </div>
-                            </div>
-                            <div class="soc-crew">
-                                <div class="soc-crew-avatars">
-                                    <span style="background:linear-gradient(135deg,#10b981,#a855f7)">NN</span>
-                                    <span style="background:linear-gradient(135deg,#a855f7,#ec4899)">XN</span>
-                                </div>
-                                <div>
-                                    <h4 class="soc-crew-name">Bakalao FC</h4>
-                                    <p class="soc-crew-meta">2 miembros · italo disco only</p>
-                                </div>
-                            </div>
+                        <div id="soc-crews-lista" style="display:flex;flex-direction:column;gap:12px">
+                            <p class="soc-vacio" style="font-size:0.8rem;padding:4px 0;">Cargando…</p>
                         </div>
-                        <button class="soc-side-btn-ghost" style="margin-top:18px">+ Crear crew</button>
+                        <button class="soc-side-btn-ghost" style="margin-top:18px" onclick="abrirModalCrearCrew()">+ Crear crew</button>
                     </div>
 
                     {{-- Trending esta noche --}}
@@ -188,37 +156,6 @@
                         <h3 class="soc-side-title">Promotoras que <em>sigues</em></h3>
                         <div id="soc-promotoras-lista" style="display:flex;flex-direction:column;gap:10px;">
                             <p class="soc-vacio" style="font-size:0.8rem;padding:4px 0;">Cargando…</p>
-                        </div>
-                    </div>
-
-                    {{-- Sugeridos para seguir --}}
-                    <div class="soc-side-card">
-                        <h3 class="soc-side-title">Sugeridos para <em>seguir</em></h3>
-                        <div style="display:flex;flex-direction:column;gap:2px">
-                            <div class="soc-sugerido">
-                                <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#22d3ee,#a855f7)">ER</div>
-                                <div class="soc-sugerido-info">
-                                    <div class="soc-sugerido-nombre">@elraval</div>
-                                    <div class="soc-sugerido-meta">12 amigos en común</div>
-                                </div>
-                                <button class="soc-side-btn-pri">Seguir</button>
-                            </div>
-                            <div class="soc-sugerido">
-                                <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">OD</div>
-                                <div class="soc-sugerido-info">
-                                    <div class="soc-sugerido-nombre">@oriol_dj</div>
-                                    <div class="soc-sugerido-meta">DJ residente · Apolo</div>
-                                </div>
-                                <button class="soc-side-btn-pri">Seguir</button>
-                            </div>
-                            <div class="soc-sugerido">
-                                <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#ec4899,#a855f7)">MB</div>
-                                <div class="soc-sugerido-info">
-                                    <div class="soc-sugerido-nombre">@martabcn</div>
-                                    <div class="soc-sugerido-meta">Primavera Sound · día 2</div>
-                                </div>
-                                <button class="soc-side-btn-pri">Seguir</button>
-                            </div>
                         </div>
                     </div>
 
@@ -390,7 +327,7 @@
             <span class="soc-sidebar-titulo">VIBEZ <span>Social</span></span>
         </div>
 
-        <button class="soc-nav-btn activo" onclick="irA('feed')" id="nav-btn-feed">
+        <button class="soc-nav-btn activo" onclick="irA('feed',true)" id="nav-btn-feed">
             <div class="soc-nav-icon-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7" rx="1.5"/>
@@ -402,7 +339,7 @@
             <span class="soc-nav-label">Publicaciones</span>
         </button>
 
-        <button class="soc-nav-btn" onclick="irA('eventos')" id="nav-btn-eventos">
+        <button class="soc-nav-btn" onclick="irA('eventos',true)" id="nav-btn-eventos">
             <div class="soc-nav-icon-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -412,7 +349,7 @@
             <span class="soc-nav-label">Eventos</span>
         </button>
 
-        <button class="soc-nav-btn" onclick="irA('chats')" id="nav-btn-chats">
+        <button class="soc-nav-btn" onclick="irA('chats',true)" id="nav-btn-chats">
             <div class="soc-nav-icon-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -423,7 +360,7 @@
             <span class="soc-nav-label">Mensajes</span>
         </button>
 
-        <button class="soc-nav-btn" onclick="irA('amigos')" id="nav-btn-amigos">
+        <button class="soc-nav-btn" onclick="irA('amigos',true)" id="nav-btn-amigos">
             <div class="soc-nav-icon-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -689,23 +626,22 @@
         }
 
         lista.innerHTML = promotoras.map(p => {
-            const inicialLetra = p.nombre ? p.nombre.charAt(0).toUpperCase() : '?';
+            const inicial = p.nombre ? p.nombre.charAt(0).toUpperCase() : '?';
             const logoHtml = p.logo_url
-                ? `<img src="${p.logo_url}" alt="${p.nombre}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
-                : `<div style="width:36px;height:36px;border-radius:50%;background:#a855f7;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:0.9rem;flex-shrink:0;">${inicialLetra}</div>`;
+                ? `<img src="${p.logo_url}" alt="${p.nombre}" class="soc-promotora-logo">`
+                : `<div class="soc-promotora-logo-ini">${inicial}</div>`;
 
             const proximoEvento = (p.proximos_eventos && p.proximos_eventos.length > 0)
-                ? `<span style="color:#a855f7;font-size:0.72rem;">${p.proximos_eventos[0].titulo}</span>`
+                ? `<span class="soc-promotora-evento">${p.proximos_eventos[0].titulo}</span>`
                 : '';
 
-            return `<div style="display:flex;align-items:center;gap:10px;">
+            return `<div class="soc-promotora-item">
                 ${logoHtml}
-                <div style="flex:1;min-width:0;">
-                    <div style="font-weight:700;color:#f5f1ea;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.nombre}</div>
+                <div class="soc-promotora-info">
+                    <div class="soc-promotora-nombre">${p.nombre}</div>
                     ${proximoEvento}
                 </div>
-                <button class="soc-side-btn-ghost"
-                        style="font-size:0.7rem;padding:4px 10px;flex-shrink:0;"
+                <button class="soc-promotora-btn"
                         data-empresa-id="${p.id}"
                         onclick="toggleSeguirSocial(this)">✓</button>
             </div>`;
@@ -728,7 +664,7 @@ async function toggleSeguirSocial(btn) {
         });
         const data = await res.json();
         if (data.success && !data.siguiendo) {
-            const fila = btn.closest('div[style*="display:flex"]');
+            const fila = btn.closest('.soc-promotora-item');
             if (fila) {
                 fila.style.transition = 'opacity 0.25s';
                 fila.style.opacity   = '0';

@@ -7,11 +7,13 @@
    VARIABLES DE ESTADO
    ============================================================ */
 
-var chatActualId    = null;
-var amigoActualId   = null;
-var ultimoMensajeId = 0;
+var chatActualId     = null;
+var amigoActualId    = null;
+var ultimoMensajeId  = 0;
 var intervaloPolling = null;
-var panelActual     = 'feed';
+var intervaloChats       = null;
+var intervaloSolicitudes = null;
+var panelActual      = 'feed';
 
 var pubPagina           = 1;
 var pubHayMas           = false;
@@ -47,7 +49,6 @@ function parsearErrorServidor(respuesta, porDefecto) {
 
 var temporizadorBusqueda = null;
 
-<<<<<<< HEAD
 var historialHistorias  = [];  // grupos de historias cargados [{ usuario, historias }]
 var visorGrupoIdx       = 0;   // índice del grupo actual en el visor
 var visorHistoriaIdx    = 0;   // índice de la historia dentro del grupo
@@ -55,21 +56,7 @@ var visorTimer          = null; // setTimeout del avance automático
 var eventoFiltroActual  = null; // id del evento actualmente filtrado
 
 var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-=======
-function obtenerTokenCsrf() {
-    var metadatos = document.getElementsByTagName('meta');
-
-    for (var indice = 0; indice < metadatos.length; indice++) {
-        if (metadatos[indice].getAttribute('name') === 'csrf-token') {
-            return metadatos[indice].getAttribute('content');
-        }
-    }
-
-    return '';
-}
-
-var tokenCsrf = obtenerTokenCsrf();
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
+var tokenCsrf = csrfToken;
 
 /* ============================================================
    INICIALIZACIÓN
@@ -85,10 +72,17 @@ window.onload = function () {
    NAVEGACIÓN — bottom nav
    ============================================================ */
 
-function irA(panel) {
-    // Detener polling si salimos de chats
+/* navDesdeBoton indica que la llamada viene del usuario pulsando un botón de nav,
+   no de abrirChat/abrirChatGrupo que gestionan su propio polling internamente. */
+function irA(panel, navDesdeBoton) {
+    // Al salir de chats detener ambos pollings de chat
     if (panelActual === 'chats' && panel !== 'chats') {
         detenerPolling();
+        detenerPollingChats();
+    }
+    // Al salir de amigos detener el polling de solicitudes
+    if (panelActual === 'amigos' && panel !== 'amigos') {
+        detenerPollingAmigos();
     }
 
     // Desactivar todos los paneles y botones
@@ -108,11 +102,17 @@ function irA(panel) {
     // Cargar datos del panel
     if (panel === 'chats') {
         cargarChats();
+        iniciarPollingChats();
+        // Reanudar polling de mensajes solo cuando el usuario vuelve por el nav button,
+        // no cuando abrirChat/abrirChatGrupo llaman irA internamente (ellos reinician polling solos)
+        if (chatActualId && navDesdeBoton) iniciarPolling(chatActualId);
     } else if (panel === 'amigos') {
         cargarAmigos();
         cargarSolicitudes();
+        iniciarPollingAmigos();
     } else if (panel === 'feed') {
         iniciarFeed();
+        cargarCrewsSidebar();
     } else if (panel === 'eventos') {
         cargarEventosConContenido();
     }
@@ -221,16 +221,11 @@ function cargarMasPosts() {
 function renderizarPost(post) {
     var avatarHtml    = construirAvatar(post.autor.foto_url, post.autor.nombre, post.autor.apellido1, 'sm');
     var autorNombre   = escaparHtml(post.autor.nombre + ' ' + post.autor.apellido1);
-<<<<<<< HEAD
     var eventoLabel   = post.evento ? escaparHtml(post.evento.titulo) : '';
     var eventoTagHtml = post.evento
         ? '<span class="post-evento-tag" onclick="irAFiltroEvento(' + post.evento.id + ')">🎫 ' + eventoLabel + '</span>'
         : '';
     var fechaLabel    = formatearFechaRelativa(post.fecha);
-=======
-    var eventoLabel   = escaparHtml(post.evento.titulo);
-
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
     var visiBadge     = post.visibilidad === 2
         ? '<span style="font-size:0.6rem;color:rgba(245,241,234,0.35);margin-left:4px;" title="Solo amigos">🔒</span>'
         : '';
@@ -542,7 +537,6 @@ function previsualizarFotos(input) {
     var label  = document.getElementById('pub-upload-label');
     var area   = document.getElementById('pub-upload-area');
     grid.innerHTML = '';
-<<<<<<< HEAD
 
     var archivos = Array.from(input.files).slice(0, 10);
 
@@ -559,13 +553,8 @@ function previsualizarFotos(input) {
     archivos.forEach(function (file) {
         var reader = new FileReader();
         reader.onload = function (e) {
-=======
-    Array.from(input.files).slice(0, 10).forEach(function (file) {
-        var reader   = new FileReader();
-        reader.onload = function (eventoCarga) {
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
             grid.insertAdjacentHTML('beforeend',
-                '<div class="soc-preview-thumb"><img src="' + eventoCarga.target.result + '" alt="preview"></div>'
+                '<div class="soc-preview-thumb"><img src="' + e.target.result + '" alt="preview"></div>'
             );
         };
         reader.readAsDataURL(file);
@@ -663,6 +652,78 @@ function abrirLightbox(url) {
    CHATS
    ============================================================ */
 
+/* Despacha la apertura de un chat leyendo atributos data-* del elemento clicado.
+   Evita pasar datos como strings JS dentro del onclick (problema con comillas). */
+function abrirChatPorData(el) {
+    if (el.getAttribute('data-tipo') === 'grupo') {
+        abrirChatGrupo(
+            parseInt(el.getAttribute('data-grupo-id'), 10),
+            el.getAttribute('data-nombre') || ''
+        );
+    } else {
+        abrirChat(
+            parseInt(el.getAttribute('data-amigo-id'), 10),
+            el.getAttribute('data-nombre') || '',
+            el.getAttribute('data-foto') || ''
+        );
+    }
+}
+
+/* Construye el HTML de un ítem de la lista de chats */
+function construirItemChat(chat) {
+    var ultimoMsj = chat.ultimo_mensaje;
+    var noLeidos  = chat.no_leidos;
+    var nombre, avatarHtml, dataAttrs;
+
+    if (chat.tipo === 'grupo') {
+        var grupo = chat.grupo;
+        nombre    = escaparHtml(grupo.nombre);
+        var m0    = grupo.miembros && grupo.miembros[0] ? grupo.miembros[0] : null;
+        var m1    = grupo.miembros && grupo.miembros[1] ? grupo.miembros[1] : null;
+        var i0    = m0 ? obtenerIniciales(m0.nombre, m0.apellido1) : '?';
+        var i1    = m1 ? obtenerIniciales(m1.nombre, m1.apellido1) : '+';
+        avatarHtml = '<div class="grupo-avatars-stack">'
+                   + '<div class="avatar-mini">' + i0 + '</div>'
+                   + '<div class="avatar-mini">' + i1 + '</div>'
+                   + '</div>';
+        dataAttrs  = 'data-tipo="grupo" data-grupo-id="' + grupo.id + '" data-nombre="' + escaparHtml(grupo.nombre) + '"';
+    } else {
+        var amigo  = chat.amigo;
+        nombre     = escaparHtml(amigo.nombre + ' ' + amigo.apellido1);
+        avatarHtml = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
+        dataAttrs  = 'data-tipo="dm" data-amigo-id="' + amigo.id + '" data-nombre="' + escaparHtml(amigo.nombre + ' ' + amigo.apellido1) + '" data-foto="' + escaparHtml(amigo.foto_url || '') + '"';
+    }
+
+    var vistaPrevia = ultimoMsj
+        ? (ultimoMsj.es_mio ? 'Tú: ' : '') + (ultimoMsj.contenido.length > 38
+            ? ultimoMsj.contenido.substring(0, 38) + '…'
+            : ultimoMsj.contenido)
+        : 'Sin mensajes aún';
+
+    var esActivo  = chat.chat_id === chatActualId ? ' activo' : '';
+    var badgeHtml = noLeidos > 0
+        ? '<span class="chat-item-badge">' + noLeidos + '</span>'
+        : '';
+    var horaHtml = ultimoMsj
+        ? '<span class="chat-item-hora">' + formatearHora(ultimoMsj.fecha) + '</span>'
+        : '';
+
+    return '<div class="chat-item' + esActivo + '" onclick="abrirChatPorData(this)" data-chat-id="' + chat.chat_id + '" ' + dataAttrs + '>'
+         +   '<div class="chat-item-avatar">' + avatarHtml + '</div>'
+         +   '<div class="chat-item-info">'
+         +     '<div class="chat-item-fila-top">'
+         +       '<span class="chat-item-nombre' + (noLeidos > 0 ? ' negrita' : '') + '">' + nombre + '</span>'
+         +       horaHtml
+         +     '</div>'
+         +     '<div class="chat-item-fila-bot">'
+         +       '<span class="chat-item-preview' + (noLeidos > 0 ? ' negrita' : '') + '">' + escaparHtml(vistaPrevia) + '</span>'
+         +       badgeHtml
+         +     '</div>'
+         +   '</div>'
+         + '</div>';
+}
+
+/* Carga inicial de la lista (muestra/oculta el skeleton) */
 function cargarChats() {
     fetch('/api/social/chats', {
         headers: { 'Accept': 'application/json' }
@@ -678,68 +739,50 @@ function cargarChats() {
             return;
         }
 
-        var html = '';
-        respuesta.datos.forEach(function (chat) {
-            var ultimoMsj = chat.ultimo_mensaje;
-            var noLeidos  = chat.no_leidos;
-            var nombre, avatarHtml, onclickAttr;
-
-            if (chat.tipo === 'grupo') {
-                /* ── Crew / grupo ── */
-                var grupo    = chat.grupo;
-                nombre       = escaparHtml(grupo.nombre);
-                /* Dos iniciales del primer y segundo miembro para el stack de avatares */
-                var m0 = grupo.miembros && grupo.miembros[0] ? grupo.miembros[0] : null;
-                var m1 = grupo.miembros && grupo.miembros[1] ? grupo.miembros[1] : null;
-                var i0 = m0 ? obtenerIniciales(m0.nombre, m0.apellido1) : '?';
-                var i1 = m1 ? obtenerIniciales(m1.nombre, m1.apellido1) : '+';
-                avatarHtml = '<div class="grupo-avatars-stack">'
-                           + '<div class="avatar-mini">' + i0 + '</div>'
-                           + '<div class="avatar-mini">' + i1 + '</div>'
-                           + '</div>';
-                onclickAttr = 'abrirChatGrupo(' + grupo.id + ',\'' + escaparTexto(grupo.nombre) + '\')';
-            } else {
-                /* ── DM ── */
-                var amigo   = chat.amigo;
-                nombre      = escaparHtml(amigo.nombre + ' ' + amigo.apellido1);
-                avatarHtml  = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
-                onclickAttr = 'abrirChat(' + amigo.id + ',\'' + escaparTexto(amigo.nombre + ' ' + amigo.apellido1) + '\',\'' + escaparTexto(amigo.foto_url || '') + '\')';
-            }
-
-            var vistaPrevia = ultimoMsj
-                ? (ultimoMsj.es_mio ? 'Tú: ' : '') + (ultimoMsj.contenido.length > 38
-                    ? ultimoMsj.contenido.substring(0, 38) + '…'
-                    : ultimoMsj.contenido)
-                : 'Sin mensajes aún';
-
-            var badgeHtml = noLeidos > 0
-                ? '<span class="chat-item-badge">' + noLeidos + '</span>'
-                : '';
-            var horaHtml = ultimoMsj
-                ? '<span class="chat-item-hora">' + formatearHora(ultimoMsj.fecha) + '</span>'
-                : '';
-
-            html += '<div class="chat-item" onclick="' + onclickAttr + '" data-chat-id="' + chat.chat_id + '">'
-                  +   '<div class="chat-item-avatar">' + avatarHtml + '</div>'
-                  +   '<div class="chat-item-info">'
-                  +     '<div class="chat-item-fila-top">'
-                  +       '<span class="chat-item-nombre' + (noLeidos > 0 ? ' negrita' : '') + '">' + nombre + '</span>'
-                  +       horaHtml
-                  +     '</div>'
-                  +     '<div class="chat-item-fila-bot">'
-                  +       '<span class="chat-item-preview' + (noLeidos > 0 ? ' negrita' : '') + '">' + escaparHtml(vistaPrevia) + '</span>'
-                  +       badgeHtml
-                  +     '</div>'
-                  +   '</div>'
-                  + '</div>';
-        });
-
-        contenedor.innerHTML = html;
+        contenedor.innerHTML = respuesta.datos.map(construirItemChat).join('');
     })
     .catch(function () {
         document.getElementById('lista-chats').innerHTML =
             '<p class="soc-vacio">No se pudo cargar los chats.</p>';
     });
+}
+
+/* Refresco silencioso de la lista (sin skeleton, preserva estado activo) */
+function refrescarListaChats() {
+    fetch('/api/social/chats', {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (!respuesta.exito) return;
+
+        var contenedor = document.getElementById('lista-chats');
+        if (!contenedor) return;
+
+        /* Si no hay chats y ya se muestra el mensaje vacío, no tocar el DOM */
+        if (respuesta.datos.length === 0) {
+            if (!contenedor.querySelector('.chat-item')) {
+                contenedor.innerHTML = '<p class="soc-vacio">Aún no tienes conversaciones.<br>Habla con tus amigos desde la sección Amigos.</p>';
+            }
+            return;
+        }
+
+        contenedor.innerHTML = respuesta.datos.map(construirItemChat).join('');
+    })
+    .catch(function () {});
+}
+
+/* Inicia el polling de la lista de chats cada 5 segundos */
+function iniciarPollingChats() {
+    detenerPollingChats();
+    intervaloChats = setInterval(refrescarListaChats, 5000);
+}
+
+function detenerPollingChats() {
+    if (intervaloChats) {
+        clearInterval(intervaloChats);
+        intervaloChats = null;
+    }
 }
 
 function abrirChat(amigoId, nombreAmigo, fotoUrl) {
@@ -763,7 +806,10 @@ function abrirChat(amigoId, nombreAmigo, fotoUrl) {
         },
         body: JSON.stringify({ amigo_id: amigoId }),
     })
-    .then(function (res) { return res.json(); })
+    .then(function (res) {
+        if (!res.ok) throw new Error('http_' + res.status);
+        return res.json();
+    })
     .then(function (respuesta) {
         if (!respuesta.exito) {
             vibezAlerta('Error', respuesta.mensaje || 'No se pudo abrir el chat.', 'error');
@@ -777,25 +823,27 @@ function abrirChat(amigoId, nombreAmigo, fotoUrl) {
         amigoActualId   = amigoId;
         ultimoMensajeId = 0;
 
-        // Rellenar cabecera
-        var avatarCab = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'sm');
-        document.getElementById('chat-amigo-info').innerHTML =
-              '<div class="chat-cab-avatar">' + avatarCab + '</div>'
-            + '<div class="chat-cab-datos">'
-            +   '<p class="chat-cab-nombre">' + escaparHtml(amigo.nombre + ' ' + amigo.apellido1) + '</p>'
-            +   (amigo.mood ? '<p class="chat-cab-mood">' + escaparHtml(amigo.mood) + '</p>' : '')
-            + '</div>';
-
-        mostrarVentanaChat();
-        cargarMensajes(chatId);
-        iniciarPolling(chatId);
-
+        // DOM y polling fuera de la cadena de promesas para que cualquier excepción
+        // interna no dispare el catch y muestre falso "error de conexión"
         setTimeout(function () {
+            var avatarCab = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'sm');
+            document.getElementById('chat-amigo-info').innerHTML =
+                  '<div class="chat-cab-avatar">' + avatarCab + '</div>'
+                + '<div class="chat-cab-datos">'
+                +   '<p class="chat-cab-nombre">' + escaparHtml(amigo.nombre + ' ' + amigo.apellido1) + '</p>'
+                +   (amigo.mood ? '<p class="chat-cab-mood">' + escaparHtml(amigo.mood) + '</p>' : '')
+                + '</div>';
+
+            mostrarVentanaChat();
+            cargarMensajes(chatId);
+            iniciarPolling(chatId);
+
             var ta = document.getElementById('chat-textarea');
             if (ta) ta.focus();
-        }, 150);
+        }, 0);
     })
-    .catch(function () {
+    .catch(function (err) {
+        console.error('[abrirChat] error:', err);
         vibezAlerta('Error de conexión', 'No se pudo abrir el chat. Inténtalo de nuevo.', 'error');
     });
 }
@@ -815,27 +863,78 @@ function abrirChatGrupo(grupoId, nombreGrupo) {
     amigoActualId   = null;
     ultimoMensajeId = 0;
 
-    /* Cabecera con icono de grupo */
-    document.getElementById('chat-amigo-info').innerHTML =
-          '<div class="chat-cab-avatar">'
-        + '  <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">'
-        + '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">'
-        + '      <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>'
-        + '    </svg>'
-        + '  </div>'
-        + '</div>'
-        + '<div class="chat-cab-datos">'
-        +   '<p class="chat-cab-nombre">' + escaparHtml(nombreGrupo) + '</p>'
-        + '</div>';
-
-    mostrarVentanaChat();
-    cargarMensajes(grupoId);
-    iniciarPolling(grupoId);
-
     setTimeout(function () {
+        document.getElementById('chat-amigo-info').innerHTML =
+              '<div class="chat-cab-avatar">'
+            + '  <div class="avatar-sm avatar-iniciales" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">'
+            + '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">'
+            + '      <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>'
+            + '    </svg>'
+            + '  </div>'
+            + '</div>'
+            + '<div class="chat-cab-datos">'
+            +   '<p class="chat-cab-nombre">' + escaparHtml(nombreGrupo) + '</p>'
+            + '</div>';
+
+        mostrarVentanaChat();
+        cargarMensajes(grupoId);
+        iniciarPolling(grupoId);
+
         var ta = document.getElementById('chat-textarea');
         if (ta) ta.focus();
-    }, 150);
+    }, 0);
+}
+
+/* ── Sidebar: lista de crews del usuario ── */
+
+function cargarCrewsSidebar() {
+    var lista = document.getElementById('soc-crews-lista');
+    if (!lista) return;
+
+    fetch('/api/social/chats', { headers: { 'Accept': 'application/json' } })
+    .then(function (res) { return res.json(); })
+    .then(function (respuesta) {
+        if (!respuesta.exito) return;
+
+        var grupos = respuesta.datos.filter(function (c) { return c.tipo === 'grupo'; });
+
+        if (grupos.length === 0) {
+            lista.innerHTML = '<p class="soc-vacio" style="font-size:0.8rem;padding:4px 0;">Aún no tienes crews. ¡Crea uno!</p>';
+            return;
+        }
+
+        lista.innerHTML = grupos.map(function (chat) {
+            var grupo    = chat.grupo;
+            var miembros = grupo.miembros || [];
+            var avatars  = miembros.slice(0, 3).map(function (m) {
+                return '<span>' + escaparHtml(obtenerIniciales(m.nombre, m.apellido1)) + '</span>';
+            }).join('');
+            if (miembros.length > 3) {
+                avatars += '<span>+' + (miembros.length - 3) + '</span>';
+            }
+            var meta = miembros.length + ' miembro' + (miembros.length !== 1 ? 's' : '');
+
+            return '<div class="soc-crew soc-crew--clickable"'
+                 + ' onclick="abrirChatYIr(this)"'
+                 + ' data-grupo-id="' + grupo.id + '"'
+                 + ' data-nombre="' + escaparHtml(grupo.nombre) + '">'
+                 +   '<div class="soc-crew-avatars">' + avatars + '</div>'
+                 +   '<div>'
+                 +     '<h4 class="soc-crew-name">' + escaparHtml(grupo.nombre) + '</h4>'
+                 +     '<p class="soc-crew-meta">' + meta + '</p>'
+                 +   '</div>'
+                 + '</div>';
+        }).join('');
+    })
+    .catch(function () {});
+}
+
+/* Navega al panel de chats y abre el grupo indicado */
+function abrirChatYIr(el) {
+    var grupoId = parseInt(el.getAttribute('data-grupo-id'), 10);
+    var nombre  = el.getAttribute('data-nombre') || '';
+    irA('chats');
+    setTimeout(function () { abrirChatGrupo(grupoId, nombre); }, 50);
 }
 
 /* ── Modal: crear crew ── */
@@ -909,21 +1008,30 @@ function crearCrew() {
         },
         body: JSON.stringify({ nombre: nombre, miembro_ids: miembroIds }),
     })
-    .then(function (res) { return res.json(); })
+    .then(function (res) {
+        if (!res.ok && res.status !== 201) throw new Error('http_' + res.status);
+        return res.json();
+    })
     .then(function (respuesta) {
         btn.disabled    = false;
         btn.textContent = 'Crear crew';
         if (respuesta.exito) {
             cerrarModalCrearCrew();
             cargarChats();
-            abrirChatGrupo(respuesta.datos.chat_id, respuesta.datos.nombre);
+            cargarCrewsSidebar();
+            // Se ejecuta fuera de la cadena de promesas para que cualquier excepción
+            // interna no dispare el catch de la petición y muestre "error de conexión"
+            var chatId = respuesta.datos.chat_id;
+            var nombre = respuesta.datos.nombre;
+            setTimeout(function () { abrirChatGrupo(chatId, nombre); }, 0);
         } else {
             vibezAlerta('Error', respuesta.mensaje || 'No se pudo crear el crew.', 'error');
         }
     })
-    .catch(function () {
+    .catch(function (err) {
         btn.disabled    = false;
         btn.textContent = 'Crear crew';
+        console.error('[crearCrew] error:', err);
         vibezAlerta('Error de conexión', 'No se pudo crear el crew.', 'error');
     });
 }
@@ -943,22 +1051,28 @@ function mostrarVentanaChat() {
 }
 
 function cargarMensajes(chatId) {
+    var area       = document.getElementById('chat-mensajes');
     var cargandoEl = document.getElementById('cargando-mensajes');
-    cargandoEl.style.display = 'flex';
+    if (cargandoEl) cargandoEl.style.display = 'flex';
 
     fetch('/api/social/chats/' + chatId + '/mensajes', {
         headers: { 'Accept': 'application/json' }
     })
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
-        cargandoEl.style.display = 'none';
+        // Si el usuario cambió de chat mientras cargaba, descartar esta respuesta
+        if (chatId !== chatActualId) return;
+        if (cargandoEl) cargandoEl.style.display = 'none';
         if (!respuesta.exito) return;
 
-        var area = document.getElementById('chat-mensajes');
-        area.innerHTML = '';
+        // Eliminar mensajes anteriores sin destruir el spinner (#cargando-mensajes)
+        // que vive dentro de #chat-mensajes — innerHTML='' lo borraría del DOM
+        Array.from(area.children).forEach(function (hijo) {
+            if (hijo.id !== 'cargando-mensajes') hijo.remove();
+        });
 
         if (respuesta.datos.length === 0) {
-            area.innerHTML = '<p class="chat-sin-mensajes">¡Sé el primero en escribir! 👋</p>';
+            area.insertAdjacentHTML('beforeend', '<p class="chat-sin-mensajes">¡Sé el primero en escribir! 👋</p>');
             return;
         }
 
@@ -976,7 +1090,7 @@ function cargarMensajes(chatId) {
         scrollAlFinal(area);
     })
     .catch(function () {
-        document.getElementById('cargando-mensajes').style.display = 'none';
+        if (cargandoEl) cargandoEl.style.display = 'none';
     });
 }
 
@@ -1022,7 +1136,7 @@ function enviarMensaje() {
 function iniciarPolling(chatId) {
     detenerPolling();
     intervaloPolling = setInterval(function () {
-        if (!chatActualId) { detenerPolling(); return; }
+        if (!chatActualId || chatId !== chatActualId) { detenerPolling(); return; }
 
         fetch('/api/social/chats/' + chatId + '/nuevos?desde=' + ultimoMensajeId, {
             headers: { 'Accept': 'application/json' }
@@ -1085,33 +1199,9 @@ function cargarAmigos() {
     })
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
-        var contenedor = document.getElementById('lista-amigos');
-        var skeleton   = document.getElementById('skeleton-amigos');
+        var skeleton = document.getElementById('skeleton-amigos');
         if (skeleton) skeleton.style.display = 'none';
-
-        if (!respuesta.exito || respuesta.datos.length === 0) {
-            contenedor.innerHTML = '<p class="soc-vacio">Aún no tienes amigos.<br>Usa el botón + para encontrar gente.</p>';
-            return;
-        }
-
-        var html = '';
-        respuesta.datos.forEach(function (amigo) {
-            var nombre = amigo.nombre + ' ' + amigo.apellido1;
-            var avatar = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
-
-            html += '<div class="amigo-item">'
-                  +   '<div class="amigo-item-avatar">' + avatar + '</div>'
-                  +   '<div class="amigo-item-info">'
-                  +     '<p class="amigo-item-nombre">' + escaparHtml(nombre) + '</p>'
-                  +     (amigo.mood ? '<p class="amigo-item-mood">' + escaparHtml(amigo.mood) + '</p>' : '')
-                  +   '</div>'
-                  +   '<button class="btn-chat-amigo" onclick="abrirChatDesdeAmigos(' + amigo.id + ',\'' + escaparTexto(nombre) + '\',\'' + escaparTexto(amigo.foto_url || '') + '\')" title="Enviar mensaje">'
-                  +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>'
-                  +   '</button>'
-                  + '</div>';
-        });
-
-        contenedor.innerHTML = html;
+        aplicarAmigos(respuesta);
     })
     .catch(function () {
         document.getElementById('lista-amigos').innerHTML =
@@ -1119,10 +1209,105 @@ function cargarAmigos() {
     });
 }
 
+/* Actualiza la lista de amigos de forma quirúrgica:
+   añade los nuevos con animación y elimina los que ya no son amigos. */
+function aplicarAmigos(respuesta) {
+    var contenedor = document.getElementById('lista-amigos');
+
+    if (!respuesta.exito || respuesta.datos.length === 0) {
+        contenedor.innerHTML = '<p class="soc-vacio">Aún no tienes amigos.<br>Usa el botón + para encontrar gente.</p>';
+        return;
+    }
+
+    var idsServidor = respuesta.datos.map(function (a) { return a.id; });
+
+    // Eliminar amigos que ya no están en la lista del servidor
+    Array.from(contenedor.querySelectorAll('.amigo-item[data-amigo-id]')).forEach(function (el) {
+        var id = parseInt(el.getAttribute('data-amigo-id'), 10);
+        if (idsServidor.indexOf(id) === -1) {
+            el.style.transition = 'opacity 0.3s';
+            el.style.opacity    = '0';
+            setTimeout(function () { el.remove(); }, 300);
+        }
+    });
+
+    // Añadir los amigos que aún no están en el DOM
+    respuesta.datos.forEach(function (amigo) {
+        if (contenedor.querySelector('[data-amigo-id="' + amigo.id + '"]')) return;
+
+        var nombre = amigo.nombre + ' ' + amigo.apellido1;
+        var avatar = construirAvatar(amigo.foto_url, amigo.nombre, amigo.apellido1, 'md');
+
+        var div = document.createElement('div');
+        div.className = 'amigo-item amigo-nuevo';
+        div.setAttribute('data-amigo-id', amigo.id);
+        div.setAttribute('data-relacion-id', amigo.relacion_id);
+        div.innerHTML = '<div class="amigo-item-avatar">' + avatar + '</div>'
+                      + '<div class="amigo-item-info">'
+                      +   '<p class="amigo-item-nombre">' + escaparHtml(nombre) + '</p>'
+                      +   (amigo.mood ? '<p class="amigo-item-mood">' + escaparHtml(amigo.mood) + '</p>' : '')
+                      + '</div>'
+                      + '<div class="amigo-item-acciones">'
+                      +   '<button class="btn-chat-amigo" onclick="abrirChatDesdeAmigos(' + amigo.id + ',\'' + escaparTexto(nombre) + '\',\'' + escaparTexto(amigo.foto_url || '') + '\')" title="Enviar mensaje">'
+                      +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>'
+                      +   '</button>'
+                      +   '<button class="btn-eliminar-amigo" onclick="eliminarAmigo(' + amigo.relacion_id + ', this)" title="Eliminar amigo">'
+                      +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6h8m5-4l2 2m0 0l2 2m-2-2l2-2m-2 2l-2 2"/></svg>'
+                      +   '</button>'
+                      + '</div>';
+
+        // Quitar el mensaje de "sin amigos" si existe
+        var vacio = contenedor.querySelector('.soc-vacio');
+        if (vacio) vacio.remove();
+
+        contenedor.appendChild(div);
+        void div.offsetWidth;
+        div.classList.remove('amigo-nuevo');
+    });
+}
+
 function abrirChatDesdeAmigos(amigoId, nombre, foto) {
     irA('chats');
-    // Pequeño delay para que el panel cambie antes de abrir el chat
     setTimeout(function () { abrirChat(amigoId, nombre, foto); }, 50);
+}
+
+function eliminarAmigo(relacionId, btnEl) {
+    Swal.fire({
+        title:              '¿Eliminar amigo?',
+        text:               'Dejaréis de ser amigos y perderéis el historial de chat.',
+        icon:               'warning',
+        background:         '#0d0820',
+        color:              '#f5f1ea',
+        showCancelButton:   true,
+        confirmButtonColor: '#7c3aed',
+        cancelButtonColor:  'rgba(245,241,234,0.1)',
+        confirmButtonText:  'Sí, eliminar',
+        cancelButtonText:   'Cancelar',
+    }).then(function (result) {
+        if (!result.isConfirmed) return;
+
+        fetch('/api/social/amigos/' + relacionId, {
+            method:  'DELETE',
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (respuesta) {
+            if (!respuesta.exito) {
+                vibezAlerta('Error', respuesta.mensaje || 'No se pudo eliminar.', 'error');
+                return;
+            }
+            var fila = btnEl.closest('.amigo-item');
+            if (fila) {
+                fila.style.transition = 'opacity 0.3s, transform 0.3s';
+                fila.style.opacity    = '0';
+                fila.style.transform  = 'translateX(20px)';
+                setTimeout(function () { fila.remove(); }, 300);
+            }
+        })
+        .catch(function () {
+            vibezAlerta('Error de conexión', 'No se pudo eliminar el amigo.', 'error');
+        });
+    });
 }
 
 function cargarSolicitudes() {
@@ -1131,37 +1316,89 @@ function cargarSolicitudes() {
     })
     .then(function (res) { return res.json(); })
     .then(function (respuesta) {
-        var seccion    = document.getElementById('seccion-solicitudes');
-        var contenedor = document.getElementById('lista-solicitudes');
-
-        if (!respuesta.exito || respuesta.datos.length === 0) {
-            seccion.style.display = 'none';
-            return;
-        }
-
-        seccion.style.display = 'block';
-
-        var html = '';
-        respuesta.datos.forEach(function (sol) {
-            var nombre = sol.nombre + ' ' + sol.apellido1;
-            var avatar = construirAvatar(sol.foto_url, sol.nombre, sol.apellido1, 'md');
-
-            html += '<div class="solicitud-item" id="solicitud-' + sol.id + '">'
-                  +   '<div class="solicitud-avatar">' + avatar + '</div>'
-                  +   '<div class="solicitud-info">'
-                  +     '<p class="solicitud-nombre">' + escaparHtml(nombre) + '</p>'
-                  +     '<p class="solicitud-sub">Quiere ser tu amigo</p>'
-                  +   '</div>'
-                  +   '<div class="solicitud-acciones">'
-                  +     '<button class="btn-aceptar" onclick="aceptarSolicitud(' + sol.id + ')" title="Aceptar">✓</button>'
-                  +     '<button class="btn-rechazar" onclick="rechazarSolicitud(' + sol.id + ')" title="Rechazar">✕</button>'
-                  +   '</div>'
-                  + '</div>';
-        });
-
-        contenedor.innerHTML = html;
+        aplicarSolicitudes(respuesta);
     })
     .catch(function () {});
+}
+
+/* Aplica la respuesta del servidor al DOM de forma inteligente:
+   solo añade solicitudes nuevas y elimina las que ya no existen,
+   sin reemplazar las que el usuario está a punto de aceptar/rechazar. */
+function aplicarSolicitudes(respuesta) {
+    var seccion    = document.getElementById('seccion-solicitudes');
+    var contenedor = document.getElementById('lista-solicitudes');
+
+    if (!respuesta.exito || respuesta.datos.length === 0) {
+        seccion.style.display = 'none';
+        contenedor.innerHTML  = '';
+        return;
+    }
+
+    seccion.style.display = 'block';
+
+    // IDs que vienen del servidor
+    var idsServidor = respuesta.datos.map(function (s) { return s.id; });
+
+    // Eliminar del DOM las que ya no existen en el servidor
+    Array.from(contenedor.querySelectorAll('.solicitud-item')).forEach(function (el) {
+        var id = parseInt(el.id.replace('solicitud-', ''), 10);
+        if (idsServidor.indexOf(id) === -1 && !el.classList.contains('fadeOut')) {
+            el.classList.add('fadeOut');
+            setTimeout(function () { el.remove(); }, 300);
+        }
+    });
+
+    // Añadir las que aún no están en el DOM
+    respuesta.datos.forEach(function (sol) {
+        if (document.getElementById('solicitud-' + sol.id)) return;
+
+        var nombre = sol.nombre + ' ' + sol.apellido1;
+        var avatar = construirAvatar(sol.foto_url, sol.nombre, sol.apellido1, 'md');
+
+        var div = document.createElement('div');
+        div.className = 'solicitud-item solicitud-nueva';
+        div.id        = 'solicitud-' + sol.id;
+        div.innerHTML = '<div class="solicitud-avatar">' + avatar + '</div>'
+                      + '<div class="solicitud-info">'
+                      +   '<p class="solicitud-nombre">' + escaparHtml(nombre) + '</p>'
+                      +   '<p class="solicitud-sub">Quiere ser tu amigo</p>'
+                      + '</div>'
+                      + '<div class="solicitud-acciones">'
+                      +   '<button class="btn-aceptar" onclick="aceptarSolicitud(' + sol.id + ')" title="Aceptar">✓</button>'
+                      +   '<button class="btn-rechazar" onclick="rechazarSolicitud(' + sol.id + ')" title="Rechazar">✕</button>'
+                      + '</div>';
+
+        contenedor.prepend(div);
+        // Forzar reflow para que la animación de entrada funcione
+        void div.offsetWidth;
+        div.classList.remove('solicitud-nueva');
+    });
+}
+
+function iniciarPollingAmigos() {
+    detenerPollingAmigos();
+    intervaloSolicitudes = setInterval(function () {
+        fetch('/api/social/solicitudes', {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(function (res) { return res.json(); })
+        .then(aplicarSolicitudes)
+        .catch(function () {});
+
+        fetch('/api/social/amigos', {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(function (res) { return res.json(); })
+        .then(aplicarAmigos)
+        .catch(function () {});
+    }, 8000);
+}
+
+function detenerPollingAmigos() {
+    if (intervaloSolicitudes) {
+        clearInterval(intervaloSolicitudes);
+        intervaloSolicitudes = null;
+    }
 }
 
 function aceptarSolicitud(solicitudId) {
@@ -1378,10 +1615,20 @@ function obtenerIniciales(nombre, apellido) {
           + (apellido ? apellido.charAt(0).toUpperCase() : ''));
 }
 
+/* Convierte la cadena UTC del servidor a objeto Date local.
+   Laravel envía "2024-05-26 14:30:00" sin zona horaria;
+   añadimos Z para que el navegador aplique el offset local (p.ej. +2h en España). */
+function parsearFechaUtc(fechaStr) {
+    if (!fechaStr) return null;
+    var s = String(fechaStr).replace(' ', 'T');
+    if (!s.endsWith('Z') && !s.includes('+')) s += 'Z';
+    return new Date(s);
+}
+
 function formatearHora(fechaStr) {
     if (!fechaStr) return '';
     try {
-        return new Date(fechaStr.replace(' ', 'T'))
+        return parsearFechaUtc(fechaStr)
             .toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
     } catch (errorFecha) { return ''; }
 }
@@ -1389,7 +1636,7 @@ function formatearHora(fechaStr) {
 function formatearFechaCompleta(fechaStr) {
     if (!fechaStr) return '';
     try {
-        var fecha = new Date(fechaStr.replace(' ', 'T'));
+        var fecha = parsearFechaUtc(fechaStr);
         var hoy   = new Date();
         var ayer  = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
         if (fecha.toDateString() === hoy.toDateString())  return 'Hoy';
@@ -1401,7 +1648,7 @@ function formatearFechaCompleta(fechaStr) {
 function formatearFechaRelativa(fechaStr) {
     if (!fechaStr) return '';
     try {
-        var fecha   = new Date(fechaStr.replace(' ', 'T'));
+        var fecha   = parsearFechaUtc(fechaStr);
         var diffMs  = Date.now() - fecha.getTime();
         var diffMin = Math.floor(diffMs / 60000);
         var diffH   = Math.floor(diffMin / 60);
