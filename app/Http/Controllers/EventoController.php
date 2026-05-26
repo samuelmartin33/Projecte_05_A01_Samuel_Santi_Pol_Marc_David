@@ -612,16 +612,23 @@ class EventoController extends Controller
 
         $trabajadorId = $this->resolverTrabajadorActual();
 
+        // Guardar datos del usuario autenticado para que la empresa pueda contactarle
+        $usuarioAuth = Auth::check() ? Auth::user() : null;
+
         $path = $request->file('cv_file')->store('cvs', 'public');
 
         DB::table('candidaturas_trabajo')->insert([
-            'oferta_id'          => $id,
-            'trabajador_id'      => $trabajadorId,
-            'estado_candidatura' => 1,
-            'carta_presentacion' => $request->input('carta_presentacion_archivo'),
-            'cv_url'             => $path,
-            'estado'             => 1,
-            'fecha_creacion'     => now(),
+            'oferta_id'           => $id,
+            'trabajador_id'       => $trabajadorId,
+            'estado_candidatura'  => 1,
+            'carta_presentacion'  => $request->input('carta_presentacion_archivo'),
+            'cv_url'              => $path,
+            'estado'              => 1,
+            'fecha_creacion'      => now(),
+            // Datos de contacto del usuario autenticado
+            'nombre_candidato'    => $usuarioAuth?->nombre,
+            'apellidos_candidato' => trim(($usuarioAuth?->apellido1 ?? '') . ' ' . ($usuarioAuth?->apellido2 ?? '')) ?: null,
+            'email_candidato'     => $usuarioAuth?->email,
         ]);
 
         return response()->json(['success' => true]);

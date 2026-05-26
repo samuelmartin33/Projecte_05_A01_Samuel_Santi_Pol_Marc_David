@@ -51,6 +51,7 @@
               ['Equipo',         route('empresa.equipo.index'),         'empresa.equipo.*'],
               ['Candidaturas',   route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
               ['Administración', route('empresa.facturacion.index'),    'empresa.facturacion.*'],
+              ['Perfil Fiscal',  route('empresa.perfil-fiscal'),        'empresa.perfil-fiscal'],
               ['Crear evento',   route('empresa.eventos.create'),       'empresa.eventos.create'],
               ['Crear oferta',   route('empresa.ofertas.create'),       'empresa.ofertas.create'],
             ];
@@ -144,6 +145,7 @@
               ['Equipo',          route('empresa.equipo.index')],
               ['Candidaturas',    route('empresa.candidaturas.ofertas')],
               ['Administración',  route('empresa.facturacion.index')],
+              ['Perfil Fiscal',   route('empresa.perfil-fiscal')],
               ['Crear evento',    route('empresa.eventos.create')],
               ['Crear oferta',    route('empresa.ofertas.create')],
             ] as [$item, $url])

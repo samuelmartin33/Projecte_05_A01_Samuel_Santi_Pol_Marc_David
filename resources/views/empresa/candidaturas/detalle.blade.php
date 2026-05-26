@@ -91,10 +91,11 @@
     $estadoAct = request('estado', '');
     $estados   = [
         ''  => ['label' => 'Todos',           'color' => ''],
-        '1' => ['label' => 'Nuevos',          'color' => 'text-blue-600'],
-        '2' => ['label' => 'Revisados',       'color' => 'text-amber-600'],
-        '3' => ['label' => 'Preseleccionados','color' => 'text-green-600'],
-        '4' => ['label' => 'Rechazados',      'color' => 'text-red-500'],
+        '1' => ['label' => 'Nuevos',          'color' => 'text-blue-400'],
+        '2' => ['label' => 'Revisados',       'color' => 'text-amber-400'],
+        '3' => ['label' => 'Preseleccionados','color' => 'text-green-400'],
+        '4' => ['label' => 'Rechazados',      'color' => 'text-red-400'],
+        '5' => ['label' => 'Seleccionados',   'color' => 'text-orange-400'],
     ];
 @endphp
 <div class="sticky top-16 z-30" style="background:rgba(13,8,32,0.92);border-bottom:1px solid rgba(245,241,234,0.10);backdrop-filter:blur(20px);">
@@ -104,7 +105,7 @@
             @foreach($estados as $val => $info)
                 <button type="button"
                         data-estado="{{ $val }}"
-                        onclick="cargarCandidaturas('{{ $val }}', _ordenActual)"
+                        onclick="cargarCandidaturas('{{ $val }}', ordenActual)"
                         class="tab-estado {{ $estadoAct == $val ? 'activo' : '' }}">
                     {{ $info['label'] }}
                 </button>
@@ -113,7 +114,7 @@
             <div class="ml-auto flex items-center gap-2">
                 <label class="text-navy/40 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
                 <select class="filtro-select text-xs border border-navy/10 rounded-lg px-2 py-1.5 outline-none"
-                        onchange="cargarCandidaturas(_estadoActual, this.value)">
+                        onchange="cargarCandidaturas(estadoActual, this.value)">
                     <option value="reciente" {{ $ordenAct === 'reciente' ? 'selected':'' }}>Más reciente</option>
                     <option value="nombre"   {{ $ordenAct === 'nombre'   ? 'selected':'' }}>Nombre A–Z</option>
                     <option value="estado"   {{ $ordenAct === 'estado'   ? 'selected':'' }}>Por estado</option>
@@ -238,6 +239,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
                         <option value="2" {{ $cand->estado_candidatura == 2 ? 'selected':'' }}>Revisado</option>
                         <option value="3" {{ $cand->estado_candidatura == 3 ? 'selected':'' }}>Preseleccionado</option>
                         <option value="4" {{ $cand->estado_candidatura == 4 ? 'selected':'' }}>Rechazado</option>
+                        <option value="5" {{ $cand->estado_candidatura == 5 ? 'selected':'' }}>Seleccionado</option>
                     </select>
 
                     {{-- Ver CV --}}
@@ -264,6 +266,20 @@ $candidaturasJson = $candidaturas->map(function($c) {
                                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
                         </a>
+                    @endif
+
+                    {{-- Enviar correo de selección (aparece para todos los candidatos en estado Seleccionado) --}}
+                    @if($cand->estado_candidatura == \App\Models\CandidaturaTrabajo::ESTADO_SELECCIONADO)
+                        <button id="btn-correo-{{ $cand->id }}"
+                                onclick="enviarCorreoSeleccion({{ $cand->id }}, '{{ route('empresa.candidaturas.enviar-seleccion', $cand->id) }}')"
+                                title="Enviar correo de selección al candidato"
+                                class="w-8 h-8 flex items-center justify-center transition-colors"
+                                style="background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </button>
                     @endif
                 </div>
             </div>

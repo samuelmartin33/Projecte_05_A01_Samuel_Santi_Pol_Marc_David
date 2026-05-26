@@ -59,7 +59,11 @@
             Desde aquí podrás gestionar cupones, patrocinios, ofertas de trabajo y visualizar estadísticas de tu empresa.
         </div>
 
-        <button id="logoutBtn" class="btn-primary" style="margin-top: 0.5rem;">
+        <a href="{{ route('empresa.perfil-fiscal') }}" class="btn-primary" style="display:block; text-align:center; margin-top: 0.5rem; text-decoration:none;">
+            Perfil Fiscal
+        </a>
+
+        <button id="logoutBtn" class="btn-primary" style="margin-top: 0.75rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-muted);">
             Cerrar sesión
         </button>
 
