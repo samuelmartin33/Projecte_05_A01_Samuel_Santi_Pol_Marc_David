@@ -174,6 +174,10 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
 
+/* — Google OAuth (Socialite — flujo server-side redirect) — */
+Route::get('/auth/google',          [\App\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 /* — Recuperación de contraseña (solo invitados) — */
 Route::middleware('guest')->group(function () {
     Route::get('/forgot-password',         [\App\Http\Controllers\PasswordResetController::class, 'showForgotForm'])->name('password.request');
