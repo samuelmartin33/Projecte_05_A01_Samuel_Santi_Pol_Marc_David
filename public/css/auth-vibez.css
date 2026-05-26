@@ -392,24 +392,25 @@ body {
 }
 .auth-field input,
 .auth-field select {
-  background: rgba(245,241,234,0.04);
-  border: 1px solid var(--ink-faint);
-  color: var(--ink);
-  padding: 14px 16px;
+  width: 100%;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid rgba(245,241,234,0.18);
   border-radius: 0;
+  color: var(--ink);
   font-family: 'Archivo', sans-serif;
-  font-size: 15px;
+  font-size: 1.0625rem;
   font-weight: 500;
   outline: none;
-  transition: all 0.2s ease;
-  width: 100%;
+  transition: border-color 0.2s;
 }
-.auth-field input::placeholder { color: rgba(245,241,234,0.3); }
+.auth-field input::placeholder { color: rgba(245,241,234,0.25); }
 .auth-field input:focus,
 .auth-field select:focus {
-  border-color: var(--morado-2);
-  background: rgba(168,85,247,0.06);
-  box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
+  border-bottom-color: var(--morado-2);
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Select con flecha morada */
@@ -418,8 +419,8 @@ body {
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2.5'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat: no-repeat;
-  background-position: right 16px center;
-  padding-right: 40px;
+  background-position: right 4px center;
+  padding-right: 24px;
   cursor: pointer;
 }
 .auth-field select option { background: var(--bg); }
@@ -788,7 +789,7 @@ body {
 }
 .auth-field.error input,
 .auth-field.error select {
-  border-color: rgba(239,68,68,0.6);
+  border-bottom-color: rgba(239,68,68,0.6);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1099,7 +1100,9 @@ body {
   transition: background 0.15s, color 0.15s, border-color 0.15s !important;
   line-height: 38px !important;
   height: 38px !important;
-  max-width: 38px !important;
+  width: 14.2857143% !important;
+  flex-basis: 14.2857143% !important;
+  max-width: 39px !important;
 }
 .flatpickr-day:hover,
 .flatpickr-day.prevMonthDay:hover,

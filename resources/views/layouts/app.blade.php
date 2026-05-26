@@ -31,6 +31,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/app-static.css') }}">
     <link rel="stylesheet" href="{{ asset('css/vibez.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vibez-forms.css') }}">
 
     @if (request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.*'))
         <link rel="stylesheet" href="{{ asset('css/auth-vibez.css') }}">
@@ -95,6 +96,11 @@
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
                               {{ request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Trabajo
+                    </a>
+                    <a href="{{ route('calendario') }}"
+                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                              {{ request()->routeIs('calendario') ? 'text-white' : 'text-white/60 hover:text-white' }}">
+                        Calendario
                     </a>
                     @auth
                     <a href="{{ route('social') }}"
@@ -436,6 +442,9 @@
         </div>
     </footer>
     @endif
+
+    {{-- SweetAlert2 global — disponible en todas las páginas --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- Espacio para scripts específicos de cada página (ej: Leaflet, AJAX) --}}
     @stack('scripts')

@@ -114,19 +114,26 @@
     <nav id="vibez-nav-desktop">
       @auth
         @php
-          $esAdmin   = Auth::user()->es_admin;
-          $esEmpresa = Auth::user()->isEmpresa();
-          $esPortero = Auth::user()->isPortero();
+          $esAdmin       = Auth::user()->es_admin;
+          $esEmpresa     = Auth::user()->isEmpresa();
+          $esPortero     = Auth::user()->isPortero();
+          $esOrganizador = !$esPortero && Auth::user()->isOrganizador();
           if ($esPortero) {
-            $navLinks = [
-              ['Validación QR', route('empresa.validacion.index'), 'empresa.validacion.*'],
-            ];
+            // Portero ve los mismos enlaces que un cliente normal
+            $navLinks = array_filter([
+              ['Para ti',     route('home'),                        'home'],
+              ['Eventos',     route('eventos.index'),               'eventos.index'],
+              ['Mis tickets', route('entradas.mis-entradas'),       'entradas.mis-entradas'],
+              ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
+              ['Social',      route('social'),                      'social'],
+            ]);
           } elseif ($esEmpresa) {
             $navLinks = [
               ['Panel',          route('empresa.home'),                 'empresa.home'],
               ['Equipo',         route('empresa.equipo.index'),         'empresa.equipo.*'],
               ['Candidaturas',   route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
               ['Administración', route('empresa.facturacion.index'),    'empresa.facturacion.*'],
+              ['Perfil Fiscal',  route('empresa.perfil-fiscal'),        'empresa.perfil-fiscal'],
               ['Crear evento',   route('empresa.eventos.create'),       'empresa.eventos.create'],
               ['Crear oferta',   route('empresa.ofertas.create'),       'empresa.ofertas.create'],
             ];
@@ -134,9 +141,11 @@
             $navLinks = array_filter([
               ['Para ti',     route('home'),                        'home'],
               ['Eventos',     route('eventos.index'),               'eventos.index'],
+              ['Calendario',  route('calendario'),                  'calendario'],
               !$esAdmin ? ['Mis tickets', route('entradas.mis-entradas'), 'entradas.mis-entradas'] : null,
               ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
               ['Social',      route('social'),                      'social'],
+              $esOrganizador ? ['Mis horas', route('horas.index'), 'horas.index'] : null,
             ]);
           }
         @endphp
@@ -145,6 +154,7 @@
           $navLinks = [
             ['Explorar',         route('home'),            'home'],
             ['Eventos',          route('eventos.index'),   'eventos.index'],
+            ['Calendario',       route('calendario'),      'calendario'],
             ['Bolsa de trabajo', route('trabajos.index'),  'trabajos.index'],
           ];
         @endphp
@@ -156,6 +166,19 @@
           {{ $label }}
         </a>
       @endforeach
+      {{-- Enlace Premium: solo para usuarios normales (no empresa, no admin, no portero) --}}
+      @auth
+      @if(!Auth::user()->isEmpresa() && !Auth::user()->isAdmin() && !Auth::user()->isPortero())
+        @php $premiumActivo = request()->routeIs('premium*'); @endphp
+        <a href="{{ route('premium') }}" class="mono"
+           style="font-size:11px;text-decoration:none;padding-bottom:4px;transition:color 0.2s;
+                  {{ $premiumActivo
+                      ? 'color:var(--magenta);border-bottom:1.5px solid var(--magenta);'
+                      : 'color:rgba(168,85,247,0.7);border-bottom:1.5px solid transparent;' }}">
+          {{ Auth::user()->es_premium ? '✦ Premium' : 'Premium' }}
+        </a>
+      @endif
+      @endauth
     </nav>
 
     {{-- Área derecha: usuario autenticado o botones de acceso --}}
@@ -211,9 +234,46 @@
         {{-- Dropdown de perfil --}}
         <div id="navDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.95);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:14px;padding:8px;min-width:220px;box-shadow:0 20px 50px rgba(0,0,0,0.5);z-index:100;">
           @if($esPortero)
-            <a href="{{ route('empresa.validacion.index') }}" onclick="document.getElementById('navDropdown').style.display='none'"
-               style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
-              Validación QR
+            {{-- Ítems normales de cliente --}}
+            @foreach([
+              ['Mi perfil',   route('perfil')],
+              ['Mis tickets', route('entradas.mis-entradas')],
+              ['Favoritos',   route('perfil.favoritos')],
+            ] as [$item, $url])
+              <a href="{{ $url }}" onclick="document.getElementById('navDropdown').style.display='none'"
+                 style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+                {{ $item }}
+              </a>
+            @endforeach
+
+            {{-- Divisor + botones extra de portero --}}
+            <div style="margin:6px 0;height:1px;background:rgba(245,241,234,0.08);"></div>
+            @php
+              $estiloPorteroExtra = 'display:flex;align-items:center;gap:10px;padding:9px 14px;text-decoration:none;font-size:12px;border-radius:8px;font-family:\'Archivo Narrow\',sans-serif;text-transform:uppercase;letter-spacing:0.10em;font-weight:700;color:var(--ink);transition:background 0.15s;';
+            @endphp
+            <a href="{{ route('empresa.validacion.index') }}"
+               onclick="document.getElementById('navDropdown').style.display='none'"
+               style="{{ $estiloPorteroExtra }}"
+               onmouseover="this.style.background='rgba(168,85,247,0.12)'"
+               onmouseout="this.style.background='transparent'">
+              <span style="width:26px;height:26px;border-radius:7px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.30);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="12" height="12" fill="none" stroke="#c084fc" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              Validar entradas
+            </a>
+            <a href="{{ route('horas.index') }}"
+               onclick="document.getElementById('navDropdown').style.display='none'"
+               style="{{ $estiloPorteroExtra }}"
+               onmouseover="this.style.background='rgba(168,85,247,0.12)'"
+               onmouseout="this.style.background='transparent'">
+              <span style="width:26px;height:26px;border-radius:7px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.30);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="12" height="12" fill="none" stroke="#c084fc" stroke-width="2.5" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </span>
+              Mis horas
             </a>
           @elseif($esEmpresa)
             @foreach([
@@ -221,6 +281,7 @@
               ['Equipo',          route('empresa.equipo.index')],
               ['Candidaturas',    route('empresa.candidaturas.ofertas')],
               ['Administración',  route('empresa.facturacion.index')],
+              ['Perfil Fiscal',   route('empresa.perfil-fiscal')],
               ['Crear evento',    route('empresa.eventos.create')],
               ['Crear oferta',    route('empresa.ofertas.create')],
             ] as [$item, $url])
@@ -240,6 +301,19 @@
                 {{ $item }}
               </a>
             @endforeach
+            {{-- Mis horas: solo organizadores (no porteros, ya tienen su propio bloque) --}}
+            @if($esOrganizador)
+              <a href="{{ route('horas.index') }}" onclick="document.getElementById('navDropdown').style.display='none'"
+                 style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+                Mis horas
+              </a>
+            @endif
+            {{-- Enlace Premium con color diferenciado --}}
+            <a href="{{ route('premium') }}" onclick="document.getElementById('navDropdown').style.display='none'"
+               style="display:block;padding:10px 14px;text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;
+                      {{ $u->es_premium ? 'color:#a855f7;font-weight:700;' : 'color:rgba(168,85,247,0.8);' }}">
+              {{ $u->es_premium ? '✦ Premium activo' : '★ Hazte Premium' }}
+            </a>
             @if($u->es_admin)
               <a href="{{ route('admin.dashboard') }}" style="display:block;padding:10px 14px;color:var(--magenta-2);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">
                 Panel Admin

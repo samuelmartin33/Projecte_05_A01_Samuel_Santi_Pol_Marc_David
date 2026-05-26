@@ -532,6 +532,7 @@ class EventoController extends Controller
 
     /**
      * Vista de detalle de una oferta de trabajo.
+     * Carga también los tipos de trabajo activos para el selector del formulario de candidatura.
      */
     public function detalleOferta(int $id)
     {
@@ -539,7 +540,12 @@ class EventoController extends Controller
             ->where('estado', 1)
             ->findOrFail($id);
 
-        return view('trabajos.detalle', compact('oferta'));
+        // Cargar las categorías activas para el selector de puesto en el formulario de candidatura
+        $trabajos = CategoriaTrabajo::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('trabajos.detalle', compact('oferta', 'trabajos'));
     }
 
     /**
@@ -559,6 +565,7 @@ class EventoController extends Controller
             'ciudad'               => 'required|string|max:100',
             'perfil_profesional'   => 'required|string|max:2000',
             'carta_presentacion'   => 'required|string|max:5000',
+            'trabajo_id'           => 'nullable|integer|exists:trabajos,id',
             'linkedin'             => 'nullable|string|max:500',
             'habilidades'          => 'nullable|string|max:1000',
             'idiomas'              => 'nullable|string|max:500',
@@ -572,6 +579,7 @@ class EventoController extends Controller
 
         DB::table('candidaturas_trabajo')->insert([
             'oferta_id'              => $id,
+            'trabajo_id'             => $request->trabajo_id ?: null,
             'trabajador_id'          => $trabajadorId,
             'estado_candidatura'     => 1,
             // Structured columns (visible to empresa)
@@ -606,22 +614,31 @@ class EventoController extends Controller
         $request->validate([
             'cv_file'                    => 'required|file|mimes:pdf,doc,docx|max:5120',
             'carta_presentacion_archivo' => 'nullable|string|max:3000',
+            'trabajo_id'                 => 'nullable|integer|exists:trabajos,id',
         ]);
 
         BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
 
         $trabajadorId = $this->resolverTrabajadorActual();
 
+        // Guardar datos del usuario autenticado para que la empresa pueda contactarle
+        $usuarioAuth = Auth::check() ? Auth::user() : null;
+
         $path = $request->file('cv_file')->store('cvs', 'public');
 
         DB::table('candidaturas_trabajo')->insert([
-            'oferta_id'          => $id,
-            'trabajador_id'      => $trabajadorId,
-            'estado_candidatura' => 1,
-            'carta_presentacion' => $request->input('carta_presentacion_archivo'),
-            'cv_url'             => $path,
-            'estado'             => 1,
-            'fecha_creacion'     => now(),
+            'oferta_id'           => $id,
+            'trabajo_id'          => $request->trabajo_id ?: null,
+            'trabajador_id'       => $trabajadorId,
+            'estado_candidatura'  => 1,
+            'carta_presentacion'  => $request->input('carta_presentacion_archivo'),
+            'cv_url'              => $path,
+            'estado'              => 1,
+            'fecha_creacion'      => now(),
+            // Datos de contacto del usuario autenticado
+            'nombre_candidato'    => $usuarioAuth?->nombre,
+            'apellidos_candidato' => trim(($usuarioAuth?->apellido1 ?? '') . ' ' . ($usuarioAuth?->apellido2 ?? '')) ?: null,
+            'email_candidato'     => $usuarioAuth?->email,
         ]);
 
         return response()->json(['success' => true]);
@@ -642,6 +659,57 @@ class EventoController extends Controller
         return $usuario
             ? DB::table('trabajadores')->where('usuario_id', $usuario->id)->value('id')
             : null;
+    }
+
+    /**
+     * Vista de calendario mensual de eventos.
+     * Acepta ?mes= y ?anio= para navegar entre meses.
+     */
+    public function calendario(Request $request)
+    {
+        $mes  = (int) $request->get('mes',  now()->month);
+        $anio = (int) $request->get('anio', now()->year);
+
+        /* Ajustar desbordamiento de mes */
+        if ($mes < 1)  { $mes = 12; $anio--; }
+        if ($mes > 12) { $mes = 1;  $anio++; }
+
+        $inicio = \Carbon\Carbon::create($anio, $mes, 1)->startOfMonth();
+        $fin    = \Carbon\Carbon::create($anio, $mes, 1)->endOfMonth();
+
+        /* Eventos activos y no finalizados dentro del mes seleccionado */
+        $eventos = Evento::with(['portada', 'categorias', 'organizador.empresa'])
+            ->where('estado', 1)
+            ->whereRaw('COALESCE(fecha_fin, fecha_inicio) >= NOW()')
+            ->whereBetween('fecha_inicio', [$inicio, $fin])
+            ->orderBy('fecha_inicio')
+            ->get();
+
+        /* Agrupar por día del mes (clave = 1..31) */
+        $eventosPorDia = $eventos->groupBy(
+            fn($e) => \Carbon\Carbon::parse($e->fecha_inicio)->day
+        );
+
+        /* Preparar datos para el panel JS lateral */
+        $eventosParaCalendario = $eventosPorDia->map(fn($grupo) => $grupo->map(fn($e) => [
+            'id'       => $e->id,
+            'titulo'   => $e->titulo,
+            'hora'     => \Carbon\Carbon::parse($e->fecha_inicio)->format('H:i'),
+            'horaFin'  => $e->fecha_fin ? \Carbon\Carbon::parse($e->fecha_fin)->format('H:i') : null,
+            'precio'   => $e->precio_formateado,
+            'lugar'    => $e->ubicacion_nombre,
+            'img'      => $e->url_portada,
+            'categoria'=> $e->categorias->pluck('nombre')->first() ?? 'Evento',
+            'url'      => route('eventos.detalle', $e->id),
+        ])->values())->toArray();
+
+        $mesPrev = $inicio->copy()->subMonth();
+        $mesSig  = $inicio->copy()->addMonth();
+
+        return view('calendario', compact(
+            'eventos', 'eventosPorDia', 'mes', 'anio',
+            'inicio', 'mesPrev', 'mesSig', 'eventosParaCalendario'
+        ));
     }
 
     /** Serializa experiencia laboral y formación académica del formulario. */

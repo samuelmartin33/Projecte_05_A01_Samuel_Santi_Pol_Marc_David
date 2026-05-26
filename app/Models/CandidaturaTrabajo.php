@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
+use App\Models\CategoriaTrabajo;
 
 /**
  * Modelo para la tabla `candidaturas_trabajo`.
@@ -18,9 +20,10 @@ class CandidaturaTrabajo extends Model
     const ESTADO_REVISADO        = 2;
     const ESTADO_PRESELECCIONADO = 3;
     const ESTADO_RECHAZADO       = 4;
+    const ESTADO_SELECCIONADO    = 5;
 
     protected $fillable = [
-        'oferta_id', 'trabajador_id', 'estado_candidatura',
+        'oferta_id', 'trabajo_id', 'trabajador_id', 'estado_candidatura',
         'carta_presentacion', 'cv_url', 'estado',
         'fecha_creacion', 'fecha_actualizacion',
         'nombre_candidato', 'apellidos_candidato', 'email_candidato',
@@ -31,6 +34,15 @@ class CandidaturaTrabajo extends Model
     public function oferta(): BelongsTo
     {
         return $this->belongsTo(BolsaOfertaTrabajo::class, 'oferta_id');
+    }
+
+    /**
+     * Relación con la categoría de trabajo a la que se postula el candidato.
+     * Usa la misma tabla que las categorías de las ofertas (categorias_trabajo).
+     */
+    public function trabajo(): BelongsTo
+    {
+        return $this->belongsTo(CategoriaTrabajo::class, 'trabajo_id');
     }
 
     // ── Helpers ──────────────────────────────────────────────
@@ -55,6 +67,7 @@ class CandidaturaTrabajo extends Model
             self::ESTADO_REVISADO        => 'Revisado',
             self::ESTADO_PRESELECCIONADO => 'Preseleccionado',
             self::ESTADO_RECHAZADO       => 'Rechazado',
+            self::ESTADO_SELECCIONADO    => 'Seleccionado',
             default                      => 'Desconocido',
         };
     }
@@ -62,16 +75,38 @@ class CandidaturaTrabajo extends Model
     public function estadoClases(): string
     {
         return match ((int) $this->estado_candidatura) {
-            self::ESTADO_NUEVO           => 'bg-blue-100 text-blue-700',
-            self::ESTADO_REVISADO        => 'bg-amber-100 text-amber-700',
-            self::ESTADO_PRESELECCIONADO => 'bg-green-100 text-green-700',
-            self::ESTADO_RECHAZADO       => 'bg-red-100 text-red-700',
-            default                      => 'bg-gray-100 text-gray-600',
+            self::ESTADO_NUEVO           => 'estado-1',
+            self::ESTADO_REVISADO        => 'estado-2',
+            self::ESTADO_PRESELECCIONADO => 'estado-3',
+            self::ESTADO_RECHAZADO       => 'estado-4',
+            self::ESTADO_SELECCIONADO    => 'estado-5',
+            default                      => 'estado-0',
         };
     }
 
     public function tieneArchivo(): bool
     {
         return !empty($this->cv_url);
+    }
+
+    /**
+     * Devuelve el email del candidato resolviendo por todas las vías disponibles:
+     * 1. email_candidato (candidaturas con formulario completo)
+     * 2. email del Usuario vinculado a través de trabajador_id (candidaturas solo con PDF)
+     */
+    public function emailResuelto(): ?string
+    {
+        if ($this->email_candidato) {
+            return $this->email_candidato;
+        }
+
+        if ($this->trabajador_id) {
+            $usuarioId = DB::table('trabajadores')->where('id', $this->trabajador_id)->value('usuario_id');
+            if ($usuarioId) {
+                return DB::table('usuarios')->where('id', $usuarioId)->value('email');
+            }
+        }
+
+        return null;
     }
 }

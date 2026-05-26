@@ -298,6 +298,159 @@
 }
 .soc-list .chat-item:hover,
 .soc-list .amigo-item:hover { background: rgba(168,85,247,0.06); }
+
+/* estilos internos del ítem de amigo */
+.amigo-item-info { flex: 1; min-width: 0; }
+.amigo-item-nombre {
+    font-size: 0.875rem; font-weight: 600; color: var(--soc-text);
+    margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.amigo-item-mood { font-size: 0.75rem; color: var(--soc-text-muted); margin: 2px 0 0; }
+
+/* botón de chat dentro de la fila de amigo */
+.btn-chat-amigo {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border: none; border-radius: 50%;
+    background: #f0eeff;
+    color: #7c3aed;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+}
+.btn-chat-amigo:hover { background: #7c3aed; color: #fff; transform: scale(1.08); }
+.btn-chat-amigo svg { width: 16px; height: 16px; }
+
+.amigo-item-acciones { display: flex; gap: 6px; flex-shrink: 0; }
+
+.btn-eliminar-amigo {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border: none; border-radius: 50%;
+    background: rgba(245,241,234,0.06);
+    color: var(--soc-text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.btn-eliminar-amigo:hover { background: rgba(239,68,68,0.15); color: #f87171; transform: scale(1.08); }
+.btn-eliminar-amigo svg { width: 16px; height: 16px; }
+
+/* ── Solicitudes de amistad ── */
+.solicitud-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--soc-border);
+    transition: background 0.15s, opacity 0.3s, transform 0.3s;
+}
+.solicitud-nueva {
+    animation: solicitudEntrada 0.35s ease forwards;
+}
+@keyframes solicitudEntrada {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.amigo-nuevo {
+    animation: solicitudEntrada 0.35s ease forwards;
+}
+.solicitud-item.fadeOut { opacity: 0; transform: translateY(-4px); }
+.solicitud-avatar { flex-shrink: 0; }
+.solicitud-info { flex: 1; min-width: 0; }
+.solicitud-nombre {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--soc-text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.solicitud-sub {
+    font-size: 0.72rem;
+    color: var(--soc-text-muted);
+    margin: 3px 0 0;
+}
+.solicitud-acciones {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.btn-aceptar, .btn-rechazar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    border: none;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+}
+.btn-aceptar {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff;
+}
+.btn-aceptar:hover { transform: scale(1.12); filter: brightness(1.15); }
+.btn-rechazar {
+    background: rgba(245,241,234,0.08);
+    color: var(--soc-text-muted);
+    border: 1px solid var(--soc-border);
+}
+.btn-rechazar:hover { background: rgba(239,68,68,0.15); color: #f87171; border-color: #f87171; transform: scale(1.12); }
+.chat-item-info { flex: 1; min-width: 0; }
+
+.chat-item-fila-top,
+.chat-item-fila-bot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.chat-item-nombre {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--soc-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-item-hora {
+    font-size: 0.7rem;
+    color: var(--soc-text-dim);
+    flex-shrink: 0;
+}
+
+.chat-item-preview {
+    font-size: 0.8rem;
+    color: var(--soc-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-item-badge {
+    background: var(--soc-purple);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    flex-shrink: 0;
+}
+
 .soc-list .chat-item.activo {
     background: rgba(168,85,247,0.12);
 }
@@ -1383,6 +1536,80 @@
     transition: background 0.2s;
 }
 .soc-side-btn-pri:hover { background: var(--soc-text); color: var(--soc-bg); }
+
+/* Crews clickables del sidebar */
+.soc-crew--clickable {
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s;
+}
+.soc-crew--clickable:hover {
+    background: rgba(124, 58, 237, 0.15);
+    border-color: rgba(168, 85, 247, 0.45);
+}
+
+/* Promotoras que sigues */
+.soc-promotora-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.soc-promotora-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.soc-promotora-logo-ini {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--soc-purple), var(--soc-purple-lite));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #fff;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+.soc-promotora-info {
+    flex: 1;
+    min-width: 0;
+}
+.soc-promotora-nombre {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-weight: 700;
+    color: var(--soc-text);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.soc-promotora-evento {
+    display: block;
+    color: var(--soc-purple-lite);
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.soc-promotora-btn {
+    background: transparent;
+    border: 1.5px solid rgba(168, 85, 247, 0.45);
+    border-radius: 999px;
+    color: var(--soc-purple-lite);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s, color 0.18s;
+}
+.soc-promotora-btn:hover {
+    background: var(--soc-purple-lite);
+    color: #fff;
+}
 
 /* Ocultar sidebar derecho en móvil */
 @media (max-width: 1099px) {

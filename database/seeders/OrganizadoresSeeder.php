@@ -12,11 +12,7 @@ class OrganizadoresSeeder extends Seeder
         $ahora = now();
 
         DB::table('organizadores')->insert([
-<<<<<<< HEAD
-            // Carlos (usuario_id=3) — organizador principal de SoundWave
-=======
-            // Carlos (usuario_id=3) → SoundWave (empresa_id=1)
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
+            // Carlos (usuario_id=3) — organizador principal de SoundWave (empresa_id=1)
             [
                 'usuario_id'          => 3,
                 'empresa_id'          => 1,
@@ -25,19 +21,20 @@ class OrganizadoresSeeder extends Seeder
                 'fecha_creacion'      => $ahora,
                 'fecha_actualizacion' => null,
             ],
-<<<<<<< HEAD
-            // Javier (usuario_id=9) — portero / control de acceso
-            [
-                'usuario_id'          => 9,
-                'empresa_id'          => 1,
-                'rol'                 => 'portero',
-=======
-            // Marc (usuario_id=6) → CarniaFest (empresa_id=2)
+            // Marc (usuario_id=6) — organizador de CarniaFest (empresa_id=2)
             [
                 'usuario_id'          => 6,
                 'empresa_id'          => 2,
                 'rol'                 => 'organizador',
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
+                'estado'              => 1,
+                'fecha_creacion'      => $ahora,
+                'fecha_actualizacion' => null,
+            ],
+            // Javier (usuario_id=11) — portero / control de acceso en SoundWave (empresa_id=1)
+            [
+                'usuario_id'          => 11,
+                'empresa_id'          => 1,
+                'rol'                 => 'portero',
                 'estado'              => 1,
                 'fecha_creacion'      => $ahora,
                 'fecha_actualizacion' => null,

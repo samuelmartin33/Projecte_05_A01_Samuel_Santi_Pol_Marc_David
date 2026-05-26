@@ -78,18 +78,25 @@ function procesarPago() {
 
 // ── Flujo gratuito ────────────────────────────────────────────────────────────
 function _reservarGratis() {
-    var btn     = document.getElementById('checkout-btn');
-    var errEl   = document.getElementById('checkout-error');
-    var csrf    = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var btn      = document.getElementById('checkout-btn');
+    var errEl    = document.getElementById('checkout-error');
+    var csrf     = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    // Leemos el cupón solo si el input existe (visible únicamente para usuarios Premium).
+    var cuponEl  = document.getElementById('premium-cupon-codigo');
+    var cupon    = cuponEl ? cuponEl.value.trim() : '';
 
     btn.disabled    = true;
     btn.textContent = 'Procesando...';
     if (errEl) errEl.style.display = 'none';
 
+    // Construimos el body base y añadimos el cupón solo si se introdujo uno.
+    var body = { evento_id: EVENTO_ID, cantidad: cantidad };
+    if (cupon) body.cupon_codigo = cupon;
+
     fetch('/api/entradas/comprar', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
-        body:    JSON.stringify({ evento_id: EVENTO_ID, cantidad: cantidad }),
+        body:    JSON.stringify(body),
     })
     .then(function(r) { return r.json(); })
     .then(function(d) {

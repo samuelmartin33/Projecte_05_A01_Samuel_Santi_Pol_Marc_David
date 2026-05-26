@@ -213,7 +213,7 @@ function section(title, body) {
 function field(label, value, type) {
     if (!value) return '';
     var contenidoCampo = type === 'html' ? value : '<span>' + esc(value) + '</span>';
-    return '<div><p style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(26,26,46,.4);margin-bottom:.2rem">' + label + '</p>' + contenidoCampo + '</div>';
+    return '<div><p style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(245,241,234,0.4);margin-bottom:.2rem">' + label + '</p>' + contenidoCampo + '</div>';
 }
 
 function esc(str) {
@@ -231,4 +231,27 @@ function cerrarCvModal(eventoCierre) {
 }
 function cerrarCvModalBtn() {
     document.getElementById('cv-overlay').classList.remove('abierto');
+}
+
+async function enviarCorreoSeleccion(id, url) {
+    var boton = document.getElementById('btn-correo-' + id);
+    if (boton) { boton.disabled = true; boton.style.opacity = '0.5'; }
+
+    try {
+        var respuesta = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+        });
+        var datos = await respuesta.json();
+        if (datos.success) {
+            alert('Correo enviado correctamente al candidato.');
+        } else {
+            alert('Error: ' + (datos.message || 'No se pudo enviar el correo.'));
+        }
+    } catch (err) {
+        console.error('Error enviando correo', err);
+        alert('Error de red al intentar enviar el correo.');
+    } finally {
+        if (boton) { boton.disabled = false; boton.style.opacity = ''; }
+    }
 }

@@ -88,6 +88,7 @@ Route::middleware('auth')->prefix('social')->group(function () {
 
     // Amigos
     Route::get('/amigos',                        [SocialController::class, 'misAmigos']);
+    Route::delete('/amigos/{id}',                [SocialController::class, 'eliminarAmigo']);
     Route::get('/solicitudes',                   [SocialController::class, 'solicitudesPendientes']);
     Route::post('/solicitudes/{id}/aceptar',     [SocialController::class, 'aceptarSolicitud']);
     Route::post('/solicitudes/{id}/rechazar',    [SocialController::class, 'rechazarSolicitud']);

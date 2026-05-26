@@ -74,6 +74,11 @@
 ════════════════════════════════════════════════════ --}}
 <div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    @if(session('info'))
+        <div class="perfil-alerta perfil-alerta-ok">
+            ℹ {{ session('info') }}
+        </div>
+    @endif
     @if(session('exito'))
         <div class="perfil-alerta perfil-alerta-ok">
             ✓ {{ session('exito') }}

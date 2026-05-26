@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\FacturacionEventoController;
 use App\Http\Controllers\Admin\CuponController as AdminCuponController;
+use App\Http\Controllers\Admin\TrabajosController as AdminTrabajosController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
@@ -43,10 +44,14 @@ use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\Empresa\EquipoController;
 use App\Http\Controllers\Empresa\PerfilFiscalController;
+use App\Http\Controllers\Empresa\PerfilEmpresaController;
 use App\Http\Controllers\Empresa\StripeOnboardingController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\Empresa\CuponController as EmpresaCuponController;
+use App\Http\Controllers\InvitacionEquipoController;
+use App\Http\Controllers\HorasController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\SocialController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Evento;
@@ -136,6 +141,10 @@ Route::get('/api/filtrar', [PublicEventoController::class, 'filtrar'])
 Route::get('/mapa', [PublicEventoController::class, 'mapa'])
     ->name('mapa');
 
+// --- Calendario mensual de eventos ---
+Route::get('/calendario', [PublicEventoController::class, 'calendario'])
+    ->name('calendario');
+
 // --- Páginas estáticas del footer ---
 Route::view('/quienes-somos',  'static.quienes-somos')->name('quienes-somos');
 Route::view('/manifiesto',     'static.manifiesto')->name('manifiesto');
@@ -150,6 +159,10 @@ Route::view('/devoluciones',   'static.devoluciones')->name('devoluciones');
 Route::get('/cupones', [CuponController::class, 'index'])
     ->name('cupones.index');
 
+// --- Aceptar invitación al equipo de empresa (enlace del correo de selección) ---
+Route::get('/equipo/aceptar/{token}', [InvitacionEquipoController::class, 'aceptar'])
+    ->name('equipo.aceptar');
+
 // --- Página completa de Bolsa de Trabajo ---
 Route::get('/bolsa-de-trabajo', [PublicEventoController::class, 'bolsaTrabajo'])
     ->name('trabajos.index');
@@ -163,6 +176,10 @@ Route::get('/login',    [AuthController::class, 'showLogin'])
 
 Route::get('/register', [AuthController::class, 'showRegister'])
      ->name('register');
+
+/* — Google OAuth (Socialite — flujo server-side redirect) — */
+Route::get('/auth/google',          [\App\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 /* — Recuperación de contraseña (solo invitados) — */
 Route::middleware('guest')->group(function () {
@@ -186,6 +203,8 @@ Route::get('/empresa/home', [AuthController::class, 'showEmpresaHome'])
 Route::middleware(['auth','no-portero'])->prefix('empresa/eventos')->name('empresa.eventos.')->group(function () {
     Route::get('/crear', [EmpresaEventosController::class, 'create'])->name('create');
     Route::post('/',     [EmpresaEventosController::class, 'store'])->name('store');
+    Route::get('/{id}/editar', [EmpresaEventosController::class, 'edit'])->where('id', '[0-9]+')->name('edit');
+    Route::put('/{id}',        [EmpresaEventosController::class, 'update'])->where('id', '[0-9]+')->name('update');
     Route::delete('/{id}', [EmpresaEventosController::class, 'destroy'])->where('id', '[0-9]+')->name('destroy');
 });
 
@@ -199,9 +218,12 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/ofertas')->name('empre
 Route::middleware(['auth','no-portero'])->prefix('empresa/candidaturas')->name('empresa.candidaturas.')->group(function () {
     Route::get('/',                              [CandidaturasController::class, 'ofertas'])->name('ofertas');
     Route::get('/{ofertaId}',                    [CandidaturasController::class, 'candidaturas'])->where('ofertaId', '[0-9]+')->name('detalle');
-    Route::patch('/{candidaturaId}/estado',      [CandidaturasController::class, 'actualizarEstado'])->where('candidaturaId', '[0-9]+')->name('estado');
-    Route::get('/{candidaturaId}/descargar',     [CandidaturasController::class, 'descargarCv'])->where('candidaturaId', '[0-9]+')->name('descargar');
-    Route::patch('/oferta/{ofertaId}/cerrar',    [CandidaturasController::class, 'cerrarOferta'])->where('ofertaId', '[0-9]+')->name('cerrar-oferta');
+    Route::patch('/{candidaturaId}/estado',          [CandidaturasController::class, 'actualizarEstado'])->where('candidaturaId', '[0-9]+')->name('estado');
+    Route::get('/{candidaturaId}/descargar',         [CandidaturasController::class, 'descargarCv'])->where('candidaturaId', '[0-9]+')->name('descargar');
+    Route::post('/{candidaturaId}/enviar-seleccion', [CandidaturasController::class, 'enviarEmailSeleccion'])->where('candidaturaId', '[0-9]+')->name('enviar-seleccion');
+    Route::patch('/oferta/{ofertaId}/cerrar',        [CandidaturasController::class, 'cerrarOferta'])->where('ofertaId', '[0-9]+')->name('cerrar-oferta');
+    // Ver horas registradas por un candidato (desde la empresa)
+    Route::get('/{candidaturaId}/horas-trabajador',  [HorasController::class, 'verHorasTrabajador'])->where('candidaturaId', '[0-9]+')->name('horas-trabajador');
 });
 
 /* — Validación QR (accesible también a porteros) — */
@@ -231,6 +253,8 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/cupones')->name('empre
 Route::middleware(['auth','no-portero'])->prefix('empresa')->name('empresa.')->group(function () {
     Route::get('/perfil-fiscal',  [PerfilFiscalController::class, 'show'])  ->name('perfil-fiscal');
     Route::post('/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('perfil-fiscal.guardar');
+    Route::get('/perfil',         [PerfilEmpresaController::class, 'show'])  ->name('perfil');
+    Route::post('/perfil',        [PerfilEmpresaController::class, 'update'])->name('perfil.guardar');
 });
 
 /* — Stripe Connect: onboarding de cuentas Express para empresas — */
@@ -249,6 +273,9 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empres
     Route::post('/',             [EquipoController::class, 'store'])->name('store');
     Route::patch('/{organizador}/rol', [EquipoController::class, 'cambiarRol'])->name('rol');
     Route::delete('/{organizador}',    [EquipoController::class, 'destroy'])->name('destroy');
+    // Ver horas de un miembro del equipo
+    Route::get('/{usuarioId}/horas', [HorasController::class, 'verHorasEquipo'])
+         ->where('usuarioId', '[0-9]+')->name('horas');
 });
 
 /* — Perfil de usuario — */
@@ -260,6 +287,10 @@ Route::middleware('auth')->group(function () {
     // Mis entradas (wallet de QRs)
     Route::get('/mis-entradas', [\App\Http\Controllers\EntradaController::class, 'misEntradas'])
          ->name('entradas.mis-entradas');
+
+    // Registro de horas diarias (para organizadores y porteros)
+    Route::get('/mis-horas',  [HorasController::class, 'index'])->name('horas.index');
+    Route::post('/mis-horas', [HorasController::class, 'store'])->name('horas.store');
 
     // Confirmación de compra de entradas
     Route::get('/entradas/confirmacion/{pedido}', [\App\Http\Controllers\EntradaController::class, 'confirmacion'])
@@ -280,6 +311,18 @@ Route::middleware('auth')->group(function () {
     // Aceptar / rechazar solicitudes de amistad (botones de formulario)
     Route::post('/amigos/{id}/aceptar',  [PerfilController::class, 'aceptarSolicitud'])->name('amigos.aceptar');
     Route::post('/amigos/{id}/rechazar', [PerfilController::class, 'rechazarSolicitud'])->name('amigos.rechazar');
+});
+
+/* — Premium: oferta, checkout con Stripe y páginas de retorno — */
+Route::middleware('auth')->group(function () {
+    // Página de oferta: muestra los beneficios Premium y el botón de pago.
+    Route::get('/premium',           [PremiumController::class, 'mostrar'])->name('premium');
+    // Inicia el checkout de Stripe (POST para prevenir accesos directos desde URL).
+    Route::post('/premium/checkout', [PremiumController::class, 'iniciarCheckout'])->name('premium.checkout');
+    // Stripe redirige aquí tras pago exitoso.
+    Route::get('/premium/exito',     [PremiumController::class, 'exito'])->name('premium.exito');
+    // Stripe redirige aquí si el usuario cancela.
+    Route::get('/premium/cancelado', [PremiumController::class, 'cancelado'])->name('premium.cancelado');
 });
 
 /* — Página Social: protegida por auth — */
@@ -345,6 +388,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('admin.categorias.update');
     Route::delete('/admin/categorias/{categoria}', [AdminCategoriaController::class, 'destroy'])
          ->name('admin.categorias.destroy');
+
+    /* Rutas de gestión de tipos de trabajo */
+    Route::get('/admin/trabajos', [AdminTrabajosController::class, 'index'])
+         ->name('admin.trabajos.index');
+    Route::post('/admin/trabajos', [AdminTrabajosController::class, 'store'])
+         ->name('admin.trabajos.store');
+    Route::patch('/admin/trabajos/{categoria}/estado', [AdminTrabajosController::class, 'toggleEstado'])
+         ->name('admin.trabajos.estado');
+    Route::patch('/admin/trabajos/{categoria}', [AdminTrabajosController::class, 'update'])
+         ->name('admin.trabajos.update');
+    Route::delete('/admin/trabajos/{categoria}', [AdminTrabajosController::class, 'destroy'])
+         ->name('admin.trabajos.destroy');
 
     /* Rutas de pedidos (solo lectura) */
     Route::get('/admin/pedidos', [AdminPedidoController::class, 'index'])

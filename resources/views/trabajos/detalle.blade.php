@@ -214,6 +214,22 @@
                 @csrf
                 <input type="hidden" name="oferta_id" id="oferta-id-form" value="">
 
+                {{-- Selector de tipo de trabajo --}}
+                @if($trabajos->isNotEmpty())
+                <section>
+                    <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
+                        <span class="cv-section-num">✦</span>Puesto al que te postulas
+                    </h3>
+                    <select name="trabajo_id" class="cv-input">
+                        <option value="">— Selecciona el puesto —</option>
+                        @foreach($trabajos as $trabajo)
+                            <option value="{{ $trabajo->id }}">{{ $trabajo->nombre }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-navy/35 text-xs mt-1.5">Opcional. Indica el rol específico para el que quieres ser considerado.</p>
+                </section>
+                @endif
+
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4"><span class="cv-section-num">1</span>Información Personal</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -313,6 +329,20 @@
         <form id="form-archivo" class="px-6 py-5 space-y-5">
             @csrf
             <input type="hidden" name="oferta_id" id="oferta-id-archivo" value="">
+
+            {{-- Selector de tipo de trabajo (modal archivo) --}}
+            @if($trabajos->isNotEmpty())
+            <div>
+                <label class="cv-label">Puesto al que te postulas</label>
+                <select name="trabajo_id" class="cv-input">
+                    <option value="">— Selecciona el puesto —</option>
+                    @foreach($trabajos as $trabajo)
+                        <option value="{{ $trabajo->id }}">{{ $trabajo->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
             <div id="dropzone" class="dropzone-area" onclick="document.getElementById('cv-file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
                 <div class="w-14 h-14 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
                     <svg class="w-7 h-7 text-navy/35" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>

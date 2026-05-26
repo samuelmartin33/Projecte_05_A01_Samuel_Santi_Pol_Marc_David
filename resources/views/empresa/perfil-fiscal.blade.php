@@ -4,6 +4,7 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
+<<<<<<< HEAD
 <style>
 .te-csel{position:relative;width:100%;}
 .te-csel-trigger{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;user-select:none;}
@@ -21,6 +22,8 @@
   .grid-datos-2col { grid-template-columns: 1fr !important; }
 }
 </style>
+=======
+>>>>>>> b915fe724c78fcd728e0b7a5cb8a74140e1b8962
 @endpush
 
 @section('content')
@@ -72,23 +75,23 @@
             <div class="grid-datos-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
                 {{-- Razón social --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
+                    <label class="form-label">
                         Razón social *
                     </label>
                     <input type="text" name="razon_social" value="{{ old('razon_social', $empresa->razon_social ?? '') }}"
                            placeholder="Razzmatazz Entertainment S.L."
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                           class="form-input">
                 </div>
 
                 {{-- NIF / CIF --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
+                    <label class="form-label">
                         NIF / CIF *
                     </label>
                     <input type="text" name="nif_cif" value="{{ old('nif_cif', $empresa->nif_cif ?? '') }}"
                            placeholder="B12345678" maxlength="9"
                            oninput="this.value=this.value.toUpperCase()"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                           class="form-input">
                 </div>
             </div>
 
@@ -103,17 +106,17 @@
                     Forma jurídica *
                 </label>
                 <input type="hidden" id="tipo_empresa" name="tipo_empresa" value="{{ $tipoActual }}">
-                <div class="te-csel{{ $tipoActual ? ' open-init' : '' }}" id="te-csel">
-                    <div class="te-csel-trigger" id="te-csel-trigger" onclick="toggleTeCsel()">
+                <div class="ev-csel" id="te-csel">
+                    <div class="ev-csel-trigger" id="te-csel-trigger" onclick="toggleTeCsel()">
                         <span id="te-csel-label">{{ $tipoLabelActual }}</span>
-                        <span class="te-csel-arrow" id="te-csel-arrow">▾</span>
+                        <span class="ev-csel-arrow" id="te-csel-arrow">▾</span>
                     </div>
-                    <ul class="te-csel-menu" id="te-csel-menu">
-                        <li class="te-csel-opt {{ $tipoActual === 'autonomo'   ? 'selected' : '' }}" onclick="pickTeCsel('autonomo','Autónomo')">Autónomo</li>
-                        <li class="te-csel-opt {{ $tipoActual === 'sl'         ? 'selected' : '' }}" onclick="pickTeCsel('sl','Sociedad Limitada (S.L.)')">Sociedad Limitada (S.L.)</li>
-                        <li class="te-csel-opt {{ $tipoActual === 'sa'         ? 'selected' : '' }}" onclick="pickTeCsel('sa','Sociedad Anónima (S.A.)')">Sociedad Anónima (S.A.)</li>
-                        <li class="te-csel-opt {{ $tipoActual === 'asociacion' ? 'selected' : '' }}" onclick="pickTeCsel('asociacion','Asociación')">Asociación</li>
-                        <li class="te-csel-opt {{ $tipoActual === 'otro'       ? 'selected' : '' }}" onclick="pickTeCsel('otro','Otro')">Otro</li>
+                    <ul class="ev-csel-menu" id="te-csel-menu">
+                        <li class="ev-csel-opt {{ $tipoActual === 'autonomo'   ? 'selected' : '' }}" onclick="pickTeCsel('autonomo','Autónomo')">Autónomo</li>
+                        <li class="ev-csel-opt {{ $tipoActual === 'sl'         ? 'selected' : '' }}" onclick="pickTeCsel('sl','Sociedad Limitada (S.L.)')">Sociedad Limitada (S.L.)</li>
+                        <li class="ev-csel-opt {{ $tipoActual === 'sa'         ? 'selected' : '' }}" onclick="pickTeCsel('sa','Sociedad Anónima (S.A.)')">Sociedad Anónima (S.A.)</li>
+                        <li class="ev-csel-opt {{ $tipoActual === 'asociacion' ? 'selected' : '' }}" onclick="pickTeCsel('asociacion','Asociación')">Asociación</li>
+                        <li class="ev-csel-opt {{ $tipoActual === 'otro'       ? 'selected' : '' }}" onclick="pickTeCsel('otro','Otro')">Otro</li>
                     </ul>
                 </div>
             </div>
@@ -127,57 +130,55 @@
 
             {{-- Dirección --}}
             <div style="margin-bottom:20px;">
-                <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
-                    Calle y número *
-                </label>
+                <label class="form-label">Calle y número *</label>
                 <input type="text" name="direccion" value="{{ old('direccion', $empresa->direccion ?? '') }}"
                        placeholder="Calle Almogàvers, 122"
-                       style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                       class="form-input">
             </div>
 
             <div class="grid-ciudad-cp" style="display:grid;grid-template-columns:1fr 120px 1fr;gap:16px;margin-bottom:20px;">
                 {{-- Ciudad --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">Ciudad *</label>
+                    <label class="form-label">Ciudad *</label>
                     <input type="text" name="ciudad" value="{{ old('ciudad', $empresa->ciudad ?? '') }}"
                            placeholder="Barcelona"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                           class="form-input">
                 </div>
 
                 {{-- Código postal --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">CP *</label>
+                    <label class="form-label">CP *</label>
                     <input type="text" name="codigo_postal" value="{{ old('codigo_postal', $empresa->codigo_postal ?? '') }}"
                            placeholder="08013" maxlength="5" pattern="[0-9]{5}"
                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                           class="form-input">
                 </div>
 
                 {{-- Provincia --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">Provincia *</label>
+                    <label class="form-label">Provincia *</label>
                     <input type="text" name="provincia" value="{{ old('provincia', $empresa->provincia ?? '') }}"
                            placeholder="Barcelona"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                           class="form-input">
                 </div>
             </div>
 
             <div class="grid-datos-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                 {{-- País --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">País *</label>
+                    <label class="form-label">País *</label>
                     <input type="text" name="pais" value="{{ old('pais', $empresa->pais ?? 'España') }}"
                            placeholder="España"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
+                           class="form-input">
                 </div>
 
                 {{-- Email de facturación --}}
                 <div>
-                    <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">Email para facturas *</label>
+                    <label class="form-label">Email para facturas *</label>
                     <input type="email" name="email_facturacion" value="{{ old('email_facturacion', $empresa->email_facturacion ?? '') }}"
                            placeholder="facturacion@empresa.com"
-                           style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
-                    <p style="font-family:'Archivo Narrow',sans-serif;font-size:11px;color:rgba(245,241,234,0.35);margin-top:4px;">Puede ser diferente al email de acceso</p>
+                           class="form-input">
+                    <p class="form-hint">Puede ser diferente al email de acceso</p>
                 </div>
             </div>
         </div>
@@ -271,7 +272,7 @@ function pickTeCsel(val, label) {
     document.getElementById('tipo_empresa').value    = val;
     document.getElementById('te-csel-label').textContent = label;
     document.getElementById('te-csel').classList.remove('open');
-    document.querySelectorAll('.te-csel-opt').forEach(function(li) {
+    document.querySelectorAll('.ev-csel-opt').forEach(function(li) {
         li.classList.toggle('selected', li.getAttribute('onclick').indexOf("'" + val + "'") !== -1);
     });
 }
