@@ -112,7 +112,6 @@ Route::middleware('auth')->prefix('social')->group(function () {
     Route::post('/posts/{id}/comentarios',       [EventoPostController::class, 'comentar'])->where('id', '[0-9]+');
     Route::post('/posts/{id}/like',              [EventoPostController::class, 'toggleLike'])->where('id', '[0-9]+');
     Route::get('/mis-eventos-asistidos',         [EventoPostController::class, 'misEventosAsistidos']);
-<<<<<<< HEAD
 
     // Historias
     Route::get('/historias',                     [HistoriaController::class, 'feed']);
@@ -124,6 +123,3 @@ Route::middleware('auth')->prefix('social')->group(function () {
     Route::get('/eventos-con-contenido',         [EventoPostController::class, 'eventosConContenido']);
     Route::get('/evento/{eventoId}',             [EventoPostController::class, 'feedPorEvento'])->where('eventoId', '[0-9]+');
 });
-=======
-});
->>>>>>> f1367d008a757bba14d54f01a53fcb743cdefeb9
