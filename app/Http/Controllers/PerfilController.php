@@ -53,9 +53,9 @@ class PerfilController extends Controller
         // Promotoras que sigue el usuario con sus próximos eventos
         $promotoras = $usuario->seguimientos()
             ->with(['eventos' => function ($q) {
-                $q->where('estado', 1)
-                  ->where('fecha_inicio', '>=', now())
-                  ->orderBy('fecha_inicio')
+                $q->where('eventos.estado', 1)
+                  ->where('eventos.fecha_inicio', '>=', now())
+                  ->orderBy('eventos.fecha_inicio')
                   ->limit(2);
             }])
             ->get();

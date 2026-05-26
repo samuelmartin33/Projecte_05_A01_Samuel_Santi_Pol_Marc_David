@@ -43,6 +43,7 @@ use App\Http\Controllers\Empresa\EventosController as EmpresaEventosController;
 use App\Http\Controllers\Empresa\OfertasController as EmpresaOfertasController;
 use App\Http\Controllers\Empresa\EquipoController;
 use App\Http\Controllers\Empresa\PerfilFiscalController;
+use App\Http\Controllers\Empresa\PerfilEmpresaController;
 use App\Http\Controllers\Empresa\StripeOnboardingController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\Empresa\CuponController as EmpresaCuponController;
@@ -239,6 +240,8 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/cupones')->name('empre
 Route::middleware(['auth','no-portero'])->prefix('empresa')->name('empresa.')->group(function () {
     Route::get('/perfil-fiscal',  [PerfilFiscalController::class, 'show'])  ->name('perfil-fiscal');
     Route::post('/perfil-fiscal', [PerfilFiscalController::class, 'update'])->name('perfil-fiscal.guardar');
+    Route::get('/perfil',         [PerfilEmpresaController::class, 'show'])  ->name('perfil');
+    Route::post('/perfil',        [PerfilEmpresaController::class, 'update'])->name('perfil.guardar');
 });
 
 /* — Stripe Connect: onboarding de cuentas Express para empresas — */

@@ -63,6 +63,12 @@
                 </svg>
                 Publicar oferta
             </a>
+            <a href="{{ route('empresa.perfil') }}" class="btn-crear-evento" style="background:transparent;border:1px solid rgba(168,85,247,0.45);color:#c084fc;box-shadow:none;">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Editar perfil
+            </a>
         </div>
 
     </div>
@@ -93,11 +99,21 @@
 ════════════════════════════════════════════════════ --}}
 @if($empresa)
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-    <div class="seccion-empresa-titulo">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        Información de la empresa
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
+        <div class="seccion-empresa-titulo" style="margin-bottom:0;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Información de la empresa
+        </div>
+        <a href="{{ route('empresa.perfil') }}"
+           style="display:inline-flex;align-items:center;gap:6px;font-family:'Archivo Narrow',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:7px 14px;border:1px solid rgba(168,85,247,0.35);color:#c084fc;text-decoration:none;border-radius:6px;transition:background 0.15s;"
+           onmouseover="this.style.background='rgba(168,85,247,0.12)'" onmouseout="this.style.background='transparent'">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Editar perfil
+        </a>
     </div>
     <p class="seccion-empresa-sub">Datos registrados de tu empresa</p>
 
