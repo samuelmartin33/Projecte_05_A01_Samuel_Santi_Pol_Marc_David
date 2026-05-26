@@ -17,7 +17,7 @@ body {
    BARRA DE FILTROS — dark override
 ══════════════════════════════════════════ */
 .barra-filtros {
-    top: 106px !important;
+    top: 107px !important; /* desktop: nav ≈ 107px (padding 36px + logo 70px + border 1px) */
     background: rgba(13,10,24,0.96) !important;
     border-bottom: 1px solid rgba(245,241,234,0.10) !important;
     backdrop-filter: blur(12px);
@@ -516,4 +516,10 @@ body {
     opacity: 0.9;
     transform: scale(1.04);
     box-shadow: 0 6px 20px rgba(124,58,237,0.6);
+}
+
+/* ── Responsive: sticky bar top en móvil ── */
+@media (max-width: 768px) {
+    /* Móvil: nav ≈ 79px (padding 24px + logo 54px + border 1px) */
+    .barra-filtros { top: 79px !important; }
 }

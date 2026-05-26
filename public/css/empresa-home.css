@@ -59,7 +59,7 @@ body { background: #07060c; }
     margin-bottom: 2.5rem;
 }
 @media (max-width: 640px) {
-    .empresa-stats-grid { grid-template-columns: 1fr; }
+    .empresa-stats-grid { grid-template-columns: 1fr !important; }
 }
 .empresa-stat-card {
     background: #0d0a18;

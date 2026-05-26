@@ -23,19 +23,95 @@
     text-decoration: none;
   }
   #vibez-home-nav .btn-primary:hover { background: var(--cream); color: var(--bg); }
+
+  /* ─── Responsive del nav ─────────────────────────────────── */
+  #vibez-nav-desktop { display: flex; gap: 28px; }
+
+  /* Botón hamburguesa: oculto en desktop */
+  #vibez-nav-hamburger {
+    display: none;
+    width: 38px; height: 38px;
+    align-items: center; justify-content: center;
+    background: rgba(245,241,234,0.04);
+    border: 1px solid rgba(245,241,234,0.18);
+    border-radius: 8px;
+    color: #f5f1ea;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  #vibez-nav-hamburger.abierto {
+    background: rgba(168,85,247,0.15);
+    border-color: rgba(168,85,247,0.5);
+  }
+
+  /* Panel menú móvil — posición absoluta para que sea un dropdown overlay
+     y no empuje el contenido de la página hacia abajo */
+  #vibez-mobile-menu {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 16px 14px;
+    border-top: 1px solid rgba(245,241,234,0.08);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 49;
+    background: rgba(7,6,12,0.97);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(245,241,234,0.12);
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .mob-nav-link {
+    display: block;
+    padding: 11px 14px;
+    color: rgba(245,241,234,0.65);
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
+  .mob-nav-link:hover { background: rgba(245,241,234,0.05); color: #f5f1ea; }
+  .mob-nav-link.activo { color: #c084fc; background: rgba(168,85,247,0.07); }
+  .mob-nav-link.peligro { color: var(--magenta); }
+  .mob-nav-divider { height: 1px; background: rgba(245,241,234,0.08); margin: 6px 0; }
+
+  @media (max-width: 768px) {
+    #vibez-nav-desktop    { display: none !important; }
+    #vibez-nav-hamburger  { display: flex !important; }
+    .nav-inner-pad        { padding: 12px 16px !important; }
+    .vibez-logo-img       { height: 42px !important; }
+    .nav-avatar-nombre    { display: none !important; }
+    .nav-avatar-btn       { padding: 4px !important; }
+    .nav-guest-entrar     { display: none !important; }
+    /* Dropdown notificaciones: reposicionar para no salir de pantalla */
+    #navNotifDropdown { min-width: 260px !important; right: -10px !important; }
+  }
 </style>
+
 <header id="vibez-home-nav" style="position:sticky;top:0;z-index:50;background:rgba(7,6,12,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line);transition:all 0.3s ease;">
-  <div style="max-width:1480px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+  <div class="nav-inner-pad" style="max-width:1480px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
 
     {{-- Logo pill con glow morado --}}
-    <a href="{{ route('home') }}" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);">
+    <a href="{{ route('home') }}" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);flex-shrink:0;">
       <div style="position:relative;padding:6px;display:flex;align-items:center;background:linear-gradient(135deg,rgba(168,85,247,0.18),rgba(124,58,237,0.08));border:1px solid rgba(168,85,247,0.45);border-radius:999px;box-shadow:0 0 24px rgba(168,85,247,0.35),inset 0 0 12px rgba(168,85,247,0.12);">
-        <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ" style="height:58px;width:auto;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.7));">
+        <img src="{{ asset('images/logo_vibez_white.png') }}" alt="VIBEZ" class="vibez-logo-img" style="height:58px;width:auto;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.7));">
       </div>
     </a>
 
-    {{-- Navegación central (desktop) --}}
-    <nav style="display:flex;gap:28px;">
+    {{-- Navegación central (solo desktop, oculta en móvil) --}}
+    <nav id="vibez-nav-desktop">
       @auth
         @php
           $esAdmin   = Auth::user()->es_admin;
@@ -117,8 +193,9 @@
           </div>
         </div>
 
-        {{-- Avatar + nombre --}}
+        {{-- Avatar + nombre (el nombre se oculta en móvil con CSS) --}}
         <button id="navAvatarBtn" onclick="toggleNavDropdown()"
+                class="nav-avatar-btn"
                 style="display:flex;align-items:center;gap:10px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.4);border-radius:999px;padding:4px 14px 4px 4px;cursor:pointer;color:var(--ink);"
                 aria-haspopup="true" aria-expanded="false">
           @if($u->foto_url)
@@ -128,10 +205,10 @@
               {{ strtoupper(substr($u->nombre, 0, 1)) }}{{ strtoupper(substr($u->apellido1 ?? '', 0, 1)) }}
             </span>
           @endif
-          <span class="mono" style="font-size:11px;">{{ $u->nombre }}</span>
+          <span class="mono nav-avatar-nombre" style="font-size:11px;">{{ $u->nombre }}</span>
         </button>
 
-        {{-- Dropdown --}}
+        {{-- Dropdown de perfil --}}
         <div id="navDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.95);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:14px;padding:8px;min-width:220px;box-shadow:0 20px 50px rgba(0,0,0,0.5);z-index:100;">
           @if($esPortero)
             <a href="{{ route('empresa.validacion.index') }}" onclick="document.getElementById('navDropdown').style.display='none'"
@@ -177,7 +254,8 @@
       </div>
     @else
       <div style="display:flex;align-items:center;gap:12px;">
-        <a href="{{ route('login') }}" class="mono"
+        {{-- "Entrar" se oculta en móvil para ahorrar espacio (aparece en el menú móvil) --}}
+        <a href="{{ route('login') }}" class="mono nav-guest-entrar"
            style="background:transparent;border:1px solid var(--ink-faint);color:var(--ink);padding:9px 18px;border-radius:999px;font-size:11px;text-decoration:none;">
           Entrar
         </a>
@@ -188,8 +266,81 @@
       </div>
     @endauth
 
+    {{-- Botón hamburguesa — solo visible en móvil (≤768px) --}}
+    <button id="vibez-nav-hamburger" onclick="toggleNavMobile()" aria-label="Abrir menú" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
   </div>
+
+  {{-- ─── Panel de menú móvil ─────────────────────────────────
+       Oculto por defecto; se muestra al pulsar el hamburguesa.
+       Vive dentro del <header> para que sea sticky junto al nav.
+  ──────────────────────────────────────────────────────────── --}}
+  <div id="vibez-mobile-menu">
+
+    {{-- Links de navegación principal --}}
+    @foreach($navLinks as [$label, $url, $ruta])
+      @php $activo = $ruta !== '' && request()->routeIs($ruta); @endphp
+      <a href="{{ $url }}" class="mob-nav-link {{ $activo ? 'activo' : '' }}">{{ $label }}</a>
+    @endforeach
+
+    @auth
+      {{-- Links de usuario (solo para usuarios normales; empresa/portero ya los tienen en $navLinks) --}}
+      @if(!$esEmpresa && !$esPortero)
+        <div class="mob-nav-divider"></div>
+        <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
+        <a href="{{ route('perfil.favoritos') }}" class="mob-nav-link">Favoritos</a>
+        @if($u->es_admin)
+          <a href="{{ route('admin.dashboard') }}" class="mob-nav-link" style="color:var(--magenta-2);">Panel Admin</a>
+        @endif
+      @endif
+      <div class="mob-nav-divider"></div>
+      <button onclick="cerrarSesion()" class="mob-nav-link peligro">— Cerrar sesión</button>
+    @else
+      <div class="mob-nav-divider"></div>
+      <a href="{{ route('login') }}" class="mob-nav-link">Entrar</a>
+      <a href="{{ route('register') }}" class="mob-nav-link" style="color:var(--magenta);">Registro</a>
+    @endauth
+
+  </div>
+
 </header>
+
+<script>
+/* ─── Menú móvil: hamburguesa (accesible para todos los usuarios) ── */
+function toggleNavMobile() {
+    var menu = document.getElementById('vibez-mobile-menu');
+    var btn  = document.getElementById('vibez-nav-hamburger');
+    var abierto = menu.style.display === 'flex';
+    if (abierto) {
+        menu.style.display = 'none';
+        btn.classList.remove('abierto');
+        btn.setAttribute('aria-expanded', 'false');
+    } else {
+        menu.style.display = 'flex';
+        menu.style.flexDirection = 'column';
+        btn.classList.add('abierto');
+        btn.setAttribute('aria-expanded', 'true');
+    }
+}
+
+/* Cierra el menú móvil al hacer clic fuera */
+document.addEventListener('click', function(e) {
+    var menu = document.getElementById('vibez-mobile-menu');
+    var btn  = document.getElementById('vibez-nav-hamburger');
+    if (!menu || menu.style.display !== 'flex') return;
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+        btn.classList.remove('abierto');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+});
+</script>
 
 @auth
 <script>

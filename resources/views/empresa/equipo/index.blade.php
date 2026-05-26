@@ -82,6 +82,7 @@
 }
 .crear-panel.open { display:block; }
 .crear-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width: 600px) { .crear-grid { grid-template-columns: 1fr; } }
 .form-field { display:flex; flex-direction:column; gap:6px; }
 .form-label {
     font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700;

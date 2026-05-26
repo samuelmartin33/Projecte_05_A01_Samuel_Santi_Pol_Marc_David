@@ -15,6 +15,11 @@
 .te-csel-opt{padding:10px 14px;font-family:'Archivo Narrow',sans-serif;font-size:14px;color:rgba(245,241,234,0.75);cursor:pointer;}
 .te-csel-opt:hover{background:rgba(168,85,247,0.15);color:#f5f1ea;}
 .te-csel-opt.selected{color:#c084fc;}
+/* Responsive: colapsar grids en móvil */
+@media (max-width: 480px) {
+  .grid-ciudad-cp  { grid-template-columns: 1fr !important; }
+  .grid-datos-2col { grid-template-columns: 1fr !important; }
+}
 </style>
 @endpush
 
@@ -64,7 +69,7 @@
         <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(245,241,234,0.08);border-radius:16px;padding:32px;margin-bottom:24px;">
             <p class="mono" style="font-size:10px;color:rgba(168,85,247,0.7);letter-spacing:0.18em;margin-bottom:20px;">A · DATOS LEGALES</p>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+            <div class="grid-datos-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
                 {{-- Razón social --}}
                 <div>
                     <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">
@@ -130,7 +135,7 @@
                        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 120px 1fr;gap:16px;margin-bottom:20px;">
+            <div class="grid-ciudad-cp" style="display:grid;grid-template-columns:1fr 120px 1fr;gap:16px;margin-bottom:20px;">
                 {{-- Ciudad --}}
                 <div>
                     <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">Ciudad *</label>
@@ -157,7 +162,7 @@
                 </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="grid-datos-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                 {{-- País --}}
                 <div>
                     <label style="display:block;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.55);margin-bottom:6px;">País *</label>

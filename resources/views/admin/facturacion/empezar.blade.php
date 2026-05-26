@@ -2,6 +2,14 @@
 
 @section('title', 'Admin | Emitir factura')
 
+@push('estilos')
+<style>
+@media (max-width: 700px) {
+  .adm-factura-grid { grid-template-columns: 1fr !important; }
+}
+</style>
+@endpush
+
 @section('content')
 
 <header class="admin-header">
@@ -29,7 +37,7 @@
 <form method="POST" action="{{ route('admin.facturacion.confirmar', $evento) }}">
 @csrf
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:960px;">
+<div class="adm-factura-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:960px;">
 
     {{-- ── COLUMNA IZQUIERDA: Parámetros ── --}}
     <section class="card">

@@ -19,6 +19,17 @@
   /* Grid de tarjetas */
   .vibez-grid-card { border-radius: 0; }
   .vibez-grid-card .img-wrap { border-radius: 0; }
+
+  /* ─── Responsive ─── */
+  /* Cabecera: reducir padding horizontal en móvil */
+  .ev-cabecera { padding: 80px 48px 40px; }
+  /* Barra de filtros sticky: debe pegarse DEBAJO del nav (~107px desktop, ~79px móvil) */
+  .ev-filtros-sticky { top: 107px; padding: 16px 48px; }
+
+  @media (max-width: 768px) {
+    .ev-cabecera      { padding: 60px 20px 28px !important; }
+    .ev-filtros-sticky { top: 79px !important; padding: 12px 16px !important; }
+  }
 </style>
 
 {{-- ── Datos globales para JS ── --}}
@@ -38,7 +49,7 @@
 {{-- ════════════════════════════════════════════════════
      CABECERA DE LA PÁGINA
 ════════════════════════════════════════════════════ --}}
-<section style="padding:80px 48px 40px;max-width:1480px;margin:0 auto;">
+<section class="ev-cabecera" style="max-width:1480px;margin:0 auto;">
   <div class="mono" style="font-size:11px;color:var(--magenta);margin-bottom:16px;display:flex;align-items:center;gap:10px;">
     <span style="width:28px;height:1px;background:var(--magenta);display:inline-block;"></span>
     Todos los eventos · curados por VIBEZ
@@ -54,7 +65,7 @@
 {{-- ════════════════════════════════════════════════════
      BARRA DE FILTROS POR CATEGORÍA (chips sticky)
 ════════════════════════════════════════════════════ --}}
-<section style="position:sticky;top:0;z-index:30;background:rgba(7,6,12,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:16px 48px;">
+<section class="ev-filtros-sticky" style="position:sticky;z-index:30;background:rgba(7,6,12,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);">
   <div style="max-width:1480px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
     <span class="mono" style="font-size:11px;color:var(--ink-dim);white-space:nowrap;">
       <span id="vibez-count-label">{{ $eventos->count() }}</span> eventos
