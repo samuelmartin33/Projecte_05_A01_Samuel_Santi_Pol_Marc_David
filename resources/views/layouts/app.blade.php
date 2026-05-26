@@ -31,6 +31,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/app-static.css') }}">
     <link rel="stylesheet" href="{{ asset('css/vibez.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vibez-forms.css') }}">
 
     @if (request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.*'))
         <link rel="stylesheet" href="{{ asset('css/auth-vibez.css') }}">
