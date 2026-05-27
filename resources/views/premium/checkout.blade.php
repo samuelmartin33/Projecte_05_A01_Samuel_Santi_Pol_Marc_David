@@ -4,6 +4,49 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+<style>
+  /* ── Responsive checkout Premium ──────────────────────────────── */
+
+  /* Hero: menos padding en móvil */
+  @media (max-width: 768px) {
+    .prem-hero-pad   { padding: 1.25rem 1rem 1rem !important; }
+    .prem-hero-title { font-size: clamp(1.6rem, 8vw, 2.5rem) !important; }
+  }
+
+  /* Grid principal: 2 columnas → 1 columna en móvil */
+  .prem-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .prem-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Cuerpo: menos padding lateral en móvil */
+  @media (max-width: 768px) {
+    .prem-body-pad { padding: 2rem 1rem !important; }
+  }
+
+  /* Tarjeta de pago: en móvil deja de ser sticky y pierde el top fijo */
+  @media (max-width: 900px) {
+    .prem-payment-card {
+      position: static !important;
+      top: auto !important;
+    }
+  }
+
+  /* Precio: un poco más pequeño en móvil */
+  @media (max-width: 480px) {
+    .prem-price { font-size: 2.8rem !important; }
+  }
+</style>
 @endpush
 
 @section('content')
@@ -12,21 +55,21 @@
 @include('partials.home.nav')
 
 {{-- ── Hero ── --}}
-<div style="background:rgba(7,6,12,0.95);border-bottom:1px solid var(--line);padding:2rem 2rem 1.5rem;">
+<div class="prem-hero-pad" style="background:rgba(7,6,12,0.95);border-bottom:1px solid var(--line);padding:2rem 2rem 1.5rem;">
     <div style="max-width:900px;margin:0 auto;">
         <div class="mono" style="font-size:9px;color:var(--magenta);margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;">
             <span style="width:18px;height:1px;background:var(--magenta);display:inline-block;"></span>
             MEMBRESÍA
         </div>
-        <h1 class="display" style="font-size:clamp(2rem,5vw,3.5rem);color:var(--ink);margin:0;line-height:1.1;">
+        <h1 class="prem-hero-title display" style="font-size:clamp(2rem,5vw,3.5rem);color:var(--ink);margin:0;line-height:1.1;">
             VIBEZ <span style="background:linear-gradient(90deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Premium</span>
         </h1>
     </div>
 </div>
 
 {{-- ── Cuerpo ── --}}
-<div style="background:radial-gradient(circle,rgba(124,58,237,0.08) 1.5px,transparent 1.5px),linear-gradient(160deg,#0d0820 0%,#130228 45%,#0d0820 100%);background-size:28px 28px,100% 100%;min-height:calc(100vh - 160px);padding:3rem 2rem;">
-<div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:2.5rem;align-items:start;">
+<div class="prem-body-pad" style="background:radial-gradient(circle,rgba(124,58,237,0.08) 1.5px,transparent 1.5px),linear-gradient(160deg,#0d0820 0%,#130228 45%,#0d0820 100%);background-size:28px 28px,100% 100%;min-height:calc(100vh - 160px);padding:3rem 2rem;">
+<div class="prem-grid">
 
     {{-- ── Columna izquierda: beneficios ── --}}
     <div>
@@ -111,7 +154,7 @@
     </div>
 
     {{-- ── Columna derecha: panel de pago ── --}}
-    <div class="vibe-card" style="padding:2rem;position:sticky;top:90px;">
+    <div class="vibe-card prem-payment-card" style="padding:2rem;position:sticky;top:90px;">
 
         <div class="mono" style="font-size:10px;color:var(--magenta);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;">
             <span style="width:18px;height:1px;background:var(--magenta);display:inline-block;"></span>
@@ -120,7 +163,7 @@
 
         {{-- Precio --}}
         <div style="text-align:center;margin-bottom:2rem;">
-            <div class="display" style="font-size:3.5rem;color:var(--magenta);line-height:1;">5,00 €</div>
+            <div class="prem-price display" style="font-size:3.5rem;color:var(--magenta);line-height:1;">5,00 €</div>
             <div class="mono" style="font-size:9px;color:rgba(245,241,234,0.3);margin-top:8px;">Pago único · Sin renovaciones</div>
         </div>
 
