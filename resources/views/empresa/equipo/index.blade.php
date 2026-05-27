@@ -59,10 +59,10 @@
 /* Trigger cerrado */
 .pill-trigger-btn {
     width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;
-    background:#1e293b; border:1px solid #7c3aed; border-radius:0.75rem;
-    padding:8px 12px; color:#fff; cursor:pointer; user-select:none; text-align:left;
+    background:#0d0a18; border:1px solid rgba(168,85,247,0.40); border-radius:0;
+    padding:8px 12px; color:#f5f1ea; cursor:pointer; user-select:none; text-align:left;
     font-family:'Archivo Narrow',sans-serif; font-size:0.78rem; font-weight:600;
-    transition:border-color 0.15s, border-radius 0.1s;
+    transition:border-color 0.15s;
 }
 .pill-trigger-btn:hover { border-color:#a855f7; }
 
@@ -86,8 +86,8 @@
     display:none;
     position:fixed;          /* se sobreescribe con valores exactos en JS */
     z-index:500;
-    background:#1e293b; border:1px solid #a855f7;
-    border-radius:0.75rem;   /* esquinas completas al estar desacoplado del trigger */
+    background:#0d0a18; border:1px solid rgba(168,85,247,0.40);
+    border-radius:0;
     padding:4px 4px 6px;
     flex-direction:column; gap:2px;
     max-height:220px; overflow-y:auto;
@@ -103,13 +103,13 @@
 /* Cada opción */
 .pill-opt {
     display:block; width:100%; text-align:left;
-    padding:7px 10px; border-radius:6px; border:none; cursor:pointer;
+    padding:7px 10px; border-radius:0; border:none; cursor:pointer;
     font-family:'Archivo Narrow',sans-serif; font-size:0.78rem; font-weight:600;
-    background:transparent; color:#9ca3af;
+    background:transparent; color:rgba(245,241,234,0.55);
     transition:background 0.12s, color 0.12s;
 }
-.pill-opt:hover { background:rgba(124,58,237,0.40); color:#fff; }
-.pill-opt.activo { background:#7c3aed; color:#fff; }
+.pill-opt:hover { background:rgba(168,85,247,0.15); color:#f5f1ea; }
+.pill-opt.activo { background:rgba(168,85,247,0.20); color:#c084fc; }
 
 /* Formulario de edición inline */
 .edit-form { display:flex; flex-direction:column; gap:10px; min-width:160px; }
@@ -122,27 +122,27 @@
     font-family:'Archivo Narrow',sans-serif; font-size:0.55rem; font-weight:700;
     text-transform:uppercase; letter-spacing:0.12em; padding:6px 10px;
     background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.30);
-    cursor:pointer; transition:background 0.15s; width:100%; border-radius:6px;
+    cursor:pointer; transition:background 0.15s; width:100%; border-radius:0;
 }
 .btn-rol-save:hover { background:rgba(168,85,247,0.28); }
 .btn-remove {
     font-family:'Archivo Narrow',sans-serif; font-size:0.55rem; font-weight:700;
     text-transform:uppercase; letter-spacing:0.12em; padding:5px 10px;
     background:transparent; color:rgba(248,113,113,0.7); border:1px solid rgba(248,113,113,0.20);
-    cursor:pointer; transition:background 0.15s, color 0.15s;
+    cursor:pointer; transition:background 0.15s, color 0.15s; border-radius:0;
 }
 .btn-remove:hover { background:rgba(248,113,113,0.10); color:#f87171; }
 
 /* Botón "＋ Añadir miembro" */
 .btn-anadir-miembro {
     display:inline-flex; align-items:center; gap:7px;
-    background:linear-gradient(135deg,#7c3aed,#a855f7);
-    color:#fff; border:none; border-radius:0.75rem;
+    background:#a855f7;
+    color:#fff; border:none; border-radius:0;
     padding:9px 18px; font-family:'Archivo Narrow',sans-serif;
     font-size:0.8rem; font-weight:700; cursor:pointer;
-    transition:opacity 0.15s; white-space:nowrap;
+    transition:background 0.15s; white-space:nowrap;
 }
-.btn-anadir-miembro:hover { opacity:0.88; }
+.btn-anadir-miembro:hover { background:#c084fc; color:#07060c; }
 
 /* ──────────────────────────────────────────────────────────────────────────
    Modal "Crear nuevo miembro"
@@ -154,8 +154,8 @@
     padding:1rem;
 }
 .modal-panel {
-    background:rgba(15,23,42,0.98); backdrop-filter:blur(20px);
-    border:1px solid rgba(124,58,237,0.35); border-radius:1rem;
+    background:#0d0a18; backdrop-filter:blur(20px);
+    border:1px solid rgba(168,85,247,0.35); border-radius:0;
     padding:2rem; max-width:600px; width:100%;
     max-height:90vh; overflow-y:auto;
 }
@@ -170,19 +170,19 @@
 }
 .modal-input {
     width:100%; box-sizing:border-box;
-    background:#1e293b; border:1px solid #7c3aed;
-    color:#fff; border-radius:0.75rem; padding:12px 16px;
+    background:#0d0a18; border:1px solid rgba(245,241,234,0.10);
+    color:#f5f1ea; border-radius:0; padding:12px 16px;
     font-family:'Archivo Narrow',sans-serif; font-size:0.9rem;
     outline:none; transition:border-color 0.15s, box-shadow 0.15s;
 }
-.modal-input::placeholder { color:#6b7280; }
-.modal-input:focus { border-color:#a855f7; box-shadow:0 0 0 3px rgba(168,85,247,0.25); }
+.modal-input::placeholder { color:rgba(245,241,234,0.25); }
+.modal-input:focus { border-color:#a855f7; box-shadow:0 0 0 3px rgba(168,85,247,0.15); }
 .modal-field { margin-bottom:1rem; }
 .modal-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 @media (max-width:520px) { .modal-grid-2 { grid-template-columns:1fr; } }
 .modal-error {
     background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.30);
-    color:#f87171; padding:10px 16px; border-radius:8px;
+    color:#f87171; padding:10px 16px; border-radius:0;
     font-family:'Archivo Narrow',sans-serif; font-size:0.85rem;
     margin-bottom:1.25rem; display:none;
 }
@@ -401,7 +401,7 @@
                     <div style="display:flex;align-items:center;gap:8px;">
                         <a href="{{ route('empresa.equipo.horas', $miembro->usuario_id) }}"
                            title="Ver horas de {{ $usr->nombre }}"
-                           style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.30);color:#c084fc;text-decoration:none;border-radius:6px;transition:background 0.15s;"
+                           style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.30);color:#c084fc;text-decoration:none;border-radius:0;transition:background 0.15s;"
                            onmouseover="this.style.background='rgba(168,85,247,0.25)'"
                            onmouseout="this.style.background='rgba(168,85,247,0.12)'">
                             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -424,7 +424,7 @@
 
     {{-- Leyenda --}}
     <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.07);padding:16px 20px;border-radius:8px;">
+        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.07);padding:16px 20px;border-radius:0;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                 <span class="rol-badge rol-organizador" style="font-size:0.45rem;">Organizador</span>
             </div>
@@ -432,7 +432,7 @@
                 Acceso completo al panel de empresa: eventos, candidaturas, validación QR y administración.
             </p>
         </div>
-        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.07);padding:16px 20px;border-radius:8px;">
+        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.07);padding:16px 20px;border-radius:0;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                 <span class="rol-badge rol-portero" style="font-size:0.45rem;">Portero</span>
             </div>
@@ -562,13 +562,13 @@
             {{-- Botones del modal --}}
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:1.75rem;">
                 <button type="button"
-                    style="border:1px solid #4b5563;color:#9ca3af;border-radius:0.75rem;padding:10px 20px;background:transparent;font-family:'Archivo Narrow',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:border-color 0.15s,color 0.15s;"
+                    style="border:1px solid rgba(245,241,234,0.15);color:rgba(245,241,234,0.55);border-radius:0;padding:10px 20px;background:transparent;font-family:'Archivo Narrow',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:border-color 0.15s,color 0.15s;"
                     onmouseover="this.style.borderColor='#9ca3af';this.style.color='#fff'"
                     onmouseout="this.style.borderColor='#4b5563';this.style.color='#9ca3af'"
                     onclick="cerrarModalCrear()">Cancelar</button>
 
                 <button type="button" id="btn-crear-miembro"
-                    style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:0.75rem;padding:10px 20px;font-family:'Archivo Narrow',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:opacity 0.15s;"
+                    style="background:#a855f7;color:#fff;border:none;border-radius:0;padding:10px 20px;font-family:'Archivo Narrow',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background 0.15s;"
                     onmouseover="this.style.opacity='0.88'"
                     onmouseout="this.style.opacity='1'"
                     onclick="submitCrearMiembro()">Crear miembro</button>
