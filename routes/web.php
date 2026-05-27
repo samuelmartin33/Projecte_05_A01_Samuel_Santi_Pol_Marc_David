@@ -295,6 +295,7 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 /* — Equipo de empresa: gestión de usuarios y roles — */
 Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empresa.equipo.')->group(function () {
     Route::get('/',              [EquipoController::class, 'index'])->name('index');
+    Route::post('/',             [EquipoController::class, 'store'])->name('store');
     Route::patch('/{organizador}/rol', [EquipoController::class, 'cambiarRol'])->name('rol');
     Route::delete('/{organizador}',    [EquipoController::class, 'destroy'])->name('destroy');
     // Ver horas de un miembro del equipo
