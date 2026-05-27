@@ -5,7 +5,7 @@
 
   @forelse($eventos as $evento)
     @php
-      $imgUrl    = $evento->portada?->url ?? asset('images/placeholder-evento.jpg');
+      $imgUrl    = $evento->url_portada;
       $empresa   = $evento->organizador?->empresa ?? null;
       $empNombre = $empresa?->nombre_empresa ?? '';
       $empLogo   = $empresa?->logo_url ?? null;
