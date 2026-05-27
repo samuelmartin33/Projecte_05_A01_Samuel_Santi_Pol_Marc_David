@@ -46,6 +46,7 @@ class EquipoController extends Controller
 
     /**
      * Crea un nuevo usuario y lo asigna al equipo con rol y puesto.
+     * Soporta peticiones normales y AJAX (devuelve JSON en ese caso).
      */
     public function store(Request $request)
     {
@@ -58,11 +59,23 @@ class EquipoController extends Controller
             'password'             => ['required', 'string', 'min:8', 'confirmed'],
             'rol'                  => ['required', Rule::in(['organizador', 'portero'])],
             'categoria_trabajo_id' => ['nullable', 'integer', 'exists:categorias_trabajo,id'],
+            'fecha_nacimiento'     => ['nullable', 'string', 'max:10'],
         ], [
             'email.unique'       => 'Ya existe un usuario con ese correo electrónico.',
             'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
+
+        /* Convierte fecha_nacimiento de DD/MM/AAAA a YYYY-MM-DD para la BD */
+        $fechaNac = null;
+        if ($request->filled('fecha_nacimiento')) {
+            try {
+                $fechaNac = \Carbon\Carbon::createFromFormat('d/m/Y', $request->fecha_nacimiento)
+                    ->format('Y-m-d');
+            } catch (\Exception $e) {
+                $fechaNac = null; // fecha inválida: se ignora
+            }
+        }
 
         $usuario = Usuario::create([
             'nombre'              => $request->nombre,
@@ -72,6 +85,7 @@ class EquipoController extends Controller
             'tipo_cuenta'         => 'cliente',
             'estado'              => 1,
             'email_verificado'    => 1,
+            'fecha_nacimiento'    => $fechaNac,
             'fecha_creacion'      => now(),
             'fecha_actualizacion' => now(),
         ]);
@@ -86,7 +100,14 @@ class EquipoController extends Controller
             'fecha_actualizacion'  => now(),
         ]);
 
-        return back()->with('success', "Usuario {$usuario->nombre} {$usuario->apellido1} creado como " . ucfirst($request->rol) . '.');
+        $msg = "Usuario {$usuario->nombre} {$usuario->apellido1} creado como " . ucfirst($request->rol) . '.';
+
+        /* Respuesta JSON para peticiones AJAX (modal) */
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => $msg], 201);
+        }
+
+        return back()->with('success', $msg);
     }
 
     /**
