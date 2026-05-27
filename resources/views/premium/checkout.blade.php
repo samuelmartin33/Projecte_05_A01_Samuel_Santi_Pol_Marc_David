@@ -31,6 +31,21 @@
     {{-- ── Columna izquierda: beneficios ── --}}
     <div>
 
+        {{-- Banner de incentivo cuando el usuario viene desde la sección de cupones --}}
+        @if(session('desde_cupones'))
+        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.1));border:1.5px solid rgba(168,85,247,0.45);padding:1rem 1.25rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:14px;">
+            <div style="font-size:24px;line-height:1;flex-shrink:0;">🎟️</div>
+            <div>
+                <div style="font-family:'Archivo Narrow',sans-serif;font-size:14px;font-weight:700;color:#e9d5ff;margin-bottom:4px;">
+                    Los cupones son exclusivos para miembros Premium
+                </div>
+                <div style="font-family:'Archivo Narrow',sans-serif;font-size:13px;color:rgba(245,241,234,0.55);line-height:1.5;">
+                    Por solo <strong style="color:#a855f7;">5€ únicos</strong> desbloqueas todos los códigos de descuento de las promotoras en VIBEZ. Sin renovaciones.
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Flash: mensaje informativo (cancelación o ya-premium) --}}
         @if(session('info'))
         <div style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:rgba(245,241,234,0.8);padding:12px 16px;font-family:'Archivo Narrow',sans-serif;font-size:13px;border-radius:8px;margin-bottom:1.5rem;">

@@ -30,13 +30,13 @@
         <a href="{{ route('entradas.mis-entradas') }}" class="btn-primary" style="padding:16px 28px;border-radius:999px;font-size:15px;text-decoration:none;">
           Mis tickets →
         </a>
-        @if(\Route::has('cupones.index'))
+        @if($user->es_premium)
         <a href="{{ route('cupones.index') }}" class="btn-ghost" style="padding:16px 24px;border-radius:999px;font-size:13px;text-decoration:none;">
-          Cupones
+          ⭐ Cupones
         </a>
         @else
-        <a href="#" class="btn-ghost" style="padding:16px 24px;border-radius:999px;font-size:13px;text-decoration:none;">
-          Cupones
+        <a href="{{ route('premium') }}" class="btn-ghost" style="padding:16px 24px;border-radius:999px;font-size:13px;text-decoration:none;border-color:rgba(168,85,247,0.5);color:rgba(168,85,247,0.9);">
+          🔒 Cupones Premium
         </a>
         @endif
       </div>
