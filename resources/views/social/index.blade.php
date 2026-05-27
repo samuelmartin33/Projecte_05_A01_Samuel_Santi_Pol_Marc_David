@@ -8,6 +8,7 @@
 {{-- ── Estilos base (dark theme) ── --}}
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
 <link rel="stylesheet" href="{{ asset('css/social.css') }}">
+<link rel="stylesheet" href="{{ asset('css/social-responsive.css') }}">
 
 {{-- Altura del wrapper social = viewport menos la altura real del nav sticky --}}
 {{-- Desktop: padding 18px*2 + logo 70px + border 1px ≈ 107px               --}}

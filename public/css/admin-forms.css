@@ -1,0 +1,747 @@
+/* ============================================================
+   VIBEZ — Admin Forms · CSS
+   Estilos para todos los formularios del panel admin/moderador.
+   Sobreescribe los colores claros heredados de admin-eventos.css.
+   Archivo independiente: no modificar admin-eventos.css para esto.
+   ============================================================ */
+
+/* ── Variables locales ── */
+:root {
+  --af-bg:               rgba(13, 10, 24, 0.75);
+  --af-bg-hover:         rgba(20, 16, 42, 0.90);
+  --af-border:           rgba(245, 241, 234, 0.10);
+  --af-border-focus:     rgba(168, 85, 247, 0.55);
+  --af-glow:             rgba(168, 85, 247, 0.12);
+  --af-ink:              #f5f1ea;
+  --af-ink-dim:          rgba(245, 241, 234, 0.50);
+  --af-ink-ph:           rgba(245, 241, 234, 0.22);
+  --af-purple:           #7c3aed;
+  --af-magenta:          #a855f7;
+  --af-purple-lite:      #c084fc;
+  --af-line:             rgba(245, 241, 234, 0.07);
+  --af-good:             #22c55e;
+  --af-good-bg:          rgba(34, 197, 94, 0.10);
+  --af-bad:              #ef4444;
+  --af-bad-bg:           rgba(239, 68, 68, 0.10);
+  --af-warn:             #f59e0b;
+  --af-radius-input:     10px;
+  --af-radius-card:      20px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CABECERA DE PÁGINA (admin-header)
+   Sobreescribe la versión de admin-eventos.css
+   ══════════════════════════════════════════════════════════ */
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--af-line);
+}
+
+.admin-header h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  margin: 0 0 6px;
+  color: var(--af-ink);
+}
+
+.admin-header p {
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--af-purple-lite);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARD CONTENEDOR DEL FORMULARIO
+   Reemplaza el borde-radius 0 y añade look VIBEZ
+   ══════════════════════════════════════════════════════════ */
+.card {
+  background: rgba(13, 10, 24, 0.70);
+  border: 1px solid rgba(245, 241, 234, 0.09);
+  border-radius: var(--af-radius-card) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(245, 241, 234, 0.04);
+  overflow: visible !important; /* para que los dropdowns no se corten */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: none; /* sin elevación en cards de formulario */
+  border-color: rgba(168, 85, 247, 0.22);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.50), 0 0 0 1px rgba(168, 85, 247, 0.15);
+}
+
+/* Padding del form dentro de la card */
+.evento-form {
+  padding: 1.75rem 2rem;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ALERTA DE ERRORES / ÉXITO
+   ══════════════════════════════════════════════════════════ */
+.alert {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+.alert strong {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.alert ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.alert ul li {
+  margin-top: 4px;
+}
+
+/* Error */
+.alert.error,
+.alert-danger {
+  background: var(--af-bad-bg);
+  border: 1px solid rgba(239, 68, 68, 0.30);
+  color: #fca5a5;
+}
+
+/* Éxito */
+.alert.success,
+.alert-success {
+  background: var(--af-good-bg);
+  border: 1px solid rgba(34, 197, 94, 0.30);
+  color: #86efac;
+}
+
+/* ══════════════════════════════════════════════════════════
+   GRID DE CAMPOS
+   Sobreescribe el grid de admin-eventos.css al completo
+   ══════════════════════════════════════════════════════════ */
+.grid-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 1.5rem;
+}
+
+/* Label principal */
+.grid-form > label,
+.grid-form > div > label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--af-ink-dim);
+}
+
+/* Ancho completo */
+.grid-form .full {
+  grid-column: 1 / -1;
+}
+
+/* ══════════════════════════════════════════════════════════
+   INPUTS — text, email, password, number, url
+   ══════════════════════════════════════════════════════════ */
+.grid-form input:not([type="checkbox"]):not([type="radio"]),
+.grid-form textarea,
+.grid-form select {
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--af-ink);
+  background: var(--af-bg);
+  border: 1px solid var(--af-border);
+  border-radius: var(--af-radius-input);
+  padding: 11px 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  min-height: 44px;
+}
+
+.grid-form input:not([type="checkbox"]):not([type="radio"])::placeholder,
+.grid-form textarea::placeholder {
+  color: var(--af-ink-ph);
+}
+
+.grid-form input:not([type="checkbox"]):not([type="radio"]):hover,
+.grid-form textarea:hover,
+.grid-form select:hover {
+  border-color: rgba(245, 241, 234, 0.18);
+  background: var(--af-bg-hover);
+}
+
+.grid-form input:not([type="checkbox"]):not([type="radio"]):focus,
+.grid-form textarea:focus,
+.grid-form select:focus {
+  border-color: var(--af-border-focus);
+  background: var(--af-bg-hover);
+  box-shadow: 0 0 0 3px var(--af-glow);
+}
+
+/* ── Date / Datetime-local ── */
+.grid-form input[type="date"],
+.grid-form input[type="datetime-local"] {
+  color-scheme: dark; /* fuerza el picker a modo oscuro en navegadores compatibles */
+}
+
+/* ── Number ── */
+.grid-form input[type="number"] {
+  -moz-appearance: textfield; /* Firefox: sin flechas */
+}
+.grid-form input[type="number"]::-webkit-inner-spin-button,
+.grid-form input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+/* ── Password ── */
+.grid-form input[type="password"] {
+  letter-spacing: 0.08em;
+}
+
+/* ── Textarea ── */
+.grid-form textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.55;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SELECT — con flecha personalizada
+   ══════════════════════════════════════════════════════════ */
+.grid-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23a855f7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+  cursor: pointer;
+}
+
+/* Opciones del select (limitado por el navegador, pero ayuda) */
+.grid-form select option {
+  background: #0d0a18;
+  color: var(--af-ink);
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHECKBOX PERSONALIZADO
+   Clase .checkbox-wrap que ya usan los forms existentes
+   ══════════════════════════════════════════════════════════ */
+.checkbox-wrap {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--af-ink);
+  text-transform: none;
+  letter-spacing: 0;
+  user-select: none;
+}
+
+/* Ocultar el checkbox nativo */
+.checkbox-wrap input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 1.5px solid rgba(245, 241, 234, 0.22);
+  border-radius: 6px;
+  background: rgba(245, 241, 234, 0.04);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.checkbox-wrap input[type="checkbox"]:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  background: rgba(168, 85, 247, 0.06);
+}
+
+.checkbox-wrap input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, var(--af-purple), var(--af-magenta));
+  border-color: var(--af-magenta);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.40);
+}
+
+/* Tick mark */
+.checkbox-wrap input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(43deg);
+}
+
+.checkbox-wrap input[type="checkbox"]:checked::after {
+  display: block;
+}
+
+/* Focus accesible */
+.checkbox-wrap input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--af-magenta);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHIPS DE CATEGORÍA (checkboxes en forma de etiqueta/pill)
+   Clase .cat-chip usada en eventos/_form.blade.php
+   ══════════════════════════════════════════════════════════ */
+.cat-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Input oculto */
+.cat-chip input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Apariencia de la pill */
+.cat-chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid rgba(245, 241, 234, 0.12);
+  border-radius: 999px;
+  background: rgba(245, 241, 234, 0.04);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: rgba(245, 241, 234, 0.55);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+
+.cat-chip-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(245, 241, 234, 0.20);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+/* Estado checkeado */
+.cat-chip input[type="checkbox"]:checked + .cat-chip-label {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.50);
+  color: var(--af-purple-lite);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.15);
+}
+
+.cat-chip input[type="checkbox"]:checked + .cat-chip-label::before {
+  background: var(--af-magenta);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.60);
+}
+
+/* Hover */
+.cat-chip:hover .cat-chip-label {
+  border-color: rgba(168, 85, 247, 0.30);
+  color: var(--af-ink);
+}
+
+/* Focus accesible */
+.cat-chip input[type="checkbox"]:focus-visible + .cat-chip-label {
+  outline: 2px solid var(--af-magenta);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BOTONES DE FORMULARIO
+   Sobreescribe .btn, .btn-primary, .btn-secondary en forms
+   ══════════════════════════════════════════════════════════ */
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--af-line);
+  flex-wrap: wrap;
+}
+
+.form-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 11px 26px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.form-actions .btn-primary {
+  background: linear-gradient(135deg, var(--af-purple), var(--af-magenta));
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(168, 85, 247, 0.40);
+}
+
+.form-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(168, 85, 247, 0.60);
+}
+
+.form-actions .btn-secondary {
+  background: rgba(245, 241, 234, 0.05);
+  color: var(--af-ink-dim);
+  border: 1px solid var(--af-border);
+}
+
+.form-actions .btn-secondary:hover {
+  background: rgba(245, 241, 234, 0.09);
+  color: var(--af-ink);
+  border-color: rgba(245, 241, 234, 0.20);
+}
+
+.form-actions .btn-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.30);
+}
+
+.form-actions .btn-danger:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SECCIÓN OPCIONAL DENTRO DEL FORM (separador visual)
+   ══════════════════════════════════════════════════════════ */
+.form-section-title {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--af-magenta);
+  margin-top: 0.5rem;
+}
+
+.form-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.35), transparent);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANEL HEADER (tipo admin-panel-section)
+   ══════════════════════════════════════════════════════════ */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--af-line);
+  flex-wrap: wrap;
+}
+
+.panel-header h2 {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: var(--af-ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel-empty {
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--af-ink-dim);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 13px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BADGE-COUNT (número junto a títulos de sección)
+   ══════════════════════════════════════════════════════════ */
+.badge-count {
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: var(--af-purple-lite);
+  padding: 2px 9px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BUSCADOR AJAX — barra de búsqueda en listados admin
+   ══════════════════════════════════════════════════════════ */
+.admin-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  margin-bottom: 6px;
+}
+
+.admin-search-input {
+  background: var(--af-bg);
+  border: 1px solid var(--af-border);
+  color: var(--af-ink);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 13px;
+  padding: 10px 16px 10px 40px;
+  border-radius: var(--af-radius-input);
+  width: 100%;
+  max-width: 380px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='rgba(168,85,247,0.6)' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M12 12l3 3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+}
+
+.admin-search-input:focus {
+  border-color: var(--af-border-focus);
+  box-shadow: 0 0 0 3px var(--af-glow);
+}
+
+.admin-search-input::placeholder {
+  color: var(--af-ink-ph);
+}
+
+#admin-search-spinner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+
+#admin-search-spinner::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--af-border);
+  border-top-color: var(--af-magenta);
+  border-radius: 50%;
+  animation: af-spin 0.7s linear infinite;
+}
+
+@keyframes af-spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL — todos los <select> y <input type="date/datetime-local">
+   en el panel admin/moderador con tema oscuro violeta
+   ══════════════════════════════════════════════════════════ */
+
+/* SVG del chevron morado para el custom arrow */
+/* data URI del icono de flecha abajo en violeta */
+:root {
+  --af-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a855f7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+}
+
+.adm-main select,
+.adm-main input[type="date"],
+.adm-main input[type="datetime-local"],
+.adm-main input[type="month"],
+.adm-main input[type="time"] {
+  background-color: var(--af-bg) !important;
+  color: var(--af-ink) !important;
+  border: 1px solid var(--af-border) !important;
+  border-radius: var(--af-radius-input) !important;
+  padding: 10px 14px !important;
+  font-family: 'Archivo', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  outline: none !important;
+  transition: border-color 0.18s, box-shadow 0.18s !important;
+}
+
+.adm-main select:focus,
+.adm-main input[type="date"]:focus,
+.adm-main input[type="datetime-local"]:focus,
+.adm-main input[type="month"]:focus,
+.adm-main input[type="time"]:focus {
+  border-color: var(--af-border-focus) !important;
+  box-shadow: 0 0 0 3px var(--af-glow) !important;
+}
+
+/* Select: quitar flecha nativa, añadir SVG morado */
+.adm-main select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: var(--af-select-arrow) !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  padding-right: 38px !important;
+  cursor: pointer !important;
+}
+
+/* Forzar color-scheme oscuro para el date picker nativo */
+.adm-main input[type="date"],
+.adm-main input[type="datetime-local"],
+.adm-main input[type="month"],
+.adm-main input[type="time"] {
+  color-scheme: dark !important;
+}
+
+/* Placeholder color en selects */
+.adm-main select option {
+  background: #0d0820;
+  color: #f5f1ea;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BADGE PROTEGIDO (moderador/usuarios — acción no permitida)
+   ══════════════════════════════════════════════════════════ */
+.estado-badge-protegido {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(245, 241, 234, 0.05);
+  border: 1px solid rgba(245, 241, 234, 0.12);
+  color: rgba(245, 241, 234, 0.35);
+  cursor: default;
+  white-space: nowrap;
+}
+
+.estado-badge-protegido::before {
+  content: '🔒';
+  font-size: 9px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .evento-form {
+    padding: 1.25rem;
+  }
+
+  .grid-form {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .grid-form .full {
+    grid-column: 1;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cat-chips-wrap {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .evento-form {
+    padding: 1rem;
+  }
+
+  .grid-form {
+    gap: 0.85rem;
+  }
+
+  /* Inputs más grandes en móvil para evitar zoom iOS */
+  .grid-form input:not([type="checkbox"]):not([type="radio"]),
+  .grid-form textarea,
+  .grid-form select {
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+
+  .cat-chip-label {
+    font-size: 11px;
+    padding: 5px 11px;
+  }
+}

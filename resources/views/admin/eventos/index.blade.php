@@ -15,24 +15,13 @@
         <div class="alert success">{{ session('success') }}</div>
     @endif
 
-    {{-- Buscador --}}
-    <form method="GET" action="{{ route('admin.eventos.index') }}" style="margin-bottom:1.25rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
-        <input type="text"
-               name="busqueda"
-               value="{{ $busqueda }}"
-               placeholder="Buscar por nombre de evento o promotora…"
-               style="flex:1;min-width:220px;padding:9px 14px;background:#0d0a18;border:1px solid rgba(245,241,234,0.15);color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;outline:none;">
-        <button type="submit"
-                style="padding:9px 20px;background:#a855f7;color:#fff;border:none;cursor:pointer;font-family:'Archivo Narrow',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;">
-            Buscar
-        </button>
-        @if($busqueda)
-            <a href="{{ route('admin.eventos.index') }}"
-               style="padding:9px 16px;background:rgba(245,241,234,0.07);color:rgba(245,241,234,0.6);border:1px solid rgba(245,241,234,0.12);font-family:'Archivo Narrow',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;text-decoration:none;white-space:nowrap;">
-                Limpiar
-            </a>
-        @endif
-    </form>
+    <div class="admin-search-bar">
+        <input type="search"
+               class="admin-search-input"
+               placeholder="Buscar por título de evento…"
+               oninput="adminBuscar(this, 'eventos')">
+        <div id="admin-search-spinner"></div>
+    </div>
 
     <section class="card">
         <table class="tabla-eventos">
@@ -47,13 +36,13 @@
                 <th>Acciones</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="admin-search-tbody">
             @forelse ($eventos as $evento)
                 <tr>
                     <td data-label="ID">{{ $evento->id }}</td>
                     <td data-label="Titulo">{{ $evento->titulo }}</td>
                     <td data-label="Categoria">{{ $evento->categoriaEvento->nombre ?? 'Sin categoria' }}</td>
-                    <td data-label="Organizador">{{ $evento->organizador?->empresa?->nombre_empresa ?? '#' . $evento->organizador_id }}</td>
+                    <td data-label="Organizador">#{{ $evento->organizador_id }}</td>
                     <td data-label="Inicio">{{ optional($evento->fecha_inicio)->format('d/m/Y H:i') }}</td>
                     <td data-label="Estado">
                         <span class="estado {{ $evento->estado ? 'activo' : 'inactivo' }}">
@@ -77,6 +66,26 @@
             </tbody>
         </table>
     </section>
+
+    @push('scripts')
+    <script>
+    window.adminBuscarRender = function(items) {
+        if (!items.length) return '<tr><td colspan="7" class="empty">Sin resultados.</td></tr>';
+        return items.map(function(e) {
+            var estadoBadge = e.estado ? '<span class="estado activo">Activo</span>' : '<span class="estado inactivo">Inactivo</span>';
+            return '<tr>'
+                + '<td data-label="ID">'          + e.id          + '</td>'
+                + '<td data-label="Titulo">'       + e.titulo      + '</td>'
+                + '<td data-label="Categoria">'    + e.categoria   + '</td>'
+                + '<td data-label="Organizador">—</td>'
+                + '<td data-label="Inicio">'       + e.fecha_inicio + '</td>'
+                + '<td data-label="Estado">'       + estadoBadge   + '</td>'
+                + '<td data-label="Acciones" class="acciones"><a class="btn btn-secondary" href="' + e.edit_url + '">Editar</a></td>'
+                + '</tr>';
+        }).join('');
+    };
+    </script>
+    @endpush
 
     @if ($eventos->hasPages())
         <nav class="paginacion" aria-label="Paginacion de eventos">

@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ asset('css/admin-eventos.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-vibez.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-forms.css') }}">
     @stack('estilos')
 </head>
 <body>
@@ -245,6 +246,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/app-nav.js') }}"></script>
 <script src="{{ asset('js/admin-eventos.js') }}"></script>
+<script src="{{ asset('js/admin-buscar.js') }}"></script>
 
 <script>
     /* Abre/cierra el dropdown del sidebar */
