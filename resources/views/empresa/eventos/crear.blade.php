@@ -192,15 +192,15 @@
             @endphp
             <input type="hidden" id="tipo_evento" name="tipo_evento" value="{{ $tipoEvActual }}">
             <div class="ev-csel" id="ev-tipo-evento">
-                <div class="ev-csel-trigger" onclick="toggleTipoEvento()">
+                <div class="ev-csel-trigger" onclick="cselToggle('ev-tipo-evento')">
                     <span id="ev-tipo-evento-label">{{ $tipoEvLabel }}</span>
                     <span class="ev-csel-arrow">▾</span>
                 </div>
                 <ul class="ev-csel-menu">
                     <li class="ev-csel-opt {{ $tipoEvActual == 1 ? 'selected' : '' }}"
-                        onclick="pickTipoEvento(1, 'Presencial')">Presencial</li>
+                        onclick="cselPick('ev-tipo-evento','tipo_evento','1','Presencial',this)">Presencial</li>
                     <li class="ev-csel-opt {{ $tipoEvActual == 2 ? 'selected' : '' }}"
-                        onclick="pickTipoEvento(2, 'Online')">Online</li>
+                        onclick="cselPick('ev-tipo-evento','tipo_evento','2','Online',this)">Online</li>
                 </ul>
             </div>
         </div>
@@ -396,25 +396,6 @@ function actualizarBordeCat(label) {
     var input = label.querySelector('input');
     label.style.borderColor = input.checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)';
 }
-
-// ── Selector tipo de evento (ev-csel) ─────────────────────────────────────────
-function toggleTipoEvento() {
-    document.getElementById('ev-tipo-evento').classList.toggle('open');
-}
-
-function pickTipoEvento(val, label) {
-    document.getElementById('tipo_evento').value = val;
-    document.getElementById('ev-tipo-evento-label').textContent = label;
-    document.getElementById('ev-tipo-evento').classList.remove('open');
-    document.querySelectorAll('#ev-tipo-evento .ev-csel-opt').forEach(function(li) {
-        li.classList.toggle('selected', li.textContent.trim() === label);
-    });
-}
-
-document.addEventListener('click', function(e) {
-    var el = document.getElementById('ev-tipo-evento');
-    if (el && !el.contains(e.target)) el.classList.remove('open');
-});
 
 // ── Precio ────────────────────────────────────────────────────────────────────
 function togglePrecio() {

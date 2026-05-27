@@ -163,9 +163,9 @@
 /* ══════════════════════════════════════════════════════════
    INPUTS — text, email, password, number, url
    ══════════════════════════════════════════════════════════ */
-.grid-form input:not([type="checkbox"]):not([type="radio"]),
-.grid-form textarea,
-.grid-form select {
+.grid-form input:not([type="checkbox"]):not([type="radio"]):not(.form-input),
+.grid-form textarea:not(.form-textarea),
+.grid-form select:not(.form-select) {
   font-family: 'Archivo', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -180,30 +180,35 @@
   min-height: 44px;
 }
 
-.grid-form input:not([type="checkbox"]):not([type="radio"])::placeholder,
-.grid-form textarea::placeholder {
+.grid-form input:not([type="checkbox"]):not([type="radio"]):not(.form-input)::placeholder,
+.grid-form textarea:not(.form-textarea)::placeholder {
   color: var(--af-ink-ph);
 }
 
-.grid-form input:not([type="checkbox"]):not([type="radio"]):hover,
-.grid-form textarea:hover,
-.grid-form select:hover {
+.grid-form input:not([type="checkbox"]):not([type="radio"]):not(.form-input):hover,
+.grid-form textarea:not(.form-textarea):hover,
+.grid-form select:not(.form-select):hover {
   border-color: rgba(245, 241, 234, 0.18);
   background: var(--af-bg-hover);
 }
 
-.grid-form input:not([type="checkbox"]):not([type="radio"]):focus,
-.grid-form textarea:focus,
-.grid-form select:focus {
+.grid-form input:not([type="checkbox"]):not([type="radio"]):not(.form-input):focus,
+.grid-form textarea:not(.form-textarea):focus,
+.grid-form select:not(.form-select):focus {
   border-color: var(--af-border-focus);
   background: var(--af-bg-hover);
   box-shadow: 0 0 0 3px var(--af-glow);
 }
 
 /* ── Date / Datetime-local ── */
-.grid-form input[type="date"],
-.grid-form input[type="datetime-local"] {
+.grid-form input[type="date"]:not(.form-input),
+.grid-form input[type="datetime-local"]:not(.form-input) {
   color-scheme: dark; /* fuerza el picker a modo oscuro en navegadores compatibles */
+}
+/* Los que usan .form-input también necesitan color-scheme dark */
+.grid-form input[type="date"].form-input,
+.grid-form input[type="datetime-local"].form-input {
+  color-scheme: dark;
 }
 
 /* ── Number ── */
@@ -230,7 +235,7 @@
 /* ══════════════════════════════════════════════════════════
    SELECT — con flecha personalizada
    ══════════════════════════════════════════════════════════ */
-.grid-form select {
+.grid-form select:not(.form-select) {
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23a855f7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -607,11 +612,65 @@
   --af-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a855f7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
 }
 
-.adm-main select,
-.adm-main input[type="date"],
-.adm-main input[type="datetime-local"],
-.adm-main input[type="month"],
-.adm-main input[type="time"] {
+/* ── Flatpickr alt input — clase explícita adm-fp-alt asignada via altInputClass ── */
+input.adm-fp-alt,
+.flatpickr-alt-input,
+.adm-main .flatpickr-alt-input {
+  background: #0d0a18 !important;
+  background-color: #0d0a18 !important;
+  color: #f5f1ea !important;
+  border: 1px solid rgba(245, 241, 234, 0.10) !important;
+  border-radius: 10px !important;
+  padding: 11px 14px !important;
+  font-family: 'Archivo', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  outline: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.18s, box-shadow 0.18s !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+input.adm-fp-alt::placeholder,
+.flatpickr-alt-input::placeholder,
+.adm-main .flatpickr-alt-input::placeholder {
+  color: rgba(245, 241, 234, 0.22) !important;
+}
+input.adm-fp-alt:focus,
+.adm-main .flatpickr-alt-input:focus {
+  border-color: rgba(168, 85, 247, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.12) !important;
+}
+
+/* Anular el ring azul de Tailwind en los campos con estilo VIBEZ */
+.adm-main .form-select,
+.adm-main .form-input,
+.adm-main .form-textarea {
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  box-shadow: none !important;
+}
+.adm-main .form-select:hover,
+.adm-main .form-input:hover,
+.adm-main .form-textarea:hover {
+  border-bottom-color: rgba(168,85,247,0.45) !important;
+}
+.adm-main .form-select:focus,
+.adm-main .form-input:focus,
+.adm-main .form-textarea:focus {
+  border-bottom-color: #a855f7 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+.adm-main select:not(.form-select),
+.adm-main input[type="date"]:not(.form-input),
+.adm-main input[type="datetime-local"]:not(.form-input),
+.adm-main input[type="month"]:not(.form-input),
+.adm-main input[type="time"]:not(.form-input) {
   background-color: var(--af-bg) !important;
   color: var(--af-ink) !important;
   border: 1px solid var(--af-border) !important;
@@ -623,17 +682,17 @@
   transition: border-color 0.18s, box-shadow 0.18s !important;
 }
 
-.adm-main select:focus,
-.adm-main input[type="date"]:focus,
-.adm-main input[type="datetime-local"]:focus,
-.adm-main input[type="month"]:focus,
-.adm-main input[type="time"]:focus {
+.adm-main select:not(.form-select):focus,
+.adm-main input[type="date"]:not(.form-input):focus,
+.adm-main input[type="datetime-local"]:not(.form-input):focus,
+.adm-main input[type="month"]:not(.form-input):focus,
+.adm-main input[type="time"]:not(.form-input):focus {
   border-color: var(--af-border-focus) !important;
   box-shadow: 0 0 0 3px var(--af-glow) !important;
 }
 
 /* Select: quitar flecha nativa, añadir SVG morado */
-.adm-main select {
+.adm-main select:not(.form-select) {
   appearance: none !important;
   -webkit-appearance: none !important;
   background-image: var(--af-select-arrow) !important;
@@ -644,10 +703,10 @@
 }
 
 /* Forzar color-scheme oscuro para el date picker nativo */
-.adm-main input[type="date"],
-.adm-main input[type="datetime-local"],
-.adm-main input[type="month"],
-.adm-main input[type="time"] {
+.adm-main input[type="date"]:not(.form-input),
+.adm-main input[type="datetime-local"]:not(.form-input),
+.adm-main input[type="month"]:not(.form-input),
+.adm-main input[type="time"]:not(.form-input) {
   color-scheme: dark !important;
 }
 
@@ -733,9 +792,9 @@
   }
 
   /* Inputs más grandes en móvil para evitar zoom iOS */
-  .grid-form input:not([type="checkbox"]):not([type="radio"]),
-  .grid-form textarea,
-  .grid-form select {
+  .grid-form input:not([type="checkbox"]):not([type="radio"]):not(.form-input),
+  .grid-form textarea:not(.form-textarea),
+  .grid-form select:not(.form-select) {
     font-size: 16px;
     padding: 12px 14px;
   }

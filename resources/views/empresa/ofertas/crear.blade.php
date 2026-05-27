@@ -3,6 +3,7 @@
 @section('titulo', 'Crear Oferta — VIBEZ')
 
 @push('estilos')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     body { background: #07060c; }
 
@@ -160,14 +161,28 @@
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Categoría <span class="form-required">*</span></label>
-                <select name="categoria_trabajo_id" class="form-select">
-                    <option value="">Selecciona categoría</option>
-                    @foreach ($categorias as $cat)
-                        <option value="{{ $cat->id }}" @selected(old('categoria_trabajo_id') == $cat->id)>
-                            {{ $cat->nombre }}
-                        </option>
-                    @endforeach
-                </select>
+                @php $catTrabAct = old('categoria_trabajo_id', ''); @endphp
+                <input type="hidden" id="inp-cat-trabajo" name="categoria_trabajo_id" value="{{ $catTrabAct }}">
+                <div class="ev-csel" id="ev-cat-trabajo">
+                    <div class="ev-csel-trigger" onclick="cselToggle('ev-cat-trabajo')">
+                        <span id="ev-cat-trabajo-label" class="{{ $catTrabAct ? '' : 'ev-csel-placeholder' }}">
+                            @if($catTrabAct)
+                                {{ $categorias->firstWhere('id', $catTrabAct)?->nombre ?? 'Selecciona categoría' }}
+                            @else
+                                Selecciona categoría
+                            @endif
+                        </span>
+                        <span class="ev-csel-arrow">▾</span>
+                    </div>
+                    <ul class="ev-csel-menu">
+                        @foreach ($categorias as $cat)
+                            <li class="ev-csel-opt {{ $catTrabAct == $cat->id ? 'selected' : '' }}"
+                                onclick="cselPick('ev-cat-trabajo', 'inp-cat-trabajo', '{{ $cat->id }}', '{{ $cat->nombre }}', this)">
+                                {{ $cat->nombre }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
             <div>
                 <label class="form-label">Vacantes</label>
@@ -197,13 +212,13 @@
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Fecha de inicio</label>
-                <input type="date" name="fecha_inicio_trabajo" class="form-input"
+                <input type="text" name="fecha_inicio_trabajo" class="form-input emp-fp-date"
                        value="{{ old('fecha_inicio_trabajo') }}">
                 <p class="form-hint">Opcional. Cuándo empieza el trabajo.</p>
             </div>
             <div>
                 <label class="form-label">Fecha de fin</label>
-                <input type="date" name="fecha_fin_trabajo" class="form-input"
+                <input type="text" name="fecha_fin_trabajo" class="form-input emp-fp-date"
                        value="{{ old('fecha_fin_trabajo') }}">
                 <p class="form-hint">Opcional. Déjalo vacío si es indefinido.</p>
             </div>
@@ -253,3 +268,19 @@
 </section>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    flatpickr('.emp-fp-date', {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        altInputClass: 'form-input',
+        locale: 'es'
+    });
+});
+</script>
+@endpush

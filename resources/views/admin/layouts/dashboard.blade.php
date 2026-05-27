@@ -6,8 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin — VIBEZ')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{{ asset('css/admin-eventos.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-vibez.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vibez-forms.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-forms.css') }}">
     @stack('estilos')
 </head>
@@ -243,6 +245,30 @@
 
 </div>{{-- /adm-shell --}}
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    flatpickr('.adm-fp-date', {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        altInputClass: 'adm-fp-alt',
+        locale: 'es',
+        disableMobile: true,
+    });
+    flatpickr('.adm-fp-datetime', {
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: 'Y-m-d H:i',
+        altInput: true,
+        altFormat: 'd/m/Y H:i',
+        altInputClass: 'adm-fp-alt',
+        locale: 'es',
+        disableMobile: true,
+    });
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/app-nav.js') }}"></script>
 <script src="{{ asset('js/admin-eventos.js') }}"></script>

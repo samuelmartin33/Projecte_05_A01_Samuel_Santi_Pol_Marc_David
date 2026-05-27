@@ -76,12 +76,26 @@
 
         <div class="ml-auto flex items-center gap-2">
             <label class="text-navy/50 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
-            <select class="filtro-select"
-                    onchange="window.location.href='{{ $baseOfertas }}?{{ $estadoPrefix }}orden='+this.value">
-                <option value="reciente"   {{ $ordenOfAct === 'reciente'   ? 'selected' : '' }}>Más reciente</option>
-                <option value="candidatos" {{ $ordenOfAct === 'candidatos' ? 'selected' : '' }}>Más candidatos</option>
-                <option value="titulo"     {{ $ordenOfAct === 'titulo'     ? 'selected' : '' }}>Alfabético</option>
-            </select>
+            @php
+                $ordenOfLabels = ['reciente'=>'Más reciente','candidatos'=>'Más candidatos','titulo'=>'Alfabético'];
+                $ordenOfLabel  = $ordenOfLabels[$ordenOfAct] ?? 'Más reciente';
+            @endphp
+            <input type="hidden" id="inp-orden-of" value="{{ $ordenOfAct }}">
+            <div class="ev-csel" id="ev-orden-of" style="min-width:150px;">
+                <div class="ev-csel-trigger" onclick="cselToggle('ev-orden-of')"
+                     style="padding:8px 12px;font-family:'Archivo Narrow',sans-serif;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;border-color:rgba(245,241,234,0.10);">
+                    <span id="ev-orden-of-label">{{ $ordenOfLabel }}</span>
+                    <span class="ev-csel-arrow">▾</span>
+                </div>
+                <ul class="ev-csel-menu">
+                    <li class="ev-csel-opt {{ $ordenOfAct === 'reciente' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-orden-of','inp-orden-of','reciente','Más reciente',this);window.location.href='{{ $baseOfertas }}?{{ $estadoPrefix }}orden=reciente'">Más reciente</li>
+                    <li class="ev-csel-opt {{ $ordenOfAct === 'candidatos' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-orden-of','inp-orden-of','candidatos','Más candidatos',this);window.location.href='{{ $baseOfertas }}?{{ $estadoPrefix }}orden=candidatos'">Más candidatos</li>
+                    <li class="ev-csel-opt {{ $ordenOfAct === 'titulo' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-orden-of','inp-orden-of','titulo','Alfabético',this);window.location.href='{{ $baseOfertas }}?{{ $estadoPrefix }}orden=titulo'">Alfabético</li>
+                </ul>
+            </div>
             @if($estadoOfAct !== null || request('orden'))
                 <a href="{{ $baseOfertas }}"
                    class="text-navy/40 hover:text-navy text-xs font-semibold transition-colors">

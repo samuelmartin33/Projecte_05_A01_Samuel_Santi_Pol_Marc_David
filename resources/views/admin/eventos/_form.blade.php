@@ -10,17 +10,35 @@
 @endif
 
 <div class="grid-form">
-    <label>
-        Organizador
-        <select name="organizador_id">
-            <option value="">Selecciona</option>
-            @foreach ($organizadores as $organizador)
-                <option value="{{ $organizador->id }}" @selected(old('organizador_id', $evento->organizador_id) == $organizador->id)>
-                    {{ $organizador->usuario?->nombre }} {{ $organizador->usuario?->apellido1 }} (#{{ $organizador->id }})
-                </option>
-            @endforeach
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Organizador</label>
+        @php $orgAct = old('organizador_id', $evento->organizador_id ?? ''); @endphp
+        <input type="hidden" id="inp-adm-org" name="organizador_id" value="{{ $orgAct }}">
+        <div class="ev-csel" id="ev-adm-org">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-org')">
+                <span id="ev-adm-org-label" class="{{ $orgAct ? '' : 'ev-csel-placeholder' }}">
+                    @if($orgAct)
+                        @php $orgSel = $organizadores->firstWhere('id', $orgAct); @endphp
+                        {{ $orgSel?->usuario?->nombre }} {{ $orgSel?->usuario?->apellido1 }} (#{{ $orgAct }})
+                    @else
+                        Selecciona
+                    @endif
+                </span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ !$orgAct ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-org','inp-adm-org','','Selecciona',this)">Selecciona</li>
+                @foreach ($organizadores as $organizador)
+                    @php $orgLabel = ($organizador->usuario?->nombre ?? '') . ' ' . ($organizador->usuario?->apellido1 ?? '') . ' (#' . $organizador->id . ')'; @endphp
+                    <li class="ev-csel-opt {{ $orgAct == $organizador->id ? 'selected' : '' }}"
+                        onclick="cselPick('ev-adm-org','inp-adm-org','{{ $organizador->id }}','{{ addslashes($orgLabel) }}',this)">
+                        {{ $orgLabel }}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
 
     <label class="full">
         Categorías <small style="font-weight:normal;text-transform:none;letter-spacing:0;">(selecciona una o más)</small>
@@ -36,21 +54,41 @@
         </div>
     </label>
 
-    <label>
-        Tipo evento
-        <select name="tipo_evento">
-            <option value="1" @selected(old('tipo_evento', $evento->tipo_evento ?? 1) == 1)>Presencial</option>
-            <option value="2" @selected(old('tipo_evento', $evento->tipo_evento ?? 1) == 2)>Online</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Tipo evento</label>
+        @php $tipoEvAdm = old('tipo_evento', $evento->tipo_evento ?? 1); @endphp
+        <input type="hidden" id="inp-adm-tipo-ev" name="tipo_evento" value="{{ $tipoEvAdm }}">
+        <div class="ev-csel" id="ev-adm-tipo-ev">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-tipo-ev')">
+                <span id="ev-adm-tipo-ev-label">{{ $tipoEvAdm == 2 ? 'Online' : 'Presencial' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $tipoEvAdm != 2 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-tipo-ev','inp-adm-tipo-ev','1','Presencial',this)">Presencial</li>
+                <li class="ev-csel-opt {{ $tipoEvAdm == 2 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-tipo-ev','inp-adm-tipo-ev','2','Online',this)">Online</li>
+            </ul>
+        </div>
+    </div>
 
-    <label>
-        Estado
-        <select name="estado">
-            <option value="1" @selected(old('estado', $evento->estado ?? 1) == 1)>Activo</option>
-            <option value="0" @selected(old('estado', $evento->estado ?? 1) == 0)>Inactivo</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Estado</label>
+        @php $estEvAdm = old('estado', $evento->estado ?? 1); @endphp
+        <input type="hidden" id="inp-adm-est-ev" name="estado" value="{{ $estEvAdm }}">
+        <div class="ev-csel" id="ev-adm-est-ev">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-est-ev')">
+                <span id="ev-adm-est-ev-label">{{ $estEvAdm == 1 ? 'Activo' : 'Inactivo' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $estEvAdm == 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-ev','inp-adm-est-ev','1','Activo',this)">Activo</li>
+                <li class="ev-csel-opt {{ $estEvAdm != 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-ev','inp-adm-est-ev','0','Inactivo',this)">Inactivo</li>
+            </ul>
+        </div>
+    </div>
 
     <label class="full">
         Titulo
@@ -62,15 +100,15 @@
         <textarea name="descripcion" rows="4">{{ old('descripcion', $evento->descripcion) }}</textarea>
     </label>
 
-    <label>
-        Inicio
-        <input type="datetime-local" name="fecha_inicio" value="{{ old('fecha_inicio', optional($evento->fecha_inicio)->format('Y-m-d\TH:i')) }}">
-    </label>
+    <div>
+        <label class="form-label">Inicio</label>
+        <input type="text" name="fecha_inicio" class="form-input adm-fp-datetime" value="{{ old('fecha_inicio', optional($evento->fecha_inicio)->format('Y-m-d H:i')) }}">
+    </div>
 
-    <label>
-        Fin
-        <input type="datetime-local" name="fecha_fin" value="{{ old('fecha_fin', optional($evento->fecha_fin)->format('Y-m-d\TH:i')) }}">
-    </label>
+    <div>
+        <label class="form-label">Fin</label>
+        <input type="text" name="fecha_fin" class="form-input adm-fp-datetime" value="{{ old('fecha_fin', optional($evento->fecha_fin)->format('Y-m-d H:i')) }}">
+    </div>
 
     <label>
         Nombre ubicacion

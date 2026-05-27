@@ -1,4 +1,18 @@
 
+/* ── Sección de cupones: override a tema oscuro VIBEZ ── */
+.seccion-detalle {
+    background: #0d0a18 !important;
+    border: 1px solid rgba(245,241,234,0.10) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+.seccion-titulo {
+    color: #f5f1ea !important;
+    border-bottom-color: rgba(245,241,234,0.10) !important;
+}
+/* Textos con clases text-navy/* se convierten en texto claro */
+body [class*="text-navy"] { color: rgba(245,241,234,0.75) !important; }
+
 /* Botón favorito — estado activo (rojo) */
 #btn-favorito-detalle.activo {
     background: #f43f5e !important;

@@ -20,13 +20,23 @@
         <textarea name="descripcion" rows="4">{{ old('descripcion', $categoria->descripcion) }}</textarea>
     </label>
 
-    <label>
-        Estado
-        <select name="estado">
-            <option value="1" @selected(old('estado', $categoria->estado ?? 1) == 1)>Activo</option>
-            <option value="0" @selected(old('estado', $categoria->estado ?? 1) == 0)>Inactivo</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Estado</label>
+        @php $estCatAdm = old('estado', $categoria->estado ?? 1); @endphp
+        <input type="hidden" id="inp-adm-est-cat" name="estado" value="{{ $estCatAdm }}">
+        <div class="ev-csel" id="ev-adm-est-cat">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-est-cat')">
+                <span id="ev-adm-est-cat-label">{{ $estCatAdm == 1 ? 'Activo' : 'Inactivo' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $estCatAdm == 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-cat','inp-adm-est-cat','1','Activo',this)">Activo</li>
+                <li class="ev-csel-opt {{ $estCatAdm != 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-cat','inp-adm-est-cat','0','Inactivo',this)">Inactivo</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <div class="form-actions">
