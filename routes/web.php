@@ -171,6 +171,19 @@ Route::view('/devoluciones',   'static.devoluciones')->name('devoluciones');
 Route::get('/cupones', [CuponController::class, 'index'])
     ->name('cupones.index');
 
+// --- Página exclusiva de presentación DAM (pública, sin auth) ---
+Route::get('/presentacion', function () {
+    $evento = Evento::where('titulo', 'VIBEZ DAM — Presentació del Projecte')
+        ->where('estado', 1)
+        ->first();
+    return view('static.presentacion', compact('evento'));
+})->name('presentacion');
+
+// --- Cartel imprimible para la presentación DAW ---
+Route::get('/cartel', function () {
+    return view('static.cartel');
+})->name('cartel');
+
 // --- Aceptar invitación al equipo de empresa (enlace del correo de selección) ---
 Route::get('/equipo/aceptar/{token}', [InvitacionEquipoController::class, 'aceptar'])
     ->name('equipo.aceptar');

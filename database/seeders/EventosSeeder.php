@@ -372,6 +372,31 @@ class EventosSeeder extends Seeder
                 'fecha_actualizacion'     => null,
             ],
 
+            /* ── PRESENTACIÓN DAW — CarniaFest (organizador_id=2) ── */
+            [
+                'organizador_id'          => 2,
+                'categoria_evento_id'     => 6,
+                'tipo_evento'             => 1,
+                'titulo'                  => 'VIBEZ DAW — Presentació del Projecte',
+                'descripcion'             => 'Presentació del projecte final del Cicle Formatiu de Grau Superior de Desenvolupament d\'Aplicacions Web. Accés amb entrada adquirida a la plataforma. Validació QR a l\'entrada.',
+                'fecha_inicio'            => '2026-06-05 09:30:00',
+                'fecha_fin'               => '2026-06-05 11:30:00',
+                'ubicacion_nombre'        => 'Jesuïtes Bellvitge — Aula de Presentacions',
+                'ubicacion_direccion'     => 'Carrer de la Constitució 19, 08907 L\'Hospitalet de Llobregat',
+                'latitud'                 => 41.4000000,
+                'longitud'                => 2.1200000,
+                'precio_base'             => 1.00,
+                'aforo_maximo'            => 30,
+                'aforo_actual'            => 0,
+                'edad_minima'             => null,
+                'es_gratuito'             => 0,
+                'url_externa'             => null,
+                'contador_comparticiones' => 0,
+                'estado'                  => 1,
+                'fecha_creacion'          => $ahora,
+                'fecha_actualizacion'     => null,
+            ],
+
             /* ── INFANTIL (cat 8) ─────────────────────────────────── */
             [
                 'organizador_id'          => 1,

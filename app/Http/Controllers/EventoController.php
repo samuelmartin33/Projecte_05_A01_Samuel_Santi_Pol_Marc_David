@@ -145,27 +145,60 @@ class EventoController extends Controller
     }
 
     /**
-     * Página pública de Eventos: lista completa con grid, filtros y mapa.
-     * Accesible tanto para usuarios autenticados como para invitados.
+     * Página pública de Eventos: lista completa con búsqueda, filtros y paginación.
+     * Acepta: buscar, categoria, orden (nuevo|antiguo), fecha_desde, fecha_hasta
      */
-    public function eventos()
+    public function eventos(Request $request)
     {
+        $buscar      = trim($request->input('buscar', ''));
+        $categoriaId = $request->input('categoria', '');
+        $orden       = in_array($request->input('orden'), ['nuevo', 'antiguo']) ? $request->input('orden') : 'nuevo';
+        $fechaDesde  = $request->input('fecha_desde', '');
+        $fechaHasta  = $request->input('fecha_hasta', '');
+
         $noTerminado = fn ($q) => $q->whereRaw('COALESCE(fecha_fin, fecha_inicio) >= NOW()');
 
-        $eventos = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
+        $query = Evento::with(['categoria', 'categorias', 'portada', 'organizador.empresa'])
             ->where('estado', 1)
-            ->tap($noTerminado)
-            ->orderBy('fecha_inicio')
-            ->get();
+            ->tap($noTerminado);
 
+        /* Búsqueda por texto: título, descripción, lugar o promotora */
+        if ($buscar !== '') {
+            $query->where(function ($q) use ($buscar) {
+                $q->where('titulo', 'like', "%{$buscar}%")
+                  ->orWhere('descripcion', 'like', "%{$buscar}%")
+                  ->orWhere('ubicacion_nombre', 'like', "%{$buscar}%")
+                  ->orWhereHas('organizador.empresa', fn ($q2) =>
+                      $q2->where('nombre_empresa', 'like', "%{$buscar}%")
+                  );
+            });
+        }
+
+        /* Filtro por categoría */
+        if ($categoriaId !== '' && is_numeric($categoriaId)) {
+            $query->whereHas('categorias', fn ($q) =>
+                $q->where('categorias_evento.id', (int) $categoriaId)
+            );
+        }
+
+        /* Filtro por rango de fechas (formato Y-m-d enviado por Flatpickr) */
+        if ($fechaDesde !== '') {
+            try { $query->where('fecha_inicio', '>=', $fechaDesde . ' 00:00:00'); } catch (\Exception) {}
+        }
+        if ($fechaHasta !== '') {
+            try { $query->where('fecha_inicio', '<=', $fechaHasta . ' 23:59:59'); } catch (\Exception) {}
+        }
+
+        /* Orden */
+        $query->orderBy('fecha_inicio', $orden === 'antiguo' ? 'asc' : 'desc');
+
+        $eventos    = $query->paginate(12)->withQueryString();
         $categorias = CategoriaEvento::where('estado', 1)->orderBy('nombre')->get();
 
-        $ubicaciones = Evento::where('estado', 1)
-            ->tap($noTerminado)
-            ->whereNotNull('ubicacion_nombre')
-            ->orderBy('ubicacion_nombre')
-            ->distinct()
-            ->pluck('ubicacion_nombre');
+        /* Labels para los ev-csel */
+        $catSeleccionada  = $categorias->firstWhere('id', (int) $categoriaId);
+        $categoriaLabel   = $catSeleccionada ? $catSeleccionada->nombre : 'Todas las categorías';
+        $ordenLabel       = $orden === 'antiguo' ? 'Más antiguo' : 'Más reciente';
 
         $favoritosIds    = [];
         $seguimientosIds = [];
@@ -182,33 +215,22 @@ class EventoController extends Controller
                 ->all();
         }
 
-        $ahora = now();
-        $eventosParaJs = $eventos->map(fn ($e) => [
-            'id'             => $e->id,
-            'titulo'         => $e->titulo,
-            'artista'        => $e->organizador?->empresa?->nombre_empresa ?? '',
-            'organizador'    => $e->organizador?->empresa?->nombre_empresa ?? '',
-            'empresa_id'     => $e->organizador?->empresa?->id,
-            'tagline'        => $e->tagline,
-            'fechaFmt'       => $e->fecha_fmt,
-            'hora'           => $e->hora,
-            'lugar'          => $e->ubicacion_nombre,
-            'ciudad'         => $e->ubicacion_nombre,
-            'coords'         => $e->coords,
-            'categoria'      => $e->categorias->pluck('nombre')->join(' · ') ?: ($e->categoria?->nombre ?? 'Evento'),
-            'precio'         => $e->precio_formateado,
-            'cupos'          => $e->cupos_disponibles,
-            'img'            => $e->url_portada,
-            'featured'       => (bool) $e->featured,
-            'soldOut'        => $e->sell_out,
-            'estaOcurriendo' => $e->fecha_inicio <= $ahora && ($e->fecha_fin === null || $e->fecha_fin >= $ahora),
-            'haTerminado'    => $e->fecha_fin !== null && $e->fecha_fin < $ahora,
-            'color'          => '#a855f7',
-        ]);
+        /* Respuesta AJAX: devuelve el HTML del partial + total para el buscador */
+        if ($request->ajax() || $request->wantsJson()) {
+            $html = view('partials.eventos.resultado', compact(
+                'eventos', 'favoritosIds', 'seguimientosIds'
+            ))->render();
+
+            return response()->json([
+                'html'  => $html,
+                'total' => $eventos->total(),
+            ]);
+        }
 
         return view('eventos', compact(
-            'eventos', 'categorias', 'ubicaciones',
-            'favoritosIds', 'seguimientosIds', 'eventosParaJs'
+            'eventos', 'categorias', 'favoritosIds', 'seguimientosIds',
+            'buscar', 'categoriaId', 'orden', 'fechaDesde', 'fechaHasta',
+            'categoriaLabel', 'ordenLabel'
         ));
     }
 
