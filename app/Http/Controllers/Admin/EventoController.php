@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoriaEvento;
 use App\Models\Evento;
 use App\Models\Organizador;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -22,6 +23,24 @@ class EventoController extends Controller
             ->paginate(10);
 
         return view('admin.eventos.index', compact('eventos'));
+    }
+
+    /** Búsqueda AJAX de eventos por título. */
+    public function buscar(Request $request): JsonResponse
+    {
+        $q = $request->input('q', '');
+        $eventos = Evento::with(['categoriaEvento'])
+            ->when($q, fn ($query) => $query->where('titulo', 'like', "%{$q}%"))
+            ->orderByDesc('id')->limit(30)->get();
+
+        return response()->json($eventos->map(fn ($e) => [
+            'id'          => $e->id,
+            'titulo'      => $e->titulo,
+            'categoria'   => $e->categoriaEvento?->nombre ?? 'Sin categoría',
+            'estado'      => (int) $e->estado,
+            'fecha_inicio'=> optional($e->fecha_inicio)->format('d/m/Y H:i') ?? '—',
+            'edit_url'    => route('admin.eventos.edit', $e->id),
+        ]));
     }
 
     public function create(): View

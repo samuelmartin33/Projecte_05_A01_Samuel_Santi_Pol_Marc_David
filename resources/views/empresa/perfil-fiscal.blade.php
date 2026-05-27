@@ -4,26 +4,6 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
-<<<<<<< HEAD
-<style>
-.te-csel{position:relative;width:100%;}
-.te-csel-trigger{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(245,241,234,0.14);border-radius:8px;padding:11px 14px;color:#f5f1ea;font-family:'Archivo Narrow',sans-serif;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;user-select:none;}
-.te-csel-trigger:hover{border-color:rgba(168,85,247,0.5);}
-.te-csel-arrow{font-size:12px;color:rgba(168,85,247,0.8);transition:transform 0.18s;}
-.te-csel.open .te-csel-arrow{transform:rotate(180deg);}
-.te-csel-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0d0a18;border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:4px 0;z-index:200;list-style:none;margin:0;}
-.te-csel.open .te-csel-menu{display:block;}
-.te-csel-opt{padding:10px 14px;font-family:'Archivo Narrow',sans-serif;font-size:14px;color:rgba(245,241,234,0.75);cursor:pointer;}
-.te-csel-opt:hover{background:rgba(168,85,247,0.15);color:#f5f1ea;}
-.te-csel-opt.selected{color:#c084fc;}
-/* Responsive: colapsar grids en móvil */
-@media (max-width: 480px) {
-  .grid-ciudad-cp  { grid-template-columns: 1fr !important; }
-  .grid-datos-2col { grid-template-columns: 1fr !important; }
-}
-</style>
-=======
->>>>>>> b915fe724c78fcd728e0b7a5cb8a74140e1b8962
 @endpush
 
 @section('content')

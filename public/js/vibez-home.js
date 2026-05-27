@@ -329,8 +329,8 @@ function vibezMapPanel(eventoMapa, panelMapa, mapa) {
     var esFav = (window.FAVORITOS_IDS || []).includes(eventoMapa.id);
     panelMapa.innerHTML = '<div style="position:relative;">'
         + '<img src="' + eventoMapa.img + '" alt="' + eventoMapa.titulo + '" style="width:100%;height:200px;object-fit:cover;">'
-        + '<button onclick="vibezMapCerrarPanel()" style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(7,6,12,0.7);border:1px solid var(--ink-faint);color:var(--ink);cursor:pointer;font-size:16px;backdrop-filter:blur(8px);">×</button>'
-        + '<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,6,12,0.9));"></div>'
+        + '<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,6,12,0.9));pointer-events:none;"></div>'
+        + '<button onclick="vibezMapCerrarPanel()" style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(7,6,12,0.7);border:1px solid var(--ink-faint);color:var(--ink);cursor:pointer;font-size:16px;backdrop-filter:blur(8px);z-index:2;">×</button>'
         + '<div style="position:absolute;bottom:12px;left:16px;right:16px;">'
         + (eventoMapa.estaOcurriendo ? '<div style="display:inline-flex;align-items:center;gap:5px;background:var(--magenta);color:var(--cream);padding:3px 8px;border-radius:999px;font-size:9px;font-family:\'Archivo Narrow\',sans-serif;font-weight:700;text-transform:uppercase;margin-bottom:6px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--cream);"></span>EN CURSO</div><br>' : '')
         + '<div class="display" style="font-size:22px;line-height:1;color:var(--ink);">' + eventoMapa.titulo + '</div>'
@@ -353,6 +353,12 @@ function vibezMapPanel(eventoMapa, panelMapa, mapa) {
         + '</div>';
 
     panelMapa.style.display = 'block';
+
+    /* En móvil mostrar el overlay semitransparente sobre el mapa */
+    if (window.innerWidth <= 640) {
+        var overlay = document.getElementById('mapa-panel-overlay');
+        if (overlay) overlay.style.display = 'block';
+    }
 }
 
 function _mapaMetaRow(label, val) {
@@ -363,4 +369,6 @@ function _mapaMetaRow(label, val) {
 function vibezMapCerrarPanel() {
     var panelMapa = document.getElementById('mapa-panel');
     if (panelMapa) panelMapa.style.display = 'none';
+    var overlay = document.getElementById('mapa-panel-overlay');
+    if (overlay) overlay.style.display = 'none';
 }

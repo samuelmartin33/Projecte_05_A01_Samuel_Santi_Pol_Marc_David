@@ -349,6 +349,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])
          ->name('admin.dashboard');
     
+    /* Búsqueda AJAX (deben ir antes de las rutas con {parámetros} para evitar conflictos) */
+    Route::get('/admin/usuarios/buscar', [AdminUsuarioController::class, 'buscar'])
+         ->name('admin.usuarios.buscar');
+    Route::get('/admin/eventos/buscar', [AdminEventoController::class, 'buscar'])
+         ->name('admin.eventos.buscar');
+    Route::get('/admin/cupones/buscar', [AdminCuponController::class, 'buscar'])
+         ->name('admin.cupones.buscar');
+
     /* Rutas de eventos */
     Route::get('/admin/eventos', [AdminEventoController::class, 'index'])
          ->name('admin.eventos.index');

@@ -223,17 +223,40 @@
 }
 
 /* ════════════════════════════════════════
-   CHAT — panel móvil con conversación activa
+   CHAT — layout y scroll en móvil
    ════════════════════════════════════════ */
+
+/* La columna izquierda (lista de chats) debe ocupar todo el espacio
+   disponible en el panel y el subpanel interior debe poder hacer scroll */
+.chats-col-izq {
+  flex: 1;
+  min-height: 0;
+}
+
+/* El subpanel de lista de chats necesita scroll, no clipping */
+#chats-lista-view {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-height: 0;
+}
+
+/* El subpanel de ventana de chat también necesita scroll correcto */
+#chats-ventana-view {
+  min-height: 0;
+}
+
 @media (max-width: 899px) {
-  /* Cuando se abre un chat en móvil, ocultar la lista */
-  #panel-chats.chat-abierto .chats-col-izq {
-    display: none;
-  }
-  #panel-chats.chat-abierto #chats-ventana-view {
+  /* Cuando el panel de mensajes está activo, cubre todo el panel (overlay).
+     Esto oculta el topbar "MENSAJES" y la lista que quedan detrás. */
+  #chats-ventana-view.activo {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 10 !important;
     display: flex !important;
-    flex: 1;
-    flex-direction: column;
+    flex-direction: column !important;
+    background: linear-gradient(180deg, #0d0818 0%, #0a0518 100%);
+    min-height: 0;
   }
 
   /* Botón volver con mayor área táctil */

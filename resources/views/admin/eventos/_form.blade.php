@@ -23,14 +23,14 @@
     </label>
 
     <label class="full">
-        Categorías <small style="font-weight:normal;">(selecciona una o más)</small>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+        Categorías <small style="font-weight:normal;text-transform:none;letter-spacing:0;">(selecciona una o más)</small>
+        <div class="cat-chips-wrap">
             @php $selectedCats = old('categorias', $evento->categorias->pluck('id')->toArray() ?? []); @endphp
             @foreach ($categorias as $categoria)
-                <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #555;cursor:pointer;">
+                <label class="cat-chip">
                     <input type="checkbox" name="categorias[]" value="{{ $categoria->id }}"
                            @checked(in_array($categoria->id, $selectedCats))>
-                    {{ $categoria->nombre }}
+                    <span class="cat-chip-label">{{ $categoria->nombre }}</span>
                 </label>
             @endforeach
         </div>
