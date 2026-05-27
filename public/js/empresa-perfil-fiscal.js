@@ -24,7 +24,7 @@ function pickTeCsel(val, label) {
 }
 
 /* Cierra el selector al hacer clic fuera de él */
-document.addEventListener('click', function(e) {
+document.onclick = function(e) {
     var el = document.getElementById('te-csel');
     if (el && !el.contains(e.target)) el.classList.remove('open');
-});
+};

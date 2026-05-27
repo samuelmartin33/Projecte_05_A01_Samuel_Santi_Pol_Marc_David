@@ -8,25 +8,24 @@
  */
 
 /* ── Flatpickr: inicializa todos los inputs de fecha y datetime ── */
-document.addEventListener('DOMContentLoaded', function () {
-    flatpickr('.adm-fp-date', {
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'd/m/Y',
-        altInputClass: 'adm-fp-alt',
-        locale: 'es',
-        disableMobile: true,
-    });
-    flatpickr('.adm-fp-datetime', {
-        enableTime: true,
-        time_24hr: true,
-        dateFormat: 'Y-m-d H:i',
-        altInput: true,
-        altFormat: 'd/m/Y H:i',
-        altInputClass: 'adm-fp-alt',
-        locale: 'es',
-        disableMobile: true,
-    });
+/* Script cargado al final del body: DOM ya disponible, no se necesita DOMContentLoaded */
+flatpickr('.adm-fp-date', {
+    dateFormat:    'Y-m-d',
+    altInput:      true,
+    altFormat:     'd/m/Y',
+    altInputClass: 'adm-fp-alt',
+    locale:        'es',
+    disableMobile: true,
+});
+flatpickr('.adm-fp-datetime', {
+    enableTime:    true,
+    time_24hr:     true,
+    dateFormat:    'Y-m-d H:i',
+    altInput:      true,
+    altFormat:     'd/m/Y H:i',
+    altInputClass: 'adm-fp-alt',
+    locale:        'es',
+    disableMobile: true,
 });
 
 /**
@@ -59,7 +58,7 @@ function toggleAdmNav() {
 }
 
 /* ── Cierre al hacer clic fuera del dropdown y del menú móvil ── */
-document.addEventListener('click', function (e) {
+document.onclick = function (e) {
     var foot = document.getElementById('admSideFoot');
     var drop = document.getElementById('admDropdown');
     if (drop && foot && !foot.contains(e.target)) {
@@ -78,4 +77,4 @@ document.addEventListener('click', function (e) {
             }
         }
     }
-});
+};

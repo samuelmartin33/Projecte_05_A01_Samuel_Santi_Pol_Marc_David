@@ -25,8 +25,8 @@
         });
     }
 
-    // Delegar click en opciones
-    document.addEventListener('click', function(e) {
+    // Delegar click en opciones y cierre al clicar fuera
+    document.onclick = function(e) {
         var opt = e.target.closest('.cselect-option');
         if (opt) {
             var cs = opt.closest('.cselect');

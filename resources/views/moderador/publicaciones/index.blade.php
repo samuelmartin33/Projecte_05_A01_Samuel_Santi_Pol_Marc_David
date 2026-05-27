@@ -51,6 +51,7 @@
                     <form method="POST"
                           action="{{ route('moderador.posts.destroy', $post) }}"
                           class="delete-form"
+                          onsubmit="return confirmarBorrar(event, this)"
                           data-confirm-msg="¿Eliminar la publicación de {{ addslashes($post->usuario->nombre ?? 'este usuario') }}?">
                         @csrf
                         @method('DELETE')

@@ -19,7 +19,7 @@ function toggleNavMobile() {
 }
 
 /* Cierra el menú móvil al hacer clic fuera */
-document.addEventListener('click', function(e) {
+document.onclick = function(e) {
     var menu = document.getElementById('vibez-mobile-menu');
     var btn  = document.getElementById('vibez-nav-hamburger');
     if (!menu || menu.style.display !== 'flex') return;

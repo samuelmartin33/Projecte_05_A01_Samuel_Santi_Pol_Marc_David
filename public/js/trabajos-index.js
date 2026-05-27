@@ -22,11 +22,11 @@
     }
 
     dots.forEach(function (dot) {
-        dot.addEventListener('click', function () {
+        dot.onclick = function () {
             clearInterval(timer);
             goTo(parseInt(this.dataset.index));
             startTimer();
-        });
+        };
     });
 
     startTimer();

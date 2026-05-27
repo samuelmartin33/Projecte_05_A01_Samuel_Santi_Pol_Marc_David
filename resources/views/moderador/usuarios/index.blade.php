@@ -69,6 +69,7 @@
                         <form method="POST"
                               action="{{ route('moderador.usuarios.banear', $usuario) }}"
                               class="delete-form"
+                              onsubmit="return confirmarBorrar(event, this)"
                               data-confirm-msg="¿Banear a {{ addslashes($usuario->nombre.' '.$usuario->apellido1) }}? No podrá acceder a su cuenta.">
                             @csrf
                             @method('PATCH')

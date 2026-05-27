@@ -36,17 +36,6 @@ function copiarCuponNav(codigo, cuponId) {
     });
 }
 
-/* Cierra el dropdown de cupones al hacer clic fuera */
-document.addEventListener('click', function(e) {
-    var btnCup  = document.getElementById('navCuponesBtn');
-    var dropCup = document.getElementById('navCuponesDropdown');
-    if (!btnCup || !dropCup) return;
-    if (!btnCup.contains(e.target) && !dropCup.contains(e.target)) {
-        dropCup.style.display = 'none';
-        _cuponesAbierto = false;
-    }
-});
-
 /* ─── Notificaciones: campanita del nav ─────────────────────── */
 
 var _notifAbierto = false;
@@ -66,17 +55,6 @@ function toggleNotifDropdown() {
 
     if (_notifAbierto) cargarNotificaciones();
 }
-
-/* Cierra el dropdown al hacer clic fuera */
-document.addEventListener('click', function(e) {
-    var bell = document.getElementById('navBellBtn');
-    var drop = document.getElementById('navNotifDropdown');
-    if (!bell || !drop) return;
-    if (!bell.contains(e.target) && !drop.contains(e.target)) {
-        drop.style.display = 'none';
-        _notifAbierto = false;
-    }
-});
 
 /* Carga las notificaciones via AJAX y renderiza la lista */
 function cargarNotificaciones() {
@@ -206,4 +184,30 @@ function solicitarPushPermiso(notificaciones, sinLeer) {
             if (data.sin_leer > 0) solicitarPushPermiso(data.notificaciones, data.sin_leer);
         });
     }
+})();
+
+/* ─── Cierre al hacer clic fuera (encadena el manejador previo de nav-hamburger.js) ─── */
+(function() {
+    /* Guardar el manejador previo (nav-hamburger.js lo asigna antes que este script) */
+    var _prevClick = document.onclick;
+    document.onclick = function(e) {
+        /* Propagar al manejador anterior si existe */
+        if (_prevClick) _prevClick(e);
+
+        /* Cerrar dropdown de cupones al clicar fuera */
+        var btnCup  = document.getElementById('navCuponesBtn');
+        var dropCup = document.getElementById('navCuponesDropdown');
+        if (btnCup && dropCup && !btnCup.contains(e.target) && !dropCup.contains(e.target)) {
+            dropCup.style.display = 'none';
+            _cuponesAbierto = false;
+        }
+
+        /* Cerrar dropdown de notificaciones al clicar fuera */
+        var bell = document.getElementById('navBellBtn');
+        var drop = document.getElementById('navNotifDropdown');
+        if (bell && drop && !bell.contains(e.target) && !drop.contains(e.target)) {
+            drop.style.display = 'none';
+            _notifAbierto = false;
+        }
+    };
 })();

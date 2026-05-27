@@ -24,7 +24,7 @@
     }
 
     /* Cierra al hacer clic fuera */
-    document.addEventListener('click', function (e) {
+    document.onclick = function (e) {
         var foot = document.getElementById('admSideFoot');
         var drop = document.getElementById('admDropdown');
         if (drop && foot && !foot.contains(e.target)) {

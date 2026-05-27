@@ -32,7 +32,7 @@ function toggleEvCsel(id) {
 }
 
 /* Cierra cualquier ev-csel abierto al clicar fuera */
-document.addEventListener('click', function (e) {
+document.onclick = function (e) {
     if (!e.target.closest('.ev-csel')) {
         document.querySelectorAll('.ev-csel.open').forEach(function (el) {
             el.classList.remove('open');

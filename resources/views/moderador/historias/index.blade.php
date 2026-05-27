@@ -59,6 +59,7 @@
                     <form method="POST"
                           action="{{ route('moderador.historias.destroy', $historia) }}"
                           class="delete-form"
+                          onsubmit="return confirmarBorrar(event, this)"
                           data-confirm-msg="¿Eliminar la historia de {{ addslashes($historia->usuario->nombre ?? 'este usuario') }}?">
                         @csrf
                         @method('DELETE')

@@ -59,6 +59,7 @@
                     <form method="POST"
                           action="{{ route('moderador.comentarios.destroy', $comentario) }}"
                           class="delete-form"
+                          onsubmit="return confirmarBorrar(event, this)"
                           data-confirm-msg="¿Eliminar el comentario de {{ addslashes($comentario->usuario->nombre ?? 'este usuario') }}?">
                         @csrf
                         @method('DELETE')
