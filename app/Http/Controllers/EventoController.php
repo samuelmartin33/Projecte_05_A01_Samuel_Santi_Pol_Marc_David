@@ -288,7 +288,11 @@ class EventoController extends Controller
                 }
 
                 if ($categoriaId) {
-                    $eventosQuery->whereHas('categorias', fn ($q) => $q->where('categorias_evento.id', $categoriaId));
+                    if (is_numeric($categoriaId)) {
+                        $eventosQuery->whereHas('categorias', fn ($q) => $q->where('categorias_evento.id', $categoriaId));
+                    } else {
+                        $eventosQuery->whereHas('categorias', fn ($q) => $q->where('categorias_evento.nombre', $categoriaId));
+                    }
                 }
 
                 if ($ubicacion) {

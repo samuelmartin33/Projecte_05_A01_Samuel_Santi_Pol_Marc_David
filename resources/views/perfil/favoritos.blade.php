@@ -105,7 +105,8 @@
 
     if (spinner) spinner.style.display = 'flex';
 
-    var url = '/api/filtrar?favoritos=1&categoria=' + encodeURIComponent(cat === 'Todo' ? '' : cat);
+    var ciudad = document.getElementById('grid-filtro-ubicacion') ? document.getElementById('grid-filtro-ubicacion').value : '';
+    var url = '/api/filtrar?favoritos=1&categoria=' + encodeURIComponent(cat === 'Todo' ? '' : cat) + '&ubicacion=' + encodeURIComponent(ciudad);
 
     fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
       .then(function(r) { return r.json(); })
@@ -139,5 +140,27 @@
       })
       .catch(function() { if (spinner) spinner.style.display = 'none'; });
   }
+
+  /* Sobreescribir funciones del grid para que respeten el filtro de favoritos */
+  window.vibezGridLimpiar = function() {
+    var ub = document.getElementById('grid-filtro-ubicacion');
+    if (ub) {
+      ub.value = '';
+      var label = document.getElementById('ev-filtro-ub-label');
+      if (label) { label.textContent = 'Todas las ciudades'; label.classList.add('ev-csel-placeholder'); }
+      var cont = document.getElementById('ev-filtro-ub');
+      if (cont) {
+        cont.querySelectorAll('.ev-csel-opt').forEach(function(o) { o.classList.remove('selected'); });
+        var first = cont.querySelector('.ev-csel-opt');
+        if (first) first.classList.add('selected');
+      }
+    }
+    filtrarFavoritos('Todo');
+  };
+
+  window.vibezFiltrarCiudad = function() {
+    var chip = document.querySelector('.vibez-cat-chip.active');
+    filtrarFavoritos(chip ? chip.dataset.cat : 'Todo');
+  };
 </script>
 @endpush

@@ -35,27 +35,48 @@
         <input type="password" name="password_hash" minlength="8" {{ $usuario->exists ? '' : 'required' }}>
     </label>
 
-    <label>
-        Tipo de cuenta
-        <select name="tipo_cuenta" id="tipo_cuenta" onchange="vibezActualizarRoles()">
-            <option value="cliente" @selected(old('tipo_cuenta', $usuario->tipo_cuenta ?? 'cliente') === 'cliente')>Cliente</option>
-            <option value="empresa" @selected(old('tipo_cuenta', $usuario->tipo_cuenta ?? 'cliente') === 'empresa')>Empresa</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Tipo de cuenta</label>
+        @php $tipoCuentaAdm = old('tipo_cuenta', $usuario->tipo_cuenta ?? 'cliente'); @endphp
+        <input type="hidden" id="tipo_cuenta" name="tipo_cuenta" value="{{ $tipoCuentaAdm }}">
+        <div class="ev-csel" id="ev-adm-tipo-cta">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-tipo-cta')">
+                <span id="ev-adm-tipo-cta-label">{{ $tipoCuentaAdm === 'empresa' ? 'Empresa' : 'Cliente' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $tipoCuentaAdm === 'cliente' ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-tipo-cta','tipo_cuenta','cliente','Cliente',this);vibezActualizarRoles()">Cliente</li>
+                <li class="ev-csel-opt {{ $tipoCuentaAdm === 'empresa' ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-tipo-cta','tipo_cuenta','empresa','Empresa',this);vibezActualizarRoles()">Empresa</li>
+            </ul>
+        </div>
+    </div>
 
-    <label>
-        Estado registro
-        <select name="estado_registro">
-            <option value="pendiente" @selected(old('estado_registro', $usuario->estado_registro ?? 'aprobado') === 'pendiente')>Pendiente</option>
-            <option value="aprobado" @selected(old('estado_registro', $usuario->estado_registro ?? 'aprobado') === 'aprobado')>Aprobado</option>
-            <option value="rechazado" @selected(old('estado_registro', $usuario->estado_registro ?? 'aprobado') === 'rechazado')>Rechazado</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Estado registro</label>
+        @php $estRegAdm = old('estado_registro', $usuario->estado_registro ?? 'aprobado'); @endphp
+        <input type="hidden" id="inp-adm-est-reg" name="estado_registro" value="{{ $estRegAdm }}">
+        <div class="ev-csel" id="ev-adm-est-reg">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-est-reg')">
+                <span id="ev-adm-est-reg-label">{{ $estRegAdm === 'pendiente' ? 'Pendiente' : ($estRegAdm === 'rechazado' ? 'Rechazado' : 'Aprobado') }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $estRegAdm === 'pendiente' ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-reg','inp-adm-est-reg','pendiente','Pendiente',this)">Pendiente</li>
+                <li class="ev-csel-opt {{ $estRegAdm === 'aprobado' ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-reg','inp-adm-est-reg','aprobado','Aprobado',this)">Aprobado</li>
+                <li class="ev-csel-opt {{ $estRegAdm === 'rechazado' ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-reg','inp-adm-est-reg','rechazado','Rechazado',this)">Rechazado</li>
+            </ul>
+        </div>
+    </div>
 
-    <label>
-        Fecha de nacimiento
-        <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $usuario->fecha_nacimiento) }}">
-    </label>
+    <div>
+        <label class="form-label">Fecha de nacimiento</label>
+        <input type="text" name="fecha_nacimiento" class="form-input adm-fp-date" value="{{ old('fecha_nacimiento', $usuario->fecha_nacimiento) }}">
+    </div>
 
     <label>
         Teléfono
@@ -93,13 +114,23 @@
         Es moderador
     </label>
 
-    <label>
-        Estado
-        <select name="estado">
-            <option value="1" @selected(old('estado', $usuario->estado ?? 1) == 1)>Activo</option>
-            <option value="0" @selected(old('estado', $usuario->estado ?? 1) == 0)>Inactivo</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Estado</label>
+        @php $estUsrAdm = old('estado', $usuario->estado ?? 1); @endphp
+        <input type="hidden" id="inp-adm-est-usr" name="estado" value="{{ $estUsrAdm }}">
+        <div class="ev-csel" id="ev-adm-est-usr">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-est-usr')">
+                <span id="ev-adm-est-usr-label">{{ $estUsrAdm == 1 ? 'Activo' : 'Inactivo' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $estUsrAdm == 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-usr','inp-adm-est-usr','1','Activo',this)">Activo</li>
+                <li class="ev-csel-opt {{ $estUsrAdm != 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-usr','inp-adm-est-usr','0','Inactivo',this)">Inactivo</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <div class="form-actions">

@@ -171,7 +171,7 @@ async function cambiarEstado(id, estado, selectEstado) {
         if (datosRespuesta.success) {
             etiquetaEstado.textContent = datosRespuesta.label;
             etiquetaEstado.className   = 'estado-badge ' + datosRespuesta.clases;
-            selectEstado.className     = 'estado-select estado-' + estado;
+            selectEstado.className     = 'ev-csel-trigger cand-estado-trigger estado-' + estado;
         }
     } catch(errorEstado) {
         console.error('Error al actualizar estado', errorEstado);
