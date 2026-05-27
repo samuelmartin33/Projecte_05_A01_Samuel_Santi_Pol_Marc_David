@@ -1,46 +1,31 @@
-
-/* ── Sección de cupones: override a tema oscuro VIBEZ ── */
-.seccion-detalle {
-    background: #0d0a18 !important;
-    border: 1px solid rgba(245,241,234,0.10) !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+/* eventos/detalle CSS */
+.btn-seguir-promotora {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1.5px solid rgba(168,85,247,0.6);
+    background: transparent;
+    color: #a855f7;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
-.seccion-titulo {
-    color: #f5f1ea !important;
-    border-bottom-color: rgba(245,241,234,0.10) !important;
+.btn-seguir-promotora:hover {
+    background: rgba(168,85,247,0.15);
 }
-/* Textos con clases text-navy/* se convierten en texto claro */
-body [class*="text-navy"] { color: rgba(245,241,234,0.75) !important; }
-
-/* Botón favorito — estado activo (rojo) */
-#btn-favorito-detalle.activo {
-    background: #f43f5e !important;
-    border-color: #f43f5e !important;
-    color: #ffffff !important;
+.btn-seguir-promotora.siguiendo {
+    background: rgba(168,85,247,0.2);
+    border-color: #a855f7;
+    color: #e9d5ff;
 }
-
-/* Mapa Leaflet */
-#mapa-evento { z-index: 1; }
-
-/* ─── Layout responsive de detalle ──────────────────────────────
-   En desktop: 2 columnas (contenido | panel de compra sticky).
-   En móvil: 1 columna, el panel de compra sube al principio.
-─────────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-    .detalle-grid {
-        grid-template-columns: 1fr !important;
-    }
-    /* El panel de compra pasa a la parte superior en móvil */
-    .detalle-col-derecha {
-        position: static !important;
-        order: -1;
-    }
-}
-
-@media (max-width: 600px) {
-    /* Reducir padding del hero y cuerpo en móvil */
-    .detalle-grid {
-        gap: 1.25rem !important;
-    }
+.btn-seguir-promotora.cargando {
+    opacity: 0.6;
+    pointer-events: none;
 }

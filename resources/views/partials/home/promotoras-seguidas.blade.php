@@ -85,57 +85,7 @@
 
 </section>
 
-<style>
-.btn-seguir-home {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(168,85,247,0.7);
-  background: rgba(7,6,12,0.75);
-  backdrop-filter: blur(8px);
-  color: #a855f7;
-  font-size: 18px;
-  font-weight: 900;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.18s, color 0.18s;
-  line-height: 1;
-}
-.btn-seguir-home:hover { background: rgba(168,85,247,0.25); }
-.btn-seguir-home.siguiendo { background: rgba(168,85,247,0.3); color: #e9d5ff; border-color: #a855f7; }
-.btn-seguir-home.cargando  { opacity: 0.5; pointer-events: none; }
-</style>
 
-<script>
-async function toggleSeguirHome(btn) {
-    const empresaId = btn.dataset.empresaId;
-    btn.classList.add('cargando');
-    try {
-        const res = await fetch(`/api/seguimientos/${empresaId}/toggle`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-        });
-        const data = await res.json();
-        if (data.success) {
-            if (data.siguiendo) {
-                btn.classList.add('siguiendo');
-                btn.textContent = '✓';
-                btn.title = 'Dejar de seguir';
-            } else {
-                btn.classList.remove('siguiendo');
-                btn.textContent = '+';
-                btn.title = 'Seguir';
-            }
-        }
-    } catch (e) {
-        console.error('Error al seguir promotora', e);
-    } finally {
-        btn.classList.remove('cargando');
-    }
-}
-</script>
+
+<script src="{{ asset('js/promotoras-seguidas.js') }}"></script>
+{{-- JS en public/js/promotoras-seguidas.js --}}

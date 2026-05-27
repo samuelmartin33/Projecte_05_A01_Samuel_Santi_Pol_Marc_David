@@ -277,52 +277,7 @@
 
 @section('scripts')
     <script src="{{ asset('js/perfil.js') }}"></script>
-    <style>
-    .btn-seguir-perfil {
-        padding: 6px 14px;
-        border: 1.5px solid rgba(168,85,247,0.6);
-        background: rgba(168,85,247,0.15);
-        color: #e9d5ff;
-        font-family: 'Syne', sans-serif;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        white-space: nowrap;
-        flex-shrink: 0;
-        transition: background 0.18s, opacity 0.18s;
-    }
-    .btn-seguir-perfil:hover { background: rgba(220,38,38,0.15); border-color: #ef4444; color: #fca5a5; }
-    .btn-seguir-perfil.cargando { opacity: 0.5; pointer-events: none; }
-    </style>
-    <script>
-    async function toggleSeguirPerfil(btn) {
-        const empresaId = btn.dataset.empresaId;
-        btn.classList.add('cargando');
-        try {
-            const res = await fetch(`/api/seguimientos/${empresaId}/toggle`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-            });
-            const data = await res.json();
-            if (data.success && !data.siguiendo) {
-                // Animar y quitar la fila
-                const fila = btn.closest('div[style*="display:flex"]');
-                if (fila) {
-                    fila.style.transition = 'opacity 0.3s';
-                    fila.style.opacity = '0';
-                    setTimeout(() => fila.remove(), 300);
-                }
-            }
-        } catch (e) {
-            console.error('Error al dejar de seguir', e);
-        } finally {
-            btn.classList.remove('cargando');
-        }
-    }
-    </script>
+    
+    <script src="{{ asset('js/perfil.js') }}"></script>
+{{-- JS en public/js/perfil.js --}}
 @endsection

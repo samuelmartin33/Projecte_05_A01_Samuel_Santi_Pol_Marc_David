@@ -1,0 +1,4 @@
+
+/* Ajuste especifico pagina favoritos */
+/* Compact the grid top spacing only on the favoritos page */
+        #seccion-grid-eventos { padding-top: 24px !important; }

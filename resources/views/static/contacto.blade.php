@@ -2,11 +2,8 @@
 @section('titulo', 'Contacto — VIBEZ')
 
 @push('estilos')
-<style>
-@media (max-width: 640px) {
-  .contacto-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-}
-</style>
+<link rel="stylesheet" href="{{ asset('css/static-contacto.css') }}">
+{{-- CSS extraido a public/css/static-contacto.css --}}
 @endpush
 
 @section('contenido')

@@ -836,3 +836,9 @@ body {
     min-width: 180px;
   }
 }
+
+/* ── Breakpoints de páginas específicas ── */
+@media (max-width: 700px) {
+  .adm-factura-grid { grid-template-columns: 1fr !important; }
+  .adm-empresa-grid { grid-template-columns: 1fr !important; }
+}

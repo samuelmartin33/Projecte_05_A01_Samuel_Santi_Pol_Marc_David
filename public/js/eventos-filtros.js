@@ -101,3 +101,18 @@ function _evFetch() {
         contenedor.style.opacity = '1';
     });
 }
+
+/* ── Flatpickr para filtros de fecha ── */
+/* Se inicializa al cargar el script (DOM ya disponible, script al final del body) */
+var _fpOpts = {
+    locale:      'es',
+    dateFormat:  'Y-m-d',
+    disableMobile: true,
+    onClose: function () { _evFetch(); }
+};
+
+/* Inicializar selectores de rango de fecha si existen */
+var _fpDesde = document.getElementById('ev-fecha-desde');
+var _fpHasta = document.getElementById('ev-fecha-hasta');
+if (_fpDesde) flatpickr(_fpDesde, _fpOpts);
+if (_fpHasta) flatpickr(_fpHasta, _fpOpts);

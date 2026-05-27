@@ -2,13 +2,7 @@
 
 @section('title', 'Admin | Emitir factura')
 
-@push('estilos')
-<style>
-@media (max-width: 700px) {
-  .adm-factura-grid { grid-template-columns: 1fr !important; }
-}
-</style>
-@endpush
+{{-- Estilos específicos añadidos en public/css/admin-vibez.css --}}
 
 @section('content')
 
@@ -143,25 +137,6 @@
 @endsection
 
 @push('scripts')
-<script>
-var bruto = {{ $calculo['importe_bruto'] }};
-
-function recalcular() {
-    var pct = parseFloat(document.getElementById('inputComision').value) || 0;
-    var iva = parseFloat(document.getElementById('inputIva').value) || 0;
-    var com = Math.round(bruto * pct / 100 * 100) / 100;
-    var cuota = Math.round(com * iva / 100 * 100) / 100;
-    var neto  = Math.round((bruto - com - cuota) * 100) / 100;
-
-    document.getElementById('prev-pct-com').textContent  = pct;
-    document.getElementById('prev-pct-iva').textContent  = iva;
-    document.getElementById('prev-comision').textContent = fmt(com);
-    document.getElementById('prev-iva').textContent      = fmt(cuota);
-    document.getElementById('prev-neto').textContent     = fmt(neto);
-}
-
-function fmt(n) {
-    return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-</script>
+<script>window.BRUTO = {{ $calculo['importe_bruto'] }};</script>
+<script src="{{ asset('js/admin-facturacion.js') }}"></script>
 @endpush

@@ -1,0 +1,42 @@
+/* premium-checkout.css */
+/* ── Responsive checkout Premium ──────────────────────────────── */
+
+  /* Hero: menos padding en móvil */
+  @media (max-width: 768px) {
+    .prem-hero-pad   { padding: 1.25rem 1rem 1rem !important; }
+    .prem-hero-title { font-size: clamp(1.6rem, 8vw, 2.5rem) !important; }
+  }
+
+  /* Grid principal: 2 columnas → 1 columna en móvil */
+  .prem-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .prem-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Cuerpo: menos padding lateral en móvil */
+  @media (max-width: 768px) {
+    .prem-body-pad { padding: 2rem 1rem !important; }
+  }
+
+  /* Tarjeta de pago: en móvil deja de ser sticky y pierde el top fijo */
+  @media (max-width: 900px) {
+    .prem-payment-card {
+      position: static !important;
+      top: auto !important;
+    }
+  }
+
+  /* Precio: un poco más pequeño en móvil */
+  @media (max-width: 480px) {
+    .prem-price { font-size: 2.8rem !important; }
+  }

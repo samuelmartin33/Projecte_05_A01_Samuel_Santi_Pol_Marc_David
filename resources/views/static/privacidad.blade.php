@@ -1,85 +1,15 @@
 @extends('layouts.app')
 @section('titulo', 'Política de privacidad — VIBEZ')
 
+@push('estilos')
+<link rel="stylesheet" href="{{ asset('css/static-privacidad.css') }}">
+{{-- CSS extraido a public/css/static-privacidad.css --}}
+@endpush
+
 @section('content')
 
 <link rel="stylesheet" href="{{ asset('css/vibez-welcome.css') }}">
-<style>
-  .static-hero {
-    padding: 100px 40px 72px;
-    max-width: 1320px;
-    margin: 0 auto;
-    border-bottom: 1px solid var(--line);
-    position: relative; z-index: 1;
-  }
-  .static-body {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 0 40px 120px;
-    position: relative; z-index: 1;
-  }
-  .static-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-  .static-item {
-    padding: 40px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .static-item:nth-child(odd)  { padding-right: 60px; border-right: 1px solid var(--line); }
-  .static-item:nth-child(even) { padding-left: 60px; }
-  .static-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--morado-2);
-    margin-bottom: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .static-label::before {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: var(--morado-2);
-    display: inline-block;
-    flex-shrink: 0;
-  }
-  .static-text {
-    font-family: 'Archivo', sans-serif;
-    font-size: 15px;
-    color: var(--ink-dim);
-    line-height: 1.75;
-    margin: 0;
-  }
-  .static-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--morado-2);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    text-decoration: none;
-    margin-top: 56px;
-    border-bottom: 1px solid rgba(168,85,247,0.4);
-    padding-bottom: 3px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .static-back:hover { color: var(--ink); border-color: var(--ink); }
-  @media (max-width: 820px) {
-    .static-hero { padding: 72px 20px 48px; }
-    .static-body { padding: 0 20px 80px; }
-    .static-grid { grid-template-columns: 1fr; }
-    .static-item:nth-child(odd)  { padding-right: 0; border-right: none; }
-    .static-item:nth-child(even) { padding-left: 0; }
-  }
-</style>
+
 
 {{-- Orbs de ambiente --}}
 <div class="amb amb-1" aria-hidden="true"></div>

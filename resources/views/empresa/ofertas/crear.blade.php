@@ -4,89 +4,8 @@
 
 @push('estilos')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<style>
-    body { background: #07060c; }
-
-    .form-crear-evento {
-        background: #0d0a18;
-        border: 1px solid rgba(245,241,234,0.10);
-        border-radius: 0;
-        padding: 2.25rem;
-    }
-    .form-section-title {
-        font-family: 'Archivo Narrow', sans-serif;
-        font-size: 0.6875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
-        color: #c084fc;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .form-section-title svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .form-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba(245,241,234,0.10);
-    }
-    .btn-guardar {
-        font-family: 'Anton', sans-serif;
-        font-size: 0.8125rem;
-        text-transform: uppercase;
-        letter-spacing: -0.005em;
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 12px 22px;
-        background: #a855f7;
-        color: #f5f1ea;
-        border: none;
-        cursor: pointer;
-        transition: background 0.15s;
-    }
-    .btn-guardar:hover { background: #c084fc; color: #07060c; }
-    .btn-cancelar {
-        font-family: 'Archivo Narrow', sans-serif;
-        font-size: 0.6875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
-        padding: 12px 18px;
-        background: transparent;
-        border: 1px solid rgba(245,241,234,0.10);
-        color: rgba(245,241,234,0.55);
-        cursor: pointer;
-        text-decoration: none;
-        transition: border-color 0.15s, color 0.15s;
-    }
-    .btn-cancelar:hover { border-color: rgba(245,241,234,0.3); color: #f5f1ea; }
-    .alert-errores {
-        background: rgba(239,68,68,0.10);
-        border: 1px solid rgba(239,68,68,0.4);
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
-        color: #f87171;
-        font-size: 0.85rem;
-    }
-    .alert-errores strong { display: block; margin-bottom: 0.4rem; font-family: 'Archivo Narrow', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
-    .alert-errores ul { margin: 0; padding-left: 1.25rem; }
-    .alert-errores li { margin-bottom: 0.2rem; }
-    .salario-prefix { display: flex; align-items: flex-end; gap: 0; }
-    .salario-prefix > span {
-        font-family: 'Archivo Narrow', sans-serif;
-        font-size: 0.625rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
-        color: rgba(245,241,234,0.55);
-        padding: 0 8px 8px 0;
-        flex-shrink: 0;
-    }
-    .salario-prefix .form-input { flex: 1; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/empresa-eventos-form.css') }}">
+{{-- CSS extraido a public/css/empresa-eventos-form.css --}}
 @endpush
 
 @section('content')
@@ -272,15 +191,6 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    flatpickr('.emp-fp-date', {
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'd/m/Y',
-        altInputClass: 'form-input',
-        locale: 'es'
-    });
-});
-</script>
+<script src="{{ asset('js/empresa-ofertas-form.js') }}"></script>
+{{-- JS en public/js/empresa-ofertas-form.js --}}
 @endpush

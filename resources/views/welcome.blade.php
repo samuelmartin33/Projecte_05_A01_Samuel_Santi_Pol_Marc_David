@@ -341,42 +341,7 @@
     </div>
 </footer>
 
-<script>
-function animarContadores() {
-    var els = document.querySelectorAll('.stat-num[data-target]');
-    for (var i = 0; i < els.length; i++) {
-        (function(el) {
-            var target  = parseInt(el.getAttribute('data-target'), 10);
-            var suffix  = el.getAttribute('data-suffix') || '';
-            var duration = 1600;
-            var steps    = 60;
-            var stepTime = duration / steps;
-            var current  = 0;
-            var increment = target / steps;
-            var timer = setInterval(function() {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                el.textContent = Math.floor(current).toLocaleString('es-ES') + suffix;
-            }, stepTime);
-        })(els[i]);
-    }
-}
-
-/* Lanzar cuando el elemento proof entra en pantalla */
-var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            animarContadores();
-            observer.disconnect();
-        }
-    });
-}, { threshold: 0.3 });
-
-var proofSection = document.querySelector('.proof-stats');
-if (proofSection) observer.observe(proofSection);
-</script>
+<script src="{{ asset('js/welcome.js') }}"></script>
+{{-- JS en public/js/welcome.js --}}
 </body>
 </html>

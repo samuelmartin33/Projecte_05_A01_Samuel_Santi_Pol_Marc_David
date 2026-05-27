@@ -1,140 +1,17 @@
 @extends('layouts.app')
 @section('titulo', 'Mis entradas — VIBEZ')
 
-{{-- @section('content') suprime el nav/footer del layout, igual que la home --}}
+{{-- @push('estilos')
+<link rel="stylesheet" href="{{ asset('css/mis-entradas.css') }}">
+{{-- CSS extraido a public/css/mis-entradas.css --}}
+@endpush
+
+@section('content') suprime el nav/footer del layout, igual que la home --}}
 @section('content')
 
 {{-- ── Estilos ── --}}
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
-<style>
-  /* ── Filtros ── */
-  .me-filtro-btn {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(124,58,237,0.22);
-    color: rgba(245,241,234,0.45);
-    border-radius: 999px;
-    padding: 7px 20px;
-    font-family: 'Archivo Narrow', sans-serif;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .me-filtro-btn.activo {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    border-color: transparent;
-    color: #fff;
-    font-weight: 700;
-  }
-  .me-filtro-btn:hover:not(.activo) {
-    background: rgba(124,58,237,0.1);
-    color: #c084fc;
-    border-color: rgba(124,58,237,0.4);
-  }
 
-  /* ── Tarjeta de ticket ── */
-  .me-card {
-    border-radius: 18px;
-    overflow: hidden;
-    border: 1px solid rgba(124,58,237,0.28);
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    cursor: pointer;
-    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-    user-select: none;
-    margin-bottom: 1.25rem;
-  }
-  .me-card:hover {
-    border-color: rgba(168,85,247,0.55);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(124,58,237,0.18);
-  }
-  .me-card.usada { opacity: 0.65; border-color: rgba(100,116,139,0.18); }
-
-  /* ── Chevron ── */
-  .me-chevron { transition: transform 0.25s ease; display: flex; align-items: center; }
-  .me-chevron.abierto { transform: rotate(180deg); }
-
-  /* ── Separador talonario ── */
-  .me-sep { position: relative; border-top: 2px dashed rgba(124,58,237,0.28); }
-  .me-circ {
-    position: absolute; top: -11px;
-    width: 22px; height: 22px;
-    background: #07060c;
-    border-radius: 50%;
-    border: 2px solid rgba(124,58,237,0.28);
-  }
-
-  /* ── Panel QR ── */
-  .me-qr-panel { background: rgba(0,0,0,0.22); padding: 22px 24px 26px; }
-  .me-qr-marco {
-    background: #fff; border-radius: 12px; padding: 10px;
-    box-shadow: 0 4px 28px rgba(124,58,237,0.22); display: inline-block;
-  }
-
-  /* ── Contador ── */
-  .me-cnt-unit {
-    display: flex; flex-direction: column; align-items: center;
-    background: rgba(0,0,0,0.38);
-    border: 1px solid rgba(124,58,237,0.28);
-    border-radius: 10px;
-    padding: 8px 12px; min-width: 52px;
-  }
-
-  /* ── Badge ── */
-  .me-badge-activa {
-    background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.28);
-    color: #34d399; display: inline-block;
-    font-family: 'Archivo Narrow', sans-serif; font-size: 0.58rem;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    padding: 3px 10px; border-radius: 999px; margin-bottom: 8px;
-  }
-  .me-badge-usada {
-    background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.18);
-    color: #94a3b8; display: inline-block;
-    font-family: 'Archivo Narrow', sans-serif; font-size: 0.58rem;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    padding: 3px 10px; border-radius: 999px; margin-bottom: 8px;
-  }
-  .me-badge-caducada {
-    background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.25);
-    color: #fb923c; display: inline-block;
-    font-family: 'Archivo Narrow', sans-serif; font-size: 0.58rem;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    padding: 3px 10px; border-radius: 999px; margin-bottom: 8px;
-  }
-
-  /* ── Tarjeta caducada ── */
-  .me-card.caducada { opacity: 0.55; border-color: rgba(251,146,60,0.15); }
-
-  /* ── Botón reembolso ── */
-  .me-btn-reembolso {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.28);
-    color: #f87171; border-radius: 999px;
-    padding: 5px 14px; margin-top: 10px;
-    font-family: 'Archivo Narrow', sans-serif; font-size: 0.66rem;
-    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .me-btn-reembolso:hover {
-    background: rgba(239,68,68,0.16); border-color: rgba(239,68,68,0.48);
-    color: #fca5a5;
-  }
-
-  /* ── Responsive ── */
-  @media (max-width: 600px) {
-    .me-cnt-row { flex-direction: column; align-items: flex-start; gap: 14px; }
-    .me-cnt-timer { gap: 5px; }
-    .me-cnt-unit  { min-width: 42px; padding: 6px 8px; }
-    .me-cnt-num   { font-size: 1.1rem !important; }
-    .me-filtros   { flex-wrap: wrap; }
-    .me-card-header { padding: 16px !important; }
-    .me-qr-panel  { padding: 16px !important; }
-  }
-</style>
 
 {{-- ────────────────── NAV ────────────────── --}}
 @include('partials.home.nav')

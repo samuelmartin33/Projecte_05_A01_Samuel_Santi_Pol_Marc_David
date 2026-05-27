@@ -1996,3 +1996,7 @@
     display: block;
 }
 
+
+/* Layout social */
+.soc { height: calc(100vh - 107px); }
+  @media (max-width: 768px) { .soc { height: calc(100vh - 79px); } }

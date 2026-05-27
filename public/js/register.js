@@ -654,6 +654,149 @@ function registrar(evento) {
 }
 
 /* ============================================================
+   TABS CLIENTE / EMPRESA
+   ============================================================ */
+
+/**
+ * Cambia el tab activo (Cliente / Empresa) y ajusta los campos visibles.
+ * Llamado desde onclick="seleccionarTab('empresa', this)" en el blade.
+ * @param {string}      tipo  - 'cliente' | 'empresa'
+ * @param {HTMLElement} elTab - Elemento tab pulsado
+ */
+function seleccionarTab(tipo, elTab) {
+    var tabs = document.querySelectorAll('.auth-tab');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    elTab.classList.add('active');
+
+    var select = document.getElementById('tipo_cuenta');
+    select.value = tipo;
+    cambiarTipoCuenta(select);
+
+    var esEmpresa = tipo === 'empresa';
+
+    var empresaWrap = document.getElementById('empresa-field-wrap');
+    if (empresaWrap) empresaWrap.style.display = esEmpresa ? 'block' : 'none';
+
+    var campoApellido2 = document.getElementById('field-apellido2');
+    if (campoApellido2) campoApellido2.style.display = esEmpresa ? 'none' : 'flex';
+
+    var moodPick = document.querySelector('.auth-mood-pick');
+    if (moodPick) moodPick.style.display = esEmpresa ? 'none' : 'block';
+}
+
+/* Auto-seleccionar tab empresa si la URL viene con ?tipo=empresa */
+(function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('tipo') === 'empresa') {
+        var tabEmpresa = document.querySelector('[data-tipo="empresa"]');
+        if (tabEmpresa) seleccionarTab('empresa', tabEmpresa);
+    }
+})();
+
+/* Inicializar tab "cliente" por defecto */
+(function () {
+    var select = document.getElementById('tipo_cuenta');
+    if (select) { select.value = 'cliente'; cambiarTipoCuenta(select); }
+})();
+
+/* ============================================================
+   SELECTOR CUSTOM DE TIPO DE PROMOTOR
+   ============================================================ */
+
+/** Abre o cierra el selector de tipo de promotor. */
+function toggleTpCsel() {
+    var menu    = document.getElementById('tp-csel-menu');
+    var trigger = document.getElementById('tp-csel-trigger');
+    var arrow   = document.getElementById('tp-csel-arrow');
+    var open    = menu.classList.contains('tp-csel-open');
+    menu.classList.toggle('tp-csel-open', !open);
+    trigger.classList.toggle('tp-csel-active', !open);
+    arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+/**
+ * Selecciona un tipo de promotor y cierra el dropdown.
+ * @param {string} val   - Valor interno
+ * @param {string} label - Texto visible
+ */
+function pickTpCsel(val, label) {
+    document.getElementById('tipo_promotor').value       = val;
+    document.getElementById('tp-csel-label').textContent = label;
+    document.getElementById('tp-csel-label').style.color = '';
+    var menu    = document.getElementById('tp-csel-menu');
+    var trigger = document.getElementById('tp-csel-trigger');
+    var arrow   = document.getElementById('tp-csel-arrow');
+    if (menu)    menu.classList.remove('tp-csel-open');
+    if (trigger) trigger.classList.remove('tp-csel-active');
+    if (arrow)   arrow.style.transform = 'rotate(0deg)';
+    var error = document.getElementById('error-tipo_promotor');
+    if (error) error.textContent = '';
+
+    /* Cerrar al hacer clic fuera */
+    document.onclick = function(e) {
+        var csel = document.getElementById('tp-csel');
+        if (csel && !csel.contains(e.target)) {
+            var m = document.getElementById('tp-csel-menu');
+            var t = document.getElementById('tp-csel-trigger');
+            var a = document.getElementById('tp-csel-arrow');
+            if (m) { m.classList.remove('tp-csel-open'); t.classList.remove('tp-csel-active'); a.style.transform = 'rotate(0deg)'; }
+        }
+    };
+}
+
+/**
+ * Valida el formato del campo NIF/CIF al perder el foco.
+ * @returns {boolean}
+ */
+function validarNifCif() {
+    var campo = document.getElementById('nif_cif');
+    var error = document.getElementById('error-nif_cif');
+    if (!campo || !error) return true;
+    var val = campo.value.trim();
+    if (!val) { error.textContent = 'El NIF/CIF es obligatorio'; return false; }
+    if (!/^[A-Za-z0-9]{7,9}$/.test(val)) { error.textContent = 'Formato inválido (ej: B12345678)'; return false; }
+    error.textContent = '';
+    return true;
+}
+
+/**
+ * Valida que se haya seleccionado el tipo de promotor.
+ * @returns {boolean}
+ */
+function validarTipoPromotor() {
+    var campo = document.getElementById('tipo_promotor');
+    var error = document.getElementById('error-tipo_promotor');
+    if (!campo || !error) return true;
+    if (!campo.value) { error.textContent = 'Selecciona el tipo de promotor'; return false; }
+    error.textContent = '';
+    return true;
+}
+
+/* ============================================================
+   BARRA DE FORTALEZA DE CONTRASEÑA
+   ============================================================ */
+
+/**
+ * Actualiza la barra visual de fortaleza al escribir la contraseña.
+ * @param {string} valor - Valor actual del campo contraseña
+ */
+function actualizarFortaleza(valor) {
+    var barra    = document.getElementById('strength-bar');
+    var etiqueta = document.getElementById('strength-label');
+    if (!barra) return;
+    var f = 0;
+    if (valor.length >= 8)          f += 25;
+    if (/[A-Z]/.test(valor))        f += 25;
+    if (/[0-9]/.test(valor))        f += 25;
+    if (/[^A-Za-z0-9]/.test(valor)) f += 25;
+    barra.style.width = f + '%';
+    var colores = { 25: '#ef4444', 50: '#f59e0b', 75: '#3b82f6', 100: '' };
+    var niveles = { 25: 'Débil',   50: 'Regular', 75: 'Fuerte',  100: 'Excelente' };
+    barra.style.background = colores[f] || '';
+    etiqueta.textContent   = f > 0 ? (niveles[f] || '') : '';
+}
+
+/* ============================================================
    AUTENTICACIÓN CON APPLE (Sign in with Apple — JS SDK)
    ============================================================ */
 

@@ -242,26 +242,8 @@
 </div>
 
 @push('scripts')
-<script>
-function toggleTeCsel() {
-    var el = document.getElementById('te-csel');
-    el.classList.toggle('open');
-}
-
-function pickTeCsel(val, label) {
-    document.getElementById('tipo_empresa').value    = val;
-    document.getElementById('te-csel-label').textContent = label;
-    document.getElementById('te-csel').classList.remove('open');
-    document.querySelectorAll('.ev-csel-opt').forEach(function(li) {
-        li.classList.toggle('selected', li.getAttribute('onclick').indexOf("'" + val + "'") !== -1);
-    });
-}
-
-document.addEventListener('click', function(e) {
-    var el = document.getElementById('te-csel');
-    if (el && !el.contains(e.target)) el.classList.remove('open');
-});
-</script>
+<script src="{{ asset('js/empresa-perfil-fiscal.js') }}"></script>
+{{-- JS en public/js/empresa-perfil-fiscal.js --}}
 @endpush
 
 @endsection

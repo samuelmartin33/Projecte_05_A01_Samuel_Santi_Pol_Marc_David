@@ -2,13 +2,7 @@
 
 @section('title', 'Admin | Detalle empresa')
 
-@push('estilos')
-<style>
-@media (max-width: 700px) {
-  .adm-empresa-grid { grid-template-columns: 1fr !important; }
-}
-</style>
-@endpush
+{{-- Estilos específicos añadidos en public/css/admin-vibez.css --}}
 
 @section('content')
     <header class="admin-header">

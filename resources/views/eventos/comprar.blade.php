@@ -4,23 +4,9 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
-<style>
-  /* Grid compra: 2 columnas en desktop, 1 en móvil */
-  .comprar-grid {
-    display: grid;
-    grid-template-columns: 1fr 460px;
-    gap: 2.5rem;
-    align-items: start;
-  }
-  /* El panel de pago sube al inicio en móvil para mayor conversión */
-  @media (max-width: 900px) {
-    .comprar-grid { grid-template-columns: 1fr !important; gap: 1.5rem; }
-    .comprar-col-pago { order: -1; }
-  }
-  @media (max-width: 600px) {
-    .comprar-wrap { padding: 1.5rem 1rem !important; }
-  }
-</style>
+
+<link rel="stylesheet" href="{{ asset('css/eventos-comprar.css') }}">
+{{-- CSS extraido --}}
 @endpush
 
 @section('content')

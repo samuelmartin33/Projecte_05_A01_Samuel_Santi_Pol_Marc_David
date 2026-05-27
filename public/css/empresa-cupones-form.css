@@ -1,0 +1,153 @@
+/* ── VIBEZ Empresa — Formulario de cupón (crear / editar) ── */
+
+body { background: #07060c; }
+
+.form-crear-cupon {
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 2.25rem;
+}
+.form-section-title {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #c084fc;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.form-section-title svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* Lista de eventos (checkboxes) */
+.eventos-lista {
+    border: 1px solid rgba(245,241,234,0.10);
+    background: rgba(0,0,0,0.2);
+    max-height: 240px;
+    overflow-y: auto;
+}
+.evento-check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(245,241,234,0.06);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.evento-check-item:last-child { border-bottom: none; }
+.evento-check-item:hover { background: rgba(168,85,247,0.08); }
+.evento-check-item input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: #a855f7;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.evento-check-nombre {
+    font-family: 'Archivo', sans-serif;
+    font-size: 0.875rem;
+    color: #f5f1ea;
+}
+.evento-check-fecha {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245,241,234,0.30);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.eventos-lista-empty {
+    padding: 16px;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245,241,234,0.25);
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(245,241,234,0.10);
+}
+.btn-guardar {
+    font-family: 'Anton', sans-serif;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px;
+    background: #a855f7;
+    color: #f5f1ea;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.btn-guardar:hover { background: #c084fc; color: #07060c; }
+.btn-cancelar {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 12px 18px;
+    background: transparent;
+    border: 1px solid rgba(245,241,234,0.10);
+    color: rgba(245,241,234,0.55);
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+}
+.btn-cancelar:hover { border-color: rgba(245,241,234,0.3); color: #f5f1ea; }
+
+.alert-errores {
+    background: rgba(239,68,68,0.10);
+    border: 1px solid rgba(239,68,68,0.4);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    color: #f87171;
+    font-size: 0.85rem;
+}
+.alert-errores strong {
+    display: block; margin-bottom: 0.4rem;
+    font-family: 'Archivo Narrow', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.1em;
+}
+.alert-errores ul { margin: 0; padding-left: 1.25rem; }
+.alert-errores li { margin-bottom: 0.2rem; }
+
+/* Cabecera del formulario con el código del cupón (solo en editar) */
+.cupon-edit-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(245,241,234,0.10);
+}
+.cupon-edit-badge {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c084fc;
+    background: rgba(168,85,247,0.12);
+    border: 1px solid rgba(168,85,247,0.3);
+    padding: 6px 16px;
+}
+.cupon-edit-meta {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.40);
+}

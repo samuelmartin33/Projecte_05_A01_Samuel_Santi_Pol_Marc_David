@@ -9,6 +9,7 @@ use App\Models\EventoImagen;
 use App\Models\Organizador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -186,7 +187,9 @@ class EventosController extends Controller
             $path = $request->file('imagen_portada')->store('eventos', 'public');
             EventoImagen::create([
                 'evento_id'      => $evento->id,
-                'imagen_url'     => '/storage/' . $path,
+                // Storage::url() genera la URL pública correcta según la config del disco
+                // Ejemplo resultado: /storage/eventos/abc123.jpg
+                'imagen_url'     => Storage::url($path),
                 'descripcion'    => 'Portada del evento',
                 'es_portada'     => 1,
                 'estado'         => 1,
@@ -302,7 +305,8 @@ class EventosController extends Controller
             $path = $request->file('imagen_portada')->store('eventos', 'public');
             EventoImagen::create([
                 'evento_id'      => $evento->id,
-                'imagen_url'     => '/storage/' . $path,
+                // Storage::url() genera la URL pública correcta según la config del disco
+                'imagen_url'     => Storage::url($path),
                 'descripcion'    => 'Portada del evento',
                 'es_portada'     => 1,
                 'estado'         => 1,

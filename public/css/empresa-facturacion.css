@@ -1,0 +1,82 @@
+/* empresa/facturacion/index CSS */
+/* ── Tabla ── */
+.adm-table-wrap { background:#0d0a18; border:1px solid rgba(245,241,234,0.10); overflow-x:auto; }
+.adm-table { width:100%; border-collapse:collapse; }
+.adm-table thead tr { border-bottom:1px solid rgba(245,241,234,0.10); }
+.adm-table thead th {
+    padding:13px 20px; font-family:'Archivo Narrow',sans-serif;
+    font-size:0.5625rem; font-weight:600; text-transform:uppercase; letter-spacing:0.18em;
+    color:rgba(245,241,234,0.35); white-space:nowrap; text-align:left;
+    cursor:pointer; user-select:none; transition:color 0.15s;
+}
+.adm-table thead th.r { text-align:right; }
+.adm-table thead th:hover { color:rgba(245,241,234,0.65); }
+.adm-table thead th.sorted-asc  .sort-icon::after { content:' ↑'; color:#c084fc; }
+.adm-table thead th.sorted-desc .sort-icon::after { content:' ↓'; color:#c084fc; }
+.adm-table tbody tr { border-bottom:1px solid rgba(245,241,234,0.06); transition:background 0.12s; }
+.adm-table tbody tr:last-child { border-bottom:none; }
+.adm-table tbody tr:hover { background:rgba(245,241,234,0.03); }
+.adm-table td { padding:16px 20px; color:#f5f1ea; vertical-align:middle; }
+.adm-table td.r { text-align:right; }
+.adm-evento-nombre { font-family:'Anton',sans-serif; font-size:1rem; text-transform:uppercase; letter-spacing:-0.01em; color:#f5f1ea; line-height:1.2; }
+.adm-evento-fecha  { font-family:'Archivo Narrow',sans-serif; font-size:0.5625rem; font-weight:600; text-transform:uppercase; letter-spacing:0.14em; color:rgba(245,241,234,0.35); margin-top:4px; }
+.adm-badge-activo  { display:inline-block; font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; padding:3px 8px; background:rgba(52,211,153,0.12); color:#34d399; border:1px solid rgba(52,211,153,0.25); }
+.adm-badge-inactivo{ display:inline-block; font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; padding:3px 8px; background:rgba(245,241,234,0.06); color:rgba(245,241,234,0.35); border:1px solid rgba(245,241,234,0.10); }
+.btn-pdf     { display:inline-flex; align-items:center; gap:6px; font-family:'Archivo Narrow',sans-serif; font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; padding:7px 14px; background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.30); text-decoration:none; transition:background 0.15s,border-color 0.15s; white-space:nowrap; }
+.btn-pdf:hover{ background:rgba(168,85,247,0.22); border-color:rgba(168,85,247,0.50); color:#d8b4fe; }
+.btn-pdf-dis { display:inline-flex; align-items:center; gap:6px; font-family:'Archivo Narrow',sans-serif; font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; padding:7px 14px; background:transparent; color:rgba(245,241,234,0.18); border:1px solid rgba(245,241,234,0.08); cursor:default; white-space:nowrap; }
+
+/* ── Barra de filtros ── */
+.filtros-bar { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:16px; }
+.filtro-grupo { display:flex; flex-direction:column; gap:5px; }
+.filtro-label { font-family:'Archivo Narrow',sans-serif; font-size:0.5rem; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:rgba(245,241,234,0.35); }
+.filtro-input {
+    background:#0d0a18; border:1px solid rgba(245,241,234,0.12); color:#f5f1ea;
+    padding:8px 12px; font-size:0.8rem; font-family:'Archivo Narrow',sans-serif;
+    outline:none; transition:border-color 0.15s;
+}
+.filtro-input::placeholder { color:rgba(245,241,234,0.25); }
+.filtro-input:focus { border-color:rgba(168,85,247,0.50); }
+.filtro-input-search { min-width:220px; }
+.filtro-input-date   { min-width:130px; color-scheme:dark; }
+.filtro-reset {
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:'Archivo Narrow',sans-serif; font-size:0.625rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.12em; padding:8px 14px;
+    background:transparent; color:rgba(245,241,234,0.30); border:1px solid rgba(245,241,234,0.10);
+    cursor:pointer; transition:color 0.15s,border-color 0.15s;
+}
+.filtro-reset:hover { color:rgba(245,241,234,0.65); border-color:rgba(245,241,234,0.25); }
+
+/* ── Custom dropdown ── */
+.cselect { position:relative; min-width:160px; }
+.cselect-trigger {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#0d0a18; border:1px solid rgba(245,241,234,0.12);
+    color:#f5f1ea; padding:8px 12px; font-size:0.8rem;
+    font-family:'Archivo Narrow',sans-serif; cursor:pointer;
+    transition:border-color 0.15s; user-select:none; white-space:nowrap;
+}
+.cselect-trigger:hover  { border-color:rgba(245,241,234,0.25); }
+.cselect.open .cselect-trigger { border-color:rgba(168,85,247,0.55); }
+.cselect-arrow { width:10px; height:10px; flex-shrink:0; opacity:0.4; transition:transform 0.15s,opacity 0.15s; }
+.cselect.open .cselect-arrow  { transform:rotate(180deg); opacity:0.8; }
+.cselect-menu {
+    display:none; position:absolute; top:calc(100% + 4px); left:0; right:0;
+    background:#0f0c1e; border:1px solid rgba(168,85,247,0.30);
+    z-index:200; overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.55);
+}
+.cselect.open .cselect-menu { display:block; }
+.cselect-option {
+    padding:9px 14px; font-family:'Archivo Narrow',sans-serif; font-size:0.8rem;
+    color:rgba(245,241,234,0.65); cursor:pointer; transition:background 0.1s,color 0.1s;
+    white-space:nowrap;
+}
+.cselect-option:hover   { background:rgba(168,85,247,0.12); color:#f5f1ea; }
+.cselect-option.selected{ background:rgba(168,85,247,0.18); color:#c084fc; font-weight:700; }
+
+/* ── Contador / empty ── */
+.adm-count { font-family:'Archivo Narrow',sans-serif; font-size:0.6875rem; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:rgba(245,241,234,0.30); margin-bottom:10px; }
+.adm-count span { color:#c084fc; }
+#adm-empty-filter { display:none; padding:32px; text-align:center; font-family:'Archivo Narrow',sans-serif; font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:rgba(245,241,234,0.20); }

@@ -218,16 +218,5 @@
 @endsection
 
 @push('scripts')
-<script>
-function abrirModalReembolso(actionUrl, importe) {
-    document.getElementById('form-reembolso').action = actionUrl;
-    document.getElementById('modal-importe').textContent = importe;
-    document.getElementById('modal-reembolso').style.display = 'flex';
-    document.getElementById('form-reembolso').querySelector('textarea').value = '';
-}
-
-function cerrarModalReembolso() {
-    document.getElementById('modal-reembolso').style.display = 'none';
-}
-</script>
+<script src="{{ asset('js/admin-pagos.js') }}"></script>
 @endpush
