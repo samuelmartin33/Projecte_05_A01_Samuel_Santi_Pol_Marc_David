@@ -786,3 +786,53 @@ body {
 .swal2-close:hover {
   color: var(--adm-ink) !important;
 }
+
+/* ══════════════════════════════════════
+   DROPDOWN SIDEBAR — FIXES RESPONSIVE
+   ══════════════════════════════════════ */
+
+/* En desktop el dropdown sale HACIA ARRIBA (bottom:calc(100%+8px)).
+   En móvil (≤860px) el sidebar es una topbar horizontal, así que
+   lo reposicionamos para que salga HACIA ABAJO con z-index alto. */
+@media (max-width: 860px) {
+  .adm-side-foot {
+    position: relative;
+  }
+  .adm-side-dropdown {
+    bottom: auto;
+    top: calc(100% + 8px);
+    left: auto;
+    right: 0;
+    min-width: 200px;
+    width: auto;
+    z-index: 9999;
+  }
+  .adm-side-foot {
+    margin-top: 0;
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+}
+
+/* Pantallas muy pequeñas (≤420px): ocultar texto para que quepa la topbar */
+@media (max-width: 420px) {
+  .adm-side-foot-name,
+  .adm-side-foot-role {
+    display: none;
+  }
+  .adm-side-foot {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .adm-side-logo span {
+    display: none;
+  }
+  .adm-side-logo {
+    padding: 6px;
+  }
+  .adm-side-dropdown {
+    right: 0;
+    left: auto;
+    min-width: 180px;
+  }
+}

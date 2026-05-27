@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,29 @@ class UsuarioController extends Controller
         $usuarios = Usuario::orderByDesc('id')->paginate(12);
 
         return view('admin.usuarios.index', compact('usuarios'));
+    }
+
+    /** Búsqueda AJAX de usuarios por nombre o email. */
+    public function buscar(Request $request): JsonResponse
+    {
+        $q = $request->input('q', '');
+        $usuarios = Usuario::when($q, fn ($query) => $query->where(function ($q2) use ($q) {
+            $q2->where('nombre', 'like', "%{$q}%")
+               ->orWhere('apellido1', 'like', "%{$q}%")
+               ->orWhere('email', 'like', "%{$q}%");
+        }))->orderByDesc('id')->limit(30)->get();
+
+        return response()->json($usuarios->map(fn ($u) => [
+            'id'           => $u->id,
+            'nombre'       => $u->nombre . ' ' . $u->apellido1 . ($u->apellido2 ? ' ' . $u->apellido2 : ''),
+            'email'        => $u->email,
+            'tipo_cuenta'  => ucfirst($u->tipo_cuenta ?? 'cliente'),
+            'estado_reg'   => ucfirst($u->estado_registro ?? 'aprobado'),
+            'es_admin'     => (bool) $u->es_admin,
+            'es_moderador' => (bool) $u->es_moderador,
+            'estado'       => (int) $u->estado,
+            'edit_url'     => route('admin.usuarios.edit', $u->id),
+        ]));
     }
 
     public function create(): View
@@ -130,6 +154,17 @@ class UsuarioController extends Controller
         $data['es_admin']         = $request->boolean('es_admin') ? 1 : 0;
         $data['es_moderador']     = $request->boolean('es_moderador') ? 1 : 0;
         $data['estado']           = (int) $request->input('estado', 1);
+
+        /* Las empresas no pueden tener rol de admin ni moderador */
+        if (($data['tipo_cuenta'] ?? '') === 'empresa') {
+            $data['es_admin']     = 0;
+            $data['es_moderador'] = 0;
+        }
+
+        /* Un administrador no puede ser moderador al mismo tiempo */
+        if ($data['es_admin']) {
+            $data['es_moderador'] = 0;
+        }
 
         if (! array_key_exists('password_hash', $data) || $data['password_hash'] === '') {
             unset($data['password_hash']);

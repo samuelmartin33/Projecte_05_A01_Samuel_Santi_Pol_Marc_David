@@ -1,0 +1,536 @@
+/* ============================================================
+   VIBEZ — Social Responsive · Complemento de social.css
+   Corrige y mejora el comportamiento en dispositivos móviles.
+   No modifica social.css para evitar regresiones.
+   ============================================================ */
+
+/* ════════════════════════════════════════
+   BARRA DE HISTORIAS — scroll horizontal
+   ════════════════════════════════════════ */
+.historias-barra {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+  padding: 16px 16px 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.historias-barra::-webkit-scrollbar { display: none; }
+
+.historia-circulo {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.historia-circulo-ring {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #ff1f7a);
+  padding: 2px;
+  flex-shrink: 0;
+}
+.historia-circulo-skeleton .historia-circulo-ring {
+  background: rgba(168,85,247,0.12);
+  animation: soc-shimmer 1.4s linear infinite;
+  background-size: 200% 100%;
+}
+
+/* ════════════════════════════════════════
+   FEED LAYOUT — sidebar derecho en móvil
+   ════════════════════════════════════════ */
+.soc-feed-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.soc-feed-col { width: 100%; }
+.soc-sidebar-right { display: none; }
+
+@media (min-width: 1080px) {
+  .soc-feed-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  .soc-feed-col { flex: 1; min-width: 0; }
+  .soc-sidebar-right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
+/* ── Card sidebar derecho ── */
+.soc-side-card {
+  background: rgba(13,10,24,0.7);
+  border: 1px solid rgba(245,241,234,0.10);
+  border-radius: 14px;
+  padding: 18px;
+}
+.soc-side-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: #f5f1ea;
+  margin: 0 0 14px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.soc-side-title em {
+  font-style: italic;
+  color: #a855f7;
+  font-family: 'Bebas Neue', sans-serif;
+}
+.soc-side-btn-ghost {
+  width: 100%;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid rgba(245,241,234,0.12);
+  color: rgba(245,241,234,0.55);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.soc-side-btn-ghost:hover {
+  background: rgba(168,85,247,0.08);
+  color: #c084fc;
+  border-color: rgba(168,85,247,0.35);
+}
+
+/* ── Trending ── */
+.soc-trend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(245,241,234,0.07);
+}
+.soc-trend:last-child { border-bottom: none; }
+.soc-trend-rank {
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  color: rgba(245,241,234,0.25);
+  flex-shrink: 0;
+  width: 22px;
+}
+.soc-trend--hot .soc-trend-rank { color: #a855f7; }
+.soc-trend-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5f1ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.soc-trend-meta {
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  color: rgba(245,241,234,0.45);
+  margin-top: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Promotoras ── */
+.soc-promotora-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.soc-promotora-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.soc-promotora-logo-ini {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.soc-promotora-info { flex: 1; min-width: 0; }
+.soc-promotora-nombre {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5f1ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.soc-promotora-evento {
+  font-size: 11px;
+  color: rgba(245,241,234,0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  font-family: 'Archivo Narrow', sans-serif;
+}
+.soc-promotora-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  background: rgba(168,85,247,0.12);
+  border: 1px solid rgba(168,85,247,0.35);
+  color: #c084fc;
+  font-size: 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.soc-promotora-btn:hover { background: rgba(168,85,247,0.25); }
+
+/* ════════════════════════════════════════
+   MODAL — ajuste con teclado virtual
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .soc-modal-overlay {
+    align-items: flex-start;
+    padding: 12px 12px 0;
+  }
+  .soc-modal {
+    max-height: 85vh;
+    max-height: 85dvh; /* dynamic viewport height */
+    border-radius: 14px 14px 0 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  .soc-modal-body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ════════════════════════════════════════
+   CHAT — layout y scroll en móvil
+   ════════════════════════════════════════ */
+
+/* La columna izquierda (lista de chats) debe ocupar todo el espacio
+   disponible en el panel y el subpanel interior debe poder hacer scroll */
+.chats-col-izq {
+  flex: 1;
+  min-height: 0;
+}
+
+/* El subpanel de lista de chats necesita scroll, no clipping */
+#chats-lista-view {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-height: 0;
+}
+
+/* El subpanel de ventana de chat también necesita scroll correcto */
+#chats-ventana-view {
+  min-height: 0;
+}
+
+@media (max-width: 899px) {
+  /* Cuando el panel de mensajes está activo, cubre todo el panel (overlay).
+     Esto oculta el topbar "MENSAJES" y la lista que quedan detrás. */
+  #chats-ventana-view.activo {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 10 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: linear-gradient(180deg, #0d0818 0%, #0a0518 100%);
+    min-height: 0;
+  }
+
+  /* Botón volver con mayor área táctil */
+  .soc-btn-volver {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Input de texto en móvil */
+  .soc-chat-textarea {
+    font-size: 16px; /* evita zoom en iOS */
+  }
+}
+
+/* ════════════════════════════════════════
+   TOPBAR — responsive pequeño
+   ════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .soc-topbar {
+    padding: 0 14px;
+  }
+  .soc-topbar-titulo {
+    font-size: 24px;
+  }
+  .soc-topbar-acciones {
+    gap: 6px;
+  }
+  .soc-topbar-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ════════════════════════════════════════
+   PANEL LATERAL EN DESKTOP — transición
+   ════════════════════════════════════════ */
+@media (min-width: 900px) {
+  .soc-panel {
+    transition: left 0.25s ease;
+  }
+  .soc-bottom-nav {
+    transition: width 0.25s ease;
+  }
+}
+
+/* ════════════════════════════════════════
+   SECCIÓN HERO — responsive
+   ════════════════════════════════════════ */
+.soc-hero-mini {
+  padding: 0 0 24px;
+}
+.soc-hero-kicker {
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #a855f7;
+  margin: 0 0 8px;
+}
+.soc-hero-titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  line-height: 0.95;
+  color: #f5f1ea;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.soc-hero-titulo em {
+  font-style: italic;
+  color: #a855f7;
+  font-family: 'Bebas Neue', sans-serif;
+}
+.soc-hero-sub {
+  font-size: 14px;
+  color: rgba(245,241,234,0.55);
+  max-width: 480px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Sección label */
+.soc-section-label {
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(245,241,234,0.35);
+  padding: 14px 18px 8px;
+  margin: 0;
+}
+.soc-divider {
+  height: 1px;
+  background: rgba(245,241,234,0.08);
+  margin: 8px 0;
+}
+
+/* Search */
+.soc-search-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+.soc-search-icono {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: rgba(245,241,234,0.35);
+  pointer-events: none;
+}
+.soc-search-input {
+  width: 100%;
+  background: rgba(245,241,234,0.04);
+  border: 1px solid rgba(245,241,234,0.10);
+  color: #f5f1ea;
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  padding: 11px 14px 11px 42px;
+  outline: none;
+  border-radius: 0;
+  transition: border-color 0.15s;
+}
+.soc-search-input:focus { border-color: rgba(168,85,247,0.5); }
+.soc-search-input::placeholder { color: rgba(245,241,234,0.30); }
+
+/* Upload area */
+.soc-upload-area {
+  border: 2px dashed rgba(168,85,247,0.35);
+  border-radius: 8px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  color: rgba(245,241,234,0.45);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.soc-upload-area:hover,
+.soc-upload-area.dragover {
+  background: rgba(168,85,247,0.07);
+  border-color: rgba(168,85,247,0.6);
+}
+.soc-upload-area svg {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 10px;
+  display: block;
+  color: rgba(168,85,247,0.5);
+}
+
+/* Preview grid de fotos */
+.soc-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+.soc-preview-grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Select / textarea en modales */
+.soc-select {
+  width: 100%;
+  background: rgba(245,241,234,0.04);
+  border: 1px solid rgba(245,241,234,0.12);
+  color: #f5f1ea;
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  border-radius: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  margin-bottom: 14px;
+  transition: border-color 0.15s;
+}
+.soc-select:focus { border-color: rgba(168,85,247,0.5); }
+.soc-textarea {
+  width: 100%;
+  background: rgba(245,241,234,0.04);
+  border: 1px solid rgba(245,241,234,0.12);
+  color: #f5f1ea;
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  border-radius: 0;
+  resize: vertical;
+  margin-bottom: 14px;
+  transition: border-color 0.15s;
+}
+.soc-textarea:focus { border-color: rgba(168,85,247,0.5); }
+.soc-textarea::placeholder { color: rgba(245,241,234,0.3); }
+
+.soc-field-label {
+  display: block;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(245,241,234,0.45);
+  margin-bottom: 6px;
+}
+
+/* Modal footer */
+.soc-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  -webkit-overflow-scrolling: touch;
+}
+.soc-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(245,241,234,0.10);
+  flex-shrink: 0;
+}
+.soc-btn-primary {
+  padding: 11px 22px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  border: none;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 6px 22px rgba(168,85,247,0.4);
+}
+.soc-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.soc-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.soc-btn-secondary {
+  padding: 11px 20px;
+  background: rgba(245,241,234,0.04);
+  color: rgba(245,241,234,0.6);
+  border: 1px solid rgba(245,241,234,0.12);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+}
+.soc-btn-secondary:hover { background: rgba(245,241,234,0.08); color: #f5f1ea; }
+
+/* Historia preview */
+.hist-preview-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  max-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+}
+.hist-preview-wrap img {
+  max-height: 240px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}

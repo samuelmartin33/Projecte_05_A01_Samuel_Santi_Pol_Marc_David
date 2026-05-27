@@ -516,18 +516,15 @@ class EventoController extends Controller
      */
     public function bolsaTrabajo()
     {
-        // Todas las ofertas activas con empresa y categoría
         $ofertas = BolsaOfertaTrabajo::with(['organizador.empresa', 'categoria'])
             ->where('estado', 1)
             ->orderBy('fecha_creacion', 'desc')
             ->get();
 
-        // Categorías de trabajo para el filtro
         $categoriasTrabajo = CategoriaTrabajo::where('estado', 1)
             ->orderBy('nombre')
             ->get();
 
-        // Ciudades únicas para el filtro
         $ciudades = BolsaOfertaTrabajo::where('estado', 1)
             ->whereNotNull('ubicacion')
             ->distinct()
