@@ -303,6 +303,16 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empres
          ->where('usuarioId', '[0-9]+')->name('horas');
 });
 
+/* — Fiesta (empresa): CRUD AJAX de eventos de categoría Fiesta — */
+Route::middleware(['auth','no-portero'])->prefix('empresa/fiesta')->name('empresa.fiesta.')->group(function () {
+    Route::get('/',                    [\App\Http\Controllers\Empresa\FiestaController::class, 'index'])->name('index');
+    Route::get('/listar',              [\App\Http\Controllers\Empresa\FiestaController::class, 'listar'])->name('listar');
+    Route::post('/',                   [\App\Http\Controllers\Empresa\FiestaController::class, 'store'])->name('store');
+    Route::get('/{id}',                [\App\Http\Controllers\Empresa\FiestaController::class, 'show'])->name('show');
+    Route::post('/{id}/actualizar',    [\App\Http\Controllers\Empresa\FiestaController::class, 'update'])->name('update');
+    Route::delete('/{id}',             [\App\Http\Controllers\Empresa\FiestaController::class, 'destroy'])->name('destroy');
+});
+
 /* — Perfil de usuario — */
 Route::middleware('auth')->group(function () {
 

@@ -1,0 +1,170 @@
+/* ========================================================
+   empresa-fiesta.css — Estilos del CRUD de eventos Fiesta
+   ======================================================== */
+
+body { background: #07060c; }
+
+/* Cabecera degradada */
+.fiesta-header {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.fiesta-header h1 { font-size: 1.75rem; font-weight: 700; color: #fff; margin: 0; }
+.fiesta-header p  { color: rgba(255,255,255,0.75); margin: 4px 0 0; font-size: 0.9rem; }
+
+/* Barra de filtros */
+.filtros-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.filtros-bar input {
+    flex: 1;
+    min-width: 160px;
+    background: #1a1625;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #f5f1ea;
+    font-size: 0.875rem;
+}
+.filtros-bar input:focus { outline: none; border-color: #7c3aed; }
+.filtros-bar input::placeholder { color: rgba(255,255,255,0.35); }
+
+/* Botón nuevo */
+.btn-nuevo {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-nuevo:hover { opacity: 0.9; }
+
+/* Tabla */
+.fiesta-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0d0a18;
+    border: 1px solid rgba(245,241,234,0.08);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.fiesta-tabla thead tr  { border-bottom: 1px solid rgba(245,241,234,0.10); }
+.fiesta-tabla th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.55rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.40);
+}
+.fiesta-tabla tbody tr  { border-bottom: 1px solid rgba(245,241,234,0.06); transition: background 0.15s; }
+.fiesta-tabla tbody tr:last-child { border-bottom: none; }
+.fiesta-tabla tbody tr:hover { background: rgba(168,85,247,0.05); }
+.fiesta-tabla td { padding: 14px 16px; color: #f5f1ea; font-size: 0.875rem; vertical-align: middle; }
+
+.badge-fiesta {
+    background: rgba(168,85,247,0.15);
+    color: #c084fc;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Botones de acción en tabla */
+.btn-accion {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: #f5f1ea;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    margin-right: 4px;
+}
+.btn-accion:hover         { border-color: #7c3aed; color: #c084fc; }
+.btn-accion.danger:hover  { border-color: #ef4444; color: #ef4444; }
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-overlay.activo { display: flex; }
+
+.modal-box {
+    background: #12101e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-box h2 { color: #f5f1ea; font-size: 1.25rem; font-weight: 700; margin: 0 0 24px; }
+
+/* Campos del formulario */
+.campo-grupo { margin-bottom: 16px; }
+.campo-grupo label { display: block; color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-bottom: 6px; }
+.campo-grupo input,
+.campo-grupo textarea,
+.campo-grupo select {
+    width: 100%;
+    background: #1a1625;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #f5f1ea;
+    font-size: 0.875rem;
+    box-sizing: border-box;
+}
+.campo-grupo input:focus,
+.campo-grupo textarea:focus,
+.campo-grupo select:focus  { outline: none; border-color: #7c3aed; }
+.campo-grupo select option { background: #1a1625; }
+
+.dos-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.modal-pie { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+.btn-guardar {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-cancelar {
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* Estado vacío */
+.vacio { text-align: center; padding: 60px 0; color: rgba(255,255,255,0.3); font-size: 0.95rem; }
+
+/* Aviso sin camareros */
+.aviso-camarero { color: #f59e0b; font-size: 0.8rem; margin-top: 6px; }
