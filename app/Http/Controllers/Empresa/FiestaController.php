@@ -39,7 +39,7 @@ class FiestaController extends Controller
     /** Obtiene el ID de la categoría Fiesta. */
     private function getCategoriaFiestaId(): int
     {
-        return CategoriaEvento::where('slug', 'fiesta')->value('id')
+        return CategoriaEvento::where('nombre', 'Fiesta')->value('id')
             ?? abort(500, 'Categoría Fiesta no encontrada en la BD.');
     }
 

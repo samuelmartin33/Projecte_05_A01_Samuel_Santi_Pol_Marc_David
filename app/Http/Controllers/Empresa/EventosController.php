@@ -100,7 +100,20 @@ class EventosController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        return view('empresa.eventos.crear', compact('categorias'));
+        // ID de Fiesta para que el JS sepa qué checkbox activar restricciones
+        $fiestaId = CategoriaEvento::where('nombre', 'Fiesta')->value('id');
+
+        // Camareros de esta empresa para el selector que aparece al elegir Fiesta
+        $empresa   = Auth::user()->empresa;
+        $camareros = $empresa
+            ? Organizador::where('empresa_id', $empresa->id)
+                ->where('rol', 'camarero')
+                ->where('estado', 1)
+                ->with('usuario')
+                ->get()
+            : collect();
+
+        return view('empresa.eventos.crear', compact('categorias', 'fiestaId', 'camareros'));
     }
 
     /**
@@ -118,7 +131,12 @@ class EventosController extends Controller
 
         $organizador = $this->obtenerOrganizador();
 
-        $validated = $request->validate([
+        // Detectar si se seleccionó Fiesta antes de definir las reglas (se usa condicionalmente)
+        $fiestaId = CategoriaEvento::where('nombre', 'Fiesta')->value('id');
+        $esFiesta = $fiestaId && in_array((int)$fiestaId, array_map('intval', $request->input('categorias', [])));
+
+        // Reglas base — las de Fiesta se añaden condicionalmente
+        $rules = [
             'titulo'              => ['required', 'string', 'max:300'],
             'descripcion'         => ['nullable', 'string', 'max:5000'],
             'categorias'          => ['required', 'array', 'min:1'],
@@ -136,7 +154,15 @@ class EventosController extends Controller
             'es_gratuito'         => ['nullable'],
             'url_externa'         => ['nullable', 'url', 'max:500'],
             'imagen_portada'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
-        ], [
+        ];
+
+        // Si es Fiesta: pago obligatorio y camarero requerido
+        if ($esFiesta) {
+            $rules['precio_base'] = ['required', 'numeric', 'min:10'];
+            $rules['camarero_id'] = ['required', 'integer', 'exists:organizadores,id'];
+        }
+
+        $validated = $request->validate($rules, [
             'titulo.required'        => 'El título del evento es obligatorio.',
             'titulo.max'             => 'El título no puede superar los 300 caracteres.',
             'categorias.required'    => 'Selecciona al menos una categoría.',
@@ -148,10 +174,11 @@ class EventosController extends Controller
             'fecha_fin.after_or_equal'    => 'La fecha de fin debe ser posterior a la de inicio.',
             'ubicacion_nombre.required'   => 'El nombre del lugar es obligatorio.',
             'precio_base.required'        => 'Indica el precio (0 si es gratuito).',
+            'precio_base.min'             => $esFiesta ? 'Los eventos de Fiesta son de pago obligatorio.' : 'El precio no puede ser negativo.',
+            'camarero_id.required'        => 'Debes asignar un camarero al evento de Fiesta.',
             'imagen_portada.image'        => 'El archivo debe ser una imagen.',
             'imagen_portada.mimes'        => 'Formatos permitidos: JPG, PNG, WebP, GIF.',
             'imagen_portada.max'          => 'La imagen no puede superar los 5 MB.',
-            'precio_base.min'             => 'El precio no puede ser negativo.',
         ]);
 
         $esGratuito = $request->boolean('es_gratuito');
@@ -171,8 +198,9 @@ class EventosController extends Controller
             'precio_base'         => $esGratuito ? 0 : $validated['precio_base'],
             'aforo_maximo'        => $validated['aforo_maximo'] ?? null,
             'aforo_actual'        => 0,
-            'edad_minima'         => $validated['edad_minima'] ?? null,
-            'es_gratuito'         => $esGratuito ? 1 : 0,
+            'edad_minima'         => $esFiesta ? 18 : ($validated['edad_minima'] ?? null),
+            'es_gratuito'         => ($esFiesta || !$esGratuito) ? 0 : 1,
+            'camarero_id'         => $esFiesta ? ($validated['camarero_id'] ?? null) : null,
             'url_externa'         => $validated['url_externa'] ?? null,
             'estado'              => 1,
             'fecha_creacion'      => now(),

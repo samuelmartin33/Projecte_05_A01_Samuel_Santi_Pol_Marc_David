@@ -184,6 +184,27 @@
             @error('categorias') <p style="color:#f87171;font-size:11px;margin-top:6px;">{{ $message }}</p> @enderror
         </div>
 
+        {{-- Bloque de restricciones Fiesta: visible solo cuando se marca esa categoría --}}
+        <div id="fiesta-extras" style="display:none;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:16px 20px;margin-bottom:16px;">
+            <p style="color:#c084fc;font-size:0.8rem;font-weight:600;margin:0 0 4px;">🎉 Evento Fiesta</p>
+            <p style="color:rgba(245,241,234,0.5);font-size:0.78rem;margin:0 0 14px;">Pago obligatorio · Edad mínima 18 años · Camarero requerido</p>
+            <div class="form-grupo" style="margin-bottom:0;">
+                <label class="form-label">Camarero asignado <span class="form-required">*</span></label>
+                <select name="camarero_id" id="camarero_id_select" class="form-input">
+                    <option value="">— Selecciona un camarero —</option>
+                    @foreach($camareros as $cam)
+                        <option value="{{ $cam->id }}" @selected(old('camarero_id') == $cam->id)>
+                            {{ $cam->usuario->nombre }} {{ $cam->usuario->apellido1 }}
+                        </option>
+                    @endforeach
+                </select>
+                @if($camareros->isEmpty())
+                    <p style="color:#f59e0b;font-size:0.75rem;margin-top:6px;">⚠ No tienes camareros contratados. Publica una oferta con categoría Camarero/a primero.</p>
+                @endif
+                @error('camarero_id') <p style="color:#f87171;font-size:11px;margin-top:6px;">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
         <div class="form-grupo">
             <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
             @php
@@ -305,7 +326,7 @@
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Edad mínima</label>
-                <input type="number" min="0" max="120" name="edad_minima" class="form-input"
+                <input type="number" min="0" max="120" name="edad_minima" id="edad_minima_input" class="form-input"
                        value="{{ old('edad_minima') }}" placeholder="Ej: 16">
                 <p class="form-hint">Opcional. Déjalo vacío si no hay restricción.</p>
             </div>
@@ -392,9 +413,74 @@ if (fpInicio.selectedDates[0]) {
     fpFin.set('minDate', fpInicio.selectedDates[0]);
 }
 
+// ID de la categoría Fiesta pasado desde el controlador
+var FIESTA_ID = {{ $fiestaId ?? 'null' }};
+
 function actualizarBordeCat(label) {
     var input = label.querySelector('input');
     label.style.borderColor = input.checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)';
+    verificarFiesta(); // Detectar si Fiesta quedó marcada o desmarcada
+}
+
+// Comprueba si el checkbox de Fiesta está marcado y actúa en consecuencia
+function verificarFiesta() {
+    if (!FIESTA_ID) return;
+    var cb = document.querySelector('input[name="categorias[]"][value="' + FIESTA_ID + '"]');
+    if (!cb) return;
+    if (cb.checked) {
+        activarRestriccionesFiesta();
+    } else {
+        desactivarRestriccionesFiesta();
+    }
+}
+
+// Activa las restricciones visuales cuando se selecciona Fiesta
+function activarRestriccionesFiesta() {
+    document.getElementById('fiesta-extras').style.display = 'block';
+    document.getElementById('camarero_id_select').required = true;
+
+    // Forzar que no sea gratuito y oscurecer el label visualmente
+    var gratuito = document.getElementById('es_gratuito');
+    gratuito.checked = false;
+    gratuito.disabled = true;
+    gratuito.closest('label').style.opacity = '0.35';
+    gratuito.closest('label').style.pointerEvents = 'none';
+    document.getElementById('precio-wrap').classList.remove('desactivado');
+
+    // Precio mínimo 10 €
+    var precio = document.getElementById('precio_base_input');
+    precio.min = 10;
+    precio.placeholder = 'Mín. 10,00 €';
+
+    // Fijar edad mínima a 18 y bloquear el campo
+    var edad = document.getElementById('edad_minima_input');
+    edad.value = 18;
+    edad.readOnly = true;
+    edad.style.opacity = '0.6';
+}
+
+// Revierte las restricciones cuando se desmarca Fiesta
+function desactivarRestriccionesFiesta() {
+    document.getElementById('fiesta-extras').style.display = 'none';
+    document.getElementById('camarero_id_select').required = false;
+
+    // Re-habilitar gratuito
+    var gratuito = document.getElementById('es_gratuito');
+    gratuito.disabled = false;
+    gratuito.closest('label').style.opacity = '1';
+    gratuito.closest('label').style.pointerEvents = '';
+
+    // Restaurar precio mínimo
+    var precio = document.getElementById('precio_base_input');
+    precio.min = 0;
+    precio.placeholder = '0.00';
+
+    togglePrecio(); // Volver al estado que tenía
+
+    // Liberar edad mínima
+    var edad = document.getElementById('edad_minima_input');
+    edad.readOnly = false;
+    edad.style.opacity = '1';
 }
 
 // ── Precio ────────────────────────────────────────────────────────────────────
@@ -411,8 +497,9 @@ function togglePrecio() {
     }
 }
 
-// Preview de imagen subida
+// Inicialización: aplicar estado de precio y detectar si Fiesta ya estaba marcada
 togglePrecio();
+verificarFiesta();
 
 var fileInput = document.getElementById('imagen_portada_input');
 var zona = document.getElementById('upload-zona');
