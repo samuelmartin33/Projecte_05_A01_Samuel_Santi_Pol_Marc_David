@@ -36,6 +36,12 @@ function cerrarModal() {
     document.getElementById('modal-overlay').classList.remove('abierto');
 }
 
+// Cierra el modal de éxito y recarga la página para mostrar el estado "Ya te has postulado"
+function cerrarModalExito() {
+    cerrarModal();
+    location.reload();
+}
+
 function cerrarAlClickarFuera(e) {
     if (e.target === document.getElementById('modal-overlay')) cerrarModal();
 }

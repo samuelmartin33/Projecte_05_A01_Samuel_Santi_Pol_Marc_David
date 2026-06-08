@@ -129,6 +129,10 @@
                     <div class="w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-navy/50 text-sm font-medium">
                         Los administradores no pueden postularse a ofertas de trabajo.
                     </div>
+                    @elseif($yaPostulado)
+                    <div class="w-full text-center py-3 px-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-semibold">
+                        ✓ Ya te has postulado a esta oferta
+                    </div>
                     @else
                     <button class="btn-comprar w-full" onclick="abrirPostulacion({{ $oferta->id }})">
                         Postularme ahora
@@ -214,34 +218,16 @@
                 @csrf
                 <input type="hidden" name="oferta_id" id="oferta-id-form" value="">
 
-                {{-- Selector de tipo de trabajo --}}
-                @if($trabajos->isNotEmpty())
+                {{-- Puesto fijo desde la oferta, no editable --}}
                 <section>
-                    <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
+                    <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-3">
                         <span class="cv-section-num">✦</span>Puesto al que te postulas
                     </h3>
-                    <input type="hidden" id="inp-trabajo-cv" name="trabajo_id" value="">
-                    <div class="ev-csel" id="ev-trabajo-cv">
-                        <div class="ev-csel-trigger" onclick="cselToggle('ev-trabajo-cv')">
-                            <span id="ev-trabajo-cv-label" class="ev-csel-placeholder">— Selecciona el puesto —</span>
-                            <span class="ev-csel-arrow">▾</span>
-                        </div>
-                        <ul class="ev-csel-menu">
-                            <li class="ev-csel-opt selected"
-                                onclick="cselPick('ev-trabajo-cv','inp-trabajo-cv','','— Selecciona el puesto —',this)">
-                                — Selecciona el puesto —
-                            </li>
-                            @foreach($trabajos as $trabajo)
-                                <li class="ev-csel-opt"
-                                    onclick="cselPick('ev-trabajo-cv','inp-trabajo-cv','{{ $trabajo->id }}','{{ $trabajo->nombre }}',this)">
-                                    {{ $trabajo->nombre }}
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    <p class="text-navy/35 text-xs mt-1.5">Opcional. Indica el rol específico para el que quieres ser considerado.</p>
+                    <input type="hidden" name="trabajo_id" value="{{ $oferta->categoria_trabajo_id }}">
+                    <p class="px-4 py-2.5 rounded-xl border border-navy/10 bg-navy/5 text-navy font-semibold text-sm">
+                        {{ $oferta->categoria->nombre ?? '—' }}
+                    </p>
                 </section>
-                @endif
 
                 <section>
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4"><span class="cv-section-num">1</span>Información Personal</h3>
@@ -343,31 +329,14 @@
             @csrf
             <input type="hidden" name="oferta_id" id="oferta-id-archivo" value="">
 
-            {{-- Selector de tipo de trabajo (modal archivo) --}}
-            @if($trabajos->isNotEmpty())
+            {{-- Puesto fijo desde la oferta, no editable --}}
             <div>
                 <label class="cv-label">Puesto al que te postulas</label>
-                <input type="hidden" id="inp-trabajo-arch" name="trabajo_id" value="">
-                <div class="ev-csel" id="ev-trabajo-arch">
-                    <div class="ev-csel-trigger" onclick="cselToggle('ev-trabajo-arch')">
-                        <span id="ev-trabajo-arch-label" class="ev-csel-placeholder">— Selecciona el puesto —</span>
-                        <span class="ev-csel-arrow">▾</span>
-                    </div>
-                    <ul class="ev-csel-menu">
-                        <li class="ev-csel-opt selected"
-                            onclick="cselPick('ev-trabajo-arch','inp-trabajo-arch','','— Selecciona el puesto —',this)">
-                            — Selecciona el puesto —
-                        </li>
-                        @foreach($trabajos as $trabajo)
-                            <li class="ev-csel-opt"
-                                onclick="cselPick('ev-trabajo-arch','inp-trabajo-arch','{{ $trabajo->id }}','{{ $trabajo->nombre }}',this)">
-                                {{ $trabajo->nombre }}
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+                <input type="hidden" name="trabajo_id" value="{{ $oferta->categoria_trabajo_id }}">
+                <p class="px-4 py-2.5 rounded-xl border border-navy/10 bg-navy/5 text-navy font-semibold text-sm">
+                    {{ $oferta->categoria->nombre ?? '—' }}
+                </p>
             </div>
-            @endif
 
             <div id="dropzone" class="dropzone-area" onclick="document.getElementById('cv-file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
                 <div class="w-14 h-14 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
@@ -400,7 +369,7 @@
             </div>
             <h2 class="text-2xl font-black text-navy mb-2">¡Candidatura enviada!</h2>
             <p class="text-navy/55 text-sm leading-relaxed mb-6">Tu candidatura ha sido recibida correctamente. El equipo de selección revisará tu perfil y se pondrá en contacto contigo.</p>
-            <button onclick="cerrarModal()" class="btn-comprar px-10 py-3 rounded-xl font-bold">Perfecto</button>
+            <button onclick="cerrarModalExito()" class="btn-comprar px-10 py-3 rounded-xl font-bold">Perfecto</button>
         </div>
     </div>
 

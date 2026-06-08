@@ -321,8 +321,12 @@ class CandidaturasController extends Controller
         }
 
         // Determinar el rol de equipo según el tipo de trabajo de la candidatura
-        $nombreTrabajo = $candidatura->trabajo?->nombre ?? '';
-        $rolEquipo = str_contains(mb_strtolower($nombreTrabajo), 'portero') ? 'portero' : 'organizador';
+        $nombreTrabajo  = mb_strtolower($candidatura->trabajo?->nombre ?? '');
+        $rolEquipo = match(true) {
+            str_contains($nombreTrabajo, 'portero')  => 'portero',
+            str_contains($nombreTrabajo, 'camarero') => 'camarero',
+            default                                   => 'organizador',
+        };
 
         // Generar token único de 64 caracteres
         $token = Str::random(64);

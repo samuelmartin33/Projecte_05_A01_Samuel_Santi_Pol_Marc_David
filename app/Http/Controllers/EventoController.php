@@ -590,16 +590,20 @@ class EventoController extends Controller
      */
     public function detalleOferta(int $id)
     {
-        $oferta = BolsaOfertaTrabajo::with(['organizador.empresa'])
+        $oferta = BolsaOfertaTrabajo::with(['organizador.empresa', 'categoria'])
             ->where('estado', 1)
             ->findOrFail($id);
 
-        // Cargar las categorías activas para el selector de puesto en el formulario de candidatura
-        $trabajos = CategoriaTrabajo::where('estado', 1)
-            ->orderBy('nombre')
-            ->get();
+        // Comprobar si el usuario ya se postuló a esta oferta (por email)
+        $yaPostulado = false;
+        if (Auth::check()) {
+            $yaPostulado = DB::table('candidaturas_trabajo')
+                ->where('oferta_id', $id)
+                ->where('email_candidato', Auth::user()->email)
+                ->exists();
+        }
 
-        return view('trabajos.detalle', compact('oferta', 'trabajos'));
+        return view('trabajos.detalle', compact('oferta', 'yaPostulado'));
     }
 
     /**
@@ -619,13 +623,13 @@ class EventoController extends Controller
             'ciudad'               => 'required|string|max:100',
             'perfil_profesional'   => 'required|string|max:2000',
             'carta_presentacion'   => 'required|string|max:5000',
-            'trabajo_id'           => 'nullable|integer|exists:trabajos,id',
+            'trabajo_id'           => 'nullable|integer|exists:categorias_trabajo,id',
             'linkedin'             => 'nullable|string|max:500',
             'habilidades'          => 'nullable|string|max:1000',
             'idiomas'              => 'nullable|string|max:500',
         ]);
 
-        BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
+        $oferta = BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
 
         $trabajadorId = $this->resolverTrabajadorActual();
 
@@ -633,7 +637,7 @@ class EventoController extends Controller
 
         DB::table('candidaturas_trabajo')->insert([
             'oferta_id'              => $id,
-            'trabajo_id'             => $request->trabajo_id ?: null,
+            'trabajo_id'             => $oferta->categoria_trabajo_id,
             'trabajador_id'          => $trabajadorId,
             'estado_candidatura'     => 1,
             // Structured columns (visible to empresa)
@@ -668,10 +672,10 @@ class EventoController extends Controller
         $request->validate([
             'cv_file'                    => 'required|file|mimes:pdf,doc,docx|max:5120',
             'carta_presentacion_archivo' => 'nullable|string|max:3000',
-            'trabajo_id'                 => 'nullable|integer|exists:trabajos,id',
+            'trabajo_id'                 => 'nullable|integer|exists:categorias_trabajo,id',
         ]);
 
-        BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
+        $oferta = BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
 
         $trabajadorId = $this->resolverTrabajadorActual();
 
@@ -682,7 +686,7 @@ class EventoController extends Controller
 
         DB::table('candidaturas_trabajo')->insert([
             'oferta_id'           => $id,
-            'trabajo_id'          => $request->trabajo_id ?: null,
+            'trabajo_id'          => $oferta->categoria_trabajo_id,
             'trabajador_id'       => $trabajadorId,
             'estado_candidatura'  => 1,
             'carta_presentacion'  => $request->input('carta_presentacion_archivo'),
