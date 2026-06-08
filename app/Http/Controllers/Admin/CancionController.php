@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cancion;
+use App\Models\Empresa;
+use App\Models\Evento;
+use App\Models\PlaylistEventoCancion;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -126,5 +130,110 @@ class CancionController extends Controller
         $cancion->update(['activa' => false]);
 
         return response()->json(['ok' => true]);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       ESTADÍSTICAS
+    ══════════════════════════════════════════════════════════════ */
+
+    /**
+     * Estadísticas de reproducciones y ganancias por canción.
+     * Filtros opcionales GET: evento_id, empresa_id.
+     * AJAX → JSON {datos, total_global}
+     * Normal → vista estadisticas.blade.php
+     */
+    public function estadisticas(Request $request)
+    {
+        $consulta = PlaylistEventoCancion::selectRaw(
+                'cancion_id,
+                 COUNT(*)            AS veces,
+                 SUM(precio_pagado)  AS ganancia'
+            )
+            ->with('cancion')
+            ->join('eventos', 'eventos.id', '=', 'playlist_evento_canciones.evento_id');
+
+        // Filtro por evento concreto
+        if ($request->filled('evento_id')) {
+            $consulta->where('playlist_evento_canciones.evento_id', $request->evento_id);
+        }
+
+        // Filtro por empresa: evento → organizador → empresa
+        if ($request->filled('empresa_id')) {
+            $consulta->join(
+                'organizadores',
+                'organizadores.id', '=', 'eventos.organizador_id'
+            )->where('organizadores.empresa_id', $request->empresa_id);
+        }
+
+        $filas = $consulta
+            ->groupBy('cancion_id')
+            ->orderByDesc('veces')
+            ->get();
+
+        $totalGlobal = $filas->sum('ganancia');
+
+        if ($request->ajax()) {
+            return response()->json([
+                'datos'        => $filas->map(fn ($f) => [
+                    'titulo'   => $f->cancion?->titulo   ?? '—',
+                    'artista'  => $f->cancion?->artista  ?? '—',
+                    'veces'    => (int) $f->veces,
+                    'ganancia' => number_format((float) $f->ganancia, 2),
+                ]),
+                'total_global' => number_format((float) $totalGlobal, 2),
+            ]);
+        }
+
+        // Para los selects de la vista
+        $eventos  = Evento::orderBy('titulo')->get(['id', 'titulo']);
+        $empresas = Empresa::orderBy('nombre_empresa')->get(['id', 'nombre_empresa']);
+
+        return view('admin.canciones.estadisticas', compact('filas', 'totalGlobal', 'eventos', 'empresas'));
+    }
+
+    /**
+     * Descarga el PDF del mes actual con las estadísticas de canciones.
+     * Aplica los mismos filtros opcionales que estadisticas().
+     */
+    public function descargarPdf(Request $request)
+    {
+        $mes  = now()->month;
+        $anyo = now()->year;
+
+        $consulta = PlaylistEventoCancion::selectRaw(
+                'cancion_id,
+                 COUNT(*)            AS veces,
+                 SUM(precio_pagado)  AS ganancia'
+            )
+            ->with('cancion')
+            ->join('eventos', 'eventos.id', '=', 'playlist_evento_canciones.evento_id')
+            ->whereMonth('playlist_evento_canciones.created_at', $mes)
+            ->whereYear('playlist_evento_canciones.created_at', $anyo);
+
+        if ($request->filled('evento_id')) {
+            $consulta->where('playlist_evento_canciones.evento_id', $request->evento_id);
+        }
+
+        if ($request->filled('empresa_id')) {
+            $consulta->join(
+                'organizadores',
+                'organizadores.id', '=', 'eventos.organizador_id'
+            )->where('organizadores.empresa_id', $request->empresa_id);
+        }
+
+        $datos = $consulta
+            ->groupBy('cancion_id')
+            ->orderByDesc('veces')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.canciones.pdf-mes', compact('datos', 'mes', 'anyo'))
+                  ->setPaper('A4', 'portrait');
+
+        $nombreFichero = 'vibez-canciones-' . now()->format('m-Y') . '.pdf';
+
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $nombreFichero . '"',
+        ]);
     }
 }

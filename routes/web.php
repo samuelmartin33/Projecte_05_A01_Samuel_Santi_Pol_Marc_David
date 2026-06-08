@@ -479,6 +479,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     /* Rutas de gestión de canciones */
     Route::get('/admin/canciones', [AdminCancionController::class, 'index'])->name('admin.canciones.index');
     Route::post('/admin/canciones', [AdminCancionController::class, 'store'])->name('admin.canciones.store');
+    /* ⚠️ Rutas estáticas ANTES de {id} para evitar colisión de segmentos */
+    Route::get('/admin/canciones/estadisticas', [AdminCancionController::class, 'estadisticas'])->name('admin.canciones.estadisticas');
+    Route::get('/admin/canciones/pdf-mes', [AdminCancionController::class, 'descargarPdf'])->name('admin.canciones.pdf');
+    /* Rutas con parámetro dinámico */
     Route::get('/admin/canciones/{id}', [AdminCancionController::class, 'show'])->name('admin.canciones.show');
     Route::put('/admin/canciones/{id}', [AdminCancionController::class, 'update'])->name('admin.canciones.update');
     Route::delete('/admin/canciones/{id}', [AdminCancionController::class, 'destroy'])->name('admin.canciones.destroy');
