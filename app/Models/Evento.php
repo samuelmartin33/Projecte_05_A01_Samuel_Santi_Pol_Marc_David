@@ -63,7 +63,7 @@ class Evento extends Model
         'ubicacion_nombre', 'ubicacion_direccion',
         'latitud', 'longitud', 'precio_base', 'aforo_maximo',
         'aforo_actual', 'edad_minima', 'es_gratuito',
-        'url_externa', 'estado', 'featured', 'fecha_creacion', 'fecha_actualizacion',
+        'url_externa', 'estado', 'featured', 'camarero_id', 'fecha_creacion', 'fecha_actualizacion',
     ];
 
     /**
@@ -162,6 +162,12 @@ class Evento extends Model
     }
 
     /* Valoraciones visibles del evento */
+    // El camarero (organizador) asignado obligatoriamente a eventos de tipo Fiesta
+    public function camarero()
+    {
+        return $this->belongsTo(Organizador::class, 'camarero_id');
+    }
+
     public function valoraciones()
     {
         return $this->hasMany(\App\Models\ValoracionEvento::class, 'evento_id')
