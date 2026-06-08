@@ -166,7 +166,52 @@ document.onclick = function(eventoClic) {
         if (dropdown) dropdown.style.display = 'none';
         if (btn)      btn.setAttribute('aria-expanded', 'false');
     }
+
+    // Cerrar cualquier ev-csel abierto si el clic fue fuera de él
+    var tgt = eventoClic.target;
+    var enCsel = tgt && tgt.closest && tgt.closest('.ev-csel');
+    if (!enCsel) {
+        document.querySelectorAll('.ev-csel.open').forEach(function(c) { c.classList.remove('open'); });
+    }
 };
+
+/* ── ev-csel: helpers globales para dropdowns personalizados ─────── */
+
+/**
+ * Abre o cierra un custom select (ev-csel). Si hay otro abierto lo cierra primero.
+ * @param {string} id - ID del contenedor .ev-csel
+ */
+function cselToggle(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var wasOpen = el.classList.contains('open');
+    document.querySelectorAll('.ev-csel.open').forEach(function(c) { c.classList.remove('open'); });
+    if (!wasOpen) el.classList.add('open');
+}
+
+/**
+ * Selecciona una opción en un custom select (ev-csel).
+ * @param {string} cselId  - ID del contenedor .ev-csel
+ * @param {string} inputId - ID del input hidden que guarda el valor
+ * @param {string} valor   - Valor a guardar en el input
+ * @param {string} etiqueta - Texto visible a mostrar en el trigger
+ * @param {HTMLElement} liEl - El elemento <li> clicado (para marcar como selected)
+ */
+function cselPick(cselId, inputId, valor, etiqueta, liEl) {
+    var input = document.getElementById(inputId);
+    var label = document.getElementById(cselId + '-label');
+    var cont  = document.getElementById(cselId);
+    if (input) input.value = valor;
+    if (label) {
+        label.textContent = etiqueta;
+        label.classList.remove('ev-csel-placeholder');
+    }
+    if (cont) {
+        cont.classList.remove('open');
+        cont.querySelectorAll('.ev-csel-opt').forEach(function(o) { o.classList.remove('selected'); });
+    }
+    if (liEl) liEl.classList.add('selected');
+}
 
 /**
  * Cierra la sesión del usuario actual enviando una petición POST al servidor.

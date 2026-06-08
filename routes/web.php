@@ -295,6 +295,7 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 /* — Equipo de empresa: gestión de usuarios y roles — */
 Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empresa.equipo.')->group(function () {
     Route::get('/',              [EquipoController::class, 'index'])->name('index');
+    Route::post('/',             [EquipoController::class, 'store'])->name('store');
     Route::patch('/{organizador}/rol', [EquipoController::class, 'cambiarRol'])->name('rol');
     Route::delete('/{organizador}',    [EquipoController::class, 'destroy'])->name('destroy');
     // Ver horas de un miembro del equipo
@@ -362,6 +363,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])
          ->name('admin.dashboard');
     
+    /* Búsqueda AJAX (deben ir antes de las rutas con {parámetros} para evitar conflictos) */
+    Route::get('/admin/usuarios/buscar', [AdminUsuarioController::class, 'buscar'])
+         ->name('admin.usuarios.buscar');
+    Route::get('/admin/eventos/buscar', [AdminEventoController::class, 'buscar'])
+         ->name('admin.eventos.buscar');
+    Route::get('/admin/cupones/buscar', [AdminCuponController::class, 'buscar'])
+         ->name('admin.cupones.buscar');
+
     /* Rutas de eventos */
     Route::get('/admin/eventos', [AdminEventoController::class, 'index'])
          ->name('admin.eventos.index');

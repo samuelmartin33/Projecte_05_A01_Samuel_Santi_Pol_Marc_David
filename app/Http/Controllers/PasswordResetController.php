@@ -55,10 +55,10 @@ class PasswordResetController extends Controller
         ]);
 
         try {
-            Mail::to($usuario->email, $usuario->nombre)
-                ->send(new PasswordResetMail($usuario, $resetUrl));
+            Mail::to($usuario->email)->send(new PasswordResetMail($usuario, $resetUrl));
+            \Illuminate\Support\Facades\Log::info("Correo de restablecimiento enviado a {$usuario->email}");
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('No se pudo enviar el correo de reset: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error enviando correo de restablecimiento a ' . $usuario->email . ': ' . $e->getMessage());
         }
 
         return back()->with('status', $mensaje);

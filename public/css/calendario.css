@@ -501,7 +501,12 @@
     gap: 14px;
     margin-bottom: 30px;
   }
-  .cal-nav { gap: 16px; }
+  .cal-nav {
+    gap: 16px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .cal-mes-display { min-width: 0; flex: 1; text-align: center; }
   .cal-eventos-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;

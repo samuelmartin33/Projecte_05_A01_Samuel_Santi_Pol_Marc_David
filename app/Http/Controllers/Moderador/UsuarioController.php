@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Moderador;
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class UsuarioController extends Controller
@@ -23,11 +24,14 @@ class UsuarioController extends Controller
 
     /**
      * Banea un usuario desactivando su cuenta (estado = 0).
-     * No se puede banear a administradores.
+     * Restricciones: no se puede banear a uno mismo, admins, moderadores ni empresas.
      */
     public function banear(Usuario $usuario): RedirectResponse
     {
+        abort_if($usuario->id === Auth::id(), 403, 'No puedes banearte a ti mismo.');
         abort_if((bool) $usuario->es_admin, 403, 'No puedes banear a un administrador.');
+        abort_if((bool) $usuario->es_moderador, 403, 'No puedes banear a otro moderador.');
+        abort_if(($usuario->tipo_cuenta ?? '') === 'empresa', 403, 'No puedes banear a una cuenta de empresa.');
 
         if ((int) $usuario->estado === 0) {
             return redirect()

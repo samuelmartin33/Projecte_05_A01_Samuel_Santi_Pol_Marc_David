@@ -4,12 +4,6 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
-<style>
-@media (max-width: 480px) {
-  .grid-ciudad-cp  { grid-template-columns: 1fr !important; }
-  .grid-datos-2col { grid-template-columns: 1fr !important; }
-}
-</style>
 @endpush
 
 @section('content')

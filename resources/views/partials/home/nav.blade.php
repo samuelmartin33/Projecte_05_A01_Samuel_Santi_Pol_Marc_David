@@ -446,6 +446,11 @@
         <div class="mob-nav-divider"></div>
         <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
         <a href="{{ route('perfil.favoritos') }}" class="mob-nav-link">Favoritos</a>
+        {{-- Enlace Premium: solo para usuarios normales (no empresa, no admin, no portero) --}}
+        <a href="{{ route('premium') }}" class="mob-nav-link"
+           style="color:{{ $u->es_premium ? '#a855f7' : 'rgba(168,85,247,0.8)' }};{{ $u->es_premium ? 'font-weight:700;' : '' }}">
+          {{ $u->es_premium ? '✦ Premium activo' : '★ Hazte Premium' }}
+        </a>
         @if($u->es_admin)
           <a href="{{ route('admin.dashboard') }}" class="mob-nav-link" style="color:var(--magenta-2);">Panel Admin</a>
         @endif

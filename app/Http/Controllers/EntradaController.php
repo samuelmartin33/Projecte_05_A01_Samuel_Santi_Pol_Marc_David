@@ -306,12 +306,14 @@ class EntradaController extends Controller
         }
 
         $request->validate([
-            'evento_id' => ['required', 'integer', 'exists:eventos,id'],
-            'cantidad'  => ['required', 'integer', 'min:1', 'max:10'],
+            'evento_id'    => ['required', 'integer', 'exists:eventos,id'],
+            'cantidad'     => ['required', 'integer', 'min:1', 'max:10'],
+            'cupon_codigo' => ['nullable', 'string', 'max:50'],
         ]);
 
-        $eventoId = (int) $request->evento_id;
-        $cantidad = (int) $request->cantidad;
+        $eventoId    = (int) $request->evento_id;
+        $cantidad    = (int) $request->cantidad;
+        $cuponCodigo = $request->cupon_codigo ? strtoupper(trim($request->cupon_codigo)) : null;
 
         $evento = Evento::where('estado', 1)->findOrFail($eventoId);
 
@@ -325,7 +327,24 @@ class EntradaController extends Controller
             return response()->json(['success' => false, 'message' => 'Este evento no tiene pagos online configurados.'], 422);
         }
 
-        $totalFinal    = round($evento->precio_base * $cantidad, 2);
+        // Validar el cupón si se envió uno y calcular el descuento
+        $cupon          = null;
+        $valorDescuento = 0;
+
+        if ($cuponCodigo) {
+            $cupon = Cupon::with('eventos')->where('codigo', $cuponCodigo)->first();
+            if (!$cupon || !$cupon->is_valido) {
+                return response()->json(['success' => false, 'message' => 'El cupón no es válido o ha expirado.'], 422);
+            }
+            if (!$cupon->aplicaAEvento($eventoId)) {
+                return response()->json(['success' => false, 'message' => 'Este cupón no es válido para este evento.'], 422);
+            }
+            $valorDescuento = $cupon->valor_descuento;
+        }
+
+        $totalBruto    = round($evento->precio_base * $cantidad, 2);
+        $totalDescuento = round($totalBruto * ($valorDescuento / 100), 2);
+        $totalFinal    = round($totalBruto - $totalDescuento, 2);
         $amountCents   = (int) round($totalFinal * 100);
         $feeCents      = (int) round($amountCents * 0.10);
 
@@ -338,9 +357,10 @@ class EntradaController extends Controller
                 'application_fee_amount' => $feeCents,
                 'transfer_data'          => ['destination' => $empresa->stripe_account_id],
                 'metadata'               => [
-                    'evento_id'  => $eventoId,
-                    'cantidad'   => $cantidad,
-                    'usuario_id' => Auth::id(),
+                    'evento_id'    => $eventoId,
+                    'cantidad'     => $cantidad,
+                    'usuario_id'   => Auth::id(),
+                    'cupon_codigo' => $cuponCodigo ?? '',
                 ],
             ]);
 
@@ -401,17 +421,38 @@ class EntradaController extends Controller
 
         $evento = Evento::where('estado', 1)->findOrFail($eventoId);
 
+        // Recuperar el cupón guardado en los metadatos del PaymentIntent
+        $cuponCodigo = $pi->metadata['cupon_codigo'] ?? null;
+        $cupon       = null;
+
+        if ($cuponCodigo) {
+            $cuponCandidato = Cupon::with('eventos')->where('codigo', $cuponCodigo)->first();
+            // Solo aplicar si sigue siendo válido (puede haber caducado entre el pago y la confirmación)
+            if ($cuponCandidato && $cuponCandidato->is_valido && $cuponCandidato->aplicaAEvento($eventoId)) {
+                $cupon = $cuponCandidato;
+            }
+        }
+
         try {
-            $pedido = DB::transaction(function () use ($evento, $cantidad, $piId) {
-                $ahora                = now();
-                $totalBruto           = round($evento->precio_base * $cantidad, 2);
-                $precioUnitarioPagado = round($totalBruto / $cantidad, 2);
+            $pedido = DB::transaction(function () use ($evento, $cantidad, $piId, $cupon) {
+                $ahora          = now();
+                $totalBruto     = round($evento->precio_base * $cantidad, 2);
+                $totalDescuento = 0.00;
+                $totalFinal     = $totalBruto;
+
+                // Aplicar descuento del cupón (mismo cálculo que en crearPaymentIntent)
+                if ($cupon) {
+                    $totalDescuento = round($totalBruto * ($cupon->valor_descuento / 100), 2);
+                    $totalFinal     = round($totalBruto - $totalDescuento, 2);
+                }
+
+                $precioUnitarioPagado = $cantidad > 0 ? round($totalFinal / $cantidad, 2) : 0;
 
                 $pedido = Pedido::create([
                     'usuario_id'               => Auth::id(),
                     'total'                    => $totalBruto,
-                    'total_descuento'          => 0.00,
-                    'total_final'              => $totalBruto,
+                    'total_descuento'          => $totalDescuento,
+                    'total_final'              => $totalFinal,
                     'estado'                   => 1,
                     'stripe_payment_intent_id' => $piId,
                     'fecha_creacion'           => $ahora,
@@ -433,6 +474,19 @@ class EntradaController extends Controller
                 }
 
                 $evento->increment('aforo_actual', $cantidad);
+
+                // Registrar el uso del cupón
+                if ($cupon) {
+                    CuponUso::create([
+                        'cupon_id'            => $cupon->id,
+                        'pedido_id'           => $pedido->id,
+                        'descuento_aplicado'  => $totalDescuento,
+                        'estado'              => 1,
+                        'fecha_creacion'      => $ahora,
+                        'fecha_actualizacion' => null,
+                    ]);
+                    $cupon->increment('usos_actuales');
+                }
 
                 return $pedido;
             });

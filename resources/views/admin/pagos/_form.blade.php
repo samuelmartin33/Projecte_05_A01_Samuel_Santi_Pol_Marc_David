@@ -10,36 +10,73 @@
 @endif
 
 <div class="grid-form">
-    <label class="full">
-        Pedido
-        <select name="pedido_id">
-            <option value="">Selecciona</option>
-            @foreach ($pedidos as $pedidoItem)
-                <option value="{{ $pedidoItem->id }}" @selected(old('pedido_id', $pago->pedido_id) == $pedidoItem->id)>
-                    #{{ $pedidoItem->id }} - {{ $pedidoItem->usuario?->nombre }} {{ $pedidoItem->usuario?->apellido1 }}
-                </option>
-            @endforeach
-        </select>
-    </label>
+    <div class="full">
+        <label class="form-label">Pedido</label>
+        @php $pedidoAct = old('pedido_id', $pago->pedido_id ?? ''); @endphp
+        <input type="hidden" id="inp-adm-pedido" name="pedido_id" value="{{ $pedidoAct }}">
+        <div class="ev-csel" id="ev-adm-pedido">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-pedido')">
+                <span id="ev-adm-pedido-label" class="{{ $pedidoAct ? '' : 'ev-csel-placeholder' }}">
+                    @if($pedidoAct)
+                        @php $pedSel = $pedidos->firstWhere('id', $pedidoAct); @endphp
+                        #{{ $pedidoAct }} - {{ $pedSel?->usuario?->nombre }} {{ $pedSel?->usuario?->apellido1 }}
+                    @else
+                        Selecciona
+                    @endif
+                </span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ !$pedidoAct ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-pedido','inp-adm-pedido','','Selecciona',this)">Selecciona</li>
+                @foreach ($pedidos as $pedidoItem)
+                    @php $pedLabel = '#' . $pedidoItem->id . ' - ' . ($pedidoItem->usuario?->nombre ?? '') . ' ' . ($pedidoItem->usuario?->apellido1 ?? ''); @endphp
+                    <li class="ev-csel-opt {{ $pedidoAct == $pedidoItem->id ? 'selected' : '' }}"
+                        onclick="cselPick('ev-adm-pedido','inp-adm-pedido','{{ $pedidoItem->id }}','{{ addslashes($pedLabel) }}',this)">
+                        {{ $pedLabel }}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
 
-    <label>
-        Método pago
-        <select name="metodo_pago">
-            <option value="1" @selected(old('metodo_pago', $pago->metodo_pago ?? 1) == 1)>Tarjeta</option>
-            <option value="2" @selected(old('metodo_pago', $pago->metodo_pago ?? 1) == 2)>Transferencia</option>
-            <option value="3" @selected(old('metodo_pago', $pago->metodo_pago ?? 1) == 3)>PayPal</option>
-            <option value="4" @selected(old('metodo_pago', $pago->metodo_pago ?? 1) == 4)>Efectivo</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Método pago</label>
+        @php $metPagoAct = old('metodo_pago', $pago->metodo_pago ?? 1); @endphp
+        @php $metLabels = [1=>'Tarjeta',2=>'Transferencia',3=>'PayPal',4=>'Efectivo']; @endphp
+        <input type="hidden" id="inp-adm-met-pago" name="metodo_pago" value="{{ $metPagoAct }}">
+        <div class="ev-csel" id="ev-adm-met-pago">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-met-pago')">
+                <span id="ev-adm-met-pago-label">{{ $metLabels[$metPagoAct] ?? 'Tarjeta' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                @foreach($metLabels as $val => $lab)
+                    <li class="ev-csel-opt {{ $metPagoAct == $val ? 'selected' : '' }}"
+                        onclick="cselPick('ev-adm-met-pago','inp-adm-met-pago','{{ $val }}','{{ $lab }}',this)">{{ $lab }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
 
-    <label>
-        Estado pago
-        <select name="estado_pago">
-            <option value="1" @selected(old('estado_pago', $pago->estado_pago ?? 1) == 1)>Pendiente</option>
-            <option value="2" @selected(old('estado_pago', $pago->estado_pago ?? 1) == 2)>Completado</option>
-            <option value="3" @selected(old('estado_pago', $pago->estado_pago ?? 1) == 3)>Fallido</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Estado pago</label>
+        @php $estPagoAct = old('estado_pago', $pago->estado_pago ?? 1); @endphp
+        @php $estPagoLabels = [1=>'Pendiente',2=>'Completado',3=>'Fallido']; @endphp
+        <input type="hidden" id="inp-adm-est-pago" name="estado_pago" value="{{ $estPagoAct }}">
+        <div class="ev-csel" id="ev-adm-est-pago">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-est-pago')">
+                <span id="ev-adm-est-pago-label">{{ $estPagoLabels[$estPagoAct] ?? 'Pendiente' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                @foreach($estPagoLabels as $val => $lab)
+                    <li class="ev-csel-opt {{ $estPagoAct == $val ? 'selected' : '' }}"
+                        onclick="cselPick('ev-adm-est-pago','inp-adm-est-pago','{{ $val }}','{{ $lab }}',this)">{{ $lab }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
 
     <label>
         Importe
@@ -51,15 +88,15 @@
         <input type="text" name="moneda" maxlength="3" value="{{ old('moneda', $pago->moneda ?? 'EUR') }}">
     </label>
 
-    <label>
-        Fecha pago
-        <input type="datetime-local" name="fecha_pago" value="{{ old('fecha_pago', optional($pago->fecha_pago)->format('Y-m-d\TH:i')) }}">
-    </label>
+    <div>
+        <label class="form-label">Fecha pago</label>
+        <input type="text" name="fecha_pago" class="form-input adm-fp-datetime" value="{{ old('fecha_pago', optional($pago->fecha_pago)->format('Y-m-d H:i')) }}">
+    </div>
 
-    <label>
-        Fecha reembolso
-        <input type="datetime-local" name="fecha_reembolso" value="{{ old('fecha_reembolso', optional($pago->fecha_reembolso)->format('Y-m-d\TH:i')) }}">
-    </label>
+    <div>
+        <label class="form-label">Fecha reembolso</label>
+        <input type="text" name="fecha_reembolso" class="form-input adm-fp-datetime" value="{{ old('fecha_reembolso', optional($pago->fecha_reembolso)->format('Y-m-d H:i')) }}">
+    </div>
 
     <label>
         Importe reembolso
@@ -71,13 +108,23 @@
         <textarea name="motivo_reembolso" rows="3">{{ old('motivo_reembolso', $pago->motivo_reembolso) }}</textarea>
     </label>
 
-    <label>
-        Estado
-        <select name="estado">
-            <option value="1" @selected(old('estado', $pago->estado ?? 1) == 1)>Activo</option>
-            <option value="0" @selected(old('estado', $pago->estado ?? 1) == 0)>Inactivo</option>
-        </select>
-    </label>
+    <div>
+        <label class="form-label">Estado</label>
+        @php $estPagoGen = old('estado', $pago->estado ?? 1); @endphp
+        <input type="hidden" id="inp-adm-est-gen" name="estado" value="{{ $estPagoGen }}">
+        <div class="ev-csel" id="ev-adm-est-gen">
+            <div class="ev-csel-trigger" onclick="cselToggle('ev-adm-est-gen')">
+                <span id="ev-adm-est-gen-label">{{ $estPagoGen == 1 ? 'Activo' : 'Inactivo' }}</span>
+                <span class="ev-csel-arrow">▾</span>
+            </div>
+            <ul class="ev-csel-menu">
+                <li class="ev-csel-opt {{ $estPagoGen == 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-gen','inp-adm-est-gen','1','Activo',this)">Activo</li>
+                <li class="ev-csel-opt {{ $estPagoGen != 1 ? 'selected' : '' }}"
+                    onclick="cselPick('ev-adm-est-gen','inp-adm-est-gen','0','Inactivo',this)">Inactivo</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <div class="form-actions">

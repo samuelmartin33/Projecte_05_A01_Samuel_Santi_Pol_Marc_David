@@ -4,6 +4,7 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     body { background: #07060c; }
 
@@ -209,13 +210,21 @@
         </div>
 
         <div class="form-grupo">
-            <label class="form-label">
-                Estado <span class="form-required">*</span>
-            </label>
-            <select name="estado" required class="form-select">
-                <option value="1" {{ old('estado', '1') == '1' ? 'selected' : '' }}>Activo</option>
-                <option value="0" {{ old('estado') == '0' ? 'selected' : '' }}>Inactivo</option>
-            </select>
+            <label class="form-label">Estado <span class="form-required">*</span></label>
+            @php $estCupCr = old('estado', '1'); @endphp
+            <input type="hidden" id="inp-est-cup-cr" name="estado" value="{{ $estCupCr }}">
+            <div class="ev-csel" id="ev-est-cup-cr">
+                <div class="ev-csel-trigger" onclick="cselToggle('ev-est-cup-cr')">
+                    <span id="ev-est-cup-cr-label">{{ $estCupCr == '1' ? 'Activo' : 'Inactivo' }}</span>
+                    <span class="ev-csel-arrow">▾</span>
+                </div>
+                <ul class="ev-csel-menu">
+                    <li class="ev-csel-opt {{ $estCupCr == '1' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-est-cup-cr', 'inp-est-cup-cr', '1', 'Activo', this)">Activo</li>
+                    <li class="ev-csel-opt {{ $estCupCr != '1' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-est-cup-cr', 'inp-est-cup-cr', '0', 'Inactivo', this)">Inactivo</li>
+                </ul>
+            </div>
         </div>
 
         <hr class="form-divider">
@@ -231,13 +240,15 @@
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Fecha inicio <span class="form-required">*</span></label>
-                <input type="datetime-local" name="fecha_inicio"
-                       value="{{ old('fecha_inicio') }}" required class="form-input">
+                <input type="text" name="fecha_inicio" id="cup-fecha-inicio"
+                       value="{{ old('fecha_inicio') }}" required class="form-input"
+                       placeholder="dd/mm/aaaa hh:mm" autocomplete="off" readonly>
             </div>
             <div>
                 <label class="form-label">Fecha fin <span class="form-required">*</span></label>
-                <input type="datetime-local" name="fecha_fin"
-                       value="{{ old('fecha_fin') }}" required class="form-input">
+                <input type="text" name="fecha_fin" id="cup-fecha-fin"
+                       value="{{ old('fecha_fin') }}" required class="form-input"
+                       placeholder="dd/mm/aaaa hh:mm" autocomplete="off" readonly>
             </div>
         </div>
 
@@ -304,3 +315,26 @@
 </section>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+var fpCupConfig = {
+    enableTime: true,
+    time_24hr: true,
+    dateFormat: 'Y-m-d H:i',
+    altInput: true,
+    altFormat: 'd/m/Y H:i',
+    altInputClass: 'form-input',
+    locale: 'es',
+    disableMobile: true,
+};
+var fpCupInicio = flatpickr('#cup-fecha-inicio', Object.assign({}, fpCupConfig, {
+    onChange: function(dates) {
+        if (dates[0]) fpCupFin.set('minDate', dates[0]);
+    }
+}));
+var fpCupFin = flatpickr('#cup-fecha-fin', Object.assign({}, fpCupConfig));
+</script>
+@endpush

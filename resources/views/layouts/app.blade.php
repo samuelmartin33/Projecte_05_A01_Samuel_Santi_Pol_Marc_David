@@ -87,11 +87,26 @@
                               {{ request()->routeIs('home') ? 'text-white' : 'text-white/60 hover:text-white' }}">
                         Explorar
                     </a>
-                    <a href="{{ route('cupones.index') }}"
-                       class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
-                              {{ request()->routeIs('cupones.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
-                        Cupones
-                    </a>
+                    @auth
+                        @if(Auth::user()->es_premium)
+                        <a href="{{ route('cupones.index') }}"
+                           class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
+                                  {{ request()->routeIs('cupones.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
+                            Cupones
+                        </a>
+                        @else
+                        <a href="{{ route('premium') }}"
+                           class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 text-white/60 hover:text-white/90"
+                           style="color:rgba(168,85,247,0.7)">
+                            Cupones
+                        </a>
+                        @endif
+                    @else
+                        <a href="{{ route('premium') }}"
+                           class="font-mono text-xs uppercase tracking-widest transition-colors duration-100 text-white/60 hover:text-white">
+                            Cupones
+                        </a>
+                    @endauth
                     <a href="{{ route('trabajos.index') }}"
                        class="font-mono text-xs uppercase tracking-widest transition-colors duration-100
                               {{ request()->routeIs('trabajos.index') ? 'text-white' : 'text-white/60 hover:text-white' }}">
@@ -116,7 +131,7 @@
             {{-- Botones acción --}}
             <div class="flex items-center gap-3">
                 @guest
-                    <a href="{{ route('cupones.index') }}"
+                    <a href="{{ route('premium') }}"
                        class="font-mono text-xs uppercase tracking-widest
                               text-white/65 hover:text-white transition-colors duration-100">
                         Cupones

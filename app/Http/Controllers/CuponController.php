@@ -23,21 +23,19 @@ class CuponController extends Controller
      */
     public function index()
     {
-        // Cupones vigentes (activos y dentro del rango de fechas)
-        $cuponesActivos = Cupon::with(['eventos.categoria', 'eventos.portada'])
+        // Solo usuarios Premium pueden ver los cupones. Si no tiene Premium (o no ha iniciado sesión),
+        // redirigimos a la página de oferta con un mensaje de incentivo.
+        if (! Auth::check() || ! Auth::user()->es_premium) {
+            return redirect()->route('premium')
+                ->with('desde_cupones', true);
+        }
+
+        $cuponesActivos = Cupon::with(['empresa', 'eventos.categoria', 'eventos.portada'])
             ->vigentes()
             ->orderBy('fecha_fin', 'asc')
             ->get();
 
-        // Todos los cupones (para la vista completa)
-        $cuponesExpirados = Cupon::with(['eventos.categoria'])
-            ->where('estado', 1)
-            ->where('fecha_fin', '<', now())
-            ->orderBy('fecha_fin', 'desc')
-            ->take(6)
-            ->get();
-
-        return view('cupones.index', compact('cuponesActivos', 'cuponesExpirados'));
+        return view('cupones.index', compact('cuponesActivos'));
     }
 
     /**

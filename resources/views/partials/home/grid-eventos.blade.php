@@ -21,14 +21,27 @@
 
     {{-- Filtros --}}
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <select id="grid-filtro-ubicacion"
-              onchange="vibezFiltrarCiudad()"
-              style="background:rgba(7,6,12,0.6);border:1px solid var(--line);color:var(--ink);padding:10px 16px;font-family:'Archivo Narrow',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;">
-        <option value="">Todas las ciudades</option>
-        @foreach($ubicaciones ?? [] as $ub)
-          <option value="{{ $ub }}">{{ $ub }}</option>
-        @endforeach
-      </select>
+      {{-- Hidden input leído por vibezGridFiltrar / vibezGridLimpiar --}}
+      <input type="hidden" id="grid-filtro-ubicacion" value="">
+      <div class="ev-csel" id="ev-filtro-ub" style="min-width:180px;">
+        <div class="ev-csel-trigger" onclick="cselToggle('ev-filtro-ub')"
+             style="padding:10px 16px;font-family:'Archivo Narrow',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;border-color:var(--line);">
+          <span id="ev-filtro-ub-label" class="ev-csel-placeholder">Todas las ciudades</span>
+          <span class="ev-csel-arrow">▾</span>
+        </div>
+        <ul class="ev-csel-menu">
+          <li class="ev-csel-opt selected"
+              onclick="cselPick('ev-filtro-ub','grid-filtro-ubicacion','','Todas las ciudades',this);vibezFiltrarCiudad()">
+            Todas las ciudades
+          </li>
+          @foreach($ubicaciones ?? [] as $ub)
+            <li class="ev-csel-opt"
+                onclick="cselPick('ev-filtro-ub','grid-filtro-ubicacion','{{ $ub }}','{{ $ub }}',this);vibezFiltrarCiudad()">
+              {{ $ub }}
+            </li>
+          @endforeach
+        </ul>
+      </div>
 
       <button onclick="vibezGridLimpiar()"
               style="background:transparent;border:1px solid var(--ink-faint);color:var(--ink-dim);padding:10px 16px;font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;">
@@ -268,7 +281,17 @@ function vibezGridFiltrar() {
 
 function vibezGridLimpiar() {
   var ub = document.getElementById('grid-filtro-ubicacion');
-  if (ub) ub.value = '';
+  if (ub) {
+    ub.value = '';
+    var label = document.getElementById('ev-filtro-ub-label');
+    if (label) { label.textContent = 'Todas las ciudades'; label.classList.add('ev-csel-placeholder'); }
+    var cont  = document.getElementById('ev-filtro-ub');
+    if (cont) {
+      cont.querySelectorAll('.ev-csel-opt').forEach(function(o) { o.classList.remove('selected'); });
+      var first = cont.querySelector('.ev-csel-opt');
+      if (first) first.classList.add('selected');
+    }
+  }
   /* Resetear chip activo a "Todo" */
   document.querySelectorAll('.vibez-cat-chip').forEach(function(c) {
     c.classList.toggle('active', c.dataset.cat === 'Todo');

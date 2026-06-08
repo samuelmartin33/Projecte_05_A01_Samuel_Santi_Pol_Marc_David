@@ -2,11 +2,13 @@
 
 @section('titulo', 'VIBEZ — Todos los Eventos')
 
-{{-- @section('content') suprime el nav/footer del layout, igual que home.blade.php --}}
+{{-- @section('content') suprime el nav/footer del layout --}}
 @section('content')
 
-{{-- ── Estilos ── --}}
 <link rel="stylesheet" href="{{ asset('css/vibez-home.css') }}">
+<link rel="stylesheet" href="{{ asset('css/vibez-forms.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4/dist/flatpickr.min.css">
+
 <style>
   :root {
     --bg: #07060c; --bg-2: #0d0820; --ink: #f5f1ea;
@@ -16,41 +18,255 @@
   }
   body { background: var(--bg); color: var(--ink); }
 
-  /* Grid de tarjetas */
-  .vibez-grid-card { border-radius: 0; }
-  .vibez-grid-card .img-wrap { border-radius: 0; }
+  /* ── Cabecera ── */
+  .ev-cabecera { padding: 80px 48px 32px; }
 
-  /* ─── Responsive ─── */
-  /* Cabecera: reducir padding horizontal en móvil */
-  .ev-cabecera { padding: 80px 48px 40px; }
-  /* Barra de filtros sticky: debe pegarse DEBAJO del nav (~107px desktop, ~79px móvil) */
-  .ev-filtros-sticky { top: 107px; padding: 16px 48px; }
+  /* ── Barra de filtros ── */
+  .ev-filtros-bar {
+    position: sticky; top: 107px; z-index: 30;
+    background: rgba(7,6,12,0.94); backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+    overflow: visible;
+  }
+  .ev-filtros-inner {
+    max-width: 1480px; margin: 0 auto;
+    padding: 0 48px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+  }
 
-  @media (max-width: 768px) {
-    .ev-cabecera      { padding: 60px 20px 28px !important; }
-    .ev-filtros-sticky { top: 79px !important; padding: 12px 16px !important; }
+  /* Búsqueda: crece para rellenar el espacio disponible */
+  .ev-search-wrap {
+    position: relative; flex: 1; min-width: 140px;
+  }
+  .ev-search-wrap svg {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-dim); pointer-events: none;
+  }
+  .ev-search-input {
+    width: 100%; padding: 8px 10px 8px 32px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--ink-faint);
+    border-radius: 7px; color: var(--ink);
+    font-family: 'Archivo Narrow', sans-serif; font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .ev-search-input::placeholder { color: var(--ink-dim); }
+  .ev-search-input:focus { border-color: var(--magenta); }
+
+  /* Separador vertical */
+  .ev-sep { width: 1px; height: 22px; background: var(--line); flex-shrink: 0; }
+
+  /* ev-csel dentro de la barra: aspecto de botón compacto con borde */
+  .ev-filtros-inner .ev-csel { width: auto; flex-shrink: 0; }
+  .ev-filtros-inner .ev-csel-trigger {
+    border: 1px solid var(--ink-faint) !important;
+    border-radius: 7px !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    font-family: 'Archivo Narrow', sans-serif !important;
+    background: rgba(255,255,255,0.06) !important;
+    white-space: nowrap;
+    gap: 8px;
+  }
+  .ev-filtros-inner .ev-csel.open .ev-csel-trigger,
+  .ev-filtros-inner .ev-csel:focus-within .ev-csel-trigger {
+    border-color: var(--magenta) !important;
+  }
+  .ev-filtros-inner .ev-csel-menu {
+    min-width: 100%; width: max-content; z-index: 200;
+  }
+
+  /* Fechas Flatpickr */
+  .ev-date-input {
+    padding: 8px 8px; background: rgba(255,255,255,0.06);
+    border: 1px solid var(--ink-faint); border-radius: 7px; color: var(--ink);
+    font-family: 'Archivo Narrow', sans-serif; font-size: 13px;
+    outline: none; width: 104px; cursor: pointer; transition: border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .ev-date-input:focus { border-color: var(--magenta); }
+  .ev-date-input::placeholder { color: var(--ink-dim); }
+
+  /* Botón buscar */
+  .ev-btn-buscar {
+    padding: 8px 16px; border-radius: 7px; border: none; cursor: pointer;
+    background: linear-gradient(135deg,#7c3aed,#a855f7); color: var(--cream);
+    font-family: 'Archivo Narrow', sans-serif; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    white-space: nowrap; flex-shrink: 0; transition: opacity 0.2s;
+  }
+  .ev-btn-buscar:hover { opacity: 0.85; }
+
+  /* Limpiar filtros */
+  .ev-limpiar {
+    font-family: 'Archivo Narrow', sans-serif; font-size: 12px;
+    color: var(--ink-dim); text-decoration: none; white-space: nowrap;
+    padding: 5px 8px; border-radius: 6px; transition: color 0.2s; flex-shrink: 0;
+  }
+  .ev-limpiar:hover { color: var(--magenta); }
+
+  /* Contador */
+  .ev-count {
+    font-family: 'Archivo Narrow', sans-serif; font-size: 12px;
+    color: var(--ink-dim); white-space: nowrap; text-transform: uppercase;
+    letter-spacing: 0.1em; flex-shrink: 0; margin-left: auto;
+  }
+
+  /* ── Grid de tarjetas ── */
+  .ev-grid {
+    max-width: 1480px; margin: 0 auto;
+    padding: 40px 48px 60px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  /* Tarjeta evento */
+  .ev-card {
+    display: block; text-decoration: none; color: inherit;
+    border-radius: 4px; overflow: hidden; position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background: var(--bg-2);
+  }
+  .ev-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(168,85,247,0.18); }
+
+  .ev-card-img {
+    aspect-ratio: 3/4; width: 100%; object-fit: cover;
+    display: block; filter: contrast(1.05) saturate(1.1) brightness(0.82);
+  }
+  .ev-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 45%, rgba(7,6,12,0.9));
+    pointer-events: none;
+  }
+  .ev-card-body {
+    position: absolute; bottom: 0; left: 0; right: 0; padding: 18px;
+  }
+  .ev-card-meta {
+    font-family: 'Archivo Narrow', sans-serif; font-size: 10px;
+    color: var(--magenta-2); margin-bottom: 6px;
+    display: flex; justify-content: space-between;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .ev-card-titulo {
+    font-family: 'Anton', sans-serif; font-size: 22px;
+    margin: 0; line-height: 0.95; color: var(--ink); text-transform: uppercase;
+  }
+  .ev-card-lugar {
+    font-family: 'Archivo Narrow', sans-serif; font-size: 11px;
+    color: var(--ink-dim); margin: 6px 0 0; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* Badge empresa */
+  .ev-card-empresa {
+    position: absolute; top: 12px; left: 12px;
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(7,6,12,0.75); backdrop-filter: blur(8px);
+    padding: 4px 8px 4px 5px; border: 1px solid rgba(168,85,247,0.35);
+    border-radius: 999px; max-width: calc(100% - 60px);
+  }
+  .ev-card-empresa-logo {
+    width: 16px; height: 16px; object-fit: cover; border-radius: 50%; flex-shrink: 0;
+  }
+  .ev-card-empresa-ini {
+    width: 16px; height: 16px; background: var(--magenta);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 900; color: #fff; border-radius: 50%; flex-shrink: 0;
+  }
+  .ev-card-empresa-nombre {
+    font-family: 'Archivo Narrow', sans-serif; font-size: 9px;
+    color: var(--cream); white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; max-width: 100px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* Badge "En curso" */
+  .ev-card-encurso {
+    position: absolute; left: 12px;
+    background: var(--magenta); color: var(--cream);
+    padding: 4px 10px; border-radius: 999px;
+    font-family: 'Archivo Narrow', sans-serif; font-size: 10px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .ev-card-encurso-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cream); }
+
+  /* Botón favorito */
+  .ev-card-fav {
+    position: absolute; top: 18px; right: 18px;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(7,6,12,0.55); border: 1px solid var(--ink-faint);
+    backdrop-filter: blur(10px); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s;
+  }
+  .ev-card-fav:hover { border-color: var(--magenta); }
+
+  /* ── Vacío ── */
+  .ev-empty {
+    grid-column: 1 / -1; text-align: center;
+    padding: 80px 20px; color: var(--ink-dim);
+    font-family: 'Archivo Narrow', sans-serif; font-size: 16px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+
+  /* ── Paginación ── */
+  .ev-paginacion {
+    max-width: 1480px; margin: 0 auto 60px;
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+  }
+  .ev-pag-btn {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 38px; height: 38px; padding: 0 8px;
+    border-radius: 6px; font-family: 'Archivo Narrow', sans-serif; font-size: 13px;
+    text-decoration: none; border: 1px solid var(--ink-faint); color: var(--ink-dim);
+    background: transparent; cursor: pointer; transition: all 0.18s;
+  }
+  .ev-pag-btn:hover:not(.activo):not(.deshabilitado) { border-color: var(--magenta); color: var(--magenta); }
+  .ev-pag-btn.activo {
+    background: var(--magenta); border-color: var(--magenta);
+    color: var(--cream); font-weight: 700;
+  }
+  .ev-pag-btn.deshabilitado { opacity: 0.3; cursor: default; pointer-events: none; }
+  .ev-pag-puntos { color: var(--ink-dim); font-size: 13px; padding: 0 4px; line-height: 38px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1200px) {
+    .ev-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .ev-grid { grid-template-columns: repeat(2, 1fr); padding: 24px 20px 40px; }
+    .ev-filtros-bar { top: 79px; }
+    .ev-filtros-inner { padding: 0 20px; gap: 6px; }
+    .ev-cabecera { padding: 60px 20px 24px; }
+    .ev-paginacion { padding: 0 20px; }
+    .ev-date-input { width: 88px; font-size: 12px; padding: 8px 6px; }
+    .ev-btn-buscar { padding: 8px 12px; }
+  }
+  @media (max-width: 600px) {
+    .ev-grid { grid-template-columns: 1fr; }
+    .ev-filtros-inner { flex-wrap: wrap; row-gap: 6px; }
+    .ev-search-wrap { flex: 1 1 100%; }
+    .ev-sep { display: none; }
+    .ev-count { display: none; }
   }
 </style>
 
-{{-- ── Datos globales para JS ── --}}
+{{-- Variables JS mínimas para funciones de favoritos --}}
 <script>
-  window.EVENTOS_DATA   = @json($eventosParaJs ?? []);
   window.FAVORITOS_IDS  = @json($favoritosIds ?? []);
-  window.CATEGORIAS     = @json($categorias->pluck('nombre')->prepend('Todo')->values());
+  window.SEGUIMIENTOS_IDS = @json($seguimientosIds ?? []);
   window.USER_AUTH      = @json(Auth::check());
   window.LOGIN_URL      = @json(route('login'));
+  window.PUEDE_SEGUIR   = @json(Auth::check() && Auth::user()->tipo_cuenta === 'cliente');
 </script>
 
-{{-- ════════════════════════════════════════════════════
-     NAV
-════════════════════════════════════════════════════ --}}
+{{-- ════════════════ NAV ════════════════ --}}
 @include('partials.home.nav')
 
-{{-- ════════════════════════════════════════════════════
-     CABECERA DE LA PÁGINA
-════════════════════════════════════════════════════ --}}
+{{-- ════════════════ CABECERA ════════════════ --}}
 <section class="ev-cabecera" style="max-width:1480px;margin:0 auto;">
-  <div class="mono" style="font-size:11px;color:var(--magenta);margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+  <div class="mono" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;color:var(--magenta);margin-bottom:16px;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:0.18em;">
     <span style="width:28px;height:1px;background:var(--magenta);display:inline-block;"></span>
     Todos los eventos · curados por VIBEZ
   </div>
@@ -62,145 +278,94 @@
   </p>
 </section>
 
-{{-- ════════════════════════════════════════════════════
-     BARRA DE FILTROS POR CATEGORÍA (chips sticky)
-════════════════════════════════════════════════════ --}}
-<section class="ev-filtros-sticky" style="position:sticky;z-index:30;background:rgba(7,6,12,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);">
-  <div style="max-width:1480px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-    <span class="mono" style="font-size:11px;color:var(--ink-dim);white-space:nowrap;">
-      <span id="vibez-count-label">{{ $eventos->count() }}</span> eventos
-    </span>
-    <div class="no-scrollbar" style="overflow-x:auto;white-space:nowrap;padding:4px 0;flex:1;">
-      <div style="display:inline-flex;gap:10px;">
-        <button class="chip active vibez-cat-chip" data-cat="Todo"
-                onclick="vibezFilterCategoria('Todo')">Todo</button>
-        @foreach($categorias as $cat)
-          <button class="chip vibez-cat-chip" data-cat="{{ $cat->nombre }}"
-                  onclick="vibezFilterCategoria('{{ $cat->nombre }}')">{{ $cat->nombre }}</button>
-        @endforeach
-      </div>
+{{-- ════════════════ BARRA DE FILTROS ════════════════ --}}
+<div class="ev-filtros-bar">
+  <form id="ev-form-filtros" method="GET" action="{{ route('eventos.index') }}" class="ev-filtros-inner" onsubmit="_evFormSubmit(event)">
+
+    {{-- Búsqueda --}}
+    <div class="ev-search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" name="buscar" class="ev-search-input"
+        placeholder="Buscar evento, promotora..."
+        value="{{ $buscar }}" autocomplete="off"
+        oninput="buscarEventos(this.value)">
     </div>
-  </div>
-</section>
 
-{{-- ════════════════════════════════════════════════════
-     GRID COMPLETO DE EVENTOS CON AJAX
-════════════════════════════════════════════════════ --}}
-@include('partials.home.grid-eventos', [
-  'eventos'      => $eventos,
-  'categorias'   => $categorias,
-  'favoritosIds' => $favoritosIds ?? [],
-  'ubicaciones'  => $ubicaciones ?? [],
-])
+    <div class="ev-sep"></div>
 
-{{-- ════════════════════════════════════════════════════
-     MODAL DETALLE DE EVENTO
-════════════════════════════════════════════════════ --}}
-@include('partials.home.detail-modal')
+    {{-- Selector orden --}}
+    <input type="hidden" id="ev-orden-val" name="orden" value="{{ $orden }}">
+    <div class="ev-csel" id="ev-csel-orden">
+      <div class="ev-csel-trigger" onclick="toggleEvCsel('ev-csel-orden')">
+        <span id="ev-orden-label">{{ $ordenLabel }}</span>
+        <span class="ev-csel-arrow">▾</span>
+      </div>
+      <ul class="ev-csel-menu">
+        <li class="ev-csel-opt {{ $orden === 'nuevo' ? 'selected' : '' }}"
+            onclick="pickEvOrden('nuevo', 'Más reciente')">Más reciente</li>
+        <li class="ev-csel-opt {{ $orden === 'antiguo' ? 'selected' : '' }}"
+            onclick="pickEvOrden('antiguo', 'Más antiguo')">Más antiguo</li>
+      </ul>
+    </div>
 
-{{-- ════════════════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════════════════ --}}
+    <div class="ev-sep"></div>
+
+    {{-- Fecha desde --}}
+    <input type="text" id="ev-fecha-desde" name="fecha_desde"
+      class="ev-date-input" placeholder="Desde"
+      value="{{ $fechaDesde }}" autocomplete="off" readonly>
+
+    {{-- Fecha hasta --}}
+    <input type="text" id="ev-fecha-hasta" name="fecha_hasta"
+      class="ev-date-input" placeholder="Hasta"
+      value="{{ $fechaHasta }}" autocomplete="off" readonly>
+
+    {{-- Buscar --}}
+    <button type="button" class="ev-btn-buscar" onclick="_evFetch()">Buscar</button>
+
+    {{-- Limpiar (JS controla display; siempre presente en DOM) --}}
+    <a href="{{ route('eventos.index') }}" class="ev-limpiar" id="ev-limpiar"
+       style="{{ ($buscar || $categoriaId || $fechaDesde || $fechaHasta || $orden !== 'nuevo') ? '' : 'display:none' }}">
+      ✕ Limpiar
+    </a>
+
+    {{-- Contador --}}
+    <span class="ev-count">
+      {{ $eventos->total() }} {{ $eventos->total() === 1 ? 'evento' : 'eventos' }}
+    </span>
+
+  </form>
+</div>
+
+{{-- ════════════════ GRID + PAGINACIÓN (reemplazado vía AJAX) ════════════════ --}}
+<div id="ev-resultado">
+  @include('partials.eventos.resultado', [
+      'eventos'        => $eventos,
+      'favoritosIds'   => $favoritosIds,
+      'seguimientosIds' => $seguimientosIds,
+  ])
+</div>
+
+{{-- ════════════════ FOOTER ════════════════ --}}
 @include('partials.home.footer')
 
-{{-- Toast de confirmación (favoritos, etc.) --}}
+{{-- Toast (favoritos) --}}
 <div id="vibez-toast" class="toast" style="display:none;"></div>
 
-{{-- ════════════════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════════════════ --}}
+{{-- ════════════════ SCRIPTS ════════════════ --}}
 <script src="{{ asset('js/vibez-home.js') }}"></script>
+<script src="{{ asset('js/eventos-filtros.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4/dist/l10n/es.js"></script>
 <script>
-  /*
-   * Función unificada de filtrado para la página Eventos.
-   *
-   * Problema original:
-   *  - vibezGridFiltrar() (grid-eventos.blade.php) lee #grid-filtro-cat que
-   *    no existe aquí → siempre enviaba categoría vacía.
-   *  - _vibezFiltrarGrid() (vibez-home.js) no incluía la ubicación.
-   *  - Los dos sistemas no compartían estado.
-   *
-   * Solución: una sola función que lee vibezActiveCategoria + select ciudad,
-   * hace un único fetch y usa el renderizador completo (con badges de empresa,
-   * botón seguir, favoritos, etc.).
-   */
-  function _eventosRenderGrid(grid, eventos) {
-    if (!eventos.length) {
-      grid.innerHTML = '<p style="color:var(--ink-dim);font-family:\'Archivo Narrow\',sans-serif;padding:60px 0;text-align:center;grid-column:1/-1;">No hay eventos para estos filtros.</p>';
-      return;
-    }
-    grid.innerHTML = eventos.map(function(e) {
-      var esFav      = (window.FAVORITOS_IDS || []).includes(e.id);
-      var esSig      = e.empresa_id && (window.SEGUIMIENTOS_IDS || []).includes(e.empresa_id);
-      var puedeSeguir = window.PUEDE_SEGUIR && e.empresa_id;
-      var badgePromo = '';
-      if (puedeSeguir) {
-        var inicial = e.empresa_nombre ? e.empresa_nombre.charAt(0).toUpperCase() : '?';
-        var logoHtml = e.empresa_logo
-          ? '<img src="' + e.empresa_logo + '" style="width:16px;height:16px;object-fit:cover;border-radius:50%;flex-shrink:0;">'
-          : '<span style="width:16px;height:16px;background:#a855f7;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;border-radius:50%;flex-shrink:0;">' + inicial + '</span>';
-        badgePromo = '<div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;max-width:calc(100% - 60px);">'
-          + '<div style="display:flex;align-items:center;gap:5px;background:rgba(7,6,12,0.75);backdrop-filter:blur(8px);padding:4px 8px 4px 5px;border:1px solid rgba(168,85,247,0.35);">'
-          + logoHtml
-          + '<span class="mono" style="font-size:9px;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;">' + (e.empresa_nombre || '') + '</span>'
-          + '</div>'
-          + '<button class="btn-seguir-home ' + (esSig ? 'siguiendo' : '') + '" data-empresa-id="' + e.empresa_id + '" onclick="event.stopPropagation();toggleSeguirHome(this)" title="' + (esSig ? 'Dejar de seguir' : 'Seguir promotora') + '">'
-          + (esSig ? '✓' : '+') + '</button></div>';
-      }
-      var enCursoTop = puedeSeguir ? 'top:44px' : 'top:12px';
-      return '<article class="vibe-card vibez-grid-card" data-id="' + e.id + '" onclick="vibezOpenModal(' + e.id + ')" style="cursor:pointer;">'
-        + '<div class="img-wrap" style="position:relative;aspect-ratio:3/4;overflow:hidden;">'
-        + '<img src="' + (e.img || e.url_portada || '') + '" alt="' + e.titulo + '" style="width:100%;height:100%;object-fit:cover;filter:contrast(1.05) saturate(1.1) brightness(0.85);">'
-        + '<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(7,6,12,0.88));"></div>'
-        + badgePromo
-        + (e.estaOcurriendo ? '<div style="position:absolute;' + enCursoTop + ';left:12px;background:var(--magenta);color:var(--cream);padding:4px 10px;border-radius:999px;font-family:\'Archivo Narrow\',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--cream);"></span>En curso</div>' : '')
-        + '<button onclick="event.stopPropagation();vibezToggleFav(' + e.id + ',this)" data-fav-id="' + e.id + '" class="' + (esFav ? 'activo' : '') + '" style="position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;background:rgba(7,6,12,0.55);border:1px solid var(--ink-faint);color:' + (esFav ? 'var(--magenta)' : 'var(--ink)') + ';backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;justify-content:center;">'
-        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (esFav ? 'var(--magenta)' : 'currentColor') + '"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'
-        + '</button>'
-        + '<div style="position:absolute;bottom:0;left:0;right:0;padding:18px;">'
-        + '<div class="mono" style="font-size:10px;color:var(--magenta-2);margin-bottom:6px;display:flex;justify-content:space-between;">'
-        + '<span>' + (e.fechaFmt || e.fecha_fmt || '') + ' · ' + (e.categoria || '') + '</span>'
-        + '<span>' + (e.precio_formateado || e.precio || '') + '</span></div>'
-        + '<h3 class="display" style="font-size:24px;margin:0;line-height:0.95;">' + e.titulo + '</h3>'
-        + '<p style="font-family:\'Archivo Narrow\',sans-serif;font-size:11px;color:var(--ink-dim);margin:6px 0 0;text-transform:uppercase;letter-spacing:0.08em;">' + (e.ubicacion_nombre || e.lugar || '') + '</p>'
-        + '</div></div></article>';
-    }).join('');
-  }
-
-  function _eventosFiltrar() {
-    var cat      = vibezActiveCategoria || 'Todo';
-    var ub       = document.getElementById('grid-filtro-ubicacion');
-    var ubicacion = ub ? ub.value : '';
-    var grid     = document.getElementById('vibez-grid-todos');
-    var spinner  = document.getElementById('vibez-grid-spinner');
-    var gridCount = document.getElementById('vibez-grid-count');
-    var mainCount = document.getElementById('vibez-count-label');
-
-    if (!grid) return;
-    if (spinner) spinner.style.display = 'flex';
-
-    var url = '/api/filtrar?categoria=' + encodeURIComponent(cat === 'Todo' ? '' : cat)
-            + '&ubicacion=' + encodeURIComponent(ubicacion);
-
-    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (spinner) spinner.style.display = 'none';
-        var eventos = data.eventos || [];
-        if (gridCount) gridCount.textContent = eventos.length;
-        if (mainCount) mainCount.textContent = eventos.length;
-        _eventosRenderGrid(grid, eventos);
-      })
-      .catch(function() { if (spinner) spinner.style.display = 'none'; });
-  }
-
-  /* Los chips llaman vibezFilterCategoria → _vibezFiltrarGrid.
-     Redirigimos al sistema unificado. */
-  _vibezFiltrarGrid = function(cat) {
-    vibezActiveCategoria = cat;
-    _eventosFiltrar();
+  var _fpOpts = {
+    locale: 'es',
+    dateFormat: 'Y-m-d',
+    disableMobile: true,
+    onClose: function (selectedDates, dateStr) { _evFetch(); }
   };
-
+  flatpickr('#ev-fecha-desde', _fpOpts);
+  flatpickr('#ev-fecha-hasta', _fpOpts);
 </script>
 
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amigo;
+use App\Models\Evento;
 use App\Models\Usuario;
 use App\Models\CategoriaEvento;
 use Illuminate\Http\JsonResponse;
@@ -82,11 +83,18 @@ class PerfilController extends Controller
 
         $favoritosIds = $eventos->pluck('id')->map(fn($v) => (int) $v)->toArray();
 
+        $ubicaciones = Evento::where('estado', 1)
+            ->whereNotNull('ubicacion_nombre')
+            ->orderBy('ubicacion_nombre')
+            ->distinct()
+            ->pluck('ubicacion_nombre');
+
         return view('perfil.favoritos', [
-            'usuario' => $usuario,
-            'eventos' => $eventos,
-            'categorias' => $categorias,
-            'favoritosIds' => $favoritosIds,
+            'usuario'     => $usuario,
+            'eventos'     => $eventos,
+            'categorias'  => $categorias,
+            'favoritosIds'=> $favoritosIds,
+            'ubicaciones' => $ubicaciones,
         ]);
     }
 

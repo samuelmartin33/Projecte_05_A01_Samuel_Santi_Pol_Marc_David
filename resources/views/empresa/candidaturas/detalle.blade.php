@@ -113,12 +113,23 @@
 
             <div class="ml-auto flex items-center gap-2">
                 <label class="text-navy/40 text-xs font-semibold uppercase tracking-wider">Ordenar:</label>
-                <select class="filtro-select text-xs border border-navy/10 rounded-lg px-2 py-1.5 outline-none"
-                        onchange="cargarCandidaturas(estadoActual, this.value)">
-                    <option value="reciente" {{ $ordenAct === 'reciente' ? 'selected':'' }}>Más reciente</option>
-                    <option value="nombre"   {{ $ordenAct === 'nombre'   ? 'selected':'' }}>Nombre A–Z</option>
-                    <option value="estado"   {{ $ordenAct === 'estado'   ? 'selected':'' }}>Por estado</option>
-                </select>
+                @php $ordenCandLabels = ['reciente'=>'Más reciente','nombre'=>'Nombre A–Z','estado'=>'Por estado']; @endphp
+                <input type="hidden" id="inp-orden-cand" value="{{ $ordenAct }}">
+                <div class="ev-csel" id="ev-orden-cand" style="min-width:140px;">
+                    <div class="ev-csel-trigger" onclick="cselToggle('ev-orden-cand')"
+                         style="padding:8px 12px;font-family:'Archivo Narrow',sans-serif;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;border-color:rgba(245,241,234,0.10);">
+                        <span id="ev-orden-cand-label">{{ $ordenCandLabels[$ordenAct] ?? 'Más reciente' }}</span>
+                        <span class="ev-csel-arrow">▾</span>
+                    </div>
+                    <ul class="ev-csel-menu">
+                        <li class="ev-csel-opt {{ $ordenAct === 'reciente' ? 'selected' : '' }}"
+                            onclick="cselPick('ev-orden-cand','inp-orden-cand','reciente','Más reciente',this);cargarCandidaturas(estadoActual,'reciente')">Más reciente</li>
+                        <li class="ev-csel-opt {{ $ordenAct === 'nombre' ? 'selected' : '' }}"
+                            onclick="cselPick('ev-orden-cand','inp-orden-cand','nombre','Nombre A–Z',this);cargarCandidaturas(estadoActual,'nombre')">Nombre A–Z</li>
+                        <li class="ev-csel-opt {{ $ordenAct === 'estado' ? 'selected' : '' }}"
+                            onclick="cselPick('ev-orden-cand','inp-orden-cand','estado','Por estado',this);cargarCandidaturas(estadoActual,'estado')">Por estado</li>
+                    </ul>
+                </div>
             </div>
 
         </div>
@@ -170,7 +181,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
         </div>
     @else
 
-        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.10);overflow:hidden;">
+        <div style="background:#0d0a18;border:1px solid rgba(245,241,234,0.10);overflow:visible;">
 
             {{-- Cabecera de tabla --}}
             <div class="grid grid-cols-[2.5rem_1fr_auto] gap-4 px-5 py-3" style="background:rgba(168,85,247,0.06);border-bottom:1px solid rgba(245,241,234,0.10);">
@@ -179,6 +190,7 @@ $candidaturasJson = $candidaturas->map(function($c) {
                 <p class="text-xs uppercase tracking-wider font-bold" style="color:rgba(245,241,234,0.40);font-family:'Archivo Narrow',sans-serif;letter-spacing:0.16em;">Acciones</p>
             </div>
 
+            @php $estLabels = [1=>'Nuevo', 2=>'Revisado', 3=>'Preseleccionado', 4=>'Rechazado', 5=>'Seleccionado']; @endphp
             @foreach($candidaturas as $cand)
             <div class="cand-row" id="row-{{ $cand->id }}">
 
@@ -239,16 +251,23 @@ $candidaturasJson = $candidaturas->map(function($c) {
                 <div class="flex items-center gap-2 flex-shrink-0">
 
                     {{-- Cambiar estado --}}
-                    <select class="estado-select estado-{{ $cand->estado_candidatura }}"
-                            id="sel-{{ $cand->id }}"
-                            onchange="cambiarEstado({{ $cand->id }}, this.value, this)"
-                            title="Cambiar estado">
-                        <option value="1" {{ $cand->estado_candidatura == 1 ? 'selected':'' }}>Nuevo</option>
-                        <option value="2" {{ $cand->estado_candidatura == 2 ? 'selected':'' }}>Revisado</option>
-                        <option value="3" {{ $cand->estado_candidatura == 3 ? 'selected':'' }}>Preseleccionado</option>
-                        <option value="4" {{ $cand->estado_candidatura == 4 ? 'selected':'' }}>Rechazado</option>
-                        <option value="5" {{ $cand->estado_candidatura == 5 ? 'selected':'' }}>Seleccionado</option>
-                    </select>
+                    <div class="ev-csel" id="ev-est-{{ $cand->id }}" style="width:auto;min-width:140px;">
+                        <div class="ev-csel-trigger cand-estado-trigger estado-{{ $cand->estado_candidatura }}"
+                             id="trig-est-{{ $cand->id }}"
+                             onclick="cselToggle('ev-est-{{ $cand->id }}')">
+                            <span id="ev-est-{{ $cand->id }}-label">{{ $estLabels[$cand->estado_candidatura] ?? 'Nuevo' }}</span>
+                            <span class="ev-csel-arrow">▾</span>
+                        </div>
+                        <ul class="ev-csel-menu" style="min-width:140px;left:auto;right:0;">
+                            @foreach($estLabels as $val => $lab)
+                                <li class="ev-csel-opt {{ $cand->estado_candidatura == $val ? 'selected' : '' }}"
+                                    onclick="cselPick('ev-est-{{ $cand->id }}','inp-est-{{ $cand->id }}','{{ $val }}','{{ $lab }}',this); cambiarEstado({{ $cand->id }}, '{{ $val }}', document.getElementById('trig-est-{{ $cand->id }}'))">
+                                    {{ $lab }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <input type="hidden" id="inp-est-{{ $cand->id }}" value="{{ $cand->estado_candidatura }}">
 
                     {{-- Ver CV --}}
                     <button onclick="verCv({{ $cand->id }})"

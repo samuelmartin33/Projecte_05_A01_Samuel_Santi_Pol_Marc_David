@@ -220,12 +220,25 @@
                     <h3 class="flex items-center gap-2 font-bold text-navy text-sm mb-4">
                         <span class="cv-section-num">✦</span>Puesto al que te postulas
                     </h3>
-                    <select name="trabajo_id" class="cv-input">
-                        <option value="">— Selecciona el puesto —</option>
-                        @foreach($trabajos as $trabajo)
-                            <option value="{{ $trabajo->id }}">{{ $trabajo->nombre }}</option>
-                        @endforeach
-                    </select>
+                    <input type="hidden" id="inp-trabajo-cv" name="trabajo_id" value="">
+                    <div class="ev-csel" id="ev-trabajo-cv">
+                        <div class="ev-csel-trigger" onclick="cselToggle('ev-trabajo-cv')">
+                            <span id="ev-trabajo-cv-label" class="ev-csel-placeholder">— Selecciona el puesto —</span>
+                            <span class="ev-csel-arrow">▾</span>
+                        </div>
+                        <ul class="ev-csel-menu">
+                            <li class="ev-csel-opt selected"
+                                onclick="cselPick('ev-trabajo-cv','inp-trabajo-cv','','— Selecciona el puesto —',this)">
+                                — Selecciona el puesto —
+                            </li>
+                            @foreach($trabajos as $trabajo)
+                                <li class="ev-csel-opt"
+                                    onclick="cselPick('ev-trabajo-cv','inp-trabajo-cv','{{ $trabajo->id }}','{{ $trabajo->nombre }}',this)">
+                                    {{ $trabajo->nombre }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                     <p class="text-navy/35 text-xs mt-1.5">Opcional. Indica el rol específico para el que quieres ser considerado.</p>
                 </section>
                 @endif
@@ -334,12 +347,25 @@
             @if($trabajos->isNotEmpty())
             <div>
                 <label class="cv-label">Puesto al que te postulas</label>
-                <select name="trabajo_id" class="cv-input">
-                    <option value="">— Selecciona el puesto —</option>
-                    @foreach($trabajos as $trabajo)
-                        <option value="{{ $trabajo->id }}">{{ $trabajo->nombre }}</option>
-                    @endforeach
-                </select>
+                <input type="hidden" id="inp-trabajo-arch" name="trabajo_id" value="">
+                <div class="ev-csel" id="ev-trabajo-arch">
+                    <div class="ev-csel-trigger" onclick="cselToggle('ev-trabajo-arch')">
+                        <span id="ev-trabajo-arch-label" class="ev-csel-placeholder">— Selecciona el puesto —</span>
+                        <span class="ev-csel-arrow">▾</span>
+                    </div>
+                    <ul class="ev-csel-menu">
+                        <li class="ev-csel-opt selected"
+                            onclick="cselPick('ev-trabajo-arch','inp-trabajo-arch','','— Selecciona el puesto —',this)">
+                            — Selecciona el puesto —
+                        </li>
+                        @foreach($trabajos as $trabajo)
+                            <li class="ev-csel-opt"
+                                onclick="cselPick('ev-trabajo-arch','inp-trabajo-arch','{{ $trabajo->id }}','{{ $trabajo->nombre }}',this)">
+                                {{ $trabajo->nombre }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
             @endif
 

@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ asset('css/admin-eventos.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-vibez.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-forms.css') }}">
     @stack('estilos')
 </head>
 <body>
@@ -80,6 +81,15 @@
 
         <div class="adm-side-divider"></div>
 
+        {{-- Botón hamburguesa: solo visible en móvil (≤860px) --}}
+        <button id="adm-hamburger" onclick="toggleAdmNav()" aria-label="Menú de navegación" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+
         {{-- Footer: avatar del usuario con dropdown --}}
         <div class="adm-side-foot" id="admSideFoot" onclick="toggleAdmDropdown()">
 
@@ -151,15 +161,44 @@
 <script src="{{ asset('js/admin-eventos.js') }}"></script>
 
 <script>
+    /* Abre/cierra el dropdown del sidebar */
     function toggleAdmDropdown() {
         var d = document.getElementById('admDropdown');
         d.style.display = d.style.display === 'none' ? 'block' : 'none';
     }
+
+    /* Abre/cierra la navegación en móvil (hamburguesa) */
+    function toggleAdmNav() {
+        var nav = document.querySelector('.adm-nav-group');
+        var btn = document.getElementById('adm-hamburger');
+        var side = document.querySelector('.adm-side');
+        if (!nav || !btn) return;
+
+        var abierto = nav.classList.toggle('adm-nav-abierto');
+        btn.classList.toggle('abierto', abierto);
+        btn.setAttribute('aria-expanded', abierto);
+
+        if (abierto && side) {
+            nav.style.top = side.offsetHeight + 'px';
+        }
+    }
+
+    /* Cierra al hacer clic fuera */
     document.addEventListener('click', function (e) {
         var foot = document.getElementById('admSideFoot');
         var drop = document.getElementById('admDropdown');
         if (drop && foot && !foot.contains(e.target)) {
             drop.style.display = 'none';
+        }
+
+        /* Cierra el menú móvil si se hace clic fuera */
+        var nav = document.querySelector('.adm-nav-group');
+        var hamburger = document.getElementById('adm-hamburger');
+        if (nav && nav.classList.contains('adm-nav-abierto')) {
+            if (!nav.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
+                nav.classList.remove('adm-nav-abierto');
+                if (hamburger) { hamburger.classList.remove('abierto'); hamburger.setAttribute('aria-expanded', 'false'); }
+            }
         }
     });
 </script>

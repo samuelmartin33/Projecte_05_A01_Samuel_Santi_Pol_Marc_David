@@ -6,7 +6,7 @@
 <header class="admin-header">
     <div>
         <h1>Usuarios</h1>
-        <p>Banea o desbanea usuarios de la plataforma. No puedes banear administradores.</p>
+        <p>Banea o desbanea usuarios de la plataforma. No puedes banear administradores, moderadores, empresas ni tu propia cuenta.</p>
     </div>
     <a class="btn btn-secondary" href="{{ route('moderador.dashboard') }}">← Volver</a>
 </header>
@@ -49,7 +49,23 @@
                     </span>
                 </td>
                 <td data-label="Acciones" class="acciones">
-                    @if((int) $usuario->estado === 1)
+                    @php
+                        $esMismoModerador = $usuario->id === Auth::id();
+                        $esProtegido      = $esMismoModerador
+                                         || (bool) $usuario->es_moderador
+                                         || ($usuario->tipo_cuenta ?? '') === 'empresa';
+                    @endphp
+
+                    @if($esProtegido)
+                        {{-- Badge informativo según el motivo de protección --}}
+                        @if($esMismoModerador)
+                            <span class="estado-badge-protegido">Tu cuenta</span>
+                        @elseif((bool) $usuario->es_moderador)
+                            <span class="estado-badge-protegido">Moderador</span>
+                        @else
+                            <span class="estado-badge-protegido">Empresa</span>
+                        @endif
+                    @elseif((int) $usuario->estado === 1)
                         <form method="POST"
                               action="{{ route('moderador.usuarios.banear', $usuario) }}"
                               class="delete-form"

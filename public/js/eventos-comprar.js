@@ -126,16 +126,22 @@ function _pagarConStripe() {
     var errEl = document.getElementById('checkout-error');
     var csrf  = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     var tot   = (PRECIO_BASE * cantidad).toFixed(2).replace('.', ',') + ' €';
+    // Leemos el cupón si el input existe (solo visible para usuarios Premium).
+    var cuponEl = document.getElementById('premium-cupon-codigo');
+    var cupon   = cuponEl ? cuponEl.value.trim().toUpperCase() : '';
 
     btn.disabled    = true;
     btn.textContent = 'Preparando pago...';
     if (errEl) errEl.style.display = 'none';
 
-    // Paso 1: crear PaymentIntent en el servidor
+    // Paso 1: crear PaymentIntent en el servidor (con cupón para aplicar descuento)
+    var body1 = { evento_id: EVENTO_ID, cantidad: cantidad };
+    if (cupon) body1.cupon_codigo = cupon;
+
     fetch('/api/stripe/crear-payment-intent', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
-        body:    JSON.stringify({ evento_id: EVENTO_ID, cantidad: cantidad }),
+        body:    JSON.stringify(body1),
     })
     .then(function(r) { return r.json(); })
     .then(function(d) {
@@ -191,6 +197,53 @@ function _pagarConStripe() {
         _mostrarError('Error de conexión. Inténtalo de nuevo.');
         btn.disabled    = false;
         btn.textContent = 'Pagar ' + tot;
+    });
+}
+
+// ── Validación previa del cupón (feedback instantáneo al salir del campo) ─────
+function validarCuponPreview(valorInput) {
+    var codigo  = valorInput.trim().toUpperCase();
+    var feedEl  = document.getElementById('cupon-feedback');
+    var totalEl = document.getElementById('checkout-total');
+    var btnEl   = document.getElementById('checkout-btn');
+
+    if (!feedEl) return;
+
+    // Si el campo está vacío, ocultar feedback y restaurar precio
+    if (!codigo) {
+        feedEl.style.display = 'none';
+        _actualizarUI();
+        return;
+    }
+
+    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch('/api/cupones/validar', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+        body:    JSON.stringify({ codigo: codigo, evento_id: EVENTO_ID }),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        feedEl.style.display = 'block';
+        if (d.valid) {
+            // Cupón válido: mostrar mensaje verde y actualizar total con descuento
+            feedEl.style.cssText = 'display:block;font-family:"Archivo Narrow",sans-serif;font-size:12px;margin-top:8px;padding:8px 12px;border-radius:6px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);color:#4ade80;';
+            feedEl.textContent = '✓ ' + d.message;
+            if (!ES_GRATUITO && totalEl) {
+                var tot = (PRECIO_BASE * cantidad * (1 - d.valor_descuento / 100)).toFixed(2).replace('.', ',') + ' €';
+                totalEl.textContent = tot;
+                if (btnEl && STRIPE_ACTIVO) btnEl.textContent = 'Pagar ' + tot;
+            }
+        } else {
+            // Cupón inválido: mostrar mensaje rojo y restaurar precio original
+            feedEl.style.cssText = 'display:block;font-family:"Archivo Narrow",sans-serif;font-size:12px;margin-top:8px;padding:8px 12px;border-radius:6px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;';
+            feedEl.textContent = '✗ ' + d.message;
+            _actualizarUI();
+        }
+    })
+    .catch(function() {
+        feedEl.style.display = 'none';
     });
 }
 

@@ -303,10 +303,20 @@
 
         <div class="form-grupo">
             <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
-            <select name="tipo_evento" class="form-select">
-                <option value="1" @selected(old('tipo_evento', $evento->tipo_evento) == 1)>Presencial</option>
-                <option value="2" @selected(old('tipo_evento', $evento->tipo_evento) == 2)>Online</option>
-            </select>
+            @php $tipoEvEdit = old('tipo_evento', $evento->tipo_evento); @endphp
+            <input type="hidden" id="inp-tipo-ev-edit" name="tipo_evento" value="{{ $tipoEvEdit }}">
+            <div class="ev-csel" id="ev-tipo-ev-edit">
+                <div class="ev-csel-trigger" onclick="cselToggle('ev-tipo-ev-edit')">
+                    <span id="ev-tipo-ev-edit-label">{{ $tipoEvEdit == 2 ? 'Online' : 'Presencial' }}</span>
+                    <span class="ev-csel-arrow">▾</span>
+                </div>
+                <ul class="ev-csel-menu">
+                    <li class="ev-csel-opt {{ $tipoEvEdit != 2 ? 'selected' : '' }}"
+                        onclick="cselPick('ev-tipo-ev-edit', 'inp-tipo-ev-edit', '1', 'Presencial', this)">Presencial</li>
+                    <li class="ev-csel-opt {{ $tipoEvEdit == 2 ? 'selected' : '' }}"
+                        onclick="cselPick('ev-tipo-ev-edit', 'inp-tipo-ev-edit', '2', 'Online', this)">Online</li>
+                </ul>
+            </div>
         </div>
 
         <hr class="form-divider">

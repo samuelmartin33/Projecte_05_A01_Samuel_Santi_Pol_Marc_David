@@ -188,6 +188,20 @@ body { background: #07060c; }
 .estado-4 { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); color: #f87171; }
 .estado-5 { background: rgba(251,146,60,0.15);  border-color: rgba(251,146,60,0.4);  color: #fb923c; }
 
+/* ── Trigger compacto para ev-csel de estado en filas ── */
+.cand-estado-trigger {
+    font-family: 'Archivo Narrow', sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    padding: 6px 10px !important;
+    border: 1px solid rgba(245,241,234,0.10) !important;
+    border-bottom: 1px solid rgba(245,241,234,0.10) !important;
+    border-radius: 0 !important;
+    width: auto !important;
+}
+
 /* ── Action buttons in rows ── */
 .cand-row button[title="Ver CV completo"],
 .cand-row button[onclick*="verCv"] {

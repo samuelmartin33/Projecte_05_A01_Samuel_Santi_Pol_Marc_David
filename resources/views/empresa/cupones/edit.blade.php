@@ -4,6 +4,7 @@
 
 @push('estilos')
 <link rel="stylesheet" href="{{ asset('css/empresa-home.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     body { background: #07060c; }
 
@@ -246,10 +247,20 @@
 
         <div class="form-grupo">
             <label class="form-label">Estado <span class="form-required">*</span></label>
-            <select name="estado" required class="form-select">
-                <option value="1" {{ old('estado', $cupon->estado) == '1' ? 'selected' : '' }}>Activo</option>
-                <option value="0" {{ old('estado', $cupon->estado) == '0' ? 'selected' : '' }}>Inactivo</option>
-            </select>
+            @php $estCupEd = old('estado', $cupon->estado); @endphp
+            <input type="hidden" id="inp-est-cup-ed" name="estado" value="{{ $estCupEd }}">
+            <div class="ev-csel" id="ev-est-cup-ed">
+                <div class="ev-csel-trigger" onclick="cselToggle('ev-est-cup-ed')">
+                    <span id="ev-est-cup-ed-label">{{ $estCupEd == '1' ? 'Activo' : 'Inactivo' }}</span>
+                    <span class="ev-csel-arrow">▾</span>
+                </div>
+                <ul class="ev-csel-menu">
+                    <li class="ev-csel-opt {{ $estCupEd == '1' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-est-cup-ed', 'inp-est-cup-ed', '1', 'Activo', this)">Activo</li>
+                    <li class="ev-csel-opt {{ $estCupEd != '1' ? 'selected' : '' }}"
+                        onclick="cselPick('ev-est-cup-ed', 'inp-est-cup-ed', '0', 'Inactivo', this)">Inactivo</li>
+                </ul>
+            </div>
         </div>
 
         <hr class="form-divider">
@@ -265,13 +276,15 @@
         <div class="form-grupo-doble">
             <div>
                 <label class="form-label">Fecha inicio <span class="form-required">*</span></label>
-                <input type="datetime-local" name="fecha_inicio" required class="form-input"
-                       value="{{ old('fecha_inicio', optional($cupon->fecha_inicio)->format('Y-m-d\TH:i')) }}">
+                <input type="text" name="fecha_inicio" id="cup-ed-fecha-inicio" required class="form-input"
+                       value="{{ old('fecha_inicio', optional($cupon->fecha_inicio)->format('Y-m-d H:i')) }}"
+                       placeholder="dd/mm/aaaa hh:mm" autocomplete="off" readonly>
             </div>
             <div>
                 <label class="form-label">Fecha fin <span class="form-required">*</span></label>
-                <input type="datetime-local" name="fecha_fin" required class="form-input"
-                       value="{{ old('fecha_fin', optional($cupon->fecha_fin)->format('Y-m-d\TH:i')) }}">
+                <input type="text" name="fecha_fin" id="cup-ed-fecha-fin" required class="form-input"
+                       value="{{ old('fecha_fin', optional($cupon->fecha_fin)->format('Y-m-d H:i')) }}"
+                       placeholder="dd/mm/aaaa hh:mm" autocomplete="off" readonly>
             </div>
         </div>
 
@@ -338,3 +351,26 @@
 </section>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+var fpCupEdConfig = {
+    enableTime: true,
+    time_24hr: true,
+    dateFormat: 'Y-m-d H:i',
+    altInput: true,
+    altFormat: 'd/m/Y H:i',
+    altInputClass: 'form-input',
+    locale: 'es',
+    disableMobile: true,
+};
+var fpCupEdInicio = flatpickr('#cup-ed-fecha-inicio', Object.assign({}, fpCupEdConfig, {
+    onChange: function(dates) {
+        if (dates[0]) fpCupEdFin.set('minDate', dates[0]);
+    }
+}));
+var fpCupEdFin = flatpickr('#cup-ed-fecha-fin', Object.assign({}, fpCupEdConfig));
+</script>
+@endpush

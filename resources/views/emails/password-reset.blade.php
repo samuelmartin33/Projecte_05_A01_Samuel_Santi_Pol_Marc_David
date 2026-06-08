@@ -1,83 +1,105 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restablece tu contraseña — VIBEZ</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #F5F3FF; color: #1F2937; }
-        .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(91,33,182,0.12); }
-        .header { background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%); padding: 40px 48px; text-align: center; }
-        .logo { font-size: 2.4rem; font-weight: 900; color: #ffffff; letter-spacing: -0.03em; }
-        .header-sub { font-size: 0.9rem; color: rgba(255,255,255,0.75); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
-        .body { padding: 40px 48px; }
-        .greeting { font-size: 1.5rem; font-weight: 700; color: #1F2937; margin-bottom: 16px; }
-        .greeting span { color: #7C3AED; }
-        .text { font-size: 1rem; color: #4B5563; line-height: 1.7; margin-bottom: 16px; }
-        .btn-wrapper { text-align: center; margin: 32px 0; }
-        .btn { display: inline-block; background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 10px; font-size: 1rem; font-weight: 700; letter-spacing: 0.03em; }
-        .divider { border: none; border-top: 1px solid #E5E7EB; margin: 28px 0; }
-        .info-box { background: #F5F3FF; border-left: 3px solid #7C3AED; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; }
-        .info-box p { font-size: 0.88rem; color: #5B21B6; line-height: 1.6; }
-        .url-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px 16px; margin: 20px 0; word-break: break-all; }
-        .url-box span { font-size: 0.78rem; color: #6B7280; }
-        .footer { background: #F9FAFB; padding: 24px 48px; text-align: center; }
-        .footer p { font-size: 0.78rem; color: #9CA3AF; line-height: 1.6; }
-        .footer strong { color: #7C3AED; }
-        .warning { font-size: 0.85rem; color: #9CA3AF; margin-top: 8px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restablece tu contraseña — VIBEZ</title>
+<style>
+  /* Reset básico para clientes de correo */
+  body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+  body { margin: 0; padding: 0; background-color: #0f0d1e; font-family: Arial, sans-serif; }
+</style>
 </head>
-<body>
-<div class="wrapper">
+<body style="margin:0;padding:0;background-color:#0f0d1e;">
 
-    <div class="header">
-        <div class="logo">VIBEZ</div>
-        <div class="header-sub">Restablecimiento de contraseña</div>
-    </div>
+<!-- Wrapper -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0f0d1e;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
 
-    <div class="body">
-        <p class="greeting">Hola, <span>{{ $usuario->nombre }}</span></p>
+      <!-- Contenedor principal (max 600px) -->
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
-        <p class="text">
-            Hemos recibido una solicitud para restablecer la contraseña de tu cuenta <strong>VIBEZ</strong>.
-            Haz clic en el botón de abajo para crear una nueva contraseña.
-        </p>
+        <!-- ── CABECERA VIBEZ ── -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+            <div style="font-size:28px;font-weight:900;color:#ffffff;letter-spacing:0.08em;margin-bottom:6px;">VIBEZ</div>
+            <div style="font-size:13px;color:rgba(196,181,253,0.85);letter-spacing:0.05em;">Plataforma de eventos para jóvenes</div>
+          </td>
+        </tr>
 
-        <div class="info-box">
-            <p>
-                <strong>Este enlace es válido durante 60 minutos.</strong><br>
-                Si no solicitaste restablecer tu contraseña, puedes ignorar este mensaje. Tu cuenta sigue segura.
+        <!-- ── HERO: ICONO + TÍTULO ── -->
+        <tr>
+          <td style="background:#13102a;padding:36px 40px 28px;text-align:center;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
+            <!-- Icono candado -->
+            <div style="font-size:48px;line-height:1;margin-bottom:20px;">🔐</div>
+
+            <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#ffffff;">
+              Restablece tu contraseña
+            </h1>
+            <p style="margin:0;font-size:15px;color:rgba(148,163,184,0.9);">
+              Hola <strong style="color:#a78bfa;">{{ $usuario->nombre }}</strong>, recibimos una solicitud para cambiar tu contraseña.
             </p>
-        </div>
+          </td>
+        </tr>
 
-        <div class="btn-wrapper">
-            <a href="{{ $resetUrl }}" class="btn">Restablecer contraseña →</a>
-        </div>
+        <!-- ── AVISO EXPIRACIÓN ── -->
+        <tr>
+          <td style="background:#13102a;padding:0 40px 24px;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;">
+              <tr>
+                <td style="padding:14px 18px;">
+                  <div style="font-size:13px;color:#fbbf24;font-weight:700;margin-bottom:4px;">⏱ Enlace válido 60 minutos</div>
+                  <div style="font-size:12px;color:#94a3b8;line-height:1.6;">
+                    Si no solicitaste este cambio, puedes ignorar este correo. Tu cuenta sigue siendo segura.
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-        <hr class="divider">
+        <!-- ── BOTÓN PRINCIPAL ── -->
+        <tr>
+          <td style="background:#13102a;padding:0 40px 36px;text-align:center;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
+            <a href="{{ $resetUrl }}"
+               style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 40px;border-radius:10px;">
+              Restablecer contraseña →
+            </a>
+          </td>
+        </tr>
 
-        <p class="text" style="font-size:0.88rem; color:#6B7280;">
-            Si el botón no funciona, copia y pega este enlace en tu navegador:
-        </p>
-        <div class="url-box">
-            <span>{{ $resetUrl }}</span>
-        </div>
+        <!-- ── URL DE RESERVA ── -->
+        <tr>
+          <td style="background:#13102a;padding:0 40px 32px;border-left:1px solid #1e1b4b;border-right:1px solid #1e1b4b;">
+            <div style="font-size:12px;color:#64748b;margin-bottom:10px;">
+              Si el botón no funciona, copia y pega este enlace en tu navegador:
+            </div>
+            <div style="background:#1a1535;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:12px 16px;word-break:break-all;">
+              <span style="font-size:11px;color:#7c3aed;font-family:monospace;">{{ $resetUrl }}</span>
+            </div>
+          </td>
+        </tr>
 
-        <p class="warning">
-            Por seguridad, este enlace expirará automáticamente a los 60 minutos.
-            Si lo necesitas de nuevo, solicita un nuevo enlace desde la pantalla de inicio de sesión.
-        </p>
-    </div>
+        <!-- ── PIE ── -->
+        <tr>
+          <td style="background:#0d0b1e;border:1px solid #1e1b4b;border-top:none;border-radius:0 0 16px 16px;padding:24px 40px;text-align:center;">
+            <div style="font-size:18px;font-weight:900;color:#4c1d95;letter-spacing:0.06em;margin-bottom:8px;">VIBEZ</div>
+            <div style="font-size:12px;color:#334155;line-height:1.7;">
+              Este correo fue enviado automáticamente. Por favor, no respondas a este mensaje.<br>
+              © {{ date('Y') }} VIBEZ — Plataforma de eventos para jóvenes.
+            </div>
+          </td>
+        </tr>
 
-    <div class="footer">
-        <p>
-            Has recibido este correo porque se solicitó un restablecimiento de contraseña para tu cuenta en <strong>VIBEZ</strong>.<br>
-            Si no fuiste tú, ignora este mensaje. Tu contraseña no ha cambiado.<br><br>
-            © {{ date('Y') }} VIBEZ. Todos los derechos reservados.
-        </p>
-    </div>
+      </table>
 
-</div>
+    </td>
+  </tr>
+</table>
+
 </body>
 </html>
