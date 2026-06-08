@@ -1,0 +1,257 @@
+/* ════════════════════════════════════════════════════════════════
+   admin-bonos.css — Panel de bonos de bebidas (Admin VIBEZ)
+   Acento de sección Fiesta: #d4537e (pink)
+════════════════════════════════════════════════════════════════ */
+
+/* ── Variables de acento Fiesta ──────────────────────────────────── */
+:root {
+    --bonos-pink:        #d4537e;
+    --bonos-pink-dim:    rgba(212, 83, 126, 0.18);
+    --bonos-pink-border: rgba(212, 83, 126, 0.35);
+}
+
+/* ── Grid de metric cards ────────────────────────────────────────── */
+.bonos-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.bono-card {
+    background: var(--bonos-pink-dim);
+    border: 1px solid var(--bonos-pink-border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.bono-card.card-total {
+    background: rgba(168, 85, 247, 0.12);
+    border-color: rgba(168, 85, 247, 0.3);
+}
+.bono-card-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(245, 241, 234, 0.45);
+}
+.bono-card-valor {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--bonos-pink);
+    line-height: 1;
+}
+.bono-card.card-total .bono-card-valor {
+    color: #c084fc;
+}
+.bono-card-sub {
+    font-size: 12px;
+    color: rgba(245, 241, 234, 0.55);
+}
+
+/* ── Barra de filtros ────────────────────────────────────────────── */
+.bonos-filtros {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+.bonos-filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 180px;
+}
+.bonos-filtro-grupo label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(245, 241, 234, 0.45);
+}
+.bonos-filtro-grupo select {
+    background: rgba(245, 241, 234, 0.05);
+    border: 1px solid var(--bonos-pink-border);
+    border-radius: 6px;
+    color: #f5f1ea;
+    font-size: 13px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.bonos-filtro-grupo select:focus {
+    outline: none;
+    border-color: var(--bonos-pink);
+}
+.bonos-filtro-grupo select option {
+    background: #1a1426;
+    color: #f5f1ea;
+}
+
+/* ── Badge saldo ─────────────────────────────────────────────────── */
+.badge-saldo {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--bonos-pink-dim);
+    color: var(--bonos-pink);
+    border: 1px solid var(--bonos-pink-border);
+}
+.badge-saldo.agotado {
+    background: rgba(245, 241, 234, 0.06);
+    color: rgba(245, 241, 234, 0.35);
+    border-color: rgba(245, 241, 234, 0.12);
+}
+
+/* ── Sección título ──────────────────────────────────────────────── */
+.bonos-seccion-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--bonos-pink);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--bonos-pink-border);
+}
+
+/* ── Acciones cabecera ───────────────────────────────────────────── */
+.bonos-acciones {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ── Btn pink ────────────────────────────────────────────────────── */
+.btn-pink {
+    background: var(--bonos-pink-dim);
+    border: 1px solid var(--bonos-pink-border);
+    color: var(--bonos-pink);
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-pink:hover {
+    background: rgba(212, 83, 126, 0.3);
+    color: #f5f1ea;
+}
+
+/* ── Modal overlay (reutiliza mismo patrón de canciones) ─────────── */
+#modal-tipo-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+}
+#modal-tipo-overlay.abierto {
+    display: flex;
+}
+#modal-tipo {
+    background: #1a1426;
+    border: 1px solid var(--bonos-pink-border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 480px;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+#modal-tipo h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #f5f1ea;
+    margin: 0 0 1.5rem;
+}
+.modal-tipo-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: rgba(245, 241, 234, 0.4);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px;
+    transition: color 0.2s;
+}
+.modal-tipo-close:hover { color: #f5f1ea; }
+
+/* ── Campos del modal ────────────────────────────────────────────── */
+.tipo-campo {
+    margin-bottom: 1rem;
+}
+.tipo-campo label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(245, 241, 234, 0.45);
+    margin-bottom: 5px;
+}
+.tipo-campo input[type="number"],
+.tipo-campo input[type="text"],
+.tipo-campo textarea {
+    width: 100%;
+    background: rgba(245, 241, 234, 0.05);
+    border: 1px solid var(--bonos-pink-border);
+    border-radius: 6px;
+    color: #f5f1ea;
+    font-size: 14px;
+    padding: 9px 12px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    resize: vertical;
+}
+.tipo-campo input:focus,
+.tipo-campo textarea:focus {
+    outline: none;
+    border-color: var(--bonos-pink);
+}
+.tipo-campo-grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.tipo-campo-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: rgba(245, 241, 234, 0.75);
+}
+.tipo-campo-check input[type="checkbox"] {
+    accent-color: var(--bonos-pink);
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Footer modal ────────────────────────────────────────────────── */
+.tipo-modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(245, 241, 234, 0.08);
+}
+
+/* ── Campo requerido ─────────────────────────────────────────────── */
+.campo-req { color: #f87171; }

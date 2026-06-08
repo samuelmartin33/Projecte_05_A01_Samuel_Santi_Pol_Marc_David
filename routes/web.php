@@ -36,6 +36,8 @@ use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\FacturacionEventoController;
 use App\Http\Controllers\Admin\CuponController as AdminCuponController;
 use App\Http\Controllers\Admin\TrabajosController as AdminTrabajosController;
+use App\Http\Controllers\Admin\BonoAdminController;
+use App\Http\Controllers\Admin\BonoTipoController;
 use App\Http\Controllers\Admin\CancionController as AdminCancionController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
@@ -486,6 +488,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/canciones/{id}', [AdminCancionController::class, 'show'])->name('admin.canciones.show');
     Route::put('/admin/canciones/{id}', [AdminCancionController::class, 'update'])->name('admin.canciones.update');
     Route::delete('/admin/canciones/{id}', [AdminCancionController::class, 'destroy'])->name('admin.canciones.destroy');
+
+    /* ── Panel de control de bonos ─────────────────────────────────── */
+    Route::get('/admin/bonos/pdf', [BonoAdminController::class, 'descargarPdf'])->name('admin.bonos.pdf');
+    Route::get('/admin/bonos',     [BonoAdminController::class, 'index'])->name('admin.bonos.index');
+
+    /* ── CRUD de tipos de bono ─────────────────────────────────────── */
+    Route::get('/admin/bonos-tipos',                   [BonoTipoController::class, 'index'])->name('admin.bonos-tipos.index');
+    Route::post('/admin/bonos-tipos',                  [BonoTipoController::class, 'store'])->name('admin.bonos-tipos.store');
+    Route::get('/admin/bonos-tipos/{id}',              [BonoTipoController::class, 'show'])->name('admin.bonos-tipos.show');
+    Route::put('/admin/bonos-tipos/{id}',              [BonoTipoController::class, 'update'])->name('admin.bonos-tipos.update');
+    Route::delete('/admin/bonos-tipos/{id}',           [BonoTipoController::class, 'destroy'])->name('admin.bonos-tipos.destroy');
+    Route::post('/admin/bonos-tipos/{id}/toggle',      [BonoTipoController::class, 'toggleActivo'])->name('admin.bonos-tipos.toggle');
 });
 
 
