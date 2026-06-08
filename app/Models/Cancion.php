@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Cancion extends Model
 {
+    // Nombre explícito de la tabla (Laravel pluralizaría a 'cancions' en inglés)
+    protected $table = 'canciones';
+
     // Lista blanca de campos asignables masivamente (create() / fill())
     protected $fillable = [
         'titulo',

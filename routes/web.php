@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\FacturacionEventoController;
 use App\Http\Controllers\Admin\CuponController as AdminCuponController;
 use App\Http\Controllers\Admin\TrabajosController as AdminTrabajosController;
+use App\Http\Controllers\Admin\CancionController as AdminCancionController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
@@ -474,7 +475,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/factura/{factura}/descargar',[FacturacionEventoController::class, 'descargar'])->name('descargar');
         Route::patch('/factura/{factura}/anular', [FacturacionEventoController::class, 'anular'])   ->name('anular');
     });
+
+    /* Rutas de gestión de canciones */
+    Route::get('/admin/canciones', [AdminCancionController::class, 'index'])->name('admin.canciones.index');
+    Route::post('/admin/canciones', [AdminCancionController::class, 'store'])->name('admin.canciones.store');
+    Route::get('/admin/canciones/{id}', [AdminCancionController::class, 'show'])->name('admin.canciones.show');
+    Route::put('/admin/canciones/{id}', [AdminCancionController::class, 'update'])->name('admin.canciones.update');
+    Route::delete('/admin/canciones/{id}', [AdminCancionController::class, 'destroy'])->name('admin.canciones.destroy');
 });
+
 
 /* — Migración remota: permite ejecutar migraciones desde el servidor sin SSH — */
 Route::get('/migrate', function (\Illuminate\Http\Request $request) {
