@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FacturaPremium;
 use App\Models\Empresa;
 use App\Models\PagoPremium;
 use App\Models\Usuario;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Stripe;
 use Stripe\Webhook;
 
@@ -126,6 +128,21 @@ class StripeWebhookController extends Controller
 
         if ($actualizado) {
             Log::info("Premium activado para usuario {$usuarioId} via checkout {$session->id}");
+
+            // Enviamos la factura solo cuando el usuario acaba de activarse (no en webhooks duplicados).
+            try {
+                $usuario = Usuario::find($usuarioId);
+                if ($usuario) {
+                    Mail::to($usuario->email)->send(new FacturaPremium(
+                        $usuario,
+                        $importe,
+                        $session->id,
+                        $ahora,
+                    ));
+                }
+            } catch (\Throwable $e) {
+                Log::error("Error enviando factura Premium a usuario {$usuarioId}: " . $e->getMessage());
+            }
         }
         Log::info("Pago premium registrado: usuario {$usuarioId}, session {$session->id}, importe {$importe} EUR");
     }

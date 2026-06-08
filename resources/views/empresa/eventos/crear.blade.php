@@ -186,10 +186,23 @@
 
         <div class="form-grupo">
             <label class="form-label">Tipo de evento <span class="form-required">*</span></label>
-            <select name="tipo_evento" class="form-select">
-                <option value="1" @selected(old('tipo_evento', 1) == 1)>Presencial</option>
-                <option value="2" @selected(old('tipo_evento') == 2)>Online</option>
-            </select>
+            @php
+                $tipoEvActual = old('tipo_evento', 1);
+                $tipoEvLabel  = $tipoEvActual == 2 ? 'Online' : 'Presencial';
+            @endphp
+            <input type="hidden" id="tipo_evento" name="tipo_evento" value="{{ $tipoEvActual }}">
+            <div class="ev-csel" id="ev-tipo-evento">
+                <div class="ev-csel-trigger" onclick="toggleTipoEvento()">
+                    <span id="ev-tipo-evento-label">{{ $tipoEvLabel }}</span>
+                    <span class="ev-csel-arrow">▾</span>
+                </div>
+                <ul class="ev-csel-menu">
+                    <li class="ev-csel-opt {{ $tipoEvActual == 1 ? 'selected' : '' }}"
+                        onclick="pickTipoEvento(1, 'Presencial')">Presencial</li>
+                    <li class="ev-csel-opt {{ $tipoEvActual == 2 ? 'selected' : '' }}"
+                        onclick="pickTipoEvento(2, 'Online')">Online</li>
+                </ul>
+            </div>
         </div>
 
         <hr class="form-divider">
@@ -383,6 +396,25 @@ function actualizarBordeCat(label) {
     var input = label.querySelector('input');
     label.style.borderColor = input.checked ? 'rgba(168,85,247,0.7)' : 'rgba(245,241,234,0.14)';
 }
+
+// ── Selector tipo de evento (ev-csel) ─────────────────────────────────────────
+function toggleTipoEvento() {
+    document.getElementById('ev-tipo-evento').classList.toggle('open');
+}
+
+function pickTipoEvento(val, label) {
+    document.getElementById('tipo_evento').value = val;
+    document.getElementById('ev-tipo-evento-label').textContent = label;
+    document.getElementById('ev-tipo-evento').classList.remove('open');
+    document.querySelectorAll('#ev-tipo-evento .ev-csel-opt').forEach(function(li) {
+        li.classList.toggle('selected', li.textContent.trim() === label);
+    });
+}
+
+document.addEventListener('click', function(e) {
+    var el = document.getElementById('ev-tipo-evento');
+    if (el && !el.contains(e.target)) el.classList.remove('open');
+});
 
 // ── Precio ────────────────────────────────────────────────────────────────────
 function togglePrecio() {

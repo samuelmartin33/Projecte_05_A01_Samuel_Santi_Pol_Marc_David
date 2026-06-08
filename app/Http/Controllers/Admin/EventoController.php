@@ -15,13 +15,22 @@ use Illuminate\View\View;
  */
 class EventoController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $eventos = Evento::with(['categoriaEvento', 'organizador'])
-            ->orderByDesc('id')
-            ->paginate(10);
+        $busqueda = $request->input('busqueda', '');
 
-        return view('admin.eventos.index', compact('eventos'));
+        $eventos = Evento::with(['categoriaEvento', 'organizador.empresa'])
+            ->when($busqueda, function ($q) use ($busqueda) {
+                $q->where('titulo', 'like', '%' . $busqueda . '%')
+                  ->orWhereHas('organizador.empresa', function ($q2) use ($busqueda) {
+                      $q2->where('nombre_empresa', 'like', '%' . $busqueda . '%');
+                  });
+            })
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.eventos.index', compact('eventos', 'busqueda'));
     }
 
     public function create(): View
