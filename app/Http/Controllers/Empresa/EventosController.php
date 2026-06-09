@@ -96,24 +96,13 @@ class EventosController extends Controller
                 ->with('warning', 'Debes completar tu perfil fiscal antes de publicar eventos.');
         }
 
+        // Fiesta tiene su propio área en /empresa/fiesta — se excluye aquí
         $categorias = CategoriaEvento::where('estado', 1)
+            ->where('nombre', '!=', 'Fiesta')
             ->orderBy('nombre')
             ->get();
 
-        // ID de Fiesta para que el JS sepa qué checkbox activar restricciones
-        $fiestaId = CategoriaEvento::where('nombre', 'Fiesta')->value('id');
-
-        // Camareros de esta empresa para el selector que aparece al elegir Fiesta
-        $empresa   = Auth::user()->empresa;
-        $camareros = $empresa
-            ? Organizador::where('empresa_id', $empresa->id)
-                ->where('rol', 'camarero')
-                ->where('estado', 1)
-                ->with('usuario')
-                ->get()
-            : collect();
-
-        return view('empresa.eventos.crear', compact('categorias', 'fiestaId', 'camareros'));
+        return view('empresa.eventos.crear', compact('categorias'));
     }
 
     /**

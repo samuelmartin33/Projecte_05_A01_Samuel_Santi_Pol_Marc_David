@@ -126,7 +126,7 @@ class CandidaturasController extends Controller
     {
         $empresa = $this->empresa();
 
-        $candidatura = CandidaturaTrabajo::with(['oferta.categoria', 'trabajo'])
+        $candidatura = CandidaturaTrabajo::with('oferta')
             ->whereHas('oferta', function ($q) use ($empresa) {
                 $orgIds = $empresa->organizadores()->pluck('organizadores.id');
                 $q->whereIn('organizador_id', $orgIds);
@@ -139,15 +139,9 @@ class CandidaturasController extends Controller
         $estadoAnterior = (int) $candidatura->estado_candidatura;
         $nuevoEstado    = (int) $request->estado;
 
-        DB::transaction(function () use ($candidatura, $nuevoEstado, $empresa) {
+        DB::transaction(function () use ($candidatura, $nuevoEstado) {
             if ($nuevoEstado === CandidaturaTrabajo::ESTADO_PRESELECCIONADO) {
                 $candidatura->trabajador_id = $this->crearTrabajadorSiNoExiste($candidatura);
-            }
-
-            // Fix temporal local: en local los emails no funcionan, así que al seleccionar
-            // un camarero lo añadimos directamente a organizadores sin esperar el link
-            if ($nuevoEstado === CandidaturaTrabajo::ESTADO_SELECCIONADO) {
-                $this->crearOrganizadorSiEsCamarero($candidatura, $empresa);
             }
 
             $candidatura->estado_candidatura = $nuevoEstado;
@@ -168,39 +162,6 @@ class CandidaturasController extends Controller
      * Busca primero un usuario registrado con el mismo email de la candidatura.
      * Si ya tiene perfil de trabajador, reutiliza ese registro.
      */
-    /**
-     * Fix temporal local: añade el candidato como organizador con rol camarero
-     * directamente sin necesitar que acepte el email de invitación.
-     * En producción el email funciona y el `$yaEsMiembro` evita duplicados.
-     */
-    private function crearOrganizadorSiEsCamarero(CandidaturaTrabajo $candidatura, $empresa): void
-    {
-        // Buscar el nombre del puesto en trabajo directo O en la categoría de la oferta
-        $nombreTrabajo   = mb_strtolower($candidatura->trabajo?->nombre ?? '');
-        $nombreCategoria = mb_strtolower($candidatura->oferta?->categoria?->nombre ?? '');
-
-        if (!str_contains($nombreTrabajo, 'camarero') && !str_contains($nombreCategoria, 'camarero')) return;
-
-        $usuario = \App\Models\Usuario::where('email', $candidatura->email_candidato)->first();
-        if (!$usuario) return;
-
-        $yaEsMiembro = \App\Models\Organizador::where('empresa_id', $empresa->id)
-            ->where('usuario_id', $usuario->id)
-            ->where('estado', 1)
-            ->exists();
-
-        if (!$yaEsMiembro) {
-            \App\Models\Organizador::create([
-                'usuario_id'          => $usuario->id,
-                'empresa_id'          => $empresa->id,
-                'rol'                 => 'camarero',
-                'estado'              => 1,
-                'fecha_creacion'      => now(),
-                'fecha_actualizacion' => now(),
-            ]);
-        }
-    }
-
     private function crearTrabajadorSiNoExiste(CandidaturaTrabajo $candidatura): int
     {
         if (!empty($candidatura->trabajador_id)) {

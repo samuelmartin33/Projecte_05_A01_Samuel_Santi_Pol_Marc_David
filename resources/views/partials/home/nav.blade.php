@@ -132,6 +132,7 @@
               ['Panel',          route('empresa.home'),                 'empresa.home'],
               ['Equipo',         route('empresa.equipo.index'),         'empresa.equipo.*'],
               ['Candidaturas',   route('empresa.candidaturas.ofertas'), 'empresa.candidaturas.*'],
+              ['Fiesta',         route('empresa.fiesta.index'),         'empresa.fiesta.*'],
               ['Administración', route('empresa.facturacion.index'),    'empresa.facturacion.*'],
               ['Perfil Fiscal',  route('empresa.perfil-fiscal'),        'empresa.perfil-fiscal'],
               ['Crear evento',   route('empresa.eventos.create'),       'empresa.eventos.create'],

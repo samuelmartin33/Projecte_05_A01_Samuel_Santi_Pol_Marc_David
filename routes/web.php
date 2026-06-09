@@ -310,6 +310,8 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/equipo')->name('empres
 Route::middleware(['auth','no-portero'])->prefix('empresa/fiesta')->name('empresa.fiesta.')->group(function () {
     Route::get('/',                    [\App\Http\Controllers\Empresa\FiestaController::class, 'index'])->name('index');
     Route::get('/listar',              [\App\Http\Controllers\Empresa\FiestaController::class, 'listar'])->name('listar');
+    Route::get('/crear',               [\App\Http\Controllers\Empresa\FiestaController::class, 'crear'])->name('crear');
+    Route::post('/guardar',            [\App\Http\Controllers\Empresa\FiestaController::class, 'guardar'])->name('guardar');
     Route::post('/',                   [\App\Http\Controllers\Empresa\FiestaController::class, 'store'])->name('store');
     Route::get('/{id}',                [\App\Http\Controllers\Empresa\FiestaController::class, 'show'])->name('show');
     Route::post('/{id}/actualizar',    [\App\Http\Controllers\Empresa\FiestaController::class, 'update'])->name('update');

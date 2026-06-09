@@ -62,6 +62,106 @@ class FiestaController extends Controller
     }
 
     /**
+     * Formulario de creación de evento Fiesta (página completa).
+     * GET /empresa/fiesta/crear
+     */
+    public function crear()
+    {
+        $empresa = $this->getEmpresa();
+
+        $camareros = Organizador::where('empresa_id', $empresa->id)
+            ->where('rol', 'camarero')
+            ->where('estado', 1)
+            ->with('usuario')
+            ->get();
+
+        $fiestaId = $this->getCategoriaFiestaId();
+
+        return view('empresa.fiesta.crear', compact('camareros', 'fiestaId'));
+    }
+
+    /**
+     * Guarda un nuevo evento Fiesta desde el formulario completo y redirige.
+     * POST /empresa/fiesta/guardar
+     */
+    public function guardar(Request $request)
+    {
+        $empresa     = $this->getEmpresa();
+        $organizador = $this->getOrganizador();
+        $categoriaId = $this->getCategoriaFiestaId();
+
+        $validated = $request->validate([
+            'titulo'              => ['required', 'string', 'max:300'],
+            'descripcion'         => ['nullable', 'string', 'max:5000'],
+            'fecha_inicio'        => ['required', 'date', 'after_or_equal:today'],
+            'fecha_fin'           => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'ubicacion_nombre'    => ['required', 'string', 'max:300'],
+            'ubicacion_direccion' => ['nullable', 'string', 'max:500'],
+            'latitud'             => ['nullable', 'numeric', 'between:-90,90'],
+            'longitud'            => ['nullable', 'numeric', 'between:-180,180'],
+            'precio_base'         => ['required', 'numeric', 'min:10'],
+            'aforo_maximo'        => ['nullable', 'integer', 'min:1'],
+            'camarero_id'         => ['required', 'integer', 'exists:organizadores,id'],
+            'url_externa'         => ['nullable', 'url', 'max:500'],
+            'imagen_portada'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+        ], [
+            'titulo.required'      => 'El título del evento es obligatorio.',
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
+            'ubicacion_nombre.required' => 'El nombre del lugar es obligatorio.',
+            'precio_base.min'      => 'Los eventos de Fiesta tienen un precio mínimo de 10 €.',
+            'camarero_id.required' => 'Debes asignar un camarero al evento de Fiesta.',
+        ]);
+
+        // Verificar que el camarero pertenece a esta empresa
+        $camarero = Organizador::where('id', $validated['camarero_id'])
+            ->where('empresa_id', $empresa->id)
+            ->where('rol', 'camarero')
+            ->firstOrFail();
+
+        $evento = Evento::create([
+            'organizador_id'      => $organizador->id,
+            'categoria_evento_id' => $categoriaId,
+            'tipo_evento'         => 1,
+            'titulo'              => $validated['titulo'],
+            'descripcion'         => $validated['descripcion'] ?? null,
+            'fecha_inicio'        => $validated['fecha_inicio'],
+            'fecha_fin'           => $validated['fecha_fin'] ?? null,
+            'ubicacion_nombre'    => $validated['ubicacion_nombre'],
+            'ubicacion_direccion' => $validated['ubicacion_direccion'] ?? null,
+            'latitud'             => $validated['latitud'] ?? null,
+            'longitud'            => $validated['longitud'] ?? null,
+            'precio_base'         => $validated['precio_base'],
+            'aforo_maximo'        => $validated['aforo_maximo'] ?? null,
+            'aforo_actual'        => 0,
+            'edad_minima'         => 18,
+            'es_gratuito'         => 0,
+            'camarero_id'         => $camarero->id,
+            'url_externa'         => $validated['url_externa'] ?? null,
+            'estado'              => 1,
+            'fecha_creacion'      => now(),
+            'fecha_actualizacion' => null,
+        ]);
+
+        $evento->categorias()->sync([$categoriaId]);
+
+        if ($request->hasFile('imagen_portada')) {
+            $path = $request->file('imagen_portada')->store('eventos', 'public');
+            \App\Models\EventoImagen::create([
+                'evento_id'      => $evento->id,
+                'imagen_url'     => '/storage/' . $path,
+                'descripcion'    => 'Portada del evento',
+                'es_portada'     => 1,
+                'estado'         => 1,
+                'fecha_creacion' => now(),
+            ]);
+        }
+
+        return redirect()->route('empresa.fiesta.index')
+            ->with('success', '¡Evento "' . $evento->titulo . '" creado correctamente!');
+    }
+
+    /**
      * Devuelve los eventos Fiesta de la empresa aplicando filtros. (AJAX)
      * GET /empresa/fiesta/listar
      */
