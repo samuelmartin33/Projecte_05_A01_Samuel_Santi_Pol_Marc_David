@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Camarero;
 
 use App\Http\Controllers\Controller;
+use App\Mail\FacturaProveedor;
 use App\Models\Evento;
 use App\Models\Notificacion;
 use App\Models\Organizador;
+use App\Models\PedidoProveedor;
 use App\Models\ProductoBarra;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * StockController — Gestión del stock de barra para el rol camarero.
@@ -183,5 +187,120 @@ class StockController extends Controller
         $producto->delete();
 
         return response()->json(['ok' => true]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // REPOSICIÓN DE STOCK (issue #75)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Inicia el flujo de reposición: crea el PedidoProveedor en estado 'pendiente'
+     * y genera un PaymentIntent de Stripe. Devuelve el client_secret al frontend.
+     */
+    public function iniciarReposicion(Request $request, int $id): JsonResponse
+    {
+        $organizador = $this->organizadorActual();
+        $producto    = $this->productoDelCamarero($id, $organizador);
+
+        $datos = $request->validate([
+            'cantidad' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $cantidad    = (int) $datos['cantidad'];
+        $precioTotal = round($producto->precio_unitario * $cantidad, 2);
+
+        // Crea el pedido en estado pendiente (todavía no pagado)
+        $pedido = PedidoProveedor::create([
+            'producto_barra_id' => $producto->id,
+            'cantidad'          => $cantidad,
+            'precio_total'      => $precioTotal,
+            'estado'            => 'pendiente',
+        ]);
+
+        // Crea el PaymentIntent de Stripe (pago directo a VIBEZ, sin transfer_data)
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        $pi = \Stripe\PaymentIntent::create([
+            'amount'   => (int) round($precioTotal * 100), // en céntimos
+            'currency' => 'eur',
+            'metadata' => [
+                'pedido_id'  => $pedido->id,
+                'usuario_id' => Auth::id(),
+                'tipo'       => 'reposicion_stock',
+            ],
+        ]);
+
+        return response()->json([
+            'success'           => true,
+            'client_secret'     => $pi->client_secret,
+            'payment_intent_id' => $pi->id,
+            'precio_total'      => $precioTotal,
+            'cantidad'          => $cantidad,
+            'pedido_id'         => $pedido->id,
+            'producto_nombre'   => $producto->nombre,
+            'proveedor'         => $producto->proveedor,
+        ]);
+    }
+
+    /**
+     * Confirma la reposición tras el pago de Stripe:
+     * verifica el PaymentIntent, incrementa el stock, envía el email con factura PDF.
+     */
+    public function confirmarReposicion(Request $request, int $id): JsonResponse
+    {
+        $organizador = $this->organizadorActual();
+        $producto    = $this->productoDelCamarero($id, $organizador);
+        $usuario     = Auth::user();
+
+        $datos = $request->validate([
+            'pedido_id'          => ['required', 'integer'],
+            'payment_intent_id'  => ['required', 'string'],
+        ]);
+
+        // Verificar el estado del PaymentIntent en Stripe
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        $pi = \Stripe\PaymentIntent::retrieve($datos['payment_intent_id']);
+
+        if ($pi->status !== 'succeeded') {
+            return response()->json([
+                'ok'      => false,
+                'mensaje' => 'El pago no se ha completado correctamente. Estado: ' . $pi->status,
+            ], 422);
+        }
+
+        // Transacción atómica: marcar como pagado e incrementar stock
+        DB::transaction(function () use ($datos, $producto) {
+            $pedido = PedidoProveedor::findOrFail($datos['pedido_id']);
+            $pedido->update(['estado' => 'pagado']);
+            $producto->increment('stock', $pedido->cantidad);
+        });
+
+        // Recarga el producto para tener el stock actualizado
+        $producto->refresh();
+
+        // Notificación si el stock ya es suficiente (> 2)
+        if ($producto->stock > 2) {
+            Notificacion::crear(
+                $usuario->id,
+                Notificacion::GENERAL,
+                '✅ Stock repuesto: ' . $producto->nombre,
+                'Ahora tienes ' . $producto->stock . ' unidades.',
+                route('camarero.stock.index')
+            );
+        }
+
+        // Carga el pedido con sus relaciones para el email
+        $pedido = PedidoProveedor::with('producto.evento')->findOrFail($datos['pedido_id']);
+
+        // Carga la relación usuario en el organizador para el email
+        $organizador->loadMissing(['usuario', 'empresa']);
+
+        // Envía el email con la factura PDF adjunta
+        Mail::to($usuario->email)->send(new FacturaProveedor($pedido, $organizador));
+
+        return response()->json([
+            'ok'        => true,
+            'nuevo_stock' => $producto->stock,
+            'mensaje'   => 'Stock repuesto correctamente. Te hemos enviado la factura por email.',
+        ]);
     }
 }

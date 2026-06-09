@@ -19,7 +19,9 @@
      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10"
      data-url-store="{{ route('camarero.stock.store') }}"
      data-url-base="{{ route('camarero.stock.index') }}"
+     data-url-reponer-base="/camarero/stock/"
      data-csrf="{{ csrf_token() }}"
+     data-stripe-key="{{ config('services.stripe.key') }}"
      x-data="stockApp()">
 
     {{-- ── Cabecera ─────────────────────────────────────────────────────── --}}
@@ -171,11 +173,10 @@
                                     Editar
                                 </button>
 
-                                {{-- Reponer (reservado issue #75) --}}
+                                {{-- Reponer — issue #75 --}}
                                 <button
-                                    disabled
-                                    title="Próximamente — Issue #75"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 text-white/25 text-xs font-semibold cursor-not-allowed select-none">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 text-xs font-semibold transition-colors duration-150"
+                                    x-on:click="abrirModalReponer({{ $producto->id }}, '{{ addslashes($producto->nombre) }}', '{{ addslashes($producto->proveedor) }}', {{ $producto->precio_unitario }})">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
@@ -367,170 +368,142 @@
         </div>
     </div>
 
+    {{-- ════════════════════════════════════════════════════════════════════
+         MODAL — Reposición de stock con pago Stripe
+    ════════════════════════════════════════════════════════════════════ --}}
+    <div
+        x-show="modalReponerAbierto"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        x-on:keydown.escape.window="cerrarModalReponer()">
+
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" x-on:click="cerrarModalReponer()"></div>
+
+        <div
+            x-show="modalReponerAbierto"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="relative z-10 w-full max-w-md bg-[#1a1033] rounded-2xl ring-1 ring-white/10 shadow-2xl shadow-black/60 overflow-hidden">
+
+            {{-- Cabecera --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                <h2 class="text-lg font-bold text-white">Reponer stock 📦</h2>
+                <button class="text-white/40 hover:text-white transition-colors duration-100" x-on:click="cerrarModalReponer()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Cuerpo --}}
+            <div class="px-6 py-5 space-y-4">
+
+                {{-- Info producto (solo lectura) --}}
+                <div class="bg-white/5 rounded-xl px-4 py-3 space-y-1">
+                    <p class="text-xs text-white/40 uppercase tracking-wider font-mono">Producto</p>
+                    <p class="text-white font-semibold" x-text="reponer.nombre"></p>
+                    <p class="text-white/50 text-sm">Proveedor: <span x-text="reponer.proveedor"></span></p>
+                </div>
+
+                {{-- Cantidad --}}
+                <div x-show="!reponer.pagoIniciado">
+                    <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">
+                        Cantidad a reponer (unidades)
+                    </label>
+                    <input
+                        type="number"
+                        x-model="reponer.cantidad"
+                        min="1"
+                        class="w-full rounded-lg bg-white/8 border border-white/10 text-white placeholder-white/30 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                    <p class="text-white/40 text-xs mt-2">
+                        Total estimado:
+                        <span class="text-emerald-400 font-bold" x-text="(reponer.cantidad * reponer.precioUnitario).toFixed(2) + ' €'"></span>
+                    </p>
+                </div>
+
+                {{-- Panel Stripe Elements (aparece tras iniciar el pago) --}}
+                <div x-show="reponer.pagoIniciado" class="space-y-3">
+                    <div class="bg-white/5 rounded-xl px-4 py-3">
+                        <p class="text-xs text-white/40 uppercase tracking-wider font-mono mb-1">Total a pagar</p>
+                        <p class="text-emerald-400 font-bold text-xl" x-text="reponer.precioTotal.toFixed(2) + ' €'"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Datos de pago</label>
+                        <div id="stripe-card-element"
+                             class="w-full rounded-lg bg-white/10 border border-white/10 px-4 py-3 text-white">
+                        </div>
+                        <p x-show="reponer.stripeError" x-text="reponer.stripeError" class="text-red-400 text-xs mt-2"></p>
+                    </div>
+                </div>
+
+                {{-- Error general --}}
+                <p
+                    x-show="reponer.errorMensaje"
+                    x-text="reponer.errorMensaje"
+                    class="text-red-400 text-xs font-semibold bg-red-500/10 rounded-lg px-4 py-2.5 ring-1 ring-red-500/20">
+                </p>
+
+            </div>
+
+            {{-- Pie --}}
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/10 bg-white/3">
+                <button
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-white/50 hover:text-white transition-colors duration-100"
+                    x-on:click="cerrarModalReponer()">
+                    Cancelar
+                </button>
+
+                {{-- Paso 1: Iniciar pago --}}
+                <button
+                    x-show="!reponer.pagoIniciado"
+                    class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="reponer.cargando || reponer.cantidad < 1"
+                    x-on:click="iniciarPago()">
+                    <svg x-show="reponer.cargando" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    <span x-text="reponer.cargando ? 'Preparando pago…' : 'Confirmar cantidad'"></span>
+                </button>
+
+                {{-- Paso 2: Confirmar pago con Stripe --}}
+                <button
+                    x-show="reponer.pagoIniciado"
+                    class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="reponer.cargando"
+                    x-on:click="pagarYConfirmar()">
+                    <svg x-show="reponer.cargando" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    <span x-text="reponer.cargando ? 'Procesando pago…' : 'Pagar y reponer'"></span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 </div>{{-- fin #stock-contenedor --}}
 
 @endsection
 
 @push('scripts')
+{{-- Stripe.js --}}
+<script src="https://js.stripe.com/v3/"></script>
 {{-- Alpine.js CDN (si no está ya incluido en el layout) --}}
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 {{-- Módulo de fetch del stock --}}
 <script src="{{ asset('js/camarero/stock.js') }}"></script>
 
-<script>
-/**
- * stockApp() — Componente Alpine.js para la gestión del stock de barra.
- * Toda la lógica de UI (estado del modal, filtros, mensajes) vive aquí.
- * Las operaciones de red se delegan a window.Stock (stock.js).
- */
-function stockApp() {
-    return {
-        // ── Estado del filtro ────────────────────────────────────────────
-        filtro: 'todos',
 
-        // ── Estado del modal ─────────────────────────────────────────────
-        modalAbierto:  false,
-        editandoId:    null,
-        guardando:     false,
-        errorMensaje:  '',
-
-        // ── Datos del formulario ─────────────────────────────────────────
-        form: {
-            nombre:          '',
-            tipo_producto:   '',
-            proveedor:       '',
-            stock:           '',
-            precio_unitario: '',
-            evento_id:       '',
-        },
-
-        // ── Acciones ─────────────────────────────────────────────────────
-
-        /** Abre el modal en modo creación. */
-        abrirModalCrear() {
-            this.resetForm();
-            this.editandoId   = null;
-            this.errorMensaje = '';
-            this.modalAbierto = true;
-        },
-
-        /** Cierra el modal y limpia el estado. */
-        cerrarModal() {
-            this.modalAbierto = false;
-            this.editandoId   = null;
-            this.errorMensaje = '';
-            this.resetForm();
-        },
-
-        /** Resetea los campos del formulario. */
-        resetForm() {
-            this.form = {
-                nombre:          '',
-                tipo_producto:   '',
-                proveedor:       '',
-                stock:           '',
-                precio_unitario: '',
-                evento_id:       '',
-            };
-        },
-
-        /**
-         * Carga los datos de un producto y abre el modal en modo edición.
-         * @param {number} id
-         */
-        async editarProducto(id) {
-            this.resetForm();
-            this.editandoId   = id;
-            this.errorMensaje = '';
-
-            const datos = await Stock.cargarParaEditar(id);
-
-            this.form.nombre          = datos.nombre;
-            this.form.tipo_producto   = datos.tipo_producto;
-            this.form.proveedor       = datos.proveedor;
-            this.form.stock           = datos.stock;
-            this.form.precio_unitario = datos.precio_unitario;
-            this.form.evento_id       = datos.evento_id;
-
-            this.modalAbierto = true;
-        },
-
-        /** Envía el formulario (crear o actualizar). */
-        async enviarFormulario() {
-            this.guardando    = true;
-            this.errorMensaje = '';
-
-            const resultado = await Stock.guardarProducto(this.form, this.editandoId);
-
-            this.guardando = false;
-
-            if (resultado.ok) {
-                this.cerrarModal();
-                Swal.fire({
-                    icon:              'success',
-                    title:             resultado.mensaje,
-                    toast:             true,
-                    position:          'top-end',
-                    showConfirmButton: false,
-                    timer:             2500,
-                    background:        '#1a1033',
-                    color:             '#e9d5ff',
-                }).then(function () {
-                    Stock.cargarProductos();
-                });
-            } else {
-                this.errorMensaje = resultado.mensaje || 'Error al guardar el producto.';
-            }
-        },
-
-        /**
-         * Solicita confirmación y elimina un producto.
-         * @param {number} id
-         * @param {string} nombre
-         */
-        async confirmarEliminar(id, nombre) {
-            const confirmacion = await Swal.fire({
-                title:              '¿Eliminar "' + nombre + '"?',
-                text:               'Esta acción no se puede deshacer.',
-                icon:               'warning',
-                showCancelButton:   true,
-                confirmButtonText:  'Sí, eliminar',
-                cancelButtonText:   'Cancelar',
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor:  '#6d28d9',
-                background:         '#1a1033',
-                color:              '#e9d5ff',
-            });
-
-            if (!confirmacion.isConfirmed) return;
-
-            const resultado = await Stock.eliminarProducto(id);
-
-            if (resultado.ok) {
-                Swal.fire({
-                    icon:              'success',
-                    title:             'Producto eliminado.',
-                    toast:             true,
-                    position:          'top-end',
-                    showConfirmButton: false,
-                    timer:             2000,
-                    background:        '#1a1033',
-                    color:             '#e9d5ff',
-                }).then(function () {
-                    Stock.cargarProductos();
-                });
-            } else {
-                Swal.fire({
-                    icon:       'error',
-                    title:      'No se puede eliminar',
-                    text:       resultado.mensaje,
-                    background: '#1a1033',
-                    color:      '#e9d5ff',
-                });
-            }
-        },
-    };
-}
-</script>
 @endpush
