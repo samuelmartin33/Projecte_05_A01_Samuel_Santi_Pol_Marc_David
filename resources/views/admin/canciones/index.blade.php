@@ -22,6 +22,7 @@
     <table class="tabla-eventos">
         <thead>
             <tr>
+                <th>Portada</th>
                 <th>Título</th>
                 <th>Artista</th>
                 <th>Géneros</th>
@@ -46,7 +47,7 @@
         <button class="modal-close-btn" onclick="cerrarModal()" aria-label="Cerrar">✕</button>
         <h2 id="modal-cancion-titulo">Nueva canción</h2>
 
-        <form id="form-cancion" novalidate>
+        <form id="form-cancion" novalidate enctype="multipart/form-data">
             @csrf
             <input type="hidden" id="cancion-id" value="">
 
@@ -101,6 +102,28 @@
                     <input type="checkbox" id="cancion-activa" name="activa" value="1">
                     Canción activa
                 </label>
+            </div>
+
+            <div class="modal-campo">
+                <label for="cancion-portada">Portada (jpg, png, webp — máx. 5 MB)</label>
+                <input type="file" id="cancion-portada" name="portada_archivo"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       onchange="previsualizarPortada(this)">
+                <div id="portada-preview-wrap" style="display:none;margin-top:8px;align-items:center;gap:12px;">
+                    <img id="portada-preview-img" alt="Portada"
+                         style="width:64px;height:64px;object-fit:cover;border:1px solid rgba(245,241,234,0.12);">
+                    <p id="portada-actual-label" style="font-size:0.72rem;color:rgba(245,241,234,0.4);margin:0;"></p>
+                </div>
+            </div>
+
+            <div class="modal-campo">
+                <label for="cancion-audio">Archivo de audio (mp3, wav, ogg — máx. 30 MB)</label>
+                <input type="file" id="cancion-audio" name="audio_archivo"
+                       accept=".mp3,.wav,.ogg,.m4a,.aac">
+                <div id="audio-preview-wrap" style="display:none;margin-top:8px;">
+                    <audio id="audio-preview" controls style="width:100%;height:36px;"></audio>
+                    <p id="audio-actual-label" style="font-size:0.72rem;color:rgba(245,241,234,0.4);margin-top:4px;"></p>
+                </div>
             </div>
 
             <div class="modal-footer">

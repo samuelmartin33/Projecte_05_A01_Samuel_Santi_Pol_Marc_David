@@ -57,6 +57,7 @@ function renderizarTabla(eventos) {
             + '<td>' + aforo + '</td>'
             + '<td>' + camarero + '</td>'
             + '<td>'
+            +   '<a href="/empresa/fiesta/' + e.id + '/playlist" class="btn-accion">Playlist</a>'
             +   '<button class="btn-accion" onclick="abrirModalEditar(' + e.id + ')">Editar</button>'
             +   '<button class="btn-accion danger" onclick="eliminarEvento(' + e.id + ', \'' + titulo + '\')">Eliminar</button>'
             + '</td>'

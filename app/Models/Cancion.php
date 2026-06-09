@@ -23,6 +23,8 @@ class Cancion extends Model
         'duracion_segundos',
         'precio',
         'activa',
+        'audio_url',
+        'portada_url',
     ];
 
     // Conversión automática de tipos al leer de la BD

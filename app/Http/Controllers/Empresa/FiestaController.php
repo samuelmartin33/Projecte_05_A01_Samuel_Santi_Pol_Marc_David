@@ -162,6 +162,28 @@ class FiestaController extends Controller
     }
 
     /**
+     * Muestra la playlist de un evento Fiesta de la empresa.
+     * GET /empresa/fiesta/{id}/playlist
+     */
+    public function playlist(int $id)
+    {
+        $empresa     = $this->getEmpresa();
+        $categoriaId = $this->getCategoriaFiestaId();
+
+        $evento = Evento::whereHas('organizador', fn($q) => $q->where('empresa_id', $empresa->id))
+            ->whereHas('categorias', fn($q) => $q->where('categorias_evento.id', $categoriaId))
+            ->findOrFail($id);
+
+        // Canciones compradas para este evento, ordenadas por orden de compra (= orden de reproducción)
+        $playlist = \App\Models\PlaylistEventoCancion::where('evento_id', $id)
+            ->with(['cancion', 'usuario'])
+            ->orderBy('orden')
+            ->get();
+
+        return view('empresa.fiesta.playlist', compact('evento', 'playlist'));
+    }
+
+    /**
      * Devuelve los eventos Fiesta de la empresa aplicando filtros. (AJAX)
      * GET /empresa/fiesta/listar
      */

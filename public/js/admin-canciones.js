@@ -56,6 +56,17 @@ function abrirModalCrear() {
         checkboxesGenero[i].checked = false;
     }
 
+    // Limpiar portada al crear
+    document.getElementById('portada-preview-wrap').style.display = 'none';
+    document.getElementById('portada-preview-img').src = '';
+    document.getElementById('portada-actual-label').textContent = '';
+    document.getElementById('cancion-portada').value = '';
+
+    // Limpiar audio al crear
+    document.getElementById('audio-preview-wrap').style.display = 'none';
+    document.getElementById('audio-preview').src = '';
+    document.getElementById('cancion-audio').value = '';
+
     document.getElementById('modal-cancion-overlay').classList.add('abierto');
     document.getElementById('cancion-titulo').focus();
 }
@@ -85,6 +96,35 @@ function abrirModalEditar(idCancion) {
         for (var i = 0; i < checkboxesGenero.length; i++) {
             checkboxesGenero[i].checked = datos.generos.indexOf(checkboxesGenero[i].value) !== -1;
         }
+
+        // Mostrar portada si la canción ya tiene imagen
+        var portadaWrap  = document.getElementById('portada-preview-wrap');
+        var portadaImg   = document.getElementById('portada-preview-img');
+        var portadaLabel = document.getElementById('portada-actual-label');
+        if (datos.portada_url) {
+            portadaImg.src           = datos.portada_url;
+            portadaLabel.textContent = 'Portada actual: ' + datos.portada_url.split('/').pop();
+            portadaWrap.style.display = 'flex';
+        } else {
+            portadaWrap.style.display = 'none';
+            portadaImg.src = '';
+            portadaLabel.textContent = '';
+        }
+        document.getElementById('cancion-portada').value = '';
+
+        // Mostrar reproductor si la canción ya tiene audio
+        var audioWrap  = document.getElementById('audio-preview-wrap');
+        var audioEl    = document.getElementById('audio-preview');
+        var audioLabel = document.getElementById('audio-actual-label');
+        if (datos.audio_url) {
+            audioEl.src            = datos.audio_url;
+            audioLabel.textContent = 'Audio actual: ' + datos.audio_url.split('/').pop();
+            audioWrap.style.display = 'block';
+        } else {
+            audioWrap.style.display = 'none';
+            audioEl.src = '';
+        }
+        document.getElementById('cancion-audio').value = '';
 
         document.getElementById('modal-cancion-overlay').classList.add('abierto');
         document.getElementById('cancion-titulo').focus();
@@ -232,6 +272,27 @@ function confirmarDesactivar(idCancion, tituloCancion) {
             });
         });
     });
+}
+
+/* ── Previsualizar portada seleccionada ──────────────────────────── */
+function previsualizarPortada(inputFile) {
+    var wrap  = document.getElementById('portada-preview-wrap');
+    var img   = document.getElementById('portada-preview-img');
+    var label = document.getElementById('portada-actual-label');
+
+    if (!inputFile.files || !inputFile.files[0]) {
+        wrap.style.display = 'none';
+        return;
+    }
+
+    var archivo = inputFile.files[0];
+    var lector  = new FileReader();
+    lector.onload = function (e) {
+        img.src             = e.target.result;
+        label.textContent   = archivo.name;
+        wrap.style.display  = 'flex';
+    };
+    lector.readAsDataURL(archivo);
 }
 
 /* ── Recargar el tbody de la tabla vía AJAX ──────────────────────── */

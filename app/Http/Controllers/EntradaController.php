@@ -106,6 +106,15 @@ class EntradaController extends Controller
             ], 422);
         }
 
+        // Un camarero asignado a este evento no puede comprar entrada para él.
+        // eventos.camarero_id apunta a organizadores.id, que a su vez tiene usuario_id.
+        if ($evento->camarero_id && \App\Models\Organizador::where('id', $evento->camarero_id)->where('usuario_id', Auth::id())->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No puedes comprar una entrada para un evento en el que vas a trabajar.',
+            ], 422);
+        }
+
         // Comprobamos el aforo antes de iniciar la transacción para evitar abrirla
         // innecesariamente si ya no hay plazas. aforo_maximo === null significa
         // que el evento tiene aforo ilimitado.
@@ -268,7 +277,7 @@ class EntradaController extends Controller
         // Solo mostramos pedidos activos (estado=1); los cancelados/reembolsados se ocultan.
         $pedidos = Pedido::where('usuario_id', Auth::id())
             ->where('estado', 1)
-            ->with(['entradas.evento'])
+            ->with(['entradas.evento.categoria'])
             ->orderByDesc('fecha_creacion')
             ->get();
 
@@ -316,6 +325,11 @@ class EntradaController extends Controller
         $cuponCodigo = $request->cupon_codigo ? strtoupper(trim($request->cupon_codigo)) : null;
 
         $evento = Evento::where('estado', 1)->findOrFail($eventoId);
+
+        // Un camarero asignado a este evento no puede comprar entrada para él.
+        if ($evento->camarero_id && \App\Models\Organizador::where('id', $evento->camarero_id)->where('usuario_id', Auth::id())->exists()) {
+            return response()->json(['success' => false, 'message' => 'No puedes comprar una entrada para un evento en el que vas a trabajar.'], 422);
+        }
 
         if ($evento->aforo_maximo !== null && ($evento->aforo_maximo - $evento->aforo_actual) < $cantidad) {
             return response()->json(['success' => false, 'message' => 'No hay suficientes entradas disponibles.'], 422);

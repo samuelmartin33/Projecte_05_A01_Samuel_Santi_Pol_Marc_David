@@ -11,7 +11,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 
 /**
  * Controlador para la gestión administrativa del catálogo de canciones.
@@ -49,9 +48,22 @@ class CancionController extends Controller
             'generos'           => ['required', 'array', 'min:1'],
             'generos.*'         => ['string'],
             'activa'            => ['nullable', 'boolean'],
+            'audio_archivo'   => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a,aac', 'max:30720'],
+            'portada_archivo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $datos['activa'] = $request->boolean('activa');
+        unset($datos['audio_archivo'], $datos['portada_archivo']);
+
+        if ($request->hasFile('audio_archivo')) {
+            $path = $request->file('audio_archivo')->store('canciones/audio', 'public');
+            $datos['audio_url'] = '/storage/' . $path;
+        }
+
+        if ($request->hasFile('portada_archivo')) {
+            $path = $request->file('portada_archivo')->store('canciones/portadas', 'public');
+            $datos['portada_url'] = '/storage/' . $path;
+        }
 
         Cancion::create($datos);
 
@@ -76,6 +88,8 @@ class CancionController extends Controller
             'precio'            => $cancion->precio,
             'generos'           => $cancion->generos ?? [],
             'activa'            => (bool) $cancion->activa,
+            'audio_url'         => $cancion->audio_url,
+            'portada_url'       => $cancion->portada_url,
         ]);
     }
 
@@ -94,9 +108,22 @@ class CancionController extends Controller
             'generos'           => ['required', 'array', 'min:1'],
             'generos.*'         => ['string'],
             'activa'            => ['nullable', 'boolean'],
+            'audio_archivo'   => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a,aac', 'max:30720'],
+            'portada_archivo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $datos['activa'] = $request->boolean('activa');
+        unset($datos['audio_archivo'], $datos['portada_archivo']);
+
+        if ($request->hasFile('audio_archivo')) {
+            $path = $request->file('audio_archivo')->store('canciones/audio', 'public');
+            $datos['audio_url'] = '/storage/' . $path;
+        }
+
+        if ($request->hasFile('portada_archivo')) {
+            $path = $request->file('portada_archivo')->store('canciones/portadas', 'public');
+            $datos['portada_url'] = '/storage/' . $path;
+        }
 
         $cancion->update($datos);
 

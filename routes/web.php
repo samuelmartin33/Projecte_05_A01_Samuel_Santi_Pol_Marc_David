@@ -39,6 +39,7 @@ use App\Http\Controllers\Admin\TrabajosController as AdminTrabajosController;
 use App\Http\Controllers\Admin\BonoAdminController;
 use App\Http\Controllers\Admin\BonoTipoController;
 use App\Http\Controllers\Admin\CancionController as AdminCancionController;
+use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
@@ -127,6 +128,12 @@ Route::get('/eventos/{id}/comprar', [PublicEventoController::class, 'compra'])
     ->where('id', '[0-9]+')
     ->middleware('auth')
     ->name('eventos.comprar');
+
+// --- Playlist Fiesta: catálogo de canciones para usuarios con entrada ---
+Route::get('/eventos/{eventoId}/fiesta-playlist', [PlaylistController::class, 'vista'])
+    ->where('eventoId', '[0-9]+')
+    ->middleware('auth')
+    ->name('eventos.fiesta-playlist');
 
 // --- Perfil público de una promotora/empresa ---
 Route::get('/promotoras/{id}', [\App\Http\Controllers\PromotoraController::class, 'show'])
@@ -313,6 +320,7 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/fiesta')->name('empres
     Route::get('/crear',               [\App\Http\Controllers\Empresa\FiestaController::class, 'crear'])->name('crear');
     Route::post('/guardar',            [\App\Http\Controllers\Empresa\FiestaController::class, 'guardar'])->name('guardar');
     Route::post('/',                   [\App\Http\Controllers\Empresa\FiestaController::class, 'store'])->name('store');
+    Route::get('/{id}/playlist',       [\App\Http\Controllers\Empresa\FiestaController::class, 'playlist'])->name('playlist');
     Route::get('/{id}',                [\App\Http\Controllers\Empresa\FiestaController::class, 'show'])->name('show');
     Route::post('/{id}/actualizar',    [\App\Http\Controllers\Empresa\FiestaController::class, 'update'])->name('update');
     Route::delete('/{id}',             [\App\Http\Controllers\Empresa\FiestaController::class, 'destroy'])->name('destroy');

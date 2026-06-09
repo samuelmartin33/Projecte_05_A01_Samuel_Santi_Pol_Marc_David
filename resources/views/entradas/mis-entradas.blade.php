@@ -457,6 +457,22 @@
                     text-transform:uppercase;letter-spacing:0.08em;">
             Presenta este QR en la entrada del evento
           </p>
+
+          {{-- Botón playlist: solo para eventos de categoría Fiesta --}}
+          @if($evento && $evento->categoria?->nombre === 'Fiesta')
+          <div style="text-align:center;margin-top:18px;">
+            <a href="{{ route('eventos.fiesta-playlist', $evento->id) }}"
+               onclick="event.stopPropagation()"
+               style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.2));border:1px solid rgba(168,85,247,0.45);border-radius:999px;color:#c084fc;font-family:'Archivo Narrow',sans-serif;font-size:0.78rem;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.1em;transition:background 0.15s;"
+               onmouseover="this.style.background='linear-gradient(135deg,rgba(124,58,237,0.35),rgba(168,85,247,0.35))'"
+               onmouseout="this.style.background='linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.2))'">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/>
+                </svg>
+                Añadir canción a la playlist
+            </a>
+          </div>
+          @endif
         </div>
 
       </div>
