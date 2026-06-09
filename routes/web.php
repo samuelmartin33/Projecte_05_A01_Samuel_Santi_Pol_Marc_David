@@ -541,6 +541,9 @@ Route::middleware(['auth', 'role:camarero'])
         Route::delete('/stock/{id}', [\App\Http\Controllers\Camarero\StockController::class, 'destroy'])->name('stock.destroy');
         Route::post('/stock/{id}/reponer',              [\App\Http\Controllers\Camarero\StockController::class, 'iniciarReposicion'])  ->name('stock.reponer');
         Route::post('/stock/{id}/confirmar-reposicion', [\App\Http\Controllers\Camarero\StockController::class, 'confirmarReposicion'])->name('stock.confirmar-reposicion');
+        
+        Route::get('/bonos',          [\App\Http\Controllers\Camarero\CanjeBonoController::class, 'index'])  ->name('bonos.index');
+        Route::post('/bonos/canjear', [\App\Http\Controllers\Camarero\CanjeBonoController::class, 'canjear'])->name('bonos.canjear');
     });
 
 /* ═══════════════════════════════════════════════════════════════════
