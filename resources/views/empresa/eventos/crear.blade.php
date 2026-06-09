@@ -483,6 +483,25 @@ function desactivarRestriccionesFiesta() {
     edad.style.opacity = '1';
 }
 
+// ── Selector tipo de evento (ev-csel) ─────────────────────────────────────────
+function toggleTipoEvento() {
+    document.getElementById('ev-tipo-evento').classList.toggle('open');
+}
+
+function pickTipoEvento(val, label) {
+    document.getElementById('tipo_evento').value = val;
+    document.getElementById('ev-tipo-evento-label').textContent = label;
+    document.getElementById('ev-tipo-evento').classList.remove('open');
+    document.querySelectorAll('#ev-tipo-evento .ev-csel-opt').forEach(function(li) {
+        li.classList.toggle('selected', li.textContent.trim() === label);
+    });
+}
+
+document.addEventListener('click', function(e) {
+    var el = document.getElementById('ev-tipo-evento');
+    if (el && !el.contains(e.target)) el.classList.remove('open');
+});
+
 // ── Precio ────────────────────────────────────────────────────────────────────
 function togglePrecio() {
     var checkbox = document.getElementById('es_gratuito');

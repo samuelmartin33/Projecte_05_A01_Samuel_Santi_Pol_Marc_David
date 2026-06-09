@@ -42,7 +42,7 @@
                     <td data-label="ID">{{ $evento->id }}</td>
                     <td data-label="Titulo">{{ $evento->titulo }}</td>
                     <td data-label="Categoria">{{ $evento->categoriaEvento->nombre ?? 'Sin categoria' }}</td>
-                    <td data-label="Organizador">#{{ $evento->organizador_id }}</td>
+                    <td data-label="Organizador">{{ $evento->organizador?->empresa?->nombre_empresa ?? '#' . $evento->organizador_id }}</td>
                     <td data-label="Inicio">{{ optional($evento->fecha_inicio)->format('d/m/Y H:i') }}</td>
                     <td data-label="Estado">
                         <span class="estado {{ $evento->estado ? 'activo' : 'inactivo' }}">

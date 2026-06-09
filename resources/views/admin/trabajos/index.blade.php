@@ -107,6 +107,28 @@
 
 @push('scripts')
 <script>
+/* Confirmación antes de activar o desactivar un puesto */
+function confirmarToggle(id, estaActivo, nombre) {
+    Swal.fire({
+        title: estaActivo ? 'Pausar puesto de trabajo' : 'Activar puesto de trabajo',
+        text: estaActivo
+            ? 'El puesto "' + nombre + '" dejará de aparecer en las ofertas y candidaturas.'
+            : 'El puesto "' + nombre + '" volverá a estar disponible en ofertas y candidaturas.',
+        icon: estaActivo ? 'warning' : 'question',
+        background: '#0d0a18',
+        color: '#f5f1ea',
+        showCancelButton: true,
+        confirmButtonText: estaActivo ? 'Sí, pausar' : 'Sí, activar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: estaActivo ? '#ef4444' : '#22c55e',
+        cancelButtonColor: 'rgba(245,241,234,0.10)',
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            document.getElementById('form-estado-' + id).submit();
+        }
+    });
+}
+
 /* Muestra u oculta el panel de creación */
 function toggleFormulario() {
     var panel = document.getElementById('tr-form-panel');

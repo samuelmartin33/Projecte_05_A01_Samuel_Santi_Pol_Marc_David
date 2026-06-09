@@ -1,0 +1,90 @@
+/* ════════════════════════════════════════════════════════════════
+   admin-canciones-stats.css — Estadísticas de canciones (Admin VIBEZ)
+════════════════════════════════════════════════════════════════ */
+
+/* ── Barra de filtros ────────────────────────────────────────────── */
+.stats-filtros {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+.stats-filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 180px;
+}
+.stats-filtro-grupo label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(245, 241, 234, 0.45);
+}
+.stats-filtro-grupo select {
+    background: rgba(245, 241, 234, 0.05);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    border-radius: 6px;
+    color: #f5f1ea;
+    font-size: 13px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.stats-filtro-grupo select:focus {
+    outline: none;
+    border-color: #a855f7;
+}
+.stats-filtro-grupo select option {
+    background: #1a1426;
+    color: #f5f1ea;
+}
+
+/* ── Acciones del header ─────────────────────────────────────────── */
+.stats-acciones {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ── Tabla de estadísticas ───────────────────────────────────────── */
+#tabla-stats-body tr td:nth-child(3),
+#tabla-stats-body tr td:nth-child(4) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Fila del total ──────────────────────────────────────────────── */
+.stats-total-row td {
+    font-weight: 700;
+    color: #a855f7;
+    border-top: 2px solid rgba(168, 85, 247, 0.4);
+    padding-top: 0.75rem;
+}
+
+/* ── Badge de veces ──────────────────────────────────────────────── */
+.badge-veces {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(168, 85, 247, 0.18);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+/* ── Mensaje vacío ───────────────────────────────────────────────── */
+.stats-vacio {
+    text-align: center;
+    color: rgba(245, 241, 234, 0.35);
+    padding: 2rem;
+    font-style: italic;
+}
