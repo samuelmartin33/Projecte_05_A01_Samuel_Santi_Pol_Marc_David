@@ -527,6 +527,21 @@ Route::get('/migrate', function (\Illuminate\Http\Request $request) {
 });
 
 /* ═══════════════════════════════════════════════════════════════════
+   PANEL CAMARERO — protegido por auth + role:camarero
+   Prefijo: /camarero  |  Nombre: camarero.*
+═══════════════════════════════════════════════════════════════════ */
+Route::middleware(['auth', 'role:camarero'])
+    ->prefix('camarero')
+    ->name('camarero.')
+    ->group(function () {
+        Route::get('/stock',         [\App\Http\Controllers\Camarero\StockController::class, 'index']) ->name('stock.index');
+        Route::post('/stock',        [\App\Http\Controllers\Camarero\StockController::class, 'store']) ->name('stock.store');
+        Route::get('/stock/{id}',    [\App\Http\Controllers\Camarero\StockController::class, 'show'])  ->name('stock.show');
+        Route::put('/stock/{id}',    [\App\Http\Controllers\Camarero\StockController::class, 'update'])->name('stock.update');
+        Route::delete('/stock/{id}', [\App\Http\Controllers\Camarero\StockController::class, 'destroy'])->name('stock.destroy');
+    });
+
+/* ═══════════════════════════════════════════════════════════════════
    PANEL MODERADOR — protegido por auth + middleware moderador
    Prefijo: /moderador  |  Nombre: moderador.*
 ═══════════════════════════════════════════════════════════════════ */
