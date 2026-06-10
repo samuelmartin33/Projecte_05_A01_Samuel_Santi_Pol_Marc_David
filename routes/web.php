@@ -40,6 +40,8 @@ use App\Http\Controllers\Admin\BonoAdminController;
 use App\Http\Controllers\Admin\BonoTipoController;
 use App\Http\Controllers\Admin\CancionController as AdminCancionController;
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\BonoController;
+use App\Http\Controllers\Empresa\CanjeBonoController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
@@ -134,6 +136,12 @@ Route::get('/eventos/{eventoId}/fiesta-playlist', [PlaylistController::class, 'v
     ->where('eventoId', '[0-9]+')
     ->middleware('auth')
     ->name('eventos.fiesta-playlist');
+
+// --- Bonos Fiesta: compra de bonos de bebidas para usuarios con entrada ---
+Route::get('/eventos/{eventoId}/bonos', [BonoController::class, 'vista'])
+    ->where('eventoId', '[0-9]+')
+    ->middleware('auth')
+    ->name('eventos.bonos');
 
 // --- Perfil público de una promotora/empresa ---
 Route::get('/promotoras/{id}', [\App\Http\Controllers\PromotoraController::class, 'show'])
@@ -265,6 +273,12 @@ Route::middleware(['auth','no-portero'])->prefix('empresa/candidaturas')->name('
 Route::middleware('auth')->prefix('empresa/validacion')->name('empresa.validacion.')->group(function () {
     Route::get('/',         [ValidacionQRController::class, 'index'])->name('index');
     Route::post('/validar', [ValidacionQRController::class, 'validar'])->name('validar');
+});
+
+/* — Canje de bonos de bebidas (accesible también a porteros/camareros) — */
+Route::middleware('auth')->prefix('empresa/bonos')->name('empresa.bonos.')->group(function () {
+    Route::get('/canjear',        [CanjeBonoController::class, 'index'])  ->name('canjear');
+    Route::post('/validar-canje', [CanjeBonoController::class, 'validar'])->name('validar-canje');
 });
 
 /* — Facturación de empresa — */

@@ -1,0 +1,105 @@
+/* ========================================================
+   fiesta-bonos.css — Vista de compra de bonos de bebidas
+   ======================================================== */
+
+.bonos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+}
+
+/* ── Tarjeta de tipo de bono ──────────────────────────── */
+.bono-card {
+    background: rgba(13,10,24,0.9);
+    border: 1px solid rgba(245,241,234,0.08);
+    border-radius: 14px;
+    padding: 1.75rem;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.bono-card:hover { border-color: rgba(124,58,237,0.5); transform: translateY(-3px); }
+.bono-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+}
+
+.bono-cantidad {
+    font-family: 'Anton', sans-serif;
+    font-size: 4rem;
+    color: #c084fc;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.bono-precio {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.8rem;
+    color: #f5f1ea;
+    margin: 12px 0;
+}
+
+/* ── Botón comprar ────────────────────────────────────── */
+.btn-comprar-bono {
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.btn-comprar-bono:hover    { opacity: 0.85; }
+.btn-comprar-bono:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Saldo activo ─────────────────────────────────────── */
+.saldo-card {
+    background: rgba(74,222,128,0.06);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* ── Modal de pago ────────────────────────────────────── */
+#modal-bono-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+#modal-bono-overlay.abierto { display: flex; }
+
+#modal-bono {
+    background: #0d0a18;
+    border: 1px solid rgba(124,58,237,0.35);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+}
+
+#stripe-bono-card-el {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(168,85,247,0.35);
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+}

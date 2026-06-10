@@ -1,0 +1,282 @@
+/* ========================================================
+   canje-bono.css — Vista camarero para canjear bonos QR
+   Mobile-first: el camarero usa el móvil en el evento.
+   ======================================================== */
+
+html, body { width: 100%; margin: 0; padding: 0; background: #07060c; }
+
+.canje-wrapper {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 5rem;
+    box-sizing: border-box;
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.canje-hero {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at 20% 30%, rgba(74,222,128,0.20), transparent 55%),
+                radial-gradient(circle at 80% 70%, rgba(124,58,237,0.20), transparent 60%),
+                #0d0820;
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 2rem 1.5rem 1.75rem;
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+.canje-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(74,222,128,0.12) 1.3px, transparent 1.3px);
+    background-size: 28px 28px;
+    pointer-events: none;
+}
+.canje-hero h1 {
+    position: relative;
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1.8rem, 6vw, 2.4rem);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    color: #f5f1ea;
+    margin: 0 0 6px;
+}
+.canje-hero p {
+    position: relative;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(245,241,234,0.45);
+    margin: 0;
+}
+
+/* ── Tarjeta de sección ────────────────────────────────── */
+.canje-card {
+    background: rgba(13,10,24,0.90);
+    border: 1px solid rgba(245,241,234,0.10);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+.canje-card__titulo {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(245,241,234,0.4);
+    margin-bottom: 1rem;
+}
+
+/* ── Selector tipo de bebida ──────────────────────────── */
+.tipo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+.tipo-btn {
+    padding: 12px 8px;
+    background: rgba(245,241,234,0.04);
+    border: 1.5px solid rgba(245,241,234,0.12);
+    color: rgba(245,241,234,0.6);
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.15s;
+    text-align: center;
+}
+.tipo-btn:hover { border-color: rgba(74,222,128,0.4); color: #4ade80; }
+.tipo-btn.seleccionado {
+    background: rgba(74,222,128,0.12);
+    border-color: rgba(74,222,128,0.5);
+    color: #4ade80;
+    font-weight: 700;
+}
+
+/* ── Selector cantidad ─────────────────────────────────── */
+.cantidad-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.cantidad-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(74,222,128,0.35);
+    background: rgba(74,222,128,0.08);
+    color: #4ade80;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    line-height: 1;
+}
+.cantidad-btn:hover { background: rgba(74,222,128,0.2); }
+.cantidad-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.cantidad-valor {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.5rem;
+    color: #f5f1ea;
+    min-width: 48px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* ── Escáner QR ────────────────────────────────────────── */
+#qr-reader {
+    width: 100%;
+    border: 1.5px solid rgba(74,222,128,0.25);
+    overflow: hidden;
+    background: #000;
+}
+#qr-reader video { width: 100%; }
+
+/* Sobreescribir estilos del SDK html5-qrcode para tema oscuro */
+#qr-reader__scan_region { background: #07060c; }
+#qr-reader__dashboard { background: #0d0820; }
+#qr-reader__dashboard_section_swaplink { color: #c084fc !important; }
+#qr-reader__status_span { color: rgba(245,241,234,0.5) !important; font-family: 'Archivo Narrow', sans-serif !important; }
+#qr-reader select { background: #0d0820 !important; color: #f5f1ea !important; border: 1px solid rgba(245,241,234,0.2) !important; }
+
+/* Input manual */
+.input-manual {
+    width: 100%;
+    background: #07060c;
+    border: 1.5px solid rgba(245,241,234,0.14);
+    color: #f5f1ea;
+    padding: 12px 16px;
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.input-manual:focus { border-color: #4ade80; }
+
+/* ── Botón acción principal ────────────────────────────── */
+.btn-canjear {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #16a34a, #4ade80);
+    color: #07060c;
+    border: none;
+    font-family: 'Anton', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.btn-canjear:hover    { opacity: 0.88; }
+.btn-canjear:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Panel resultado ───────────────────────────────────── */
+.resultado-panel {
+    display: none;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+    animation: fadeIn 0.2s ease;
+}
+.resultado-panel.ok      { background: rgba(74,222,128,0.08); border-color: #4ade80; }
+.resultado-panel.error   { background: rgba(239,68,68,0.08);  border-color: #f87171; }
+.resultado-panel.warning { background: rgba(251,146,60,0.08); border-color: #fb923c; }
+
+.resultado-titulo {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+    color: #f5f1ea;
+}
+.resultado-detalle {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(245,241,234,0.6);
+    margin: 0;
+}
+.resultado-saldo {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.6rem;
+    color: #4ade80;
+    margin: 6px 0 0;
+    line-height: 1;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* ── Historial sesión ──────────────────────────────────── */
+.historial-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(245,241,234,0.06);
+    gap: 12px;
+}
+.historial-item:last-child { border-bottom: none; }
+.historial-nombre {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.8125rem;
+    color: #f5f1ea;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+.historial-tipo {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    color: rgba(245,241,234,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+}
+.historial-saldo {
+    font-family: 'Anton', sans-serif;
+    font-size: 0.9rem;
+    color: #4ade80;
+    flex-shrink: 0;
+}
+.historial-saldo.agotado { color: #f87171; }
+
+/* ── Pestañas cámara/manual ────────────────────────────── */
+.tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(245,241,234,0.12);
+}
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: rgba(245,241,234,0.4);
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.tab-btn.activo { background: rgba(74,222,128,0.10); color: #4ade80; font-weight: 700; }
+.tab-btn + .tab-btn { border-left: 1px solid rgba(245,241,234,0.12); }
+
+/* ── Responsive desktop (≥ 640px) ─────────────────────── */
+@media (min-width: 640px) {
+    .canje-wrapper { padding: 2rem 1.5rem 4rem; }
+    .tipo-btn { padding: 14px; font-size: 0.8125rem; }
+}

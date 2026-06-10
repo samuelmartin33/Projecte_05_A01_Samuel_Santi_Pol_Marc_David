@@ -631,6 +631,28 @@ class EventoController extends Controller
 
         $oferta = BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
 
+        // Un cliente no puede postularse a camarero si ya tiene entrada para
+        // algún evento de esa empresa (podría ser el mismo evento al que se asignaría)
+        if (Auth::check()) {
+            $esCamarero = $oferta->categoria_trabajo_id &&
+                \App\Models\CategoriaTrabajo::find($oferta->categoria_trabajo_id)?->nombre === 'Camarero/a';
+
+            if ($esCamarero) {
+                $empresaId = $oferta->organizador?->empresa_id;
+                $tieneEntradaEmpresa = \App\Models\Entrada::whereHas('pedido', fn($q) => $q->where('usuario_id', Auth::id()))
+                    ->whereHas('evento.organizador', fn($q) => $q->where('empresa_id', $empresaId))
+                    ->whereIn('estado_entrada', [1, 2])
+                    ->exists();
+
+                if ($tieneEntradaEmpresa) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No puedes postularte como camarero porque ya tienes una entrada comprada para un evento de esta empresa.',
+                    ], 422);
+                }
+            }
+        }
+
         $trabajadorId = $this->resolverTrabajadorActual();
 
         $expResumen = $this->construirExpFormacion($request);
@@ -676,6 +698,27 @@ class EventoController extends Controller
         ]);
 
         $oferta = BolsaOfertaTrabajo::where('estado', 1)->findOrFail($id);
+
+        // Misma restricción: si es oferta de camarero y tiene entrada de la empresa → bloquear
+        if (Auth::check()) {
+            $esCamarero = $oferta->categoria_trabajo_id &&
+                \App\Models\CategoriaTrabajo::find($oferta->categoria_trabajo_id)?->nombre === 'Camarero/a';
+
+            if ($esCamarero) {
+                $empresaId = $oferta->organizador?->empresa_id;
+                $tieneEntrada = \App\Models\Entrada::whereHas('pedido', fn($q) => $q->where('usuario_id', Auth::id()))
+                    ->whereHas('evento.organizador', fn($q) => $q->where('empresa_id', $empresaId))
+                    ->whereIn('estado_entrada', [1, 2])
+                    ->exists();
+
+                if ($tieneEntrada) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No puedes postularte como camarero porque ya tienes una entrada comprada para un evento de esta empresa.',
+                    ], 422);
+                }
+            }
+        }
 
         $trabajadorId = $this->resolverTrabajadorActual();
 

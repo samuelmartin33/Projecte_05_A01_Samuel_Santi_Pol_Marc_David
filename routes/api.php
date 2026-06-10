@@ -19,6 +19,7 @@ use App\Http\Controllers\EventoPostController;
 use App\Http\Controllers\FavoritoController;
 use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\BonoController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\HistoriaController;
 use App\Http\Controllers\NotificacionController;
@@ -83,6 +84,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/playlist/crear-payment-intent', [PlaylistController::class, 'crearPaymentIntent'])->name('api.playlist.crear-payment-intent');
     Route::post('/playlist/confirmar',            [PlaylistController::class, 'confirmarPago'])->name('api.playlist.confirmar');
     Route::post('/playlist/agregar-gratis',       [PlaylistController::class, 'agregarGratis'])->name('api.playlist.agregar-gratis');
+
+    // Bonos de bebidas: compra de bonos para eventos Fiesta
+    Route::post('/bonos/crear-payment-intent', [BonoController::class, 'crearPaymentIntent'])->name('api.bonos.crear-payment-intent');
+    Route::post('/bonos/confirmar',            [BonoController::class, 'confirmarPago'])->name('api.bonos.confirmar');
 
     // Validar código de cupón (requiere sesión para verificar límites por usuario)
     Route::post('/cupones/validar', [CuponController::class, 'validar'])->name('api.cupones.validar');

@@ -95,8 +95,18 @@
     .nav-avatar-nombre    { display: none !important; }
     .nav-avatar-btn       { padding: 4px !important; }
     .nav-guest-entrar     { display: none !important; }
-    /* Dropdown notificaciones: reposicionar para no salir de pantalla */
-    #navNotifDropdown { min-width: 260px !important; right: -10px !important; }
+    /* Dropdowns de notificaciones y cupones: fixed para no salir de pantalla en móvil */
+    #navNotifDropdown,
+    #navCuponesDropdown {
+        position: fixed !important;
+        top: 72px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: auto !important;
+        min-width: unset !important;
+        max-width: none !important;
+        border-radius: 12px !important;
+    }
   }
 </style>
 
@@ -119,13 +129,14 @@
           $esPortero     = Auth::user()->isPortero();
           $esOrganizador = !$esPortero && Auth::user()->isOrganizador();
           if ($esPortero) {
-            // Portero ve los mismos enlaces que un cliente normal
+            // Portero ve los mismos enlaces que un cliente normal + acciones de camarero
             $navLinks = array_filter([
-              ['Para ti',     route('home'),                        'home'],
-              ['Eventos',     route('eventos.index'),               'eventos.index'],
-              ['Mis tickets', route('entradas.mis-entradas'),       'entradas.mis-entradas'],
-              ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
-              ['Social',      route('social'),                      'social'],
+              ['Para ti',       route('home'),                          'home'],
+              ['Eventos',       route('eventos.index'),                 'eventos.index'],
+              ['Mis tickets',   route('entradas.mis-entradas'),         'entradas.mis-entradas'],
+              ['Validar QR',    route('empresa.validacion.index'),      'empresa.validacion.*'],
+              ['Canjear Bonos', route('empresa.bonos.canjear'),         'empresa.bonos.*'],
+              ['Social',        route('social'),                        'social'],
             ]);
           } elseif ($esEmpresa) {
             $navLinks = [
@@ -341,6 +352,16 @@
               </span>
               Validar entradas
             </a>
+            <a href="{{ route('empresa.bonos.canjear') }}"
+               onclick="document.getElementById('navDropdown').style.display='none'"
+               style="{{ $estiloPorteroExtra }}"
+               onmouseover="this.style.background='rgba(74,222,128,0.10)'"
+               onmouseout="this.style.background='transparent'">
+              <span style="width:26px;height:26px;border-radius:7px;background:rgba(74,222,128,0.10);border:1px solid rgba(74,222,128,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">
+                🍹
+              </span>
+              Canjear bonos
+            </a>
             <a href="{{ route('horas.index') }}"
                onclick="document.getElementById('navDropdown').style.display='none'"
                style="{{ $estiloPorteroExtra }}"
@@ -443,7 +464,12 @@
 
     @auth
       {{-- Links de usuario (solo para usuarios normales; empresa/portero ya los tienen en $navLinks) --}}
-      @if(!$esEmpresa && !$esPortero)
+      @if($esPortero)
+        {{-- El portero tiene Mi perfil y Mis horas en el menú móvil --}}
+        <div class="mob-nav-divider"></div>
+        <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
+        <a href="{{ route('horas.index') }}" class="mob-nav-link">Mis horas</a>
+      @elseif(!$esEmpresa)
         <div class="mob-nav-divider"></div>
         <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
         <a href="{{ route('perfil.favoritos') }}" class="mob-nav-link">Favoritos</a>
