@@ -82,6 +82,31 @@
 ════════════════════════════════════════════════════ --}}
 <div class="perfil-page-wrap">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+{{-- Banner acceso rápido camarero: solo visible si tiene rol camarero activo --}}
+@php
+    $esCamareroActivo = \App\Models\Organizador::where('usuario_id', $usuario->id)
+        ->where('rol', 'camarero')
+        ->where('estado', 1)
+        ->exists();
+@endphp
+@if($esCamareroActivo && auth()->id() === $usuario->id)
+<div style="margin-bottom:1.5rem;background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.5rem;">🍹</span>
+        <div>
+            <p style="font-family:'Archivo Narrow',sans-serif;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#4ade80;margin:0 0 2px;">Acceso camarero</p>
+            <p style="font-family:'Archivo Narrow',sans-serif;font-size:0.7rem;color:rgba(245,241,234,0.45);margin:0;">Escanea el QR de los bonos de bebidas</p>
+        </div>
+    </div>
+    <a href="{{ route('camarero.bonos.canjear') }}"
+       style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(74,222,128,0.15);border:1.5px solid rgba(74,222,128,0.4);border-radius:999px;color:#4ade80;font-family:'Archivo Narrow',sans-serif;font-size:0.75rem;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.1em;transition:background 0.15s;white-space:nowrap;"
+       onmouseover="this.style.background='rgba(74,222,128,0.25)'"
+       onmouseout="this.style.background='rgba(74,222,128,0.15)'">
+        Canjear bonos →
+    </a>
+</div>
+@endif
     @if(session('info'))
         <div class="perfil-alerta perfil-alerta-ok">
             ℹ {{ session('info') }}

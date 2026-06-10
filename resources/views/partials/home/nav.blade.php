@@ -128,6 +128,50 @@
           $esEmpresa     = Auth::user()->isEmpresa();
           $esPortero     = Auth::user()->isPortero();
           $esOrganizador = !$esPortero && Auth::user()->isOrganizador();
+          {{--
+            isOrganizador() usa hasOne y devuelve el primer rol encontrado;
+            si el usuario tiene rol 'portero' primero y 'camarero' después,
+            isOrganizador() no detectaría al camarero. Por eso usamos query directa
+            filtrando explícitamente por rol='camarero'.
+          --}}
+          $esCamarero = \App\Models\Organizador::where('usuario_id', Auth::id())
+              ->where('rol', 'camarero')
+              ->where('estado', 1)
+              ->exists();
+
+          {{--
+            SISTEMA DE ALERTAS DE STOCK BAJO
+            ─────────────────────────────────
+            Se calcula en cada carga de página (no es tiempo real).
+            Solo para camareros y porteros.
+
+            $productosStockNav → lista completa de productos con stock ≤ 2,
+              ordenados de menor a mayor stock (los agotados primero).
+              Se usa para pintar el dropdown con nombre/tipo/proveedor de cada producto.
+
+            $stockBajoCount → cuántos productos están bajos.
+              Controla si el badge 🍺 aparece y qué número muestra (máx "9+").
+
+            El stock baja cuando CanjeBonoController@validar procesa un canje:
+              ProductoBarra stock = GREATEST(0, stock - N) en la misma transacción.
+            El stock sube cuando ProductoBarraController@confirmarPagoPedido
+              confirma el pago al proveedor: stock += cantidad pedida.
+          --}}
+          $stockBajoCount    = 0;
+          $productosStockNav = collect();
+          if ($esCamarero || $esPortero) {
+              // Usamos el primer organizador activo para obtener empresa_id
+              $orgRec = \App\Models\Organizador::where('usuario_id', Auth::id())->where('estado', 1)->first();
+              if ($orgRec) {
+                  // El stock es por empresa (no por evento), por eso filtramos por empresa_id directamente
+                  $productosStockNav = \App\Models\ProductoBarra::where('empresa_id', $orgRec->empresa_id)
+                      ->where('stock', '<=', 2)
+                      ->orderBy('stock')   // primero los agotados (stock=0), luego los bajos (1,2)
+                      ->get();
+                  $stockBajoCount = $productosStockNav->count();
+              }
+          }
+
           if ($esPortero) {
             // Portero ve los mismos enlaces que un cliente normal + acciones de camarero
             $navLinks = array_filter([
@@ -135,7 +179,8 @@
               ['Eventos',       route('eventos.index'),                 'eventos.index'],
               ['Mis tickets',   route('entradas.mis-entradas'),         'entradas.mis-entradas'],
               ['Validar QR',    route('empresa.validacion.index'),      'empresa.validacion.*'],
-              ['Canjear Bonos', route('empresa.bonos.canjear'),         'empresa.bonos.*'],
+              ['Canjear Bonos', route('camarero.bonos.canjear'),         'camarero.bonos.*'],
+              ['Stock',         route('camarero.stock.index'),          'camarero.stock.*'],
               ['Social',        route('social'),                        'social'],
             ]);
           } elseif ($esEmpresa) {
@@ -158,6 +203,8 @@
               ['Bolsa',       route('trabajos.index'),              'trabajos.index'],
               ['Social',      route('social'),                      'social'],
               $esOrganizador ? ['Mis horas', route('horas.index'), 'horas.index'] : null,
+              $esCamarero    ? ['🍹 Canjear bonos', route('camarero.bonos.canjear'), 'camarero.bonos.*'] : null,
+              $esCamarero    ? ['📦 Stock', route('camarero.stock.index'), 'camarero.stock.*'] : null,
             ]);
           }
         @endphp
@@ -279,6 +326,79 @@
         </div>
         @endif
 
+        {{--
+          ICONO 🍺 CON BADGE DE STOCK BAJO
+          ──────────────────────────────────
+          Siempre visible para camareros y porteros.
+          - Sin alertas: borde y color apagados (gris).
+          - Con alertas: borde y color amarillo (#fbbf24), badge numérico encima.
+          - Badge muestra el nº de productos con stock ≤ 2. Máximo visible: "9+".
+          - Al hacer click abre toggleStockDropdown() → dropdown con la lista.
+        --}}
+        @if($esCamarero || $esPortero)
+        <div style="position:relative;">
+          {{-- El color del borde/icono cambia dinámicamente según $stockBajoCount --}}
+          <button id="navStockBtn" onclick="toggleStockDropdown()"
+                  title="Stock de barra"
+                  style="width:38px;height:38px;border-radius:50%;background:rgba(251,191,36,0.1);border:1px solid {{ $stockBajoCount > 0 ? 'rgba(251,191,36,0.5)' : 'rgba(245,241,234,0.15)' }};color:{{ $stockBajoCount > 0 ? '#fbbf24' : 'rgba(245,241,234,0.45)' }};cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;">
+            🍺
+            {{-- Badge: solo aparece si hay productos con stock ≤ 2 --}}
+            @if($stockBajoCount > 0)
+            <span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,0.6);font-size:10px;font-family:'Archivo Narrow',sans-serif;font-weight:700;color:#07060c;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #07060c;">
+              {{ $stockBajoCount > 9 ? '9+' : $stockBajoCount }}
+            </span>
+            @endif
+          </button>
+
+          {{--
+            DROPDOWN DE STOCK BAJO
+            ─────────────────────
+            Muestra la lista de $productosStockNav (productos con stock ≤ 2).
+            Cada fila: cuadro con el número de stock (rojo si 0, amarillo si >0),
+            nombre + tipo·proveedor, y badge "Agotado"/"Bajo".
+            El dropdown se abre/cierra con toggleStockDropdown() en JS.
+            "Gestionar" es un link directo a /camarero/stock.
+          --}}
+          <div id="navStockDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:rgba(13,10,24,0.97);backdrop-filter:blur(20px);border:1px solid rgba(251,191,36,0.2);border-radius:14px;padding:8px;min-width:300px;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,0.6);z-index:200;">
+            {{-- Cabecera --}}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 10px;border-bottom:1px solid rgba(245,241,234,0.08);">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-size:0.85rem;">🍺</span>
+                <span style="font-family:'Archivo Narrow',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(245,241,234,0.5);">Stock de barra</span>
+              </div>
+              <a href="{{ route('camarero.stock.index') }}" onclick="document.getElementById('navStockDropdown').style.display='none';_stockAbierto=false;"
+                 style="color:#fbbf24;font-size:11px;font-family:'Archivo Narrow',sans-serif;text-decoration:none;">Gestionar</a>
+            </div>
+            {{-- Lista de productos bajos (o mensaje "todo en orden" si no hay) --}}
+            <div style="max-height:280px;overflow-y:auto;padding:4px 0;">
+              @if($productosStockNav->isEmpty())
+                <p style="padding:20px 12px;text-align:center;font-family:'Archivo Narrow',sans-serif;font-size:12px;color:rgba(245,241,234,0.35);">Todo el stock está en orden ✅</p>
+              @else
+                @foreach($productosStockNav as $pNav)
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;transition:background 0.15s;"
+                     onmouseover="this.style.background='rgba(251,191,36,0.06)'"
+                     onmouseout="this.style.background='transparent'">
+                  {{-- Cuadro con el número: rojo si agotado (0), amarillo si bajo (1-2) --}}
+                  <div style="flex-shrink:0;width:40px;height:40px;background:{{ $pNav->stock === 0 ? 'rgba(248,113,113,0.15)' : 'rgba(251,191,36,0.12)' }};border:1px solid {{ $pNav->stock === 0 ? 'rgba(248,113,113,0.3)' : 'rgba(251,191,36,0.3)' }};display:flex;align-items:center;justify-content:center;">
+                    <span style="font-family:'Anton',sans-serif;font-size:1.1rem;color:{{ $pNav->stock === 0 ? '#f87171' : '#fbbf24' }};">{{ $pNav->stock }}</span>
+                  </div>
+                  {{-- Info --}}
+                  <div style="flex:1;min-width:0;">
+                    <p style="font-family:'Archivo Narrow',sans-serif;font-weight:700;color:#f5f1ea;margin:0 0 2px;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pNav->nombre }}</p>
+                    <p style="font-family:'Archivo Narrow',sans-serif;font-size:0.65rem;color:rgba(245,241,234,0.4);margin:0;text-transform:uppercase;letter-spacing:0.08em;">{{ $pNav->tipo_producto }} · {{ $pNav->proveedor }}</p>
+                  </div>
+                  {{-- "Agotado" (rojo) si stock=0, "Bajo" (amarillo) si stock 1-2 --}}
+                  <span style="flex-shrink:0;font-family:'Archivo Narrow',sans-serif;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:3px 8px;border:1px solid;{{ $pNav->stock === 0 ? 'color:#f87171;border-color:rgba(248,113,113,0.35);background:rgba(248,113,113,0.08);' : 'color:#fbbf24;border-color:rgba(251,191,36,0.35);background:rgba(251,191,36,0.08);' }}">
+                    {{ $pNav->stock === 0 ? 'Agotado' : 'Bajo' }}
+                  </span>
+                </div>
+                @endforeach
+              @endif
+            </div>
+          </div>
+        </div>
+        @endif
+
         {{-- Campana de notificaciones con badge y dropdown --}}
         <div style="position:relative;">
           <button id="navBellBtn" onclick="toggleNotifDropdown()"
@@ -352,7 +472,7 @@
               </span>
               Validar entradas
             </a>
-            <a href="{{ route('empresa.bonos.canjear') }}"
+            <a href="{{ route('camarero.bonos.canjear') }}"
                onclick="document.getElementById('navDropdown').style.display='none'"
                style="{{ $estiloPorteroExtra }}"
                onmouseover="this.style.background='rgba(74,222,128,0.10)'"
@@ -361,6 +481,19 @@
                 🍹
               </span>
               Canjear bonos
+            </a>
+            <a href="{{ route('camarero.stock.index') }}"
+               onclick="document.getElementById('navDropdown').style.display='none'"
+               style="{{ $estiloPorteroExtra }}"
+               onmouseover="this.style.background='rgba(251,191,36,0.10)'"
+               onmouseout="this.style.background='transparent'">
+              <span style="width:26px;height:26px;border-radius:7px;background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;position:relative;">
+                🍺
+                @if($stockBajoCount > 0)
+                <span style="position:absolute;top:-5px;right:-5px;min-width:14px;height:14px;border-radius:999px;background:#fbbf24;font-size:8px;font-weight:700;color:#07060c;display:flex;align-items:center;justify-content:center;padding:0 2px;border:1.5px solid #07060c;">{{ $stockBajoCount }}</span>
+                @endif
+              </span>
+              Gestión de Stock
             </a>
             <a href="{{ route('horas.index') }}"
                onclick="document.getElementById('navDropdown').style.display='none'"
@@ -400,11 +533,24 @@
                 {{ $item }}
               </a>
             @endforeach
-            {{-- Mis horas: solo organizadores (no porteros, ya tienen su propio bloque) --}}
+            {{-- Mis horas y Canjear bonos: solo organizadores/camareros --}}
             @if($esOrganizador)
               <a href="{{ route('horas.index') }}" onclick="document.getElementById('navDropdown').style.display='none'"
                  style="display:block;padding:10px 14px;color:var(--ink);text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
                 Mis horas
+              </a>
+            @endif
+            @if($esCamarero)
+              <a href="{{ route('camarero.bonos.canjear') }}" onclick="document.getElementById('navDropdown').style.display='none'"
+                 style="display:flex;align-items:center;gap:8px;padding:10px 14px;color:#4ade80;text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">
+                🍹 Canjear bonos
+              </a>
+              <a href="{{ route('camarero.stock.index') }}" onclick="document.getElementById('navDropdown').style.display='none'"
+                 style="display:flex;align-items:center;gap:8px;padding:10px 14px;color:#fbbf24;text-decoration:none;font-size:13px;border-radius:8px;font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">
+                🍺 Gestión de Stock
+                @if($stockBajoCount > 0)
+                <span style="background:#fbbf24;color:#07060c;font-size:10px;font-weight:700;border-radius:999px;padding:1px 6px;margin-left:4px;">{{ $stockBajoCount }}</span>
+                @endif
               </a>
             @endif
             {{-- Enlace Premium con color diferenciado --}}
@@ -465,10 +611,28 @@
     @auth
       {{-- Links de usuario (solo para usuarios normales; empresa/portero ya los tienen en $navLinks) --}}
       @if($esPortero)
-        {{-- El portero tiene Mi perfil y Mis horas en el menú móvil --}}
+        {{-- El portero tiene Mi perfil, Mis horas y Gestión de Stock --}}
         <div class="mob-nav-divider"></div>
         <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
         <a href="{{ route('horas.index') }}" class="mob-nav-link">Mis horas</a>
+        <a href="{{ route('camarero.stock.index') }}" class="mob-nav-link" style="color:#fbbf24;">
+          🍺 Gestión de Stock
+          @if($stockBajoCount > 0)
+          <span style="background:#fbbf24;color:#07060c;font-size:9px;font-weight:700;border-radius:999px;padding:1px 6px;margin-left:4px;">{{ $stockBajoCount }}</span>
+          @endif
+        </a>
+      @elseif($esCamarero)
+        {{-- El camarero tiene Mi perfil, Mis horas, Canjear bonos y Gestión de Stock --}}
+        <div class="mob-nav-divider"></div>
+        <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
+        <a href="{{ route('horas.index') }}" class="mob-nav-link">Mis horas</a>
+        <a href="{{ route('camarero.bonos.canjear') }}" class="mob-nav-link" style="color:#4ade80;">🍹 Canjear bonos</a>
+        <a href="{{ route('camarero.stock.index') }}" class="mob-nav-link" style="color:#fbbf24;">
+          🍺 Gestión de Stock
+          @if($stockBajoCount > 0)
+          <span style="background:#fbbf24;color:#07060c;font-size:9px;font-weight:700;border-radius:999px;padding:1px 6px;margin-left:4px;">{{ $stockBajoCount }}</span>
+          @endif
+        </a>
       @elseif(!$esEmpresa)
         <div class="mob-nav-divider"></div>
         <a href="{{ route('perfil') }}" class="mob-nav-link">Mi perfil</a>
@@ -527,6 +691,43 @@ document.addEventListener('click', function(e) {
 
 @auth
 <script>
+/* ─── Stock de barra: dropdown del icono 🍺 ─────────────────────
+   La lista de productos ya viene renderizada en PHP (Blade) con $productosStockNav.
+   Este JS solo controla la visibilidad del panel (abre/cierra),
+   no hace ninguna petición AJAX — los datos son estáticos al cargar la página.
+   ──────────────────────────────────────────────────────────────── */
+
+var _stockAbierto = false;
+
+function toggleStockDropdown() {
+    var drop      = document.getElementById('navStockDropdown');
+    var notifDrop = document.getElementById('navNotifDropdown');
+    var avatarDrop = document.getElementById('navDropdown');
+    var cupDrop   = document.getElementById('navCuponesDropdown');
+    if (!drop) return;
+
+    // Cierra los otros dropdowns de la navbar para evitar solapamientos
+    if (notifDrop)  notifDrop.style.display  = 'none';
+    if (avatarDrop) avatarDrop.style.display = 'none';
+    if (cupDrop)    cupDrop.style.display    = 'none';
+    _notifAbierto    = false;
+    _cuponesAbierto  = false;
+
+    _stockAbierto = !_stockAbierto;
+    drop.style.display = _stockAbierto ? 'block' : 'none';
+}
+
+/* Cierra el dropdown de stock al hacer clic fuera del botón y del panel */
+document.addEventListener('click', function(e) {
+    var btn  = document.getElementById('navStockBtn');
+    var drop = document.getElementById('navStockDropdown');
+    if (!btn || !drop) return;
+    if (!btn.contains(e.target) && !drop.contains(e.target)) {
+        drop.style.display = 'none';
+        _stockAbierto = false;
+    }
+});
+
 /* ─── Cupones Premium: dropdown del icono de ticket ─────────── */
 
 var _cuponesAbierto = false;

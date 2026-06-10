@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Mail\BonoAgotado;
 use App\Models\BonoCompra;
 use App\Models\BonoConsumo;
+use App\Models\ProductoBarra;
+use App\Models\TipoBebida;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,27 +51,31 @@ class CanjeBonoController extends Controller
     /**
      * GET /empresa/bonos/canjear
      * Vista del escáner de bonos para el camarero.
+     * Pasa los tipos de bebida activos para renderizarlos dinámicamente.
      */
     public function index()
     {
         $empresa = $this->empresa();
-        return view('empresa.bonos.canjear', compact('empresa'));
+        $tipos   = TipoBebida::activos()->orderBy('nombre')->get();
+        return view('empresa.bonos.canjear', compact('empresa', 'tipos'));
     }
 
     /**
      * POST /empresa/bonos/validar-canje  (AJAX)
      *
      * Valida el QR del bono, descuenta bebidas y registra el consumo.
+     * También descuenta una unidad del stock físico de la empresa.
      * Si el bono se agota (bebidas_restantes = 0), envía email al cliente.
      */
     public function validar(Request $request): JsonResponse
     {
-        $empresa = $this->empresa();
+        // Tipos válidos: cargados dinámicamente desde tipos_bebida (no hardcoded)
+        $tiposValidos = TipoBebida::activos()->pluck('nombre')->toArray();
 
         $request->validate([
             'codigo_qr'    => ['required', 'string', 'max:255'],
             'cantidad'     => ['required', 'integer', 'min:1', 'max:10'],
-            'tipo_producto'=> ['required', 'string', 'in:Cocktail,Destilado,Sin alcohol'],
+            'tipo_producto'=> ['required', 'string', 'in:' . implode(',', $tiposValidos)],
         ]);
 
         $bono = BonoCompra::where('codigo_qr', trim($request->codigo_qr))
@@ -85,8 +91,26 @@ class CanjeBonoController extends Controller
             ], 404);
         }
 
-        // Verificar que el bono pertenece a un evento de esta empresa
-        if ($bono->evento?->organizador?->empresa_id !== $empresa->id) {
+        // empresa_id del evento: se obtiene por evento→organizador→empresa_id
+        // (organizador_id en eventos apunta al creador del evento)
+        $empresaIdDelEvento = $bono->evento?->organizador?->empresa_id;
+
+        if (!$empresaIdDelEvento) {
+            return response()->json([
+                'ok'    => false,
+                'tipo'  => 'no_autorizado',
+                'error' => 'No se pudo determinar la empresa del evento.',
+            ], 403);
+        }
+
+        // Query directa a organizadores: hasOne solo devuelve el primer registro y puede
+        // no coincidir si el usuario tiene varios roles/empresas asociadas.
+        $esCamareroDeEmpresa = \App\Models\Organizador::where('usuario_id', Auth::id())
+            ->where('empresa_id', $empresaIdDelEvento)
+            ->where('estado', 1)
+            ->exists();
+
+        if (!$esCamareroDeEmpresa) {
             return response()->json([
                 'ok'    => false,
                 'tipo'  => 'no_autorizado',
@@ -119,7 +143,7 @@ class CanjeBonoController extends Controller
         $camareroId = Auth::user()->organizador?->id;
 
         try {
-            $bonoActualizado = DB::transaction(function () use ($bono, $cantidad, $request, $camareroId) {
+            $bonoActualizado = DB::transaction(function () use ($bono, $cantidad, $request, $camareroId, $empresaIdDelEvento) {
                 // Crear un BonoConsumo por cada bebida canjeable
                 for ($i = 0; $i < $cantidad; $i++) {
                     BonoConsumo::create([
@@ -129,13 +153,44 @@ class CanjeBonoController extends Controller
                     ]);
                 }
 
-                // Descontar del saldo restante
+                // Descontar del saldo restante del bono
                 $bono->decrement('bebidas_restantes', $cantidad);
+
+                // ── Descontar stock físico de la empresa ────────────────
+                // Recogemos TODOS los empresa_id del camarero (no solo el primero que devuelve hasOne)
+                // y también añadimos el empresa_id del evento como fallback de seguridad.
+                // unique() evita duplicados si el camarero tiene varios registros en la misma empresa.
+                $empresaIdsCamarero = \App\Models\Organizador::where('usuario_id', Auth::user()->id)
+                    ->where('estado', 1)
+                    ->pluck('empresa_id')
+                    ->push($empresaIdDelEvento)   // añade empresa del evento como fallback
+                    ->unique()
+                    ->values();
+
+                // Elegimos el producto del tipo correcto con MÁS stock (orderByDesc)
+                // para minimizar el riesgo de dejar otro producto a 0 antes de tiempo.
+                $productoStock = ProductoBarra::whereIn('empresa_id', $empresaIdsCamarero)
+                    ->where('tipo_producto', $request->tipo_producto)
+                    ->orderByDesc('stock')
+                    ->first();
+
+                if ($productoStock) {
+                    // GREATEST(0, ...) evita que el stock quede negativo en la BD
+                    DB::table('productos_barra')
+                        ->where('id', $productoStock->id)
+                        ->update([
+                            'stock' => DB::raw('GREATEST(0, stock - ' . (int) $cantidad . ')'),
+                        ]);
+                } else {
+                    // El tipo de bebida no tiene producto registrado en el stock: solo se registra
+                    Log::info('Canje sin producto de stock: empresas=[' . $empresaIdsCamarero->implode(',') . '], tipo=' . $request->tipo_producto);
+                }
+
                 $bono->refresh();
                 return $bono;
             });
 
-            // Enviar email si el bono se ha agotado
+            // Email de aviso al cliente si el bono llega a 0 bebidas
             if ($bonoActualizado->bebidas_restantes === 0) {
                 try {
                     Mail::to($bono->usuario?->email)->send(new BonoAgotado($bonoActualizado));

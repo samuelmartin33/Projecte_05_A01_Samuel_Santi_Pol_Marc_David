@@ -117,8 +117,8 @@
               </div>
             @endif
 
-            <p style="font-size:11px;color:rgba(148,163,184,0.5);margin:12px 0 0;font-family:monospace;">
-              {{ substr($bono->codigo_qr, 0, 18) }}…
+            <p style="font-size:11px;color:rgba(148,163,184,0.5);margin:12px 0 0;font-family:monospace;word-break:break-all;">
+              {{ $bono->codigo_qr }}
             </p>
             <p style="font-size:11px;color:rgba(148,163,184,0.4);margin:6px 0 0;font-family:Arial,sans-serif;">
               Si no se muestra el QR, está adjunto en este correo como imagen.

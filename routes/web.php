@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\CancionController as AdminCancionController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\BonoController;
 use App\Http\Controllers\Empresa\CanjeBonoController;
+use App\Http\Controllers\Empresa\ProductoBarraController;
 use App\Http\Controllers\CuponController;
 use App\Http\Controllers\EventoController as PublicEventoController;
 use App\Http\Controllers\Empresa\CandidaturasController;
@@ -275,10 +276,22 @@ Route::middleware('auth')->prefix('empresa/validacion')->name('empresa.validacio
     Route::post('/validar', [ValidacionQRController::class, 'validar'])->name('validar');
 });
 
-/* — Canje de bonos de bebidas (accesible también a porteros/camareros) — */
-Route::middleware('auth')->prefix('empresa/bonos')->name('empresa.bonos.')->group(function () {
-    Route::get('/canjear',        [CanjeBonoController::class, 'index'])  ->name('canjear');
+/* — Canje de bonos de bebidas (camarero y portero, sin prefijo empresa) — */
+Route::middleware('auth')->prefix('camarero')->name('camarero.bonos.')->group(function () {
+    Route::get('/canjear-bonos',  [CanjeBonoController::class, 'index'])  ->name('canjear');
     Route::post('/validar-canje', [CanjeBonoController::class, 'validar'])->name('validar-canje');
+});
+
+/* — Gestión de stock de barra (camarero y empresa) — */
+Route::middleware('auth')->prefix('camarero/stock')->name('camarero.stock.')->group(function () {
+    Route::get('/',                           [ProductoBarraController::class, 'index'])      ->name('index');
+    Route::post('/',                          [ProductoBarraController::class, 'store'])      ->name('store');
+    Route::put('/{id}',                       [ProductoBarraController::class, 'update'])     ->name('update')  ->where('id', '[0-9]+');
+    Route::delete('/{id}',                    [ProductoBarraController::class, 'destroy'])    ->name('destroy') ->where('id', '[0-9]+');
+    Route::post('/{id}/pedido',                          [ProductoBarraController::class, 'crearPedido'])             ->name('pedido')          ->where('id', '[0-9]+');
+    Route::post('/pedidos/{pedidoId}/crear-payment-intent', [ProductoBarraController::class, 'crearPaymentIntentPedido'])->name('pedido.payment-intent')->where('pedidoId', '[0-9]+');
+    Route::post('/pedidos/{pedidoId}/confirmar-pago',    [ProductoBarraController::class, 'confirmarPagoPedido'])    ->name('pedido.confirmar')    ->where('pedidoId', '[0-9]+');
+    Route::get('/alertas',                               [ProductoBarraController::class, 'alertas'])               ->name('alertas');
 });
 
 /* — Facturación de empresa — */

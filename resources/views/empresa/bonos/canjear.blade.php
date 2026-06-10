@@ -23,17 +23,13 @@
     <div class="canje-card" id="panel-seleccion">
         <div class="canje-card__titulo">① Elige la bebida</div>
 
-        {{-- Tipo de bebida --}}
+        {{-- Tipos de bebida: cargados dinámicamente desde la BD --}}
         <div class="tipo-grid">
-            <button class="tipo-btn" onclick="seleccionarTipo('Cocktail', this)">
-                🍸<br>Cocktail
+            @foreach($tipos as $tipo)
+            <button class="tipo-btn" onclick="seleccionarTipo('{{ addslashes($tipo->nombre) }}', this)">
+                {{ $tipo->icono }}<br>{{ $tipo->nombre }}
             </button>
-            <button class="tipo-btn" onclick="seleccionarTipo('Destilado', this)">
-                🥃<br>Destilado
-            </button>
-            <button class="tipo-btn" onclick="seleccionarTipo('Sin alcohol', this)">
-                🧃<br>Sin alcohol
-            </button>
+            @endforeach
         </div>
 
         {{-- Cantidad --}}
@@ -107,7 +103,7 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 window.canjeData = {
-    urlValidar: '{{ route('empresa.bonos.validar-canje') }}',
+    urlValidar: '{{ route('camarero.bonos.validar-canje') }}',
     csrf: '{{ csrf_token() }}',
 };
 </script>
